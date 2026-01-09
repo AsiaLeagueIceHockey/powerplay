@@ -3,6 +3,7 @@ import { getMessages, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing, type Locale } from "@/i18n/routing";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Metadata } from "next";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,6 +17,57 @@ const geistMono = Geist_Mono({
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
+}
+
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://powerplay.vercel.app";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+
+  const title = locale === "ko" ? "파워플레이 - 아이스하키 경기 매칭" : "Power Play - Ice Hockey Match Management";
+  const description =
+    locale === "ko"
+      ? "아이스하키 동호회 경기 운영 및 용병 매칭 관리 플랫폼"
+      : "Ice hockey club match management and player matching platform";
+
+  return {
+    title: {
+      default: title,
+      template: `%s | ${locale === "ko" ? "파워플레이" : "Power Play"}`,
+    },
+    description,
+    metadataBase: new URL(siteUrl),
+    openGraph: {
+      title,
+      description,
+      url: siteUrl,
+      siteName: "Power Play",
+      images: [
+        {
+          url: `/api/og?title=${encodeURIComponent(title)}`,
+          width: 1200,
+          height: 630,
+          alt: "Power Play - Ice Hockey Match Management",
+        },
+      ],
+      locale: locale === "ko" ? "ko_KR" : "en_US",
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [`/api/og?title=${encodeURIComponent(title)}`],
+    },
+    robots: {
+      index: true,
+      follow: true,
+    },
+  };
 }
 
 export default async function LocaleLayout({

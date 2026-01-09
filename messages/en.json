@@ -54,7 +54,10 @@
         "join": "Join",
         "cancel": "Cancel",
         "details": "Details",
-        "spots": "{count} spots"
+        "spots": "{count} spots",
+        "viewMap": "View Map",
+        "noParticipants": "No participants",
+        "confirmCancel": "Are you sure you want to cancel?"
     },
     "participant": {
         "status": {
@@ -66,6 +69,48 @@
         "payment": {
             "paid": "Paid",
             "unpaid": "Unpaid"
+        }
+    },
+    "mypage": {
+        "title": "My Page",
+        "subtitle": "My match applications",
+        "noMatches": "No matches applied yet",
+        "browseMatches": "Browse matches"
+    },
+    "admin": {
+        "matches": {
+            "title": "Match Management",
+            "create": "Create Match",
+            "noMatches": "No matches registered",
+            "rink": "Rink",
+            "date": "Date",
+            "status": "Status",
+            "participants": "Participants",
+            "actions": "Actions",
+            "edit": "Edit",
+            "backToList": "Back to list",
+            "createNew": "Create New Match"
+        },
+        "form": {
+            "rink": "Rink",
+            "selectRink": "Select a rink",
+            "dateTime": "Date & Time",
+            "fee": "Fee (KRW)",
+            "maxFw": "Max FW",
+            "maxDf": "Max DF",
+            "maxG": "Max G",
+            "description": "Description",
+            "descriptionPlaceholder": "Enter additional info about the match...",
+            "create": "Create Match",
+            "creating": "Creating...",
+            "save": "Save",
+            "saving": "Saving...",
+            "status": "Status"
+        },
+        "participants": {
+            "title": "Participants",
+            "noParticipants": "No participants yet",
+            "togglePayment": "Toggle payment status"
         }
     }
 }

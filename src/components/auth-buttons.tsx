@@ -47,7 +47,7 @@ export function AuthButtons() {
     return (
       <div className="flex items-center gap-3">
         <Link
-          href="/profile"
+          href="/mypage"
           className="text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
         >
           {user.email?.split("@")[0]}
