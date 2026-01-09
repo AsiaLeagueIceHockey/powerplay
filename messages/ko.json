@@ -1,0 +1,45 @@
+{
+    "common": {
+        "appName": "파워플레이",
+        "login": "로그인",
+        "logout": "로그아웃",
+        "signup": "회원가입",
+        "profile": "프로필",
+        "myPage": "마이페이지",
+        "admin": "관리자"
+    },
+    "home": {
+        "title": "경기 목록",
+        "subtitle": "다가오는 아이스하키 경기에 참가하세요",
+        "noMatches": "예정된 경기가 없습니다"
+    },
+    "match": {
+        "status": {
+            "open": "모집중",
+            "closed": "마감",
+            "canceled": "취소됨"
+        },
+        "position": {
+            "FW": "포워드",
+            "DF": "디펜스",
+            "G": "골리"
+        },
+        "fee": "참가비",
+        "remaining": "잔여석",
+        "join": "참가 신청",
+        "cancel": "신청 취소",
+        "details": "상세 정보"
+    },
+    "participant": {
+        "status": {
+            "applied": "신청 완료",
+            "confirmed": "확정",
+            "waiting": "대기",
+            "canceled": "취소됨"
+        },
+        "payment": {
+            "paid": "입금 완료",
+            "unpaid": "미입금"
+        }
+    }
+}

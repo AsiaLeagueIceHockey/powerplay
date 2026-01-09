@@ -1,0 +1,45 @@
+{
+    "common": {
+        "appName": "Power Play",
+        "login": "Login",
+        "logout": "Logout",
+        "signup": "Sign Up",
+        "profile": "Profile",
+        "myPage": "My Page",
+        "admin": "Admin"
+    },
+    "home": {
+        "title": "Matches",
+        "subtitle": "Join upcoming ice hockey games",
+        "noMatches": "No matches scheduled"
+    },
+    "match": {
+        "status": {
+            "open": "Open",
+            "closed": "Closed",
+            "canceled": "Canceled"
+        },
+        "position": {
+            "FW": "Forward",
+            "DF": "Defense",
+            "G": "Goalie"
+        },
+        "fee": "Fee",
+        "remaining": "Spots left",
+        "join": "Join",
+        "cancel": "Cancel",
+        "details": "Details"
+    },
+    "participant": {
+        "status": {
+            "applied": "Applied",
+            "confirmed": "Confirmed",
+            "waiting": "Waiting",
+            "canceled": "Canceled"
+        },
+        "payment": {
+            "paid": "Paid",
+            "unpaid": "Unpaid"
+        }
+    }
+}
