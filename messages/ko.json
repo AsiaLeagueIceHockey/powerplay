@@ -13,6 +13,31 @@
         "subtitle": "다가오는 아이스하키 경기에 참가하세요",
         "noMatches": "예정된 경기가 없습니다"
     },
+    "auth": {
+        "login": "로그인",
+        "signup": "회원가입",
+        "logout": "로그아웃",
+        "email": "이메일",
+        "password": "비밀번호",
+        "confirmPassword": "비밀번호 확인",
+        "fullName": "이름",
+        "loading": "처리 중...",
+        "noAccount": "계정이 없으신가요?",
+        "hasAccount": "이미 계정이 있으신가요?",
+        "checkEmail": "이메일을 확인하세요",
+        "confirmationSent": "가입 확인 이메일을 발송했습니다. 이메일을 확인해주세요.",
+        "passwordMismatch": "비밀번호가 일치하지 않습니다"
+    },
+    "profile": {
+        "title": "프로필",
+        "email": "이메일",
+        "fullName": "이름",
+        "position": "포지션",
+        "preferredLang": "선호 언어",
+        "save": "저장",
+        "saving": "저장 중...",
+        "saved": "저장되었습니다"
+    },
     "match": {
         "status": {
             "open": "모집중",
@@ -28,7 +53,8 @@
         "remaining": "잔여석",
         "join": "참가 신청",
         "cancel": "신청 취소",
-        "details": "상세 정보"
+        "details": "상세 정보",
+        "spots": "{count}석"
     },
     "participant": {
         "status": {

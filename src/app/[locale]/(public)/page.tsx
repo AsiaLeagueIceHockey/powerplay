@@ -1,4 +1,6 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { getMatches } from "@/app/actions/match";
+import { MatchCard } from "@/components/match-card";
 
 export default async function HomePage({
   params,
@@ -7,9 +9,9 @@ export default async function HomePage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  
-  // Use getTranslations for async server components
+
   const t = await getTranslations("home");
+  const matches = await getMatches();
 
   return (
     <div className="flex flex-col gap-8">
@@ -23,13 +25,17 @@ export default async function HomePage({
         </p>
       </section>
 
-      {/* Matches List Placeholder */}
+      {/* Matches List */}
       <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <div className="rounded-lg border border-zinc-200 p-6 dark:border-zinc-800">
-          <p className="text-center text-zinc-500 dark:text-zinc-400">
-            {t("noMatches")}
-          </p>
-        </div>
+        {matches.length === 0 ? (
+          <div className="col-span-full rounded-lg border border-zinc-200 p-6 dark:border-zinc-800">
+            <p className="text-center text-zinc-500 dark:text-zinc-400">
+              {t("noMatches")}
+            </p>
+          </div>
+        ) : (
+          matches.map((match) => <MatchCard key={match.id} match={match} />)
+        )}
       </section>
     </div>
   );

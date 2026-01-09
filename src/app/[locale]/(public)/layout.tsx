@@ -1,7 +1,7 @@
 import { Link } from "@/i18n/navigation";
-import { useTranslations } from "next-intl";
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { AuthButtons } from "@/components/auth-buttons";
 
 export default async function PublicLayout({
   children,
@@ -12,6 +12,7 @@ export default async function PublicLayout({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  const t = await getTranslations("common");
 
   return (
     <div className="min-h-screen">
@@ -26,6 +27,7 @@ export default async function PublicLayout({
           {/* Navigation */}
           <nav className="flex items-center gap-4">
             <LanguageSwitcher />
+            <AuthButtons />
           </nav>
         </div>
       </header>

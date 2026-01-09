@@ -13,6 +13,31 @@
         "subtitle": "Join upcoming ice hockey games",
         "noMatches": "No matches scheduled"
     },
+    "auth": {
+        "login": "Log In",
+        "signup": "Sign Up",
+        "logout": "Log Out",
+        "email": "Email",
+        "password": "Password",
+        "confirmPassword": "Confirm Password",
+        "fullName": "Full Name",
+        "loading": "Loading...",
+        "noAccount": "Don't have an account?",
+        "hasAccount": "Already have an account?",
+        "checkEmail": "Check your email",
+        "confirmationSent": "We've sent you a confirmation email. Please check your inbox.",
+        "passwordMismatch": "Passwords do not match"
+    },
+    "profile": {
+        "title": "Profile",
+        "email": "Email",
+        "fullName": "Full Name",
+        "position": "Position",
+        "preferredLang": "Preferred Language",
+        "save": "Save",
+        "saving": "Saving...",
+        "saved": "Saved successfully"
+    },
     "match": {
         "status": {
             "open": "Open",
@@ -28,7 +53,8 @@
         "remaining": "Spots left",
         "join": "Join",
         "cancel": "Cancel",
-        "details": "Details"
+        "details": "Details",
+        "spots": "{count} spots"
     },
     "participant": {
         "status": {
