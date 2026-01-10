@@ -42,6 +42,10 @@ export async function generateMetadata({
     },
     description,
     metadataBase: new URL(siteUrl),
+    icons: {
+      icon: "/favicon.png",
+      apple: "/favicon.png",
+    },
     openGraph: {
       title,
       description,
@@ -49,7 +53,7 @@ export async function generateMetadata({
       siteName: "Power Play",
       images: [
         {
-          url: `/api/og?title=${encodeURIComponent(title)}`,
+          url: "/og-image.png",
           width: 1200,
           height: 630,
           alt: "Power Play - Ice Hockey Match Management",
@@ -62,7 +66,7 @@ export async function generateMetadata({
       card: "summary_large_image",
       title,
       description,
-      images: [`/api/og?title=${encodeURIComponent(title)}`],
+      images: ["/og-image.png"],
     },
     robots: {
       index: true,
