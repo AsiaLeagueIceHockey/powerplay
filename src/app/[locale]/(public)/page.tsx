@@ -2,6 +2,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { getMatches } from "@/app/actions/match";
 import { MatchCard } from "@/components/match-card";
 import { DateFilter } from "@/components/date-filter";
+import { FeedbackBanner } from "@/components/feedback-banner";
 import { Suspense } from "react";
 
 export default async function HomePage({
@@ -41,6 +42,9 @@ export default async function HomePage({
           {t("subtitle")}
         </p>
       </section>
+
+      {/* Feedback Banner */}
+      <FeedbackBanner />
 
       {/* Date Filter */}
       <Suspense fallback={<div className="h-16" />}>
