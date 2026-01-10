@@ -27,7 +27,7 @@ export default async function MatchPage({
     notFound();
   }
 
-  // Format Date Logic
+  // Format Date Logic (KST)
   const date = new Date(match.start_time);
   const dateStr =
     locale === "ko"
@@ -36,17 +36,20 @@ export default async function MatchPage({
           month: "long",
           day: "numeric",
           weekday: "long",
+          timeZone: "Asia/Seoul",
         })
       : date.toLocaleDateString("en-US", {
           weekday: "long",
           year: "numeric",
           month: "long",
           day: "numeric",
+          timeZone: "Asia/Seoul",
         });
 
   const timeStr = date.toLocaleTimeString(locale === "ko" ? "ko-KR" : "en-US", {
     hour: "numeric",
     minute: "2-digit",
+    timeZone: "Asia/Seoul",
   });
 
   // Participant Lists (filtered by active status)
