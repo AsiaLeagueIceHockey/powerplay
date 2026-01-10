@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { routing, type Locale } from "@/i18n/routing";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Metadata } from "next";
+import { ScrollToTop } from "@/components/scroll-to-top";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,7 +32,7 @@ export async function generateMetadata({
   const title = locale === "ko" ? "파워플레이 - 아이스하키 경기 매칭" : "Power Play - Ice Hockey Match Management";
   const description =
     locale === "ko"
-      ? "아이스하키 동호회 경기 운영 및 용병 매칭 관리 플랫폼"
+      ? "아이스하키 동호회 경기 운영 및 게스트 매칭 관리 플랫폼"
       : "Ice hockey club match management and player matching platform";
 
   return {
@@ -93,6 +94,7 @@ export default async function LocaleLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100`}
       >
         <NextIntlClientProvider messages={messages}>
+          <ScrollToTop />
           {children}
         </NextIntlClientProvider>
       </body>

@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Power Play | 파워플레이",
-  description: "아이스하키 동호회 경기 운영 & 용병 매칭 관리 플랫폼",
+  description: "아이스하키 동호회 경기 운영 & 게스트 매칭 관리 플랫폼",
 };
 
 export default function RootLayout({

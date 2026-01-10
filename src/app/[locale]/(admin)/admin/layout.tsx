@@ -1,5 +1,7 @@
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
+import { createClient } from "@/lib/supabase/server";
+import { AdminUserMenu } from "@/components/admin-user-menu";
 
 export default async function AdminLayout({
   children,
@@ -11,18 +13,24 @@ export default async function AdminLayout({
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("admin");
+  
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   return (
     <div className="min-h-screen bg-zinc-900 text-zinc-100">
       {/* Mobile Header */}
       <header className="sticky top-0 z-50 flex items-center justify-between border-b border-zinc-800 bg-zinc-900/95 px-4 py-3 backdrop-blur md:hidden">
         <span className="text-lg font-bold">🏒 파워플레이 관리자</span>
+        <AdminUserMenu user={user} locale={locale} />
       </header>
 
       <div className="flex flex-col md:flex-row">
         {/* Desktop Sidebar - Hidden on mobile */}
         <aside className="hidden w-64 shrink-0 border-r border-zinc-800 bg-zinc-950 p-4 md:block md:min-h-screen">
-          <div className="mb-8">
+          <div className="mb-8 flex items-center justify-between">
             <span className="text-xl font-bold">🏒 파워플레이 관리자</span>
           </div>
           <nav className="space-y-1">
@@ -39,6 +47,13 @@ export default async function AdminLayout({
               🏟️ 링크 관리
             </Link>
           </nav>
+          
+          {/* User Menu at bottom of sidebar */}
+          <div className="absolute bottom-4 left-4 right-4">
+            <div className="border-t border-zinc-800 pt-4">
+              <AdminUserMenu user={user} locale={locale} />
+            </div>
+          </div>
         </aside>
 
         {/* Main Content */}
@@ -65,5 +80,3 @@ export default async function AdminLayout({
     </div>
   );
 }
-
-

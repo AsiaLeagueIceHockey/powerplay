@@ -44,7 +44,7 @@ export async function createMatch(formData: FormData) {
   }
 
   const rinkId = formData.get("rink_id") as string;
-  const startTime = formData.get("start_time") as string;
+  const startTimeInput = formData.get("start_time") as string;
   const fee = parseInt(formData.get("fee") as string) || 0;
   const maxFw = parseInt(formData.get("max_fw") as string) || 8;
   const maxDf = parseInt(formData.get("max_df") as string) || 4;
@@ -52,11 +52,15 @@ export async function createMatch(formData: FormData) {
   const description = formData.get("description") as string;
   const bankAccount = formData.get("bank_account") as string;
 
+  // datetime-local 입력은 KST로 가정, UTC로 변환하여 저장
+  // 입력: "2026-01-11T00:00" (KST) → 저장: "2026-01-10T15:00:00.000Z" (UTC)
+  const startTimeUTC = new Date(startTimeInput + "+09:00").toISOString();
+
   const { data, error } = await supabase
     .from("matches")
     .insert({
       rink_id: rinkId || null,
-      start_time: startTime,
+      start_time: startTimeUTC,
       fee,
       max_fw: maxFw,
       max_df: maxDf,
@@ -102,7 +106,7 @@ export async function updateMatch(matchId: string, formData: FormData) {
   }
 
   const rinkId = formData.get("rink_id") as string;
-  const startTime = formData.get("start_time") as string;
+  const startTimeInput = formData.get("start_time") as string;
   const fee = parseInt(formData.get("fee") as string) || 0;
   const maxFw = parseInt(formData.get("max_fw") as string) || 8;
   const maxDf = parseInt(formData.get("max_df") as string) || 4;
@@ -111,11 +115,14 @@ export async function updateMatch(matchId: string, formData: FormData) {
   const bankAccount = formData.get("bank_account") as string;
   const status = formData.get("status") as string;
 
+  // datetime-local 입력은 KST로 가정, UTC로 변환하여 저장
+  const startTimeUTC = new Date(startTimeInput + "+09:00").toISOString();
+
   const { error } = await supabase
     .from("matches")
     .update({
       rink_id: rinkId || null,
-      start_time: startTime,
+      start_time: startTimeUTC,
       fee,
       max_fw: maxFw,
       max_df: maxDf,

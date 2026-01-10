@@ -20,7 +20,7 @@ export default async function AboutPage({
         </h1>
         <p className="text-xl text-zinc-600 dark:text-zinc-400">
           {isKo 
-            ? "아이스하키 동호회 경기 운영 & 용병 매칭 플랫폼"
+            ? "아이스하키 동호회 경기 운영 & 게스트 매칭 플랫폼"
             : "Ice Hockey Club Match Management & Mercenary Matching Platform"}
         </p>
       </section>
@@ -60,7 +60,7 @@ export default async function AboutPage({
             </h3>
             <p className="text-sm text-red-600 dark:text-red-300">
               {isKo 
-                ? "한국어 공지를 이해하지 못하는 외국인 용병/멤버"
+                ? "한국어 공지를 이해하지 못하는 외국인 게스트/멤버"
                 : "Foreign players who can't understand Korean announcements"}
             </p>
           </div>
