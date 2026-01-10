@@ -58,6 +58,27 @@ date.toLocaleDateString("ko-KR", {
 - 새 칼럼 추가 시 `schema_changes.sql`에 기록
 - 운영 DB에 수동 실행 필요 (Supabase Dashboard SQL Editor)
 
+### 5. 경기 시간 저장 (KST → UTC)
+- `datetime-local` 입력값은 KST로 가정
+- 저장 시 UTC로 변환: `new Date(input + "+09:00").toISOString()`
+
+### 6. 병렬 데이터 페칭 (성능 최적화)
+- **독립적인 데이터는 `Promise.all()`로 병렬 실행**
+- 의존 관계가 있는 쿼리만 순차 실행
+
+예시:
+```typescript
+// ✅ 병렬 실행 (권장)
+const [t, allMatches] = await Promise.all([
+  getTranslations("home"),
+  getMatches(),
+]);
+
+// ❌ 순차 실행 (느림)
+const t = await getTranslations("home");
+const allMatches = await getMatches();
+```
+
 ---
 
 ## 📁 프로젝트 구조

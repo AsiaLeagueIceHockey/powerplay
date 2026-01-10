@@ -12,13 +12,15 @@ export default async function PublicLayout({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const t = await getTranslations("common");
+  
+  // 병렬 데이터 페칭
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const [, { data: { user } }] = await Promise.all([
+    getTranslations("common"),
+    supabase.auth.getUser(),
+  ]);
 
-  // Check if user is admin
+  // user 정보가 필요한 쿼리는 순차 실행 (의존 관계)
   let isAdmin = false;
   if (user) {
     const { data: profile } = await supabase

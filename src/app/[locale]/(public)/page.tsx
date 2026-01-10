@@ -16,8 +16,11 @@ export default async function HomePage({
   const { date: selectedDate } = await searchParams;
   setRequestLocale(locale);
 
-  const t = await getTranslations("home");
-  const allMatches = await getMatches();
+  // 병렬 데이터 페칭
+  const [t, allMatches] = await Promise.all([
+    getTranslations("home"),
+    getMatches(),
+  ]);
 
   // Filter matches by selected date (KST)
   const filteredMatches = selectedDate

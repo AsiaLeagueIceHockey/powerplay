@@ -12,12 +12,13 @@ export default async function AdminLayout({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const t = await getTranslations("admin");
   
+  // 병렬 데이터 페칭
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const [, { data: { user } }] = await Promise.all([
+    getTranslations("admin"),
+    supabase.auth.getUser(),
+  ]);
 
   return (
     <div className="min-h-screen bg-zinc-900 text-zinc-100">
