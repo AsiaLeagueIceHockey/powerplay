@@ -9,9 +9,9 @@ export async function middleware(request: NextRequest) {
   // First, update Supabase session
   const supabaseResponse = await updateSession(request);
 
-  // Check if the request is for an admin route
+  // Check if the request is for an admin route (but not admin-apply)
   const pathname = request.nextUrl.pathname;
-  const isAdminRoute = pathname.includes("/admin");
+  const isAdminRoute = pathname.includes("/admin") && !pathname.includes("/admin-apply");
 
   if (isAdminRoute) {
     const isAdmin = await checkAdminAccess(request);

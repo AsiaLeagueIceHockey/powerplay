@@ -42,7 +42,8 @@
         "status": {
             "open": "Open",
             "closed": "Closed",
-            "canceled": "Canceled"
+            "canceled": "Canceled",
+            "finished": "Finished"
         },
         "position": {
             "FW": "Forward",
@@ -101,6 +102,8 @@
             "maxG": "Max G",
             "description": "Description",
             "descriptionPlaceholder": "Enter additional info about the match...",
+            "bankAccount": "Bank Account",
+            "bankAccountPlaceholder": "Bank Name Account Number Account Holder",
             "create": "Create Match",
             "creating": "Creating...",
             "save": "Save",

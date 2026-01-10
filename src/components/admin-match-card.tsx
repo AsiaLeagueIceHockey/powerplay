@@ -35,25 +35,29 @@ export function AdminMatchCard({
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    if (locale === "ko") {
-      return date.toLocaleDateString("ko-KR", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-        weekday: "short",
-        hour: "2-digit",
-        minute: "2-digit",
-      });
-    }
-    return date.toLocaleDateString("en-US", {
+    const dateFormatter = new Intl.DateTimeFormat(locale === "ko" ? "ko-KR" : "en-US", {
       year: "numeric",
-      month: "short",
+      month: locale === "ko" ? "long" : "short",
       day: "numeric",
       weekday: "short",
+      timeZone: "Asia/Seoul",
+    });
+    const timeFormatter = new Intl.DateTimeFormat(locale === "ko" ? "ko-KR" : "en-US", {
       hour: "2-digit",
       minute: "2-digit",
+      hour12: false,
+      timeZone: "Asia/Seoul",
     });
+    return `${dateFormatter.format(date)} ${timeFormatter.format(date)}`;
   };
+
+  // KST 기준 과거 경기 체크
+  const startDate = new Date(match.start_time);
+  const now = new Date();
+  const isPastMatch = startDate < now;
+
+  // 과거 경기면 'finished'로 오버라이드
+  const displayStatus = isPastMatch ? 'finished' : match.status;
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -63,8 +67,25 @@ export function AdminMatchCard({
         return "bg-zinc-700 text-zinc-300 border border-zinc-600";
       case "canceled":
         return "bg-red-900/50 text-red-300 border border-red-800";
+      case "finished":
+        return "bg-gray-700 text-gray-300 border border-gray-600";
       default:
         return "bg-zinc-700 text-zinc-300";
+    }
+  };
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case "open":
+        return locale === "ko" ? "모집중" : "Open";
+      case "closed":
+        return locale === "ko" ? "마감" : "Closed";
+      case "canceled":
+        return locale === "ko" ? "취소됨" : "Canceled";
+      case "finished":
+        return locale === "ko" ? "경기완료" : "Finished";
+      default:
+        return status;
     }
   };
 
@@ -83,14 +104,10 @@ export function AdminMatchCard({
         </div>
         <span
           className={`px-2.5 py-1 rounded-md text-xs font-semibold ${getStatusColor(
-            match.status
+            displayStatus
           )}`}
         >
-          {match.status === "open"
-            ? "모집중"
-            : match.status === "closed"
-            ? "마감"
-            : "취소됨"}
+          {getStatusText(displayStatus)}
         </span>
       </div>
 

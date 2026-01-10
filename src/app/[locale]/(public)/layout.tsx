@@ -18,20 +18,31 @@ export default async function PublicLayout({
     data: { user },
   } = await supabase.auth.getUser();
 
+  // Check if user is admin
+  let isAdmin = false;
+  if (user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+    isAdmin = profile?.role === "admin";
+  }
+
   return (
     <div className="min-h-screen">
       {/* Header / GNB */}
       <header className="sticky top-0 z-50 w-full border-b border-zinc-200 bg-white/80 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-950/80">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           {/* Logo - Left */}
-          <Link href={`/${locale}`} className="flex items-center gap-2">
+          <a href={`/${locale}`} className="flex items-center gap-2">
             <span className="text-xl font-bold tracking-tight">
               🏒 Power Play
             </span>
-          </Link>
+          </a>
 
           {/* User Menu - Right */}
-          <UserHeaderMenu user={user} locale={locale} />
+          <UserHeaderMenu user={user} locale={locale} isAdmin={isAdmin} />
         </div>
       </header>
 
@@ -40,3 +51,4 @@ export default async function PublicLayout({
     </div>
   );
 }
+

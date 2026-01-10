@@ -42,7 +42,8 @@
         "status": {
             "open": "모집중",
             "closed": "마감",
-            "canceled": "취소됨"
+            "canceled": "취소됨",
+            "finished": "경기완료"
         },
         "position": {
             "FW": "포워드",
@@ -101,6 +102,8 @@
             "maxG": "최대 G",
             "description": "설명",
             "descriptionPlaceholder": "경기에 대한 추가 정보를 입력하세요...",
+            "bankAccount": "입금 계좌",
+            "bankAccountPlaceholder": "은행명 계좌번호 예금주 (예: 카카오뱅크 3333-01-1234567 홍길동)",
             "create": "경기 생성",
             "creating": "생성 중...",
             "save": "저장",

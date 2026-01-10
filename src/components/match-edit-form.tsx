@@ -20,6 +20,7 @@ interface Match {
   max_g: number;
   status: "open" | "closed" | "canceled";
   description: string | null;
+  bank_account?: string | null;
   rink: Rink | null;
 }
 
@@ -36,10 +37,21 @@ export function MatchEditForm({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Format datetime for input
+  // Format datetime for input (KST)
   const formatDateTimeLocal = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toISOString().slice(0, 16);
+    // KST로 변환 (브라우저 로컬 시간과 무관하게 KST 기준)
+    const kstFormatter = new Intl.DateTimeFormat("sv-SE", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+      timeZone: "Asia/Seoul",
+    });
+    // sv-SE 로케일은 "YYYY-MM-DD HH:mm" 형식으로 출력
+    return kstFormatter.format(date).replace(" ", "T");
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -131,6 +143,20 @@ export function MatchEditForm({
           defaultValue={match.fee}
           min={0}
           className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+        />
+      </div>
+
+      {/* Bank Account */}
+      <div>
+        <label className="block text-sm font-medium mb-2 text-zinc-300">
+          {t("admin.form.bankAccount")}
+        </label>
+        <input
+          type="text"
+          name="bank_account"
+          defaultValue={match.bank_account || ""}
+          className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+          placeholder={t("admin.form.bankAccountPlaceholder")}
         />
       </div>
 

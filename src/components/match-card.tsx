@@ -13,20 +13,31 @@ export function MatchCard({ match }: { match: Match }) {
     month: "short",
     day: "numeric",
     weekday: "short",
+    timeZone: "Asia/Seoul",
   });
   const timeFormatter = new Intl.DateTimeFormat(locale, {
     hour: "2-digit",
     minute: "2-digit",
+    hour12: false,
+    timeZone: "Asia/Seoul",
   });
 
   const startDate = new Date(match.start_time);
   const formattedDate = dateFormatter.format(startDate);
   const formattedTime = timeFormatter.format(startDate);
 
-  const statusColors = {
+  // KST 기준 과거 경기 체크
+  const now = new Date();
+  const isPastMatch = startDate < now;
+
+  // 과거 경기면 'finished'로 오버라이드
+  const displayStatus = isPastMatch ? 'finished' : match.status;
+
+  const statusColors: Record<string, string> = {
     open: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
     closed: "bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-400",
     canceled: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
+    finished: "bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-400",
   };
 
   const counts = match.participants_count || { fw: 0, df: 0, g: 0 };
@@ -37,7 +48,7 @@ export function MatchCard({ match }: { match: Match }) {
   return (
     <Link
       href={`/match/${match.id}`}
-      className="group block rounded-lg border border-zinc-200 bg-white p-5 transition-shadow hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900"
+      className="group block rounded-lg border border-zinc-200 bg-white p-4 transition-shadow hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900"
     >
       {/* Header: Date & Status */}
       <div className="mb-3 flex items-center justify-between">
@@ -45,9 +56,9 @@ export function MatchCard({ match }: { match: Match }) {
           {formattedDate} · {formattedTime}
         </div>
         <span
-          className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColors[match.status]}`}
+          className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColors[displayStatus]}`}
         >
-          {t(`status.${match.status}`)}
+          {t(`status.${displayStatus}`)}
         </span>
       </div>
 

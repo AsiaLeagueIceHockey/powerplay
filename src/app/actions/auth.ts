@@ -2,10 +2,13 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 
 export async function signUp(formData: FormData) {
   const supabase = await createClient();
+  const headersList = await headers();
+  const origin = headersList.get("origin") || "http://localhost:3000";
 
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
@@ -18,6 +21,7 @@ export async function signUp(formData: FormData) {
       data: {
         full_name: fullName,
       },
+      emailRedirectTo: `${origin}/ko/auth/callback`,
     },
   });
 
@@ -110,3 +114,55 @@ export async function updateProfile(formData: FormData) {
   revalidatePath("/profile", "page");
   return { success: true };
 }
+
+// 관리자 신청
+export async function applyForAdmin() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "Not authenticated" };
+  }
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({ role: "admin" })
+    .eq("id", user.id);
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  revalidatePath("/", "layout");
+  return { success: true };
+}
+
+// 회원 탈퇴 (Soft Delete)
+export async function deleteAccount() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "Not authenticated" };
+  }
+
+  // Soft delete: deleted_at 타임스탬프 설정
+  const { error } = await supabase
+    .from("profiles")
+    .update({ deleted_at: new Date().toISOString() })
+    .eq("id", user.id);
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  // 로그아웃 처리
+  await supabase.auth.signOut();
+  revalidatePath("/", "layout");
+  redirect("/");
+}
+

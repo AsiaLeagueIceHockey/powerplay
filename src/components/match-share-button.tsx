@@ -19,30 +19,50 @@ export function MatchShareButton({ match }: MatchShareButtonProps) {
       month: "long",
       day: "numeric",
       weekday: "short",
+      timeZone: "Asia/Seoul",
     });
     const timeStr = date.toLocaleTimeString("ko-KR", {
       hour: "2-digit",
       minute: "2-digit",
+      timeZone: "Asia/Seoul",
     });
     
     // Rink Name
     const rinkName = locale === "ko" ? match.rink?.name_ko : match.rink?.name_en || match.rink?.name_ko;
     
+    const title = locale === "ko" ? "[Power Play] 경기 모집" : "[Power Play] Match Invitation";
     let text = "";
     let toastMsg = "";
 
     if (locale === "ko") {
-      // Kakao Format
-      text = `[Power Play] 경기 모집\n\n🏒 ${rinkName}\n📅 ${dateStr} ${timeStr}\n\n참가 신청하기:\n${window.location.href}`;
+      text = `🏒 ${rinkName}\n📅 ${dateStr} ${timeStr}`;
       toastMsg = "카카오톡 공유 텍스트가 복사되었습니다!";
     } else {
-      // Global Format
-      text = `[Power Play] Match Invitation\n\n🏒 ${rinkName}\n📅 ${dateStr} ${timeStr}\n\nJoin here:\n${window.location.href}`;
+      text = `🏒 ${rinkName}\n📅 ${dateStr} ${timeStr}`;
       toastMsg = "Invitation copied to clipboard!";
     }
 
+    // Use Web Share API if available (mobile)
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: title,
+          text: text,
+          url: window.location.href,
+        });
+        return; // Success, no toast needed
+      } catch (err: unknown) {
+        // User cancelled or error - fall through to clipboard
+        if (err instanceof Error && err.name === 'AbortError') {
+          return; // User cancelled, do nothing
+        }
+      }
+    }
+
+    // Fallback: Copy to clipboard
     try {
-      await navigator.clipboard.writeText(text);
+      const fullText = `${title}\n\n${text}\n\n참가 신청하기:\n${window.location.href}`;
+      await navigator.clipboard.writeText(fullText);
       setToastMessage(toastMsg);
       setShowToast(true);
       setTimeout(() => setShowToast(false), 3000);

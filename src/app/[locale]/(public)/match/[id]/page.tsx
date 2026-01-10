@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { MatchApplication } from "@/components/match-application";
 import { AdminControls } from "@/components/admin-controls";
 import { MatchShareButton } from "@/components/match-share-button";
+import { CopyBankAccount } from "@/components/copy-bank-account";
 
 export default async function MatchPage({
   params,
@@ -48,24 +49,24 @@ export default async function MatchPage({
     minute: "2-digit",
   });
 
-  // Calculate remaining spots
-  const remaining = {
-    fw: match.max_fw - (match.participants_count?.fw || 0),
-    df: match.max_df - (match.participants_count?.df || 0),
-    g: match.max_g - (match.participants_count?.g || 0),
-  };
-
-  // Participant Lists
+  // Participant Lists (filtered by active status)
   const players = {
     fw: match.participants?.filter(
       (p) => p.position === "FW" && ["applied", "confirmed"].includes(p.status)
-    ),
+    ) || [],
     df: match.participants?.filter(
       (p) => p.position === "DF" && ["applied", "confirmed"].includes(p.status)
-    ),
+    ) || [],
     g: match.participants?.filter(
       (p) => p.position === "G" && ["applied", "confirmed"].includes(p.status)
-    ),
+    ) || [],
+  };
+
+  // Calculate remaining spots from actual participant counts
+  const remaining = {
+    fw: match.max_fw - players.fw.length,
+    df: match.max_df - players.df.length,
+    g: match.max_g - players.g.length,
   };
 
   // User Status
@@ -117,24 +118,38 @@ export default async function MatchPage({
             </span>
           </div>
           
+          {/* Bank Account with Copy */}
+          {match.bank_account && (
+            <div className="flex justify-between items-center text-sm">
+              <span className="text-zinc-500">{locale === 'ko' ? '입금 계좌' : 'Bank Account'}</span>
+              <CopyBankAccount bankAccount={match.bank_account} locale={locale} />
+            </div>
+          )}
+          
           <div className="border-t border-zinc-100 dark:border-zinc-800 my-2"></div>
 
           <div className="flex justify-between items-center text-sm">
             <span className="text-zinc-500">FW</span>
-            <span className={`font-semibold ${remaining.fw === 0 ? 'text-red-500' : ''}`}>
-              {match.participants_count?.fw}/{match.max_fw}
+            <span className={`font-semibold ${remaining.fw === 0 ? 'text-red-500' : 'text-green-600 dark:text-green-400'}`}>
+              {remaining.fw === 0 
+                ? (locale === 'ko' ? '마감' : 'Full') 
+                : (locale === 'ko' ? `${remaining.fw}자리 남음` : `${remaining.fw} spots left`)}
             </span>
           </div>
           <div className="flex justify-between items-center text-sm">
             <span className="text-zinc-500">DF</span>
-            <span className={`font-semibold ${remaining.df === 0 ? 'text-red-500' : ''}`}>
-               {match.participants_count?.df}/{match.max_df}
+            <span className={`font-semibold ${remaining.df === 0 ? 'text-red-500' : 'text-green-600 dark:text-green-400'}`}>
+              {remaining.df === 0 
+                ? (locale === 'ko' ? '마감' : 'Full') 
+                : (locale === 'ko' ? `${remaining.df}자리 남음` : `${remaining.df} spots left`)}
             </span>
           </div>
           <div className="flex justify-between items-center text-sm">
             <span className="text-zinc-500">G</span>
-            <span className={`font-semibold ${remaining.g === 0 ? 'text-red-500' : ''}`}>
-               {match.participants_count?.g}/{match.max_g}
+            <span className={`font-semibold ${remaining.g === 0 ? 'text-red-500' : 'text-green-600 dark:text-green-400'}`}>
+              {remaining.g === 0 
+                ? (locale === 'ko' ? '마감' : 'Full') 
+                : (locale === 'ko' ? `${remaining.g}자리 남음` : `${remaining.g} spots left`)}
             </span>
           </div>
 

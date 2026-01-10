@@ -27,12 +27,6 @@ export default async function AdminLayout({
           </div>
           <nav className="space-y-1">
             <Link
-              href={`/${locale}/admin`}
-              className="block rounded-lg px-4 py-2.5 text-sm font-medium text-zinc-300 hover:bg-zinc-800 hover:text-white"
-            >
-              📊 대시보드
-            </Link>
-            <Link
               href={`/${locale}/admin/matches`}
               className="block rounded-lg px-4 py-2.5 text-sm font-medium text-zinc-300 hover:bg-zinc-800 hover:text-white"
             >
@@ -54,13 +48,6 @@ export default async function AdminLayout({
       {/* Mobile Bottom Navigation */}
       <nav className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around border-t border-zinc-800 bg-zinc-950 py-2 md:hidden">
         <Link
-          href={`/${locale}/admin`}
-          className="flex flex-col items-center gap-1 px-4 py-2 text-zinc-400 hover:text-white"
-        >
-          <span className="text-xl">📊</span>
-          <span className="text-xs">대시보드</span>
-        </Link>
-        <Link
           href={`/${locale}/admin/matches`}
           className="flex flex-col items-center gap-1 px-4 py-2 text-zinc-400 hover:text-white"
         >
@@ -78,4 +65,5 @@ export default async function AdminLayout({
     </div>
   );
 }
+
 

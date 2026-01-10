@@ -32,6 +32,7 @@ export interface Match {
   max_g: number;
   status: "open" | "closed" | "canceled";
   description: string | null;
+  bank_account?: string | null;
   rink: MatchRink | null;
   participants_count?: {
     fw: number;
@@ -110,6 +111,7 @@ export async function getMatch(id: string): Promise<Match | null> {
       max_g,
       status,
       description,
+      bank_account,
       rink:rink_id(id, name_ko, name_en, map_url)
     `
     )

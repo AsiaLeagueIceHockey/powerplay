@@ -50,6 +50,7 @@ export async function createMatch(formData: FormData) {
   const maxDf = parseInt(formData.get("max_df") as string) || 4;
   const maxG = parseInt(formData.get("max_g") as string) || 2;
   const description = formData.get("description") as string;
+  const bankAccount = formData.get("bank_account") as string;
 
   const { data, error } = await supabase
     .from("matches")
@@ -61,6 +62,7 @@ export async function createMatch(formData: FormData) {
       max_df: maxDf,
       max_g: maxG,
       description: description || null,
+      bank_account: bankAccount || null,
       status: "open",
       created_by: user.id,
     })
@@ -106,6 +108,7 @@ export async function updateMatch(matchId: string, formData: FormData) {
   const maxDf = parseInt(formData.get("max_df") as string) || 4;
   const maxG = parseInt(formData.get("max_g") as string) || 2;
   const description = formData.get("description") as string;
+  const bankAccount = formData.get("bank_account") as string;
   const status = formData.get("status") as string;
 
   const { error } = await supabase
@@ -118,6 +121,7 @@ export async function updateMatch(matchId: string, formData: FormData) {
       max_df: maxDf,
       max_g: maxG,
       description: description || null,
+      bank_account: bankAccount || null,
       status: status as "open" | "closed" | "canceled",
     })
     .eq("id", matchId);
