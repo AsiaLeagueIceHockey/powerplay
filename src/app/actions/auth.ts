@@ -8,7 +8,7 @@ import { createClient } from "@/lib/supabase/server";
 export async function signUp(formData: FormData) {
   const supabase = await createClient();
   const headersList = await headers();
-  const origin = headersList.get("origin") || "http://localhost:3000";
+  const origin = headersList.get("origin") || "https://pphockey.vercel.app";
 
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;

@@ -20,7 +20,7 @@ export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://powerplay.vercel.app";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://pphockey.vercel.app";
 
 export async function generateMetadata({
   params,
@@ -53,7 +53,7 @@ export async function generateMetadata({
       siteName: "Power Play",
       images: [
         {
-          url: "/og-image.png",
+          url: `${siteUrl}/og-image.png`,
           width: 1200,
           height: 630,
           alt: "Power Play - Ice Hockey Match Management",
@@ -66,7 +66,7 @@ export async function generateMetadata({
       card: "summary_large_image",
       title,
       description,
-      images: ["/og-image.png"],
+      images: [`${siteUrl}/og-image.png`],
     },
     robots: {
       index: true,
