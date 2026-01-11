@@ -11,7 +11,10 @@
     "home": {
         "title": "Matches",
         "subtitle": "Join upcoming ice hockey games",
-        "noMatches": "No matches scheduled"
+        "noMatches": "No matches scheduled",
+        "viewList": "List",
+        "viewMap": "Map",
+        "unknownRink": "Unknown Rink"
     },
     "auth": {
         "login": "Log In",

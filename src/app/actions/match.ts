@@ -4,10 +4,14 @@ import { createClient } from "@/lib/supabase/server";
 
 // Type definitions for match data
 export interface MatchRink {
-  id?: string;
+  id: string;
   name_ko: string;
   name_en: string;
   map_url?: string;
+  address?: string;
+  rink_type?: "FULL" | "MINI";
+  lat?: number;
+  lng?: number;
 }
 
 export interface MatchParticipant {
@@ -57,7 +61,7 @@ export async function getMatches(): Promise<Match[]> {
       max_g,
       status,
       description,
-      rink:rink_id(name_ko, name_en)
+      rink:rink_id(id, name_ko, name_en, address, lat, lng, rink_type)
     `
     )
     .order("start_time", { ascending: true });

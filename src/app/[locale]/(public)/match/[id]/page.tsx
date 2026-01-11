@@ -7,6 +7,7 @@ import { MatchApplication } from "@/components/match-application";
 import { AdminControls } from "@/components/admin-controls";
 import { MatchShareButton } from "@/components/match-share-button";
 import { CopyBankAccount } from "@/components/copy-bank-account";
+import { RinkMap } from "@/components/rink-map";
 
 export default async function MatchPage({
   params,
@@ -161,10 +162,17 @@ export default async function MatchPage({
               href={match.rink?.map_url || "#"}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-600 hover:underline text-sm flex items-center"
+              className="text-blue-600 hover:underline text-sm flex items-center mb-4"
             >
               📍 {t("match.viewMap")}
             </a>
+            
+            {/* Embedded Map */}
+            {match.rink && match.rink.lat && match.rink.lng && (
+                <div className="w-full h-48 rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-800">
+                    <RinkMap rinks={[match.rink]} /> 
+                </div>
+            )}
           </div>
         </div>
       </div>

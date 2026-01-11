@@ -7,4 +7,6 @@ const nextConfig: NextConfig = {
   /* config options here */
 };
 
+
 export default withNextIntl(nextConfig);
+// Trigger restart

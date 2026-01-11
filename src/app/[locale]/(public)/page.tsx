@@ -1,8 +1,8 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { getMatches } from "@/app/actions/match";
-import { MatchCard } from "@/components/match-card";
-import { DateFilter } from "@/components/date-filter";
+import { getRinks } from "@/app/actions/rink";
 import { FeedbackBanner } from "@/components/feedback-banner";
+import { HomeClient } from "@/components/home-client";
 import { Suspense } from "react";
 
 export default async function HomePage({
@@ -17,12 +17,13 @@ export default async function HomePage({
   setRequestLocale(locale);
 
   // 병렬 데이터 페칭
-  const [t, allMatches] = await Promise.all([
+  const [t, allMatches, rinks] = await Promise.all([
     getTranslations("home"),
     getMatches(),
+    getRinks(),
   ]);
 
-  // Filter matches by selected date (KST)
+  // Filter matches by selected date (KST) for the Match List View
   const filteredMatches = selectedDate
     ? allMatches.filter((match) => {
         const matchDate = new Date(match.start_time);
@@ -37,35 +38,23 @@ export default async function HomePage({
   return (
     <div className="flex flex-col gap-6">
       {/* Hero Section */}
-      <section className="text-center py-8">
-        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+      <section className="text-center py-6">
+        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
           {t("title")}
         </h1>
-        <p className="mt-3 text-base text-zinc-600 dark:text-zinc-400">
-          {t("subtitle")}
-        </p>
       </section>
 
       {/* Feedback Banner */}
       <FeedbackBanner />
 
-      {/* Date Filter */}
-      <Suspense fallback={<div className="h-16" />}>
-        <DateFilter />
+      {/* Main Tabbed Content - Client Component */}
+      <Suspense fallback={<div className="h-96 animate-pulse bg-zinc-100 rounded-xl" />}>
+        <HomeClient 
+            matches={filteredMatches} 
+            allMatches={allMatches} 
+            rinks={rinks} 
+        />
       </Suspense>
-
-      {/* Matches List */}
-      <section className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-        {filteredMatches.length === 0 ? (
-          <div className="col-span-full rounded-lg border border-zinc-200 p-6 dark:border-zinc-800">
-            <p className="text-center text-zinc-500 dark:text-zinc-400">
-              {t("noMatches")}
-            </p>
-          </div>
-        ) : (
-          filteredMatches.map((match) => <MatchCard key={match.id} match={match} />)
-        )}
-      </section>
     </div>
   );
 }
