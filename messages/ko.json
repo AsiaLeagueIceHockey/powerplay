@@ -29,7 +29,9 @@
         "hasAccount": "이미 계정이 있으신가요?",
         "checkEmail": "이메일을 확인하세요",
         "confirmationSent": "가입 확인 이메일을 발송했습니다. 이메일을 확인해주세요.",
-        "passwordMismatch": "비밀번호가 일치하지 않습니다"
+        "passwordMismatch": "비밀번호가 일치하지 않습니다",
+        "signInWithGoogle": "Google로 계속하기",
+        "googleLoginNote": "파워플레이 Google 로그인입니다"
     },
     "profile": {
         "title": "프로필",

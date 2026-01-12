@@ -29,7 +29,9 @@
         "hasAccount": "Already have an account?",
         "checkEmail": "Check your email",
         "confirmationSent": "We've sent you a confirmation email. Please check your inbox.",
-        "passwordMismatch": "Passwords do not match"
+        "passwordMismatch": "Passwords do not match",
+        "signInWithGoogle": "Continue with Google",
+        "googleLoginNote": "Power Play Google Login"
     },
     "profile": {
         "title": "Profile",
