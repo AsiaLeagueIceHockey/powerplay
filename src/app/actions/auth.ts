@@ -59,10 +59,8 @@ export async function signOut() {
   redirect("/");
 }
 
-export async function signInWithGoogle() {
+export async function signInWithGoogle(origin: string) {
   const supabase = await createClient();
-  const headersList = await headers();
-  const origin = headersList.get("origin") || "https://pphockey.vercel.app";
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",

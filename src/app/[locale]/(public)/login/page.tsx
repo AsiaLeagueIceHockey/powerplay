@@ -13,7 +13,7 @@ export default function LoginPage() {
     setIsLoading(true);
     setError(null);
 
-    const result = await signInWithGoogle();
+    const result = await signInWithGoogle(window.location.origin);
 
     if (result?.error) {
       setError(result.error);
