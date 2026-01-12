@@ -38,11 +38,11 @@ export default async function HomePage({
   return (
     <div className="flex flex-col gap-6">
       {/* Hero Section */}
-      <section className="text-center py-6">
+      {/* <section className="text-center py-6">
         <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
           {t("title")}
         </h1>
-      </section>
+      </section> */}
 
       {/* Feedback Banner */}
       <FeedbackBanner />
