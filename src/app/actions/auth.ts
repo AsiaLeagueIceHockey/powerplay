@@ -84,6 +84,27 @@ export async function signInWithGoogle(origin: string) {
   return { error: "Failed to get OAuth URL" };
 }
 
+export async function signInWithKakao(origin: string) {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: "kakao",
+    options: {
+      redirectTo: `${origin}/ko/auth/callback`,
+    },
+  });
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  if (data.url) {
+    redirect(data.url);
+  }
+
+  return { error: "Failed to get OAuth URL" };
+}
+
 export async function getUser() {
   const supabase = await createClient();
   const {
