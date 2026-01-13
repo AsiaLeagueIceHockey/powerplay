@@ -311,6 +311,94 @@ export async function getAdminMatches() {
 
 // ==================== RINK CRUD ====================
 
+// Parse Naver Map URL to extract coordinates
+export async function parseNaverMapUrl(url: string): Promise<{
+  success: boolean;
+  data?: { lat: number; lng: number; address: string; mapUrl: string };
+  error?: string;
+}> {
+  try {
+    // Follow redirects to get the full URL
+    const response = await fetch(url, {
+      method: "HEAD",
+      redirect: "follow",
+    });
+
+    const finalUrl = response.url;
+
+    // Extract lat and lng from URL params
+    const urlObj = new URL(finalUrl);
+    const lat = urlObj.searchParams.get("lat");
+    const lng = urlObj.searchParams.get("lng");
+
+    if (!lat || !lng) {
+      return { success: false, error: "좌표를 추출할 수 없습니다. 올바른 네이버 지도 URL인지 확인해주세요." };
+    }
+
+    const latitude = parseFloat(lat);
+    const longitude = parseFloat(lng);
+
+    if (isNaN(latitude) || isNaN(longitude)) {
+      return { success: false, error: "좌표 형식이 올바르지 않습니다." };
+    }
+
+    // Use Naver Reverse Geocoding API to get address
+    const clientId = process.env.NEXT_PUBLIC_NAVER_MAP_CLIENT_ID;
+    const clientSecret = process.env.NAVER_MAP_CLIENT_SECRET;
+
+    let address = "";
+
+    if (clientId && clientSecret) {
+      try {
+        const geocodeResponse = await fetch(
+          `https://naveropenapi.apigw.ntruss.com/map-reversegeocode/v2/gc?coords=${longitude},${latitude}&output=json&orders=roadaddr,addr`,
+          {
+            headers: {
+              "X-NCP-APIGW-API-KEY-ID": clientId,
+              "X-NCP-APIGW-API-KEY": clientSecret,
+            },
+          }
+        );
+
+        if (geocodeResponse.ok) {
+          const geocodeData = await geocodeResponse.json();
+          // Extract address from response
+          const results = geocodeData.results;
+          if (results && results.length > 0) {
+            const result = results[0];
+            const region = result.region;
+            const land = result.land;
+
+            if (result.name === "roadaddr" && land) {
+              // Road address format
+              address = `${region.area1.name} ${region.area2.name} ${region.area3.name} ${land.name} ${land.number1}${land.number2 ? "-" + land.number2 : ""}`;
+            } else if (region) {
+              // Lot number address format
+              address = `${region.area1.name} ${region.area2.name} ${region.area3.name}${region.area4?.name ? " " + region.area4.name : ""}`;
+            }
+          }
+        }
+      } catch (geocodeError) {
+        console.error("Reverse geocoding failed:", geocodeError);
+        // Continue without address - user can enter manually if needed
+      }
+    }
+
+    return {
+      success: true,
+      data: {
+        lat: latitude,
+        lng: longitude,
+        address: address.trim(),
+        mapUrl: url, // Store original short URL
+      },
+    };
+  } catch (error) {
+    console.error("Error parsing Naver Map URL:", error);
+    return { success: false, error: "URL을 파싱하는 중 오류가 발생했습니다." };
+  }
+}
+
 // Create a new rink
 export async function createRink(formData: FormData) {
   const supabase = await createClient();
@@ -337,9 +425,13 @@ export async function createRink(formData: FormData) {
   const nameKo = formData.get("name_ko") as string;
   const nameEn = formData.get("name_en") as string;
   const mapUrl = formData.get("map_url") as string;
+  const address = formData.get("address") as string;
+  const lat = formData.get("lat") as string;
+  const lng = formData.get("lng") as string;
+  const rinkType = formData.get("rink_type") as string;
 
   if (!nameKo || !nameEn) {
-    return { error: "Name is required" };
+    return { error: "이름은 필수입니다 (한국어, 영어)" };
   }
 
   const { data, error } = await supabase
@@ -348,6 +440,10 @@ export async function createRink(formData: FormData) {
       name_ko: nameKo,
       name_en: nameEn,
       map_url: mapUrl || null,
+      address: address || null,
+      lat: lat ? parseFloat(lat) : null,
+      lng: lng ? parseFloat(lng) : null,
+      rink_type: rinkType || null,
     })
     .select()
     .single();
@@ -387,6 +483,10 @@ export async function updateRink(rinkId: string, formData: FormData) {
   const nameKo = formData.get("name_ko") as string;
   const nameEn = formData.get("name_en") as string;
   const mapUrl = formData.get("map_url") as string;
+  const address = formData.get("address") as string;
+  const lat = formData.get("lat") as string;
+  const lng = formData.get("lng") as string;
+  const rinkType = formData.get("rink_type") as string;
 
   const { error } = await supabase
     .from("rinks")
@@ -394,6 +494,10 @@ export async function updateRink(rinkId: string, formData: FormData) {
       name_ko: nameKo,
       name_en: nameEn,
       map_url: mapUrl || null,
+      address: address || null,
+      lat: lat ? parseFloat(lat) : null,
+      lng: lng ? parseFloat(lng) : null,
+      rink_type: rinkType || null,
     })
     .eq("id", rinkId);
 
