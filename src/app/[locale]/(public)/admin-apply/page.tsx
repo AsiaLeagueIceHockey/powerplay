@@ -50,68 +50,77 @@ export default function AdminApplyPage() {
       </p>
 
       {/* Feature Cards */}
-      <div className="space-y-6 mb-8">
-        {/* Match Management */}
+      <div className="space-y-8 mb-8">
+        
+        {/* 1. Club Management */}
         <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-sm">
           <div className="flex items-center gap-3 mb-3">
-            <span className="text-2xl">🏒</span>
-            <h2 className="text-lg font-bold">
-              {locale === "ko" ? "경기 관리" : "Match Management"}
+            <span className="text-2xl">👥</span>
+            <h2 className="text-xl font-bold">
+              {locale === "ko" ? "동호회 관리" : "Club Management"}
             </h2>
           </div>
-          <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4">
+          <p className="text-zinc-600 dark:text-zinc-400 mb-5 leading-relaxed">
             {locale === "ko" 
-              ? "새 경기를 생성하고, 참가자를 관리하며, 경기 상태를 변경할 수 있습니다."
-              : "Create new matches, manage participants, and update match status."}
+              ? "동호회를 생성하고 멤버를 관리할 수 있습니다. 파워 플레이를 통해 게스트 모집도 가능합니다!"
+              : "Create clubs and manage members. Recruit guests through Power Play!"}
           </p>
           <div className="grid grid-cols-2 gap-3">
-            <Image 
-              src="/admin_screen_1.png" 
-              alt="Match list" 
-              width={300} 
-              height={400}
-              className="rounded-lg border border-zinc-200 dark:border-zinc-700"
-            />
-            <Image 
-              src="/admin_screen_2.png" 
-              alt="Create match" 
-              width={300} 
-              height={400}
-              className="rounded-lg border border-zinc-200 dark:border-zinc-700"
-            />
+            <div className="relative aspect-[3/4] overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-100">
+               <Image src="/admin-club-1.png" alt="Club Management 1" fill className="object-cover" />
+            </div>
+            <div className="relative aspect-[3/4] overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-100">
+               <Image src="/admin-club-2.png" alt="Club Management 2" fill className="object-cover" />
+            </div>
           </div>
         </div>
 
-        {/* Rink Management */}
+        {/* 2. Match Management */}
+        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-sm">
+          <div className="flex items-center gap-3 mb-3">
+            <span className="text-2xl">🏒</span>
+            <h2 className="text-xl font-bold">
+              {locale === "ko" ? "경기 관리" : "Match Management"}
+            </h2>
+          </div>
+          <p className="text-zinc-600 dark:text-zinc-400 mb-5 leading-relaxed">
+            {locale === "ko" 
+              ? "대관 시작 시간과 인원을 입력하고 경기를 쉽게 생성하세요. 주최 동호회를 선택하여 일정을 관리할 수 있습니다."
+              : "Create matches with start time and player/goalie limits. Organize schedules by hosting club."}
+          </p>
+          <div className="grid grid-cols-2 gap-3">
+             <div className="relative aspect-[3/4] overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-100">
+               <Image src="/admin-game-1.png" alt="Match Management 1" fill className="object-cover" />
+            </div>
+            <div className="relative aspect-[3/4] overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-100">
+               <Image src="/admin-game-2.png" alt="Match Management 2" fill className="object-cover" />
+            </div>
+          </div>
+        </div>
+
+        {/* 3. Rink Management */}
         <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-sm">
           <div className="flex items-center gap-3 mb-3">
             <span className="text-2xl">🏟️</span>
-            <h2 className="text-lg font-bold">
-              {locale === "ko" ? "링크 관리" : "Rink Management"}
+            <h2 className="text-xl font-bold">
+              {locale === "ko" ? "링크장 관리" : "Rink Management"}
             </h2>
           </div>
-          <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4">
+          <p className="text-zinc-600 dark:text-zinc-400 mb-5 leading-relaxed">
             {locale === "ko" 
-              ? "아이스링크 정보를 등록하고 관리합니다. 한/영 이름과 지도 URL을 설정할 수 있습니다."
-              : "Register and manage ice rink information with Korean/English names and map URLs."}
+              ? "우리 링크장이 검색이 안나오나요? 네이버 지도 URL만 입력하면 우리 링크를 등록할 수 있습니다."
+              : "Auto-fill rink address and location by simply entering the Naver Map URL. Register your rink!"}
           </p>
           <div className="grid grid-cols-2 gap-3">
-            <Image 
-              src="/admin_screen_3.png" 
-              alt="Rink list" 
-              width={300} 
-              height={400}
-              className="rounded-lg border border-zinc-200 dark:border-zinc-700"
-            />
-            <Image 
-              src="/admin_screen_4.png" 
-              alt="Add rink" 
-              width={300} 
-              height={400}
-              className="rounded-lg border border-zinc-200 dark:border-zinc-700"
-            />
+            <div className="relative aspect-[3/4] overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-100">
+               <Image src="/admin-rink-1.png" alt="Rink Management 1" fill className="object-cover" />
+            </div>
+            <div className="relative aspect-[3/4] overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-100">
+               <Image src="/admin-rink-2.png" alt="Rink Management 2" fill className="object-cover" />
+            </div>
           </div>
         </div>
+
       </div>
 
       {/* Apply Button */}

@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { AdminParticipantList } from "./admin-participant-list";
+import { deleteMatch } from "@/app/actions/admin";
 
 interface Match {
   id: string;
@@ -18,9 +20,8 @@ interface Match {
     df: number;
     g: number;
   };
-  max_fw: number;
-  max_df: number;
-  max_g: number;
+  max_skaters: number;
+  max_goalies: number;
   fee: number;
 }
 
@@ -32,6 +33,24 @@ export function AdminMatchCard({
   locale: string;
 }) {
   const [showParticipants, setShowParticipants] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const router = useRouter();
+
+  const handleDelete = async () => {
+    if (!confirm(locale === "ko" ? "정말 이 경기를 삭제하시겠습니까?" : "Are you sure you want to delete this match?")) {
+      return;
+    }
+
+    setIsDeleting(true);
+    const result = await deleteMatch(match.id);
+    if (result.error) {
+      alert(locale === "ko" ? "삭제 실패: " + result.error : "Delete failed: " + result.error);
+      setIsDeleting(false);
+    } else {
+      router.refresh();
+      // Optional: Give UI feedback or wait for refresh
+    }
+  };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -113,34 +132,36 @@ export function AdminMatchCard({
 
       <div className="flex justify-between items-center text-sm text-zinc-300 mb-6 bg-zinc-900/50 p-3 rounded-lg border border-zinc-700/50">
         <span className="flex flex-col items-center">
-          <span className="text-xs text-zinc-500 mb-1">FW</span>
+          <span className="text-xs text-zinc-500 mb-1">Skater</span>
           <span className="font-medium">
-            {match.participants_count.fw}/{match.max_fw}
+            {match.participants_count.fw + match.participants_count.df}/{match.max_skaters}
           </span>
         </span>
         <div className="h-8 w-px bg-zinc-700"></div>
         <span className="flex flex-col items-center">
-          <span className="text-xs text-zinc-500 mb-1">DF</span>
+          <span className="text-xs text-zinc-500 mb-1">Goalie</span>
           <span className="font-medium">
-            {match.participants_count.df}/{match.max_df}
-          </span>
-        </span>
-        <div className="h-8 w-px bg-zinc-700"></div>
-        <span className="flex flex-col items-center">
-          <span className="text-xs text-zinc-500 mb-1">G</span>
-          <span className="font-medium">
-            {match.participants_count.g}/{match.max_g}
+            {match.participants_count.g}/{match.max_goalies}
           </span>
         </span>
       </div>
 
       <div className="space-y-3">
-        <Link
-          href={`/${locale}/admin/matches/${match.id}/edit`}
-          className="block w-full py-2.5 text-center bg-zinc-100 dark:bg-zinc-200 text-zinc-900 rounded-lg text-sm font-bold hover:bg-white transition-colors"
-        >
-          수정
-        </Link>
+        <div className="grid grid-cols-2 gap-3">
+          <Link
+            href={`/${locale}/admin/matches/${match.id}/edit`}
+            className="block w-full py-2.5 text-center bg-zinc-100 dark:bg-zinc-200 text-zinc-900 rounded-lg text-sm font-bold hover:bg-white transition-colors"
+          >
+            {locale === "ko" ? "수정" : "Edit"}
+          </Link>
+          <button
+            onClick={handleDelete}
+            disabled={isDeleting}
+            className="block w-full py-2.5 text-center bg-red-100/10 border border-red-900/50 text-red-500 rounded-lg text-sm font-bold hover:bg-red-900/20 transition-colors disabled:opacity-50"
+          >
+             {isDeleting ? "..." : (locale === "ko" ? "삭제" : "Delete")}
+          </button>
+        </div>
 
         <button
           onClick={() => setShowParticipants(!showParticipants)}
