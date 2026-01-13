@@ -27,6 +27,12 @@ export interface MatchParticipant {
   } | null;
 }
 
+export interface MatchClub {
+  id: string;
+  name: string;
+  kakao_open_chat_url?: string;
+}
+
 export interface Match {
   id: string;
   start_time: string;
@@ -38,6 +44,7 @@ export interface Match {
   description: string | null;
   bank_account?: string | null;
   rink: MatchRink | null;
+  club?: MatchClub | null;
   participants_count?: {
     fw: number;
     df: number;
@@ -116,7 +123,8 @@ export async function getMatch(id: string): Promise<Match | null> {
       status,
       description,
       bank_account,
-      rink:rink_id(id, name_ko, name_en, map_url)
+      rink:rink_id(id, name_ko, name_en, map_url, lat, lng),
+      club:club_id(id, name, kakao_open_chat_url)
     `
     )
     .eq("id", id)
@@ -145,6 +153,9 @@ export async function getMatch(id: string): Promise<Match | null> {
 
   // Handle rink which might be an array or object
   const rink = Array.isArray(match.rink) ? match.rink[0] : match.rink;
+  
+  // Handle club which might be an array or object
+  const club = Array.isArray(match.club) ? match.club[0] : match.club;
 
   // Transform participants to handle user array
   const transformedParticipants = (participants || []).map((p) => {
@@ -158,6 +169,7 @@ export async function getMatch(id: string): Promise<Match | null> {
   return {
     ...match,
     rink: rink as MatchRink | null,
+    club: club as MatchClub | null,
     participants: transformedParticipants,
   } as Match;
 }

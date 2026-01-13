@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { joinMatch, cancelJoin } from "@/app/actions/match";
 
@@ -16,6 +16,7 @@ interface MatchApplicationProps {
   isJoined: boolean;
   currentPosition?: string;
   matchStatus: string;
+  onboardingCompleted?: boolean;
 }
 
 export function MatchApplication({
@@ -24,9 +25,11 @@ export function MatchApplication({
   isJoined,
   currentPosition,
   matchStatus,
+  onboardingCompleted = true,
 }: MatchApplicationProps) {
   const t = useTranslations("match");
   const tAuth = useTranslations("auth");
+  const locale = useLocale();
   const router = useRouter();
   
   const [loading, setLoading] = useState(false);
@@ -57,6 +60,23 @@ export function MatchApplication({
     }
     setLoading(false);
   };
+
+  // 0. If onboarding not completed => Show onboarding prompt
+  if (!onboardingCompleted && !isJoined) {
+    return (
+      <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6 text-center dark:border-amber-800 dark:bg-amber-900/20">
+        <p className="mb-4 text-amber-700 dark:text-amber-300 font-medium">
+          경기 참가 전 프로필 설정이 필요합니다
+        </p>
+        <button
+          onClick={() => router.push(`/${locale}/onboarding`)}
+          className="inline-block rounded-lg bg-amber-600 px-6 py-3 font-bold text-white transition-colors hover:bg-amber-700"
+        >
+          프로필 설정하기
+        </button>
+      </div>
+    );
+  }
 
   // 1. If Match Closed/Canceled => Show nothing or status?
   // User didn't specify, but typically we disable join.

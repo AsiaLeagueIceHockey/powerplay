@@ -42,6 +42,12 @@ export default async function AdminLayout({
               🏒 경기 관리
             </Link>
             <Link
+              href={`/${locale}/admin/clubs`}
+              className="block rounded-lg px-4 py-2.5 text-sm font-medium text-zinc-300 hover:bg-zinc-800 hover:text-white"
+            >
+              👥 동호회 관리
+            </Link>
+            <Link
               href={`/${locale}/admin/rinks`}
               className="block rounded-lg px-4 py-2.5 text-sm font-medium text-zinc-300 hover:bg-zinc-800 hover:text-white"
             >
@@ -69,6 +75,13 @@ export default async function AdminLayout({
         >
           <span className="text-xl">🏒</span>
           <span className="text-xs">경기</span>
+        </Link>
+        <Link
+          href={`/${locale}/admin/clubs`}
+          className="flex flex-col items-center gap-1 px-4 py-2 text-zinc-400 hover:text-white"
+        >
+          <span className="text-xl">👥</span>
+          <span className="text-xs">동호회</span>
         </Link>
         <Link
           href={`/${locale}/admin/rinks`}

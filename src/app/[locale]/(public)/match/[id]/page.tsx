@@ -16,16 +16,31 @@ export default async function MatchPage({
 }) {
   const { locale, id } = await params;
   setRequestLocale(locale);
-  const t = await getTranslations();
+  
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
+  
+  // Parallel fetch user and translations
+  const [t, { data: { user } }] = await Promise.all([
+    getTranslations(),
+    supabase.auth.getUser(),
+  ]);
+  
+  // Fetch match
   const match = await getMatch(id);
 
   if (!match) {
     notFound();
+  }
+  
+  // Get user profile for onboarding status
+  let onboardingCompleted = true;
+  if (user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("onboarding_completed")
+      .eq("id", user.id)
+      .single();
+    onboardingCompleted = profile?.onboarding_completed ?? false;
   }
 
   // Format Date Logic (KST)
@@ -95,6 +110,11 @@ export default async function MatchPage({
             >
               {t(`match.status.${match.status}`)}
             </span>
+            {match.club && (
+              <span className="px-3 py-1 rounded-full text-sm font-bold bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 flex items-center gap-1">
+                👥 {match.club.name}
+              </span>
+            )}
           </div>
           
           <MatchShareButton match={match} />
@@ -198,6 +218,7 @@ export default async function MatchPage({
         isJoined={isJoined}
         currentPosition={userParticipant?.position}
         matchStatus={match.status}
+        onboardingCompleted={onboardingCompleted}
       />
 
       {/* Participant List Header */}

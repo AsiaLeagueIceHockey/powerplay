@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { joinMatch, cancelJoin } from "@/app/actions/match";
 
@@ -20,6 +20,7 @@ interface JoinButtonProps {
   currentFW: number;
   currentDF: number;
   currentG: number;
+  onboardingCompleted?: boolean;
 }
 
 export function JoinButton({
@@ -32,9 +33,11 @@ export function JoinButton({
   currentFW,
   currentDF,
   currentG,
+  onboardingCompleted = true,
 }: JoinButtonProps) {
   const t = useTranslations("match");
   const tAuth = useTranslations("auth");
+  const locale = useLocale();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [showPositionSelect, setShowPositionSelect] = useState(false);
@@ -56,6 +59,24 @@ export function JoinButton({
       </div>
     );
   }
+
+  // If onboarding not completed, redirect to onboarding
+  if (!onboardingCompleted) {
+    return (
+      <div className="rounded-lg border border-amber-200 bg-amber-50 p-6 text-center dark:border-amber-800 dark:bg-amber-900/20">
+        <p className="mb-4 text-amber-700 dark:text-amber-300">
+          경기 참가 전 프로필 설정이 필요합니다
+        </p>
+        <button
+          onClick={() => router.push(`/${locale}/onboarding`)}
+          className="inline-block rounded-lg bg-amber-600 px-6 py-2 font-medium text-white transition-colors hover:bg-amber-700"
+        >
+          프로필 설정하기
+        </button>
+      </div>
+    );
+  }
+
 
   // If already joined, show cancel option
   if (userParticipant) {

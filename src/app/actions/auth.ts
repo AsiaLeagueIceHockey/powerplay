@@ -143,14 +143,22 @@ export async function updateProfile(formData: FormData) {
   const fullName = formData.get("fullName") as string;
   const position = formData.get("position") as string;
   const preferredLang = formData.get("preferredLang") as string;
+  const onboardingCompleted = formData.get("onboarding_completed") === "true";
+
+  const updateData: Record<string, unknown> = {
+    full_name: fullName,
+    position: position,
+    preferred_lang: preferredLang,
+  };
+
+  // Only set onboarding_completed if explicitly provided
+  if (formData.has("onboarding_completed")) {
+    updateData.onboarding_completed = onboardingCompleted;
+  }
 
   const { error } = await supabase
     .from("profiles")
-    .update({
-      full_name: fullName,
-      position: position,
-      preferred_lang: preferredLang,
-    })
+    .update(updateData)
     .eq("id", user.id);
 
   if (error) {
@@ -158,6 +166,7 @@ export async function updateProfile(formData: FormData) {
   }
 
   revalidatePath("/profile", "page");
+  revalidatePath("/onboarding", "page");
   return { success: true };
 }
 

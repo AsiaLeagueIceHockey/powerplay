@@ -44,6 +44,7 @@ export async function createMatch(formData: FormData) {
   }
 
   const rinkId = formData.get("rink_id") as string;
+  const clubId = formData.get("club_id") as string;
   const startTimeInput = formData.get("start_time") as string;
   const fee = parseInt(formData.get("fee") as string) || 0;
   const maxFw = parseInt(formData.get("max_fw") as string) || 8;
@@ -60,6 +61,7 @@ export async function createMatch(formData: FormData) {
     .from("matches")
     .insert({
       rink_id: rinkId || null,
+      club_id: clubId || null,
       start_time: startTimeUTC,
       fee,
       max_fw: maxFw,

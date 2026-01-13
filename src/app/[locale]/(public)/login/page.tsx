@@ -97,7 +97,41 @@ export default function LoginPage() {
             {isLoading === "kakao" ? t("loading") : t("signInWithKakao")}
           </button>
         </div>
+
+          {/* Email/Password Login (Dev Only) */}
+          {process.env.NODE_ENV === "development" && (
+            <div className="mt-8 border-t border-zinc-200 pt-6 dark:border-zinc-700">
+              <div className="mb-4 text-center text-xs font-semibold uppercase text-zinc-500">
+                Development Only
+              </div>
+              <form action={async (formData) => {
+                const result = await import("@/app/actions/auth").then(m => m.signIn(formData));
+                if (result?.error) setError(result.error);
+              }} className="space-y-3">
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Email"
+                  required
+                  className="w-full rounded-lg border border-zinc-300 px-4 py-2 text-sm focus:border-zinc-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800"
+                />
+                <input
+                  type="password"
+                  name="password"
+                  placeholder="Password"
+                  required
+                  className="w-full rounded-lg border border-zinc-300 px-4 py-2 text-sm focus:border-zinc-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800"
+                />
+                <button
+                  type="submit"
+                  className="w-full rounded-lg bg-zinc-200 px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-300 dark:bg-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-600"
+                >
+                  Sign in with Email
+                </button>
+              </form>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
   );
 }

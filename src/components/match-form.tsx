@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createMatch } from "@/app/actions/admin";
 import { useTranslations, useLocale } from "next-intl";
+import type { Club } from "@/app/actions/types";
 
 interface Rink {
   id: string;
@@ -11,7 +12,12 @@ interface Rink {
   name_en: string;
 }
 
-export function MatchForm({ rinks }: { rinks: Rink[] }) {
+interface MatchFormProps {
+  rinks: Rink[];
+  clubs?: Club[];
+}
+
+export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
   const t = useTranslations();
   const locale = useLocale();
   const router = useRouter();
@@ -43,6 +49,29 @@ export function MatchForm({ rinks }: { rinks: Rink[] }) {
       {error && (
         <div className="p-4 bg-red-900/50 border border-red-800 text-red-200 rounded-lg">
           {error}
+        </div>
+      )}
+
+      {/* Club Selection (Optional) */}
+      {clubs.length > 0 && (
+        <div>
+          <label className="block text-sm font-medium mb-2 text-zinc-300">
+            👥 주최 동호회 (선택)
+          </label>
+          <select
+            name="club_id"
+            className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+          >
+            <option value="">동호회 없음 (개인 주최)</option>
+            {clubs.map((club) => (
+              <option key={club.id} value={club.id}>
+                {club.name}
+              </option>
+            ))}
+          </select>
+          <p className="text-xs text-zinc-500 mt-1">
+            동호회를 선택하면 해당 동호회 경기로 등록됩니다.
+          </p>
         </div>
       )}
 

@@ -1,5 +1,6 @@
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { getRinks } from "@/app/actions/admin";
+import { getClubs } from "@/app/actions/clubs";
 import { MatchForm } from "@/components/match-form";
 import Link from "next/link";
 
@@ -10,8 +11,12 @@ export default async function NewMatchPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const t = await getTranslations();
-  const rinks = await getRinks();
+  
+  const [t, rinks, clubs] = await Promise.all([
+    getTranslations(),
+    getRinks(),
+    getClubs(),
+  ]);
 
   return (
     <div>
@@ -26,7 +31,8 @@ export default async function NewMatchPage({
 
       <h1 className="text-2xl font-bold mb-6">{t("admin.matches.createNew")}</h1>
 
-      <MatchForm rinks={rinks} />
+      <MatchForm rinks={rinks} clubs={clubs} />
     </div>
   );
 }
+
