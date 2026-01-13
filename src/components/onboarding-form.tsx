@@ -37,9 +37,13 @@ export function OnboardingForm({ profile, clubs, myClubs, locale }: OnboardingFo
   );
   
   // Step 1 form data
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    fullName: string;
+    position: "FW" | "DF" | "G" | null;
+    preferredLang: string;
+  }>({
     fullName: profile?.full_name || "",
-    position: profile?.position || "FW",
+    position: profile?.position || null,
     preferredLang: profile?.preferred_lang || "ko",
   });
 
@@ -48,7 +52,7 @@ export function OnboardingForm({ profile, clubs, myClubs, locale }: OnboardingFo
     
     const fd = new FormData();
     fd.set("fullName", formData.fullName);
-    fd.set("position", formData.position);
+    fd.set("position", formData.position || "");
     fd.set("preferredLang", formData.preferredLang);
     
     await updateProfile(fd);
@@ -78,7 +82,7 @@ export function OnboardingForm({ profile, clubs, myClubs, locale }: OnboardingFo
     // Mark onboarding as complete
     const fd = new FormData();
     fd.set("fullName", formData.fullName);
-    fd.set("position", formData.position);
+    fd.set("position", formData.position || "");
     fd.set("preferredLang", formData.preferredLang);
     fd.set("onboarding_completed", "true");
     await updateProfile(fd);
@@ -90,7 +94,7 @@ export function OnboardingForm({ profile, clubs, myClubs, locale }: OnboardingFo
     // Mark onboarding as complete without changes
     const fd = new FormData();
     fd.set("fullName", profile?.full_name || "");
-    fd.set("position", profile?.position || "FW");
+    fd.set("position", profile?.position || "");
     fd.set("preferredLang", profile?.preferred_lang || "ko");
     fd.set("onboarding_completed", "true");
     await updateProfile(fd);
@@ -137,10 +141,11 @@ export function OnboardingForm({ profile, clubs, myClubs, locale }: OnboardingFo
             <div>
               <label className="block text-sm font-medium mb-2">{t("position")}</label>
               <select
-                value={formData.position}
-                onChange={(e) => setFormData({ ...formData, position: e.target.value as "FW" | "DF" | "G" })}
+                value={formData.position || ""}
+                onChange={(e) => setFormData({ ...formData, position: (e.target.value as "FW" | "DF" | "G" | "") || null })}
                 className="w-full px-4 py-3 rounded-lg border border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800"
               >
+                <option value="">{tMatch("position.NONE")}</option>
                 <option value="FW">{tMatch("position.FW")}</option>
                 <option value="DF">{tMatch("position.DF")}</option>
                 <option value="G">{tMatch("position.G")}</option>

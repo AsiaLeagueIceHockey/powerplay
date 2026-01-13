@@ -47,9 +47,8 @@ export async function createMatch(formData: FormData) {
   const clubId = formData.get("club_id") as string;
   const startTimeInput = formData.get("start_time") as string;
   const fee = parseInt(formData.get("fee") as string) || 0;
-  const maxFw = parseInt(formData.get("max_fw") as string) || 8;
-  const maxDf = parseInt(formData.get("max_df") as string) || 4;
-  const maxG = parseInt(formData.get("max_g") as string) || 2;
+  const maxSkaters = parseInt(formData.get("max_skaters") as string) || 20;
+  const maxGoalies = parseInt(formData.get("max_goalies") as string) || 2;
   const description = formData.get("description") as string;
   const bankAccount = formData.get("bank_account") as string;
 
@@ -64,9 +63,8 @@ export async function createMatch(formData: FormData) {
       club_id: clubId || null,
       start_time: startTimeUTC,
       fee,
-      max_fw: maxFw,
-      max_df: maxDf,
-      max_g: maxG,
+      max_skaters: maxSkaters,
+      max_goalies: maxGoalies,
       description: description || null,
       bank_account: bankAccount || null,
       status: "open",
@@ -110,9 +108,8 @@ export async function updateMatch(matchId: string, formData: FormData) {
   const rinkId = formData.get("rink_id") as string;
   const startTimeInput = formData.get("start_time") as string;
   const fee = parseInt(formData.get("fee") as string) || 0;
-  const maxFw = parseInt(formData.get("max_fw") as string) || 8;
-  const maxDf = parseInt(formData.get("max_df") as string) || 4;
-  const maxG = parseInt(formData.get("max_g") as string) || 2;
+  const maxSkaters = parseInt(formData.get("max_skaters") as string) || 20;
+  const maxGoalies = parseInt(formData.get("max_goalies") as string) || 2;
   const description = formData.get("description") as string;
   const bankAccount = formData.get("bank_account") as string;
   const status = formData.get("status") as string;
@@ -126,9 +123,8 @@ export async function updateMatch(matchId: string, formData: FormData) {
       rink_id: rinkId || null,
       start_time: startTimeUTC,
       fee,
-      max_fw: maxFw,
-      max_df: maxDf,
-      max_g: maxG,
+      max_skaters: maxSkaters,
+      max_goalies: maxGoalies,
       description: description || null,
       bank_account: bankAccount || null,
       status: status as "open" | "closed" | "canceled",

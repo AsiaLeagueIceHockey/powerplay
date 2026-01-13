@@ -82,10 +82,10 @@ export default async function MatchPage({
   };
 
   // Calculate remaining spots from actual participant counts
+  const skaterCount = players.fw.length + players.df.length;
   const remaining = {
-    fw: match.max_fw - players.fw.length,
-    df: match.max_df - players.df.length,
-    g: match.max_g - players.g.length,
+    skaters: match.max_skaters - skaterCount,
+    g: match.max_goalies - players.g.length,
   };
 
   // User Status
@@ -153,25 +153,17 @@ export default async function MatchPage({
           <div className="border-t border-zinc-100 dark:border-zinc-800 my-2"></div>
 
           <div className="flex justify-between items-center text-sm">
-            <span className="text-zinc-500">FW</span>
-            <span className={`font-semibold ${remaining.fw === 0 ? 'text-red-500' : 'text-green-600 dark:text-green-400'}`}>
-              {remaining.fw === 0 
+            <span className="text-zinc-500">{t("match.skater")}</span>
+            <span className={`font-semibold ${remaining.skaters === 0 ? 'text-red-500' : 'text-green-600 dark:text-green-400'}`}>
+              {remaining.skaters <= 0 
                 ? (locale === 'ko' ? '마감' : 'Full') 
-                : (locale === 'ko' ? `${remaining.fw}자리 남음` : `${remaining.fw} spots left`)}
+                : (locale === 'ko' ? `${remaining.skaters}자리 남음` : `${remaining.skaters} spots left`)}
             </span>
           </div>
           <div className="flex justify-between items-center text-sm">
-            <span className="text-zinc-500">DF</span>
-            <span className={`font-semibold ${remaining.df === 0 ? 'text-red-500' : 'text-green-600 dark:text-green-400'}`}>
-              {remaining.df === 0 
-                ? (locale === 'ko' ? '마감' : 'Full') 
-                : (locale === 'ko' ? `${remaining.df}자리 남음` : `${remaining.df} spots left`)}
-            </span>
-          </div>
-          <div className="flex justify-between items-center text-sm">
-            <span className="text-zinc-500">G</span>
+            <span className="text-zinc-500">{t("match.position.G")}</span>
             <span className={`font-semibold ${remaining.g === 0 ? 'text-red-500' : 'text-green-600 dark:text-green-400'}`}>
-              {remaining.g === 0 
+              {remaining.g <= 0 
                 ? (locale === 'ko' ? '마감' : 'Full') 
                 : (locale === 'ko' ? `${remaining.g}자리 남음` : `${remaining.g} spots left`)}
             </span>
@@ -211,8 +203,8 @@ export default async function MatchPage({
       <MatchApplication 
         matchId={match.id} 
         positions={{
-          FW: remaining.fw > 0,
-          DF: remaining.df > 0,
+          FW: remaining.skaters > 0,
+          DF: remaining.skaters > 0,
           G: remaining.g > 0
         }}
         isJoined={isJoined}

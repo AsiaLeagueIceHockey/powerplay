@@ -55,8 +55,10 @@
         "position": {
             "FW": "Forward",
             "DF": "Defense",
-            "G": "Goalie"
+            "G": "Goalie",
+            "NONE": "None"
         },
+        "skater": "Skater",
         "fee": "Fee",
         "remaining": "Spots left",
         "join": "Join",
@@ -104,9 +106,8 @@
             "selectRink": "Select a rink",
             "dateTime": "Date & Time",
             "fee": "Fee (KRW)",
-            "maxFw": "Max FW",
-            "maxDf": "Max DF",
-            "maxG": "Max G",
+            "maxSkaters": "Max Skaters",
+            "maxGoalies": "Max Goalies",
             "description": "Description",
             "descriptionPlaceholder": "Enter additional info about the match...",
             "bankAccount": "Bank Account",

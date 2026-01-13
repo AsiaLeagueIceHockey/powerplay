@@ -15,9 +15,8 @@ interface Match {
   id: string;
   start_time: string;
   fee: number;
-  max_fw: number;
-  max_df: number;
-  max_g: number;
+  max_skaters: number;
+  max_goalies: number;
   status: "open" | "closed" | "canceled";
   description: string | null;
   bank_account?: string | null;
@@ -128,6 +127,7 @@ export function MatchEditForm({
           name="start_time"
           defaultValue={formatDateTimeLocal(match.start_time)}
           required
+          step="600"
           className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
         />
       </div>
@@ -160,40 +160,28 @@ export function MatchEditForm({
         />
       </div>
 
-      {/* Position Limits */}
-      <div className="grid grid-cols-3 gap-4">
+      {/* Position Limits (Consolidated) */}
+      <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium mb-2 text-zinc-300">
-            {t("admin.form.maxFw")}
+            {t("admin.form.maxSkaters")}
           </label>
           <input
             type="number"
-            name="max_fw"
-            defaultValue={match.max_fw}
+            name="max_skaters"
+            defaultValue={match.max_skaters}
             min={0}
             className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
           />
         </div>
         <div>
           <label className="block text-sm font-medium mb-2 text-zinc-300">
-            {t("admin.form.maxDf")}
+            {t("admin.form.maxGoalies")}
           </label>
           <input
             type="number"
-            name="max_df"
-            defaultValue={match.max_df}
-            min={0}
-            className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-2 text-zinc-300">
-            {t("admin.form.maxG")}
-          </label>
-          <input
-            type="number"
-            name="max_g"
-            defaultValue={match.max_g}
+            name="max_goalies"
+            defaultValue={match.max_goalies}
             min={0}
             className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
           />

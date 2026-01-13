@@ -14,9 +14,8 @@ interface JoinButtonProps {
     position: string;
     status: string;
   } | null;
-  maxFW: number;
-  maxDF: number;
-  maxG: number;
+  maxSkaters: number;
+  maxGoalies: number;
   currentFW: number;
   currentDF: number;
   currentG: number;
@@ -27,9 +26,8 @@ export function JoinButton({
   matchId,
   userId,
   userParticipant,
-  maxFW,
-  maxDF,
-  maxG,
+  maxSkaters,
+  maxGoalies,
   currentFW,
   currentDF,
   currentG,
@@ -127,9 +125,9 @@ export function JoinButton({
     setIsLoading(false);
   };
 
-  const availableFW = maxFW - currentFW;
-  const availableDF = maxDF - currentDF;
-  const availableG = maxG - currentG;
+  const currentSkaters = currentFW + currentDF;
+  const availableSkaters = maxSkaters - currentSkaters;
+  const availableG = maxGoalies - currentG;
 
   if (showPositionSelect) {
     return (
@@ -141,19 +139,19 @@ export function JoinButton({
         <div className="flex flex-wrap gap-3">
           <button
             onClick={() => handleJoin("FW")}
-            disabled={availableFW <= 0 || isLoading}
+            disabled={availableSkaters <= 0 || isLoading}
             className="flex-1 rounded-lg border border-blue-300 bg-blue-50 px-4 py-3 font-medium text-blue-700 transition-colors hover:bg-blue-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-blue-800 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/40"
           >
             {t("position.FW")}
-            <span className="ml-2 text-sm opacity-70">({availableFW}석)</span>
+            <span className="ml-2 text-sm opacity-70">({availableSkaters}석)</span>
           </button>
           <button
             onClick={() => handleJoin("DF")}
-            disabled={availableDF <= 0 || isLoading}
+            disabled={availableSkaters <= 0 || isLoading}
             className="flex-1 rounded-lg border border-orange-300 bg-orange-50 px-4 py-3 font-medium text-orange-700 transition-colors hover:bg-orange-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-orange-800 dark:bg-orange-900/20 dark:text-orange-400 dark:hover:bg-orange-900/40"
           >
             {t("position.DF")}
-            <span className="ml-2 text-sm opacity-70">({availableDF}석)</span>
+            <span className="ml-2 text-sm opacity-70">({availableSkaters}석)</span>
           </button>
           <button
             onClick={() => handleJoin("G")}

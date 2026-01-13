@@ -147,7 +147,7 @@ export async function updateProfile(formData: FormData) {
 
   const updateData: Record<string, unknown> = {
     full_name: fullName,
-    position: position,
+    position: position || null,
     preferred_lang: preferredLang,
   };
 

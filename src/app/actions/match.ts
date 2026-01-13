@@ -37,9 +37,8 @@ export interface Match {
   id: string;
   start_time: string;
   fee: number;
-  max_fw: number;
-  max_df: number;
-  max_g: number;
+  max_skaters: number;
+  max_goalies: number;
   status: "open" | "closed" | "canceled";
   description: string | null;
   bank_account?: string | null;
@@ -63,12 +62,12 @@ export async function getMatches(): Promise<Match[]> {
       id,
       start_time,
       fee,
-      max_fw,
-      max_df,
-      max_g,
+      max_skaters,
+      max_goalies,
       status,
       description,
-      rink:rink_id(id, name_ko, name_en, address, lat, lng, rink_type)
+      rink:rink_id(id, name_ko, name_en, address, lat, lng, rink_type),
+      club:club_id(id, name, kakao_open_chat_url)
     `
     )
     .order("start_time", { ascending: true });
@@ -95,10 +94,14 @@ export async function getMatches(): Promise<Match[]> {
 
       // Handle rink which might be an array or object
       const rink = Array.isArray(match.rink) ? match.rink[0] : match.rink;
+      
+      // Handle club
+      const club = Array.isArray(match.club) ? match.club[0] : match.club;
 
       return {
         ...match,
         rink: rink as MatchRink | null,
+        club: club as MatchClub | null,
         participants_count: counts,
       } as Match;
     })
@@ -117,9 +120,8 @@ export async function getMatch(id: string): Promise<Match | null> {
       id,
       start_time,
       fee,
-      max_fw,
-      max_df,
-      max_g,
+      max_skaters,
+      max_goalies,
       status,
       description,
       bank_account,

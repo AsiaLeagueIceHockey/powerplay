@@ -3,6 +3,7 @@
 import { Link } from "@/i18n/navigation";
 import { useTranslations, useLocale } from "next-intl";
 import type { Match } from "@/app/actions/match";
+import { Users } from "lucide-react";
 
 export function MatchCard({ match }: { match: Match }) {
   const t = useTranslations("match");
@@ -41,9 +42,9 @@ export function MatchCard({ match }: { match: Match }) {
   };
 
   const counts = match.participants_count || { fw: 0, df: 0, g: 0 };
-  const remainingFW = match.max_fw - counts.fw;
-  const remainingDF = match.max_df - counts.df;
-  const remainingG = match.max_g - counts.g;
+  const currentSkaters = counts.fw + counts.df;
+  const remainingSkaters = match.max_skaters - currentSkaters;
+  const remainingGoalies = match.max_goalies - counts.g;
 
   return (
     <Link
@@ -63,46 +64,42 @@ export function MatchCard({ match }: { match: Match }) {
       </div>
 
       {/* Rink Name */}
-      <h3 className="mb-3 text-lg font-semibold group-hover:text-blue-600 dark:group-hover:text-blue-400">
+      <h3 className="mb-1 text-lg font-semibold group-hover:text-blue-600 dark:group-hover:text-blue-400">
         {rinkName || "Unknown Rink"}
       </h3>
+
+      {/* Club Name */}
+      {match.club && (
+        <div className="mb-3 flex items-center gap-1 text-sm font-medium text-blue-600 dark:text-blue-400">
+          <Users className="h-4 w-4" />
+          {match.club.name}
+        </div>
+      )}
 
       {/* Position Availability */}
       <div className="mb-3 flex gap-3 text-sm">
         <div className="flex items-center gap-1">
-          <span className="font-medium">{t("position.FW")}</span>
+          <span className="font-medium">{t("skater")}</span>
           <span
             className={`rounded px-1.5 py-0.5 ${
-              remainingFW > 0
+              remainingSkaters > 0
                 ? "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
                 : "bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-500"
             }`}
           >
-            {remainingFW}/{match.max_fw}
-          </span>
-        </div>
-        <div className="flex items-center gap-1">
-          <span className="font-medium">{t("position.DF")}</span>
-          <span
-            className={`rounded px-1.5 py-0.5 ${
-              remainingDF > 0
-                ? "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
-                : "bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-500"
-            }`}
-          >
-            {remainingDF}/{match.max_df}
+            {remainingSkaters}/{match.max_skaters}
           </span>
         </div>
         <div className="flex items-center gap-1">
           <span className="font-medium">{t("position.G")}</span>
           <span
             className={`rounded px-1.5 py-0.5 ${
-              remainingG > 0
+              remainingGoalies > 0
                 ? "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
                 : "bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-500"
             }`}
           >
-            {remainingG}/{match.max_g}
+            {remainingGoalies}/{match.max_goalies}
           </span>
         </div>
       </div>

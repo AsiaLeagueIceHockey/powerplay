@@ -102,6 +102,7 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
           type="datetime-local"
           name="start_time"
           required
+          step="600"
           className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
         />
       </div>
@@ -133,39 +134,27 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
         />
       </div>
 
-      {/* Position Limits */}
-      <div className="grid grid-cols-3 gap-4">
+      {/* Position Limits (Consolidated) */}
+      <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium mb-2 text-zinc-300">
-            {t("admin.form.maxFw")}
+            {t("admin.form.maxSkaters")}
           </label>
           <input
             type="number"
-            name="max_fw"
-            defaultValue={8}
+            name="max_skaters"
+            defaultValue={20}
             min={0}
             className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
           />
         </div>
         <div>
           <label className="block text-sm font-medium mb-2 text-zinc-300">
-            {t("admin.form.maxDf")}
+            {t("admin.form.maxGoalies")}
           </label>
           <input
             type="number"
-            name="max_df"
-            defaultValue={4}
-            min={0}
-            className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-2 text-zinc-300">
-            {t("admin.form.maxG")}
-          </label>
-          <input
-            type="number"
-            name="max_g"
+            name="max_goalies"
             defaultValue={2}
             min={0}
             className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"

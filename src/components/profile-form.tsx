@@ -90,9 +90,10 @@ export function ProfileForm({ profile }: { profile: Profile | null }) {
         <select
           id="position"
           name="position"
-          defaultValue={profile?.position || "FW"}
+          defaultValue={profile?.position || ""}
           className="w-full rounded-lg border border-zinc-300 px-4 py-2 focus:border-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-500/20 dark:border-zinc-700 dark:bg-zinc-800"
         >
+          <option value="">{tMatch("position.NONE")}</option>
           <option value="FW">{tMatch("position.FW")}</option>
           <option value="DF">{tMatch("position.DF")}</option>
           <option value="G">{tMatch("position.G")}</option>
