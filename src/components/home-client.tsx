@@ -1,13 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Match } from "@/app/actions/match";
 import { Rink } from "@/app/actions/types";
 import { DateFilter } from "@/components/date-filter";
 import { MatchCard } from "@/components/match-card";
+import { CalendarView } from "@/components/calendar-view";
 import { RinkExplorer } from "@/components/rink-explorer";
 import { useTranslations } from "next-intl";
-import { Calendar, Map as MapIcon } from "lucide-react";
+import { List, CalendarDays } from "lucide-react";
 
 interface HomeClientProps {
   matches: Match[]; // These are already filtered by date from the server if date param exists
@@ -19,7 +21,17 @@ interface HomeClientProps {
 
 export function HomeClient({ matches: filteredMatches, rinks, allMatches }: HomeClientProps) {
   const t = useTranslations("home");
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState<"match" | "rink">("match");
+  const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
+
+  const handleDateSelect = (dateStr: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("date", dateStr);
+    router.push(`?${params.toString()}`);
+    setViewMode("list"); // Switch to list view after selecting date
+  };
 
   return (
     <div className="flex flex-col gap-6">
@@ -62,22 +74,60 @@ export function HomeClient({ matches: filteredMatches, rinks, allMatches }: Home
       {/* Tab Content */}
       <div className="min-h-[500px]">
         {activeTab === "match" ? (
-          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-             {/* Match Tab: Date Filter + Match Grid */}
-             <div className="sticky top-0 z-10 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-sm py-2">
-                <DateFilter />
+          <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
+             {/* View Mode Toggle */}
+             <div className="flex items-center justify-end">
+               <div className="flex items-center bg-zinc-100 dark:bg-zinc-800 p-1 rounded-lg">
+                 <button
+                   onClick={() => setViewMode("list")}
+                   className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                     viewMode === "list"
+                       ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-700 dark:text-white"
+                       : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
+                   }`}
+                 >
+                   <List className="w-4 h-4" />
+                   {t("viewList")}
+                 </button>
+                 <button
+                   onClick={() => setViewMode("calendar")}
+                   className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                     viewMode === "calendar"
+                       ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-700 dark:text-white"
+                       : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
+                   }`}
+                 >
+                   <CalendarDays className="w-4 h-4" />
+                   {t("viewCalendar")}
+                 </button>
+               </div>
              </div>
-             
-             {filteredMatches.length === 0 ? (
-                <div className="text-center py-20 bg-zinc-50 dark:bg-zinc-900 rounded-xl border border-zinc-100 dark:border-zinc-800">
-                    <p className="text-zinc-500">{t("noMatches")}</p>
-                </div>
+
+             {viewMode === "list" ? (
+               <>
+                 {/* Date Filter (horizontal scrollable dates) */}
+                 <div className="sticky top-0 z-10 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-sm py-2">
+                   <DateFilter />
+                 </div>
+                 
+                 {filteredMatches.length === 0 ? (
+                   <div className="text-center py-20 bg-zinc-50 dark:bg-zinc-900 rounded-xl border border-zinc-100 dark:border-zinc-800">
+                       <p className="text-zinc-500">{t("noMatches")}</p>
+                   </div>
+                 ) : (
+                   <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                       {filteredMatches.map((match) => (
+                           <MatchCard key={match.id} match={match} />
+                       ))}
+                   </div>
+                 )}
+               </>
              ) : (
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                    {filteredMatches.map((match) => (
-                        <MatchCard key={match.id} match={match} />
-                    ))}
-                </div>
+               /* Calendar View */
+               <CalendarView 
+                 matches={allMatches} 
+                 onDateSelect={handleDateSelect} 
+               />
              )}
           </div>
         ) : (
@@ -90,3 +140,4 @@ export function HomeClient({ matches: filteredMatches, rinks, allMatches }: Home
     </div>
   );
 }
+

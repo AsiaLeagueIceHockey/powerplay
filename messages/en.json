@@ -14,6 +14,7 @@
         "noMatches": "No matches scheduled",
         "viewList": "List",
         "viewMap": "Map",
+        "viewCalendar": "Calendar",
         "unknownRink": "Unknown Rink"
     },
     "auth": {
