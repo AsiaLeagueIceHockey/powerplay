@@ -35,6 +35,10 @@ export function RinkForm({ locale, rink }: RinkFormProps) {
 
   const isEdit = !!rink;
 
+  // State for name fields (can be auto-filled)
+  const [nameKo, setNameKo] = useState(rink?.name_ko || "");
+  const [nameEn, setNameEn] = useState(rink?.name_en || "");
+
   const handleParseUrl = async () => {
     if (!formData.map_url) {
       setError("네이버 지도 URL을 입력해주세요.");
@@ -53,6 +57,11 @@ export function RinkForm({ locale, rink }: RinkFormProps) {
         lat: result.data.lat.toString(),
         lng: result.data.lng.toString(),
       });
+      
+      // Auto-fill name if available and not already set
+      if (result.data.name && !nameKo) {
+        setNameKo(result.data.name);
+      }
     } else {
       setError(result.error || "URL 파싱 실패");
     }
@@ -160,7 +169,8 @@ export function RinkForm({ locale, rink }: RinkFormProps) {
         <input
           type="text"
           name="name_ko"
-          defaultValue={rink?.name_ko || ""}
+          value={nameKo}
+          onChange={(e) => setNameKo(e.target.value)}
           required
           placeholder="예: 목동 아이스링크"
           className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
@@ -175,7 +185,8 @@ export function RinkForm({ locale, rink }: RinkFormProps) {
         <input
           type="text"
           name="name_en"
-          defaultValue={rink?.name_en || ""}
+          value={nameEn}
+          onChange={(e) => setNameEn(e.target.value)}
           required
           placeholder="e.g. Mokdong Ice Rink"
           className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"

@@ -311,10 +311,16 @@ export async function getAdminMatches() {
 
 // ==================== RINK CRUD ====================
 
-// Parse Naver Map URL to extract coordinates
+// Parse Naver Map URL to extract coordinates and place info
 export async function parseNaverMapUrl(url: string): Promise<{
   success: boolean;
-  data?: { lat: number; lng: number; address: string; mapUrl: string };
+  data?: { 
+    lat: number; 
+    lng: number; 
+    address: string; 
+    mapUrl: string;
+    name?: string; // Place name if available
+  };
   error?: string;
 }> {
   try {
@@ -325,62 +331,105 @@ export async function parseNaverMapUrl(url: string): Promise<{
     });
 
     const finalUrl = response.url;
-
-    // Extract lat and lng from URL params
     const urlObj = new URL(finalUrl);
-    const lat = urlObj.searchParams.get("lat");
-    const lng = urlObj.searchParams.get("lng");
 
-    if (!lat || !lng) {
-      return { success: false, error: "좌표를 추출할 수 없습니다. 올바른 네이버 지도 URL인지 확인해주세요." };
-    }
-
-    const latitude = parseFloat(lat);
-    const longitude = parseFloat(lng);
-
-    if (isNaN(latitude) || isNaN(longitude)) {
-      return { success: false, error: "좌표 형식이 올바르지 않습니다." };
-    }
-
-    // Use Naver Reverse Geocoding API to get address
-    const clientId = process.env.NEXT_PUBLIC_NAVER_MAP_CLIENT_ID;
-    const clientSecret = process.env.NAVER_MAP_CLIENT_SECRET;
-
+    // Try to extract lat and lng from URL params first
+    let latitude = urlObj.searchParams.get("lat") ? parseFloat(urlObj.searchParams.get("lat")!) : null;
+    let longitude = urlObj.searchParams.get("lng") ? parseFloat(urlObj.searchParams.get("lng")!) : null;
+    let placeName = "";
     let address = "";
 
-    if (clientId && clientSecret) {
-      try {
-        const geocodeResponse = await fetch(
-          `https://naveropenapi.apigw.ntruss.com/map-reversegeocode/v2/gc?coords=${longitude},${latitude}&output=json&orders=roadaddr,addr`,
-          {
-            headers: {
-              "X-NCP-APIGW-API-KEY-ID": clientId,
-              "X-NCP-APIGW-API-KEY": clientSecret,
-            },
-          }
-        );
+    // If lat/lng not in params, try to extract Place ID and use Naver Place API
+    if (!latitude || !longitude) {
+      // Extract place ID from URL path (e.g., /place/1450992971 or /entry/place/1450992971)
+      const placeIdMatch = finalUrl.match(/\/place\/(\d+)/);
+      
+      if (placeIdMatch) {
+        const placeId = placeIdMatch[1];
+        
+        try {
+          // Call Naver Place Summary API
+          const placeResponse = await fetch(
+            `https://map.naver.com/p/api/place/summary/${placeId}`,
+            {
+              headers: {
+                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+                "Referer": "https://map.naver.com/",
+              },
+            }
+          );
 
-        if (geocodeResponse.ok) {
-          const geocodeData = await geocodeResponse.json();
-          // Extract address from response
-          const results = geocodeData.results;
-          if (results && results.length > 0) {
-            const result = results[0];
-            const region = result.region;
-            const land = result.land;
-
-            if (result.name === "roadaddr" && land) {
-              // Road address format
-              address = `${region.area1.name} ${region.area2.name} ${region.area3.name} ${land.name} ${land.number1}${land.number2 ? "-" + land.number2 : ""}`;
-            } else if (region) {
-              // Lot number address format
-              address = `${region.area1.name} ${region.area2.name} ${region.area3.name}${region.area4?.name ? " " + region.area4.name : ""}`;
+          if (placeResponse.ok) {
+            const placeData = await placeResponse.json();
+            const detail = placeData?.data?.placeDetail;
+            
+            if (detail) {
+              // Extract coordinates
+              if (detail.coordinate) {
+                latitude = detail.coordinate.latitude;
+                longitude = detail.coordinate.longitude;
+              }
+              
+              // Extract name
+              if (detail.name) {
+                placeName = detail.name;
+              }
+              
+              // Extract address (prefer road address)
+              if (detail.address) {
+                address = detail.address.roadAddress || detail.address.address || "";
+              }
             }
           }
+        } catch (placeError) {
+          console.error("Naver Place API failed:", placeError);
         }
-      } catch (geocodeError) {
-        console.error("Reverse geocoding failed:", geocodeError);
-        // Continue without address - user can enter manually if needed
+      }
+    }
+
+    // Final validation
+    if (!latitude || !longitude || isNaN(latitude) || isNaN(longitude)) {
+      return { 
+        success: false, 
+        error: "좌표를 추출할 수 없습니다. 올바른 네이버 지도 URL인지 확인해주세요." 
+      };
+    }
+
+    // If we still don't have an address and we have coords, try reverse geocoding
+    if (!address && latitude && longitude) {
+      const clientId = process.env.NEXT_PUBLIC_NAVER_MAP_CLIENT_ID;
+      const clientSecret = process.env.NAVER_MAP_CLIENT_SECRET;
+
+      if (clientId && clientSecret) {
+        try {
+          const geocodeResponse = await fetch(
+            `https://naveropenapi.apigw.ntruss.com/map-reversegeocode/v2/gc?coords=${longitude},${latitude}&output=json&orders=roadaddr,addr`,
+            {
+              headers: {
+                "X-NCP-APIGW-API-KEY-ID": clientId,
+                "X-NCP-APIGW-API-KEY": clientSecret,
+              },
+            }
+          );
+
+          if (geocodeResponse.ok) {
+            const geocodeData = await geocodeResponse.json();
+            const results = geocodeData.results;
+            if (results && results.length > 0) {
+              const result = results[0];
+              const region = result.region;
+              const land = result.land;
+
+              if (result.name === "roadaddr" && land) {
+                address = `${region.area1.name} ${region.area2.name} ${region.area3.name} ${land.name} ${land.number1}${land.number2 ? "-" + land.number2 : ""}`;
+              } else if (region) {
+                address = `${region.area1.name} ${region.area2.name} ${region.area3.name}${region.area4?.name ? " " + region.area4.name : ""}`;
+              }
+            }
+          }
+        } catch (geocodeError) {
+          console.error("Reverse geocoding failed:", geocodeError);
+        }
       }
     }
 
@@ -390,7 +439,8 @@ export async function parseNaverMapUrl(url: string): Promise<{
         lat: latitude,
         lng: longitude,
         address: address.trim(),
-        mapUrl: url, // Store original short URL
+        mapUrl: url,
+        name: placeName || undefined,
       },
     };
   } catch (error) {
