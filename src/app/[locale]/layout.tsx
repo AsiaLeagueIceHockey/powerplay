@@ -5,6 +5,7 @@ import { routing, type Locale } from "@/i18n/routing";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Metadata } from "next";
 import { ScrollToTop } from "@/components/scroll-to-top";
+import { PushServiceWorkerRegister } from "@/components/push-manager";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -99,6 +100,7 @@ export default async function LocaleLayout({
       >
         <NextIntlClientProvider messages={messages}>
           <ScrollToTop />
+          <PushServiceWorkerRegister />
           {children}
         </NextIntlClientProvider>
       </body>

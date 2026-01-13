@@ -10,20 +10,22 @@ import { CalendarView } from "@/components/calendar-view";
 import { RinkExplorer } from "@/components/rink-explorer";
 import { useTranslations } from "next-intl";
 import { List, CalendarDays } from "lucide-react";
+import { Club } from "@/app/actions/types";
+import { ClubCard } from "@/components/club-card";
 
 interface HomeClientProps {
   matches: Match[]; // These are already filtered by date from the server if date param exists
   rinks: Rink[];
+  clubs: Club[];
   allMatches: Match[]; // Unfiltered matches for the Rink Explorer counts? Or just reuse matches? 
-                       // Actually Rink Explorer might want ALL future matches to show counts regardless of date filter selected in Match Tab.
-                       // Let's assume we pass allMatches for RinkExplorer and filteredMatches for MatchList.
+  myClubIds?: string[];
 }
 
-export function HomeClient({ matches: filteredMatches, rinks, allMatches }: HomeClientProps) {
+export function HomeClient({ matches: filteredMatches, rinks, clubs, allMatches, myClubIds = [] }: HomeClientProps) {
   const t = useTranslations("home");
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [activeTab, setActiveTab] = useState<"match" | "rink">("match");
+  const [activeTab, setActiveTab] = useState<"match" | "rink" | "club">("match");
   const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
 
   const handleDateSelect = (dateStr: string) => {
@@ -66,6 +68,21 @@ export function HomeClient({ matches: filteredMatches, rinks, allMatches }: Home
             링크장
           </span>
           {activeTab === "rink" && (
+            <span className="absolute bottom-0 left-0 w-full h-0.5 bg-zinc-900 dark:bg-white" />
+          )}
+        </button>
+        <button
+          onClick={() => setActiveTab("club")}
+          className={`flex-1 pb-3 text-lg font-bold transition-all relative ${
+            activeTab === "club"
+              ? "text-zinc-900 dark:text-white"
+              : "text-zinc-400 hover:text-zinc-600"
+          }`}
+        >
+          <span className="flex items-center justify-center gap-2">
+            동호회
+          </span>
+          {activeTab === "club" && (
             <span className="absolute bottom-0 left-0 w-full h-0.5 bg-zinc-900 dark:bg-white" />
           )}
         </button>
@@ -130,10 +147,29 @@ export function HomeClient({ matches: filteredMatches, rinks, allMatches }: Home
                />
              )}
           </div>
-        ) : (
+        ) : activeTab === "rink" ? (
           <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
              {/* Rink Tab: Rink Explorer */}
              <RinkExplorer rinks={rinks} matches={allMatches} />
+          </div>
+        ) : (
+          <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+             {/* Club Tab */}
+             {clubs.length === 0 ? (
+               <div className="text-center py-20 bg-zinc-50 dark:bg-zinc-900 rounded-xl border border-zinc-100 dark:border-zinc-800">
+                   <p className="text-zinc-500">등록된 동호회가 없습니다.</p>
+               </div>
+             ) : (
+               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                   {clubs.map((club) => (
+                       <ClubCard 
+                          key={club.id} 
+                          club={club} 
+                          initialIsMember={myClubIds.includes(club.id)} 
+                       />
+                   ))}
+               </div>
+             )}
           </div>
         )}
       </div>

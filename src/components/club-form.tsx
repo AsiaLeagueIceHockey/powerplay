@@ -58,6 +58,20 @@ export function ClubForm({ locale, club }: ClubFormProps) {
         />
       </div>
 
+      {/* Description */}
+      <div>
+        <label className="block text-sm font-medium mb-2 text-zinc-300">
+          동호회 소개 (선택)
+        </label>
+        <textarea
+          name="description"
+          defaultValue={club?.description || ""}
+          rows={4}
+          placeholder="동호회에 대한 간단한 소개를 입력해주세요."
+          className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+        />
+      </div>
+
       {/* 카카오톡 오픈채팅 URL */}
       <div>
         <label className="block text-sm font-medium mb-2 text-zinc-300">

@@ -3,6 +3,7 @@ import { getTranslations, getLocale } from "next-intl/server";
 import { getUser } from "@/app/actions/auth";
 import { getMyMatches } from "@/app/actions/mypage";
 import { Link } from "@/i18n/navigation";
+import { PushPermissionButton } from "@/components/push-manager";
 
 export default async function MyPage() {
   const user = await getUser();
@@ -56,8 +57,13 @@ export default async function MyPage() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <h1 className="text-2xl font-bold mb-2">{t("mypage.title")}</h1>
-      <p className="text-gray-600 mb-6">{t("mypage.subtitle")}</p>
+      <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+        <div>
+          <h1 className="text-2xl font-bold mb-2">{t("mypage.title")}</h1>
+          <p className="text-gray-600">{t("mypage.subtitle")}</p>
+        </div>
+        <PushPermissionButton className="px-5 py-2.5 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-lg font-medium hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors shadow-sm" />
+      </div>
 
       {myMatches.length === 0 ? (
         <div className="text-center py-12 bg-gray-50 rounded-lg">

@@ -1,6 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { getMatches } from "@/app/actions/match";
 import { getRinks } from "@/app/actions/rink";
+import { getClubs, getMyClubs } from "@/app/actions/clubs";
 import { FeedbackBanner } from "@/components/feedback-banner";
 import { HomeClient } from "@/components/home-client";
 import { Suspense } from "react";
@@ -17,11 +18,15 @@ export default async function HomePage({
   setRequestLocale(locale);
 
   // 병렬 데이터 페칭
-  const [t, allMatches, rinks] = await Promise.all([
+  const [t, allMatches, rinks, clubs, myClubs] = await Promise.all([
     getTranslations("home"),
     getMatches(),
     getRinks(),
+    getClubs(),
+    getMyClubs(),
   ]);
+
+  const myClubIds = new Set(myClubs.map(c => c.club_id));
 
   // Filter matches by selected date (KST) for the Match List View
   const filteredMatches = selectedDate
@@ -53,6 +58,8 @@ export default async function HomePage({
             matches={filteredMatches} 
             allMatches={allMatches} 
             rinks={rinks} 
+            clubs={clubs}
+            myClubIds={Array.from(myClubIds)}
         />
       </Suspense>
     </div>

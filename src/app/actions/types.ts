@@ -14,6 +14,7 @@ export interface Club {
   id: string;
   name: string;
   kakao_open_chat_url?: string;
+  description?: string;
   created_by?: string;
   created_at?: string;
   member_count?: number;
@@ -28,3 +29,12 @@ export interface ClubMembership {
   club?: Club;
 }
 
+export interface ClubPost {
+  id: string;
+  club_id: string;
+  title: string;
+  content: string;
+  created_by?: string;
+  created_at: string;
+  updated_at?: string;
+}

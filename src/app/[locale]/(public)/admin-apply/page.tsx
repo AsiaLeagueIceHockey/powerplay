@@ -62,7 +62,7 @@ export default function AdminApplyPage() {
           </div>
           <p className="text-zinc-600 dark:text-zinc-400 mb-5 leading-relaxed">
             {locale === "ko" 
-              ? "동호회를 생성하고 멤버를 관리할 수 있습니다. 파워 플레이를 통해 게스트 모집도 가능합니다!"
+              ? "동호회를 생성하고 멤버들을 관리하세요. 파워 플레이를 통해 게스트를 모집해보세요!"
               : "Create clubs and manage members. Recruit guests through Power Play!"}
           </p>
           <div className="grid grid-cols-2 gap-3">
@@ -108,7 +108,7 @@ export default function AdminApplyPage() {
           </div>
           <p className="text-zinc-600 dark:text-zinc-400 mb-5 leading-relaxed">
             {locale === "ko" 
-              ? "우리 링크장이 검색이 안나오나요? 네이버 지도 URL만 입력하면 우리 링크를 등록할 수 있습니다."
+              ? "링크장이 검색이 안되나요? 네이버 지도 URL만 입력하면 링크장을 등록할 수 있습니다!"
               : "Auto-fill rink address and location by simply entering the Naver Map URL. Register your rink!"}
           </p>
           <div className="grid grid-cols-2 gap-3">

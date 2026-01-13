@@ -1,7 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { Club, ClubMembership } from "./types";
+import { Club, ClubMembership, ClubPost } from "./types";
 
 // ============================================
 // Club CRUD Operations
@@ -79,6 +79,7 @@ export async function createClub(formData: FormData) {
 
   const name = formData.get("name") as string;
   const kakaoUrl = formData.get("kakao_open_chat_url") as string;
+  const description = formData.get("description") as string;
 
   if (!name?.trim()) {
     return { error: "Club name is required" };
@@ -89,6 +90,7 @@ export async function createClub(formData: FormData) {
     .insert({
       name: name.trim(),
       kakao_open_chat_url: kakaoUrl?.trim() || null,
+      description: description?.trim() || null,
       created_by: user.id,
     })
     .select()
@@ -122,12 +124,14 @@ export async function updateClub(id: string, formData: FormData) {
 
   const name = formData.get("name") as string;
   const kakaoUrl = formData.get("kakao_open_chat_url") as string;
+  const description = formData.get("description") as string;
 
   const { error } = await supabase
     .from("clubs")
     .update({
       name: name?.trim(),
       kakao_open_chat_url: kakaoUrl?.trim() || null,
+      description: description?.trim() || null,
     })
     .eq("id", id);
 
@@ -260,4 +264,68 @@ export async function isClubMember(clubId: string): Promise<boolean> {
     .single();
 
   return !!data;
+}
+
+// ============================================
+// Club Notices (Posts)
+// ============================================
+
+export async function getClubNotices(clubId: string): Promise<ClubPost[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("club_posts")
+    .select("*")
+    .eq("club_id", clubId)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Error fetching club notices:", error);
+    return [];
+  }
+  return data as ClubPost[];
+}
+
+export async function createClubNotice(clubId: string, title: string, content: string) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "Not authenticated" };
+  }
+
+  // Check permission: System Admin or Club Admin
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  const { data: membership } = await supabase
+    .from("club_memberships")
+    .select("role")
+    .eq("club_id", clubId)
+    .eq("user_id", user.id)
+    .single();
+
+  const isSystemAdmin = profile?.role === "admin";
+  const isClubAdmin = membership?.role === "admin";
+
+  if (!isSystemAdmin && !isClubAdmin) {
+    return { error: "Unauthorized" };
+  }
+
+  const { error } = await supabase.from("club_posts").insert({
+    club_id: clubId,
+    title,
+    content,
+    created_by: user.id,
+  });
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  return { success: true };
 }
