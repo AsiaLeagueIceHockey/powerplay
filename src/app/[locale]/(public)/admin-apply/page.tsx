@@ -66,11 +66,11 @@ export default function AdminApplyPage() {
               : "Create clubs and manage members. Recruit guests through Power Play!"}
           </p>
           <div className="grid grid-cols-2 gap-3">
-            <div className="relative aspect-[3/4] overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-100">
-               <Image src="/admin-club-1.png" alt="Club Management 1" fill className="object-cover" />
+            <div className="relative aspect-[9/16] overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-100">
+               <Image src="/admin-club-1.png" alt="Club Management 1" fill className="object-contain" />
             </div>
-            <div className="relative aspect-[3/4] overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-100">
-               <Image src="/admin-club-2.png" alt="Club Management 2" fill className="object-cover" />
+            <div className="relative aspect-[9/16] overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-100">
+               <Image src="/admin-club-2.png" alt="Club Management 2" fill className="object-contain" />
             </div>
           </div>
         </div>
@@ -89,11 +89,11 @@ export default function AdminApplyPage() {
               : "Create matches with start time and player/goalie limits. Organize schedules by hosting club."}
           </p>
           <div className="grid grid-cols-2 gap-3">
-             <div className="relative aspect-[3/4] overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-100">
-               <Image src="/admin-game-1.png" alt="Match Management 1" fill className="object-cover" />
+             <div className="relative aspect-[9/16] overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-100">
+               <Image src="/admin-game-1.png" alt="Match Management 1" fill className="object-contain" />
             </div>
-            <div className="relative aspect-[3/4] overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-100">
-               <Image src="/admin-game-2.png" alt="Match Management 2" fill className="object-cover" />
+            <div className="relative aspect-[9/16] overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-100">
+               <Image src="/admin-game-2.png" alt="Match Management 2" fill className="object-contain" />
             </div>
           </div>
         </div>
@@ -112,11 +112,11 @@ export default function AdminApplyPage() {
               : "Auto-fill rink address and location by simply entering the Naver Map URL. Register your rink!"}
           </p>
           <div className="grid grid-cols-2 gap-3">
-            <div className="relative aspect-[3/4] overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-100">
-               <Image src="/admin-rink-1.png" alt="Rink Management 1" fill className="object-cover" />
+            <div className="relative aspect-[9/16] overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-100">
+               <Image src="/admin-rink-1.png" alt="Rink Management 1" fill className="object-contain" />
             </div>
-            <div className="relative aspect-[3/4] overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-100">
-               <Image src="/admin-rink-2.png" alt="Rink Management 2" fill className="object-cover" />
+            <div className="relative aspect-[9/16] overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-100">
+               <Image src="/admin-rink-2.png" alt="Rink Management 2" fill className="object-contain" />
             </div>
           </div>
         </div>
