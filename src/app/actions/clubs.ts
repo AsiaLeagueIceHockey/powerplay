@@ -4,6 +4,42 @@ import { createClient } from "@/lib/supabase/server";
 import { Club, ClubMembership, ClubPost } from "./types";
 
 // ============================================
+// Club Logo Upload
+// ============================================
+
+export async function uploadClubLogo(formData: FormData): Promise<{ url?: string; error?: string }> {
+  const supabase = await createClient();
+  
+  const file = formData.get("file") as File;
+  if (!file || file.size === 0) {
+    return { error: "No file provided" };
+  }
+
+  // Generate unique filename
+  const fileExt = file.name.split(".").pop();
+  const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from("club-logos")
+    .upload(fileName, file, {
+      cacheControl: "3600",
+      upsert: false,
+    });
+
+  if (uploadError) {
+    console.error("Upload error:", uploadError);
+    return { error: uploadError.message };
+  }
+
+  // Get public URL
+  const { data: { publicUrl } } = supabase.storage
+    .from("club-logos")
+    .getPublicUrl(fileName);
+
+  return { url: publicUrl };
+}
+
+// ============================================
 // Club CRUD Operations
 // ============================================
 
@@ -80,6 +116,9 @@ export async function createClub(formData: FormData) {
   const name = formData.get("name") as string;
   const kakaoUrl = formData.get("kakao_open_chat_url") as string;
   const description = formData.get("description") as string;
+  const logoUrl = formData.get("logo_url") as string;
+  const repName = formData.get("rep_name") as string;
+  const repPhone = formData.get("rep_phone") as string;
 
   if (!name?.trim()) {
     return { error: "Club name is required" };
@@ -91,6 +130,9 @@ export async function createClub(formData: FormData) {
       name: name.trim(),
       kakao_open_chat_url: kakaoUrl?.trim() || null,
       description: description?.trim() || null,
+      logo_url: logoUrl?.trim() || null,
+      rep_name: repName?.trim() || null,
+      rep_phone: repPhone?.trim() || null,
       created_by: user.id,
     })
     .select()
@@ -125,6 +167,9 @@ export async function updateClub(id: string, formData: FormData) {
   const name = formData.get("name") as string;
   const kakaoUrl = formData.get("kakao_open_chat_url") as string;
   const description = formData.get("description") as string;
+  const logoUrl = formData.get("logo_url") as string;
+  const repName = formData.get("rep_name") as string;
+  const repPhone = formData.get("rep_phone") as string;
 
   const { error } = await supabase
     .from("clubs")
@@ -132,6 +177,9 @@ export async function updateClub(id: string, formData: FormData) {
       name: name?.trim(),
       kakao_open_chat_url: kakaoUrl?.trim() || null,
       description: description?.trim() || null,
+      logo_url: logoUrl?.trim() || null,
+      rep_name: repName?.trim() || null,
+      rep_phone: repPhone?.trim() || null,
     })
     .eq("id", id);
 

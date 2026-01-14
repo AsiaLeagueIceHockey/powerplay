@@ -31,6 +31,7 @@ export interface MatchClub {
   id: string;
   name: string;
   kakao_open_chat_url?: string;
+  logo_url?: string;
 }
 
 export interface Match {
@@ -67,7 +68,7 @@ export async function getMatches(): Promise<Match[]> {
       status,
       description,
       rink:rink_id(id, name_ko, name_en, address, lat, lng, rink_type),
-      club:club_id(id, name, kakao_open_chat_url)
+      club:club_id(id, name, kakao_open_chat_url, logo_url)
     `
     )
     .order("start_time", { ascending: true });
@@ -126,7 +127,7 @@ export async function getMatch(id: string): Promise<Match | null> {
       description,
       bank_account,
       rink:rink_id(id, name_ko, name_en, map_url, lat, lng),
-      club:club_id(id, name, kakao_open_chat_url)
+      club:club_id(id, name, kakao_open_chat_url, logo_url)
     `
     )
     .eq("id", id)

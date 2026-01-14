@@ -3,7 +3,8 @@
 import { Link } from "@/i18n/navigation";
 import { useTranslations, useLocale } from "next-intl";
 import type { Match } from "@/app/actions/match";
-import { Users } from "lucide-react";
+import { Users, Building2 } from "lucide-react";
+import Image from "next/image";
 
 export function MatchCard({ match }: { match: Match }) {
   const t = useTranslations("match");
@@ -68,10 +69,20 @@ export function MatchCard({ match }: { match: Match }) {
         {rinkName || "Unknown Rink"}
       </h3>
 
-      {/* Club Name */}
+      {/* Club Name with Logo */}
       {match.club && (
-        <div className="mb-3 flex items-center gap-1 text-sm font-medium text-blue-600 dark:text-blue-400">
-          <Users className="h-4 w-4" />
+        <div className="mb-3 flex items-center gap-2 text-sm font-medium text-blue-600 dark:text-blue-400">
+          {match.club.logo_url ? (
+            <Image 
+              src={match.club.logo_url} 
+              alt={match.club.name} 
+              width={20} 
+              height={20} 
+              className="w-5 h-5 rounded object-cover"
+            />
+          ) : (
+            <Building2 className="h-4 w-4" />
+          )}
           {match.club.name}
         </div>
       )}

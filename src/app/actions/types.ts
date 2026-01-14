@@ -15,6 +15,9 @@ export interface Club {
   name: string;
   kakao_open_chat_url?: string;
   description?: string;
+  logo_url?: string;
+  rep_name?: string;
+  rep_phone?: string;
   created_by?: string;
   created_at?: string;
   member_count?: number;
