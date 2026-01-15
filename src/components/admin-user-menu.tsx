@@ -11,13 +11,17 @@ interface User {
   };
 }
 
+interface AdminUserMenuProps {
+  user: User | null;
+  locale: string;
+  position?: "top" | "bottom"; // "top" for header (menu goes down), "bottom" for sidebar (menu goes up)
+}
+
 export function AdminUserMenu({
   user,
   locale,
-}: {
-  user: User | null;
-  locale: string;
-}) {
+  position = "top",
+}: AdminUserMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
   const menuRef = useRef<HTMLDivElement>(null);
@@ -42,6 +46,11 @@ export function AdminUserMenu({
   if (!user) return null;
 
   const displayName = user.user_metadata?.full_name || user.email?.split("@")[0];
+
+  // Menu positioning based on where the button is placed
+  const menuPositionClasses = position === "bottom" 
+    ? "absolute left-0 bottom-full mb-2" // For sidebar (opens upward)
+    : "absolute right-0 mt-2"; // For header (opens downward)
 
   return (
     <div className="relative" ref={menuRef}>
@@ -68,7 +77,7 @@ export function AdminUserMenu({
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-48 bg-zinc-800 rounded-lg shadow-xl border border-zinc-700 py-1 z-50">
+        <div className={`${menuPositionClasses} w-48 bg-zinc-800 rounded-lg shadow-xl border border-zinc-700 py-1 z-50`}>
           {/* User Page */}
           <button
             onClick={() => {

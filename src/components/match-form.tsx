@@ -103,7 +103,7 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
           name="start_time"
           required
           step="600"
-          className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+          className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 appearance-none [-webkit-appearance:none] [&::-webkit-date-and-time-value]:text-left"
         />
       </div>
 

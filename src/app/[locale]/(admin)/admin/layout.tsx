@@ -58,7 +58,7 @@ export default async function AdminLayout({
           {/* User Menu at bottom of sidebar */}
           <div className="absolute bottom-4 left-4 right-4">
             <div className="border-t border-zinc-800 pt-4">
-              <AdminUserMenu user={user} locale={locale} />
+              <AdminUserMenu user={user} locale={locale} position="bottom" />
             </div>
           </div>
         </aside>
