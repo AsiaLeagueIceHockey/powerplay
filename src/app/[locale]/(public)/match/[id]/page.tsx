@@ -19,20 +19,18 @@ export default async function MatchPage({
   
   const supabase = await createClient();
   
-  // Parallel fetch user and translations
-  const [t, { data: { user } }] = await Promise.all([
+  // Fully parallel fetch - translations, user, and match all at once
+  const [t, { data: { user } }, match] = await Promise.all([
     getTranslations(),
     supabase.auth.getUser(),
+    getMatch(id),
   ]);
-  
-  // Fetch match
-  const match = await getMatch(id);
 
   if (!match) {
     notFound();
   }
   
-  // Get user profile for onboarding status
+  // Get user profile for onboarding status (only if user exists)
   let onboardingCompleted = true;
   if (user) {
     const { data: profile } = await supabase

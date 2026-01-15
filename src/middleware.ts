@@ -6,15 +6,16 @@ import { routing } from "@/i18n/routing";
 const intlMiddleware = createMiddleware(routing);
 
 export async function middleware(request: NextRequest) {
-  // First, update Supabase session
-  const supabaseResponse = await updateSession(request);
+  // First, update Supabase session and get user data
+  const { supabaseResponse, user, supabase } = await updateSession(request);
 
   // Check if the request is for an admin route (but not admin-apply)
   const pathname = request.nextUrl.pathname;
   const isAdminRoute = pathname.includes("/admin") && !pathname.includes("/admin-apply");
 
   if (isAdminRoute) {
-    const isAdmin = await checkAdminAccess(request);
+    // Reuse user and supabase from updateSession (no duplicate auth call!)
+    const isAdmin = await checkAdminAccess(request, user, supabase);
     if (!isAdmin) {
       // Redirect non-admins to home page
       const locale = pathname.split("/")[1] || "ko";

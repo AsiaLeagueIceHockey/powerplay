@@ -29,14 +29,35 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
-  // IMPORTANT: DO NOT REMOVE
-  // Refreshes the user's session if expired
-  await supabase.auth.getUser();
+  // IMPORTANT: Refreshes the user's session if expired
+  // Also returns the user data for reuse
+  const { data: { user } } = await supabase.auth.getUser();
 
-  return supabaseResponse;
+  return { supabaseResponse, user, supabase };
 }
 
-export async function checkAdminAccess(request: NextRequest): Promise<boolean> {
+export async function checkAdminAccess(
+  request: NextRequest,
+  cachedUser?: { id: string } | null,
+  cachedSupabase?: ReturnType<typeof createServerClient>
+): Promise<boolean> {
+  // Reuse cached user if available (from updateSession)
+  if (cachedUser === null) {
+    return false;
+  }
+
+  // If we have cached user, use it
+  if (cachedUser && cachedSupabase) {
+    const { data: profile } = await cachedSupabase
+      .from("profiles")
+      .select("role")
+      .eq("id", cachedUser.id)
+      .single();
+
+    return profile?.role === "admin";
+  }
+
+  // Fallback: Create new Supabase client (shouldn't happen normally)
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -45,9 +66,7 @@ export async function checkAdminAccess(request: NextRequest): Promise<boolean> {
         getAll() {
           return request.cookies.getAll();
         },
-        setAll() {
-          // Not needed for read-only access
-        },
+        setAll() {},
       },
     }
   );
@@ -60,7 +79,6 @@ export async function checkAdminAccess(request: NextRequest): Promise<boolean> {
     return false;
   }
 
-  // Check if user has admin role
   const { data: profile } = await supabase
     .from("profiles")
     .select("role")
