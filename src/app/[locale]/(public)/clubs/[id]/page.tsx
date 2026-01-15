@@ -1,8 +1,9 @@
 import { getClub, getClubNotices, isClubMember, joinClub } from "@/app/actions/clubs";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
-import { MessageCircle, Users, Calendar } from "lucide-react";
-import { JoinClubButton } from "@/components/join-club-button"; // Separate client component for interactivity
+import { MessageCircle, Users, Calendar, Building2 } from "lucide-react";
+import { JoinClubButton } from "@/components/join-club-button";
+import Image from "next/image";
 
 export default async function ClubDetailPage({
   params,
@@ -28,35 +29,53 @@ export default async function ClubDetailPage({
       {/* Club Header */}
       <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 mb-8 shadow-sm">
         <div className="flex flex-col md:flex-row justify-between gap-6">
-          <div className="flex-1">
-            <h1 className="text-2xl font-bold mb-3 text-zinc-900 dark:text-white flex items-center gap-3">
-              {club.name}
-              {club.member_count !== undefined && (
-                <span className="flex items-center text-sm font-medium text-zinc-500 bg-zinc-100 dark:bg-zinc-800 px-3 py-1 rounded-full">
-                  <Users className="w-4 h-4 mr-1" />
-                  {club.member_count}
-                </span>
+          <div className="flex gap-5">
+            {/* Club Logo */}
+            <div className="w-20 h-20 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center overflow-hidden shrink-0">
+              {club.logo_url ? (
+                <Image 
+                  src={club.logo_url} 
+                  alt={club.name} 
+                  width={80} 
+                  height={80} 
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <Building2 className="w-10 h-10 text-zinc-400" />
               )}
-            </h1>
-            
-            <p className="text-zinc-600 dark:text-zinc-400 whitespace-pre-wrap leading-relaxed mb-6">
-              {club.description || (locale === "ko" ? "소개글이 없습니다." : "No description.")}
-            </p>
+            </div>
 
-            <div className="flex flex-wrap gap-3">
-               <JoinClubButton club={club} initialIsMember={isMember} />
-               
-               {club.kakao_open_chat_url && (
-                 <a
-                   href={club.kakao_open_chat_url}
-                   target="_blank"
-                   rel="noreferrer"
-                   className="flex items-center gap-2 px-4 py-2 bg-[#FAE100] text-[#371D1E] rounded-lg font-medium hover:bg-[#FCE620] transition-colors"
-                 >
-                   <MessageCircle className="w-5 h-5" />
-                   {locale === "ko" ? "오픈채팅 참여" : "KakaoTalk"}
-                 </a>
-               )}
+            {/* Club Info */}
+            <div className="flex-1">
+              <h1 className="text-2xl font-bold mb-2 text-zinc-900 dark:text-white flex items-center gap-3">
+                {club.name}
+                {club.member_count !== undefined && (
+                  <span className="flex items-center text-sm font-medium text-zinc-500 bg-zinc-100 dark:bg-zinc-800 px-3 py-1 rounded-full">
+                    <Users className="w-4 h-4 mr-1" />
+                    {club.member_count}
+                  </span>
+                )}
+              </h1>
+              
+              <p className="text-zinc-600 dark:text-zinc-400 whitespace-pre-wrap leading-relaxed mb-4">
+                {club.description || (locale === "ko" ? "소개글이 없습니다." : "No description.")}
+              </p>
+
+              <div className="flex flex-wrap gap-3">
+                 <JoinClubButton club={club} initialIsMember={isMember} />
+                 
+                 {club.kakao_open_chat_url && (
+                   <a
+                     href={club.kakao_open_chat_url}
+                     target="_blank"
+                     rel="noreferrer"
+                     className="flex items-center gap-2 px-4 py-2 bg-[#FAE100] text-[#371D1E] rounded-lg font-medium hover:bg-[#FCE620] transition-colors"
+                   >
+                     <MessageCircle className="w-5 h-5" />
+                     {locale === "ko" ? "오픈채팅 참여" : "KakaoTalk"}
+                   </a>
+                 )}
+              </div>
             </div>
           </div>
         </div>
