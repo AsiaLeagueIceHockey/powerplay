@@ -54,7 +54,7 @@ export async function checkAdminAccess(
       .eq("id", cachedUser.id)
       .single();
 
-    return profile?.role === "admin";
+    return profile?.role === "admin" || profile?.role === "superuser";
   }
 
   // Fallback: Create new Supabase client (shouldn't happen normally)
@@ -85,5 +85,5 @@ export async function checkAdminAccess(
     .eq("id", user.id)
     .single();
 
-  return profile?.role === "admin";
+  return profile?.role === "admin" || profile?.role === "superuser";
 }

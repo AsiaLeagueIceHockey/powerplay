@@ -59,7 +59,8 @@
             "NONE": "선택 안함"
         },
         "skater": "플레이어",
-        "fee": "참가비",
+        "fee": "참가 포인트",
+        "entryPoints": "참가 포인트",
         "remaining": "잔여석",
         "join": "참가 신청",
         "cancel": "신청 취소",
@@ -67,7 +68,10 @@
         "spots": "{count}석",
         "viewMap": "지도 보기",
         "noParticipants": "참가자가 없습니다",
-        "confirmCancel": "신청을 취소하시겠습니까?"
+        "confirmCancel": "신청을 취소하시겠습니까?",
+        "insufficientPoints": "포인트가 부족합니다",
+        "goToCharge": "충전하러 가기",
+        "refundPolicy": "환불 정책"
     },
     "participant": {
         "status": {
@@ -87,6 +91,44 @@
         "noMatches": "신청한 경기가 없습니다",
         "browseMatches": "경기 둘러보기"
     },
+    "points": {
+        "title": "포인트",
+        "balance": "보유 포인트",
+        "charge": "충전하기",
+        "history": "포인트 내역",
+        "noHistory": "포인트 내역이 없습니다",
+        "transaction": {
+            "charge": "충전",
+            "use": "사용",
+            "refund": "환불",
+            "admin_adjustment": "관리자 조정"
+        },
+        "chargeRequest": {
+            "title": "포인트 충전",
+            "amount": "충전 금액",
+            "depositorName": "입금자명",
+            "depositorNamePlaceholder": "이체 시 입금자명",
+            "bankAccount": "입금 계좌",
+            "submit": "충전 신청",
+            "submitting": "신청 중...",
+            "pending": "입금 확인 대기중",
+            "confirmed": "충전 완료",
+            "rejected": "거부됨",
+            "canceled": "취소됨",
+            "cancel": "신청 취소",
+            "note": "계좌이체 후 입금자명을 정확히 입력해주세요. 관리자 확인 후 포인트가 적립됩니다.",
+            "quickAmounts": "빠른 선택",
+            "customAmount": "직접 입력",
+            "myRequests": "내 충전 신청 내역"
+        },
+        "refundPolicy": {
+            "title": "환불 정책",
+            "description": "경기 취소 시 환불 규정",
+            "hoursBeforeMatch": "경기 {hours}시간 전",
+            "refundPercent": "{percent}% 환불",
+            "rule": "{hours}시간 전: {percent}% 환불"
+        }
+    },
     "admin": {
         "matches": {
             "title": "경기 관리",
@@ -105,7 +147,8 @@
             "rink": "링크",
             "selectRink": "링크 선택",
             "dateTime": "날짜 및 시간",
-            "fee": "참가비 (원)",
+            "fee": "참가 포인트",
+            "entryPoints": "참가 포인트",
             "maxSkaters": "모집 인원 (플레이어)",
             "maxGoalies": "모집 인원 (골리)",
             "description": "설명",
@@ -122,6 +165,31 @@
             "title": "참가자 목록",
             "noParticipants": "참가자가 없습니다",
             "togglePayment": "입금 상태 변경"
+        },
+        "settings": {
+            "title": "플랫폼 설정",
+            "bankAccount": "입금 계좌",
+            "bank": "은행명",
+            "account": "계좌번호",
+            "holder": "예금주",
+            "refundPolicy": "환불 정책",
+            "addRule": "규칙 추가",
+            "hoursLabel": "시간 전",
+            "percentLabel": "환불 %",
+            "save": "저장",
+            "saved": "저장되었습니다"
+        },
+        "chargeRequests": {
+            "title": "충전 요청 관리",
+            "noRequests": "대기중인 요청이 없습니다",
+            "user": "사용자",
+            "amount": "금액",
+            "depositorName": "입금자명",
+            "requestedAt": "신청일",
+            "confirm": "입금 확인",
+            "reject": "거부",
+            "confirmMessage": "입금을 확인하고 포인트를 지급하시겠습니까?",
+            "rejectMessage": "충전 요청을 거부하시겠습니까?"
         }
     }
 }

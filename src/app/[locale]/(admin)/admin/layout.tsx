@@ -20,6 +20,17 @@ export default async function AdminLayout({
     supabase.auth.getUser(),
   ]);
 
+  // Check if user is superuser
+  let isSuperUser = false;
+  if (user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+    isSuperUser = profile?.role === "superuser";
+  }
+
   return (
     <div className="min-h-screen bg-zinc-900 text-zinc-100">
       {/* Mobile Header */}
@@ -53,6 +64,26 @@ export default async function AdminLayout({
             >
               🏟️ 링크 관리
             </Link>
+            
+            {/* SuperUser Only Menus */}
+            {isSuperUser && (
+              <>
+                <div className="border-t border-zinc-800 my-3"></div>
+                <div className="px-4 py-1 text-xs text-amber-500 font-medium uppercase">SuperUser</div>
+                <Link
+                  href={`/${locale}/admin/charge-requests`}
+                  className="block rounded-lg px-4 py-2.5 text-sm font-medium text-zinc-300 hover:bg-zinc-800 hover:text-white"
+                >
+                  💰 충전 요청 관리
+                </Link>
+                <Link
+                  href={`/${locale}/admin/settings`}
+                  className="block rounded-lg px-4 py-2.5 text-sm font-medium text-zinc-300 hover:bg-zinc-800 hover:text-white"
+                >
+                  ⚙️ 플랫폼 설정
+                </Link>
+              </>
+            )}
           </nav>
           
           {/* User Menu at bottom of sidebar */}
@@ -90,7 +121,26 @@ export default async function AdminLayout({
           <span className="text-xl">🏟️</span>
           <span className="text-xs">링크</span>
         </Link>
+        {isSuperUser && (
+          <>
+            <Link
+              href={`/${locale}/admin/charge-requests`}
+              className="flex flex-col items-center gap-1 px-3 py-2 text-amber-400 hover:text-amber-300"
+            >
+              <span className="text-xl">💰</span>
+              <span className="text-xs">충전</span>
+            </Link>
+            <Link
+              href={`/${locale}/admin/settings`}
+              className="flex flex-col items-center gap-1 px-3 py-2 text-amber-400 hover:text-amber-300"
+            >
+              <span className="text-xl">⚙️</span>
+              <span className="text-xs">설정</span>
+            </Link>
+          </>
+        )}
       </nav>
     </div>
   );
 }
+

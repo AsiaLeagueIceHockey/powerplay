@@ -59,7 +59,8 @@
             "NONE": "None"
         },
         "skater": "Skater",
-        "fee": "Fee",
+        "fee": "Entry Points",
+        "entryPoints": "Entry Points",
         "remaining": "Spots left",
         "join": "Join",
         "cancel": "Cancel",
@@ -67,7 +68,10 @@
         "spots": "{count} spots",
         "viewMap": "View Map",
         "noParticipants": "No participants",
-        "confirmCancel": "Are you sure you want to cancel?"
+        "confirmCancel": "Are you sure you want to cancel?",
+        "insufficientPoints": "Insufficient points",
+        "goToCharge": "Charge Points",
+        "refundPolicy": "Refund Policy"
     },
     "participant": {
         "status": {
@@ -87,6 +91,44 @@
         "noMatches": "No matches applied yet",
         "browseMatches": "Browse matches"
     },
+    "points": {
+        "title": "Points",
+        "balance": "Balance",
+        "charge": "Charge",
+        "history": "History",
+        "noHistory": "No point history",
+        "transaction": {
+            "charge": "Charge",
+            "use": "Use",
+            "refund": "Refund",
+            "admin_adjustment": "Admin Adjustment"
+        },
+        "chargeRequest": {
+            "title": "Charge Points",
+            "amount": "Amount",
+            "depositorName": "Depositor Name",
+            "depositorNamePlaceholder": "Name used for bank transfer",
+            "bankAccount": "Bank Account",
+            "submit": "Request Charge",
+            "submitting": "Submitting...",
+            "pending": "Pending Confirmation",
+            "confirmed": "Confirmed",
+            "rejected": "Rejected",
+            "canceled": "Canceled",
+            "cancel": "Cancel Request",
+            "note": "After bank transfer, enter your depositor name exactly. Points will be credited after admin confirmation.",
+            "quickAmounts": "Quick Select",
+            "customAmount": "Custom Amount",
+            "myRequests": "My Charge Requests"
+        },
+        "refundPolicy": {
+            "title": "Refund Policy",
+            "description": "Refund rules when canceling match",
+            "hoursBeforeMatch": "{hours} hours before",
+            "refundPercent": "{percent}% refund",
+            "rule": "{hours}h before: {percent}% refund"
+        }
+    },
     "admin": {
         "matches": {
             "title": "Match Management",
@@ -105,7 +147,8 @@
             "rink": "Rink",
             "selectRink": "Select a rink",
             "dateTime": "Date & Time",
-            "fee": "Fee (KRW)",
+            "fee": "Entry Points",
+            "entryPoints": "Entry Points",
             "maxSkaters": "Max Skaters",
             "maxGoalies": "Max Goalies",
             "description": "Description",
@@ -122,6 +165,31 @@
             "title": "Participants",
             "noParticipants": "No participants yet",
             "togglePayment": "Toggle payment status"
+        },
+        "settings": {
+            "title": "Platform Settings",
+            "bankAccount": "Bank Account",
+            "bank": "Bank Name",
+            "account": "Account Number",
+            "holder": "Account Holder",
+            "refundPolicy": "Refund Policy",
+            "addRule": "Add Rule",
+            "hoursLabel": "Hours Before",
+            "percentLabel": "Refund %",
+            "save": "Save",
+            "saved": "Saved successfully"
+        },
+        "chargeRequests": {
+            "title": "Charge Request Management",
+            "noRequests": "No pending requests",
+            "user": "User",
+            "amount": "Amount",
+            "depositorName": "Depositor Name",
+            "requestedAt": "Requested At",
+            "confirm": "Confirm Payment",
+            "reject": "Reject",
+            "confirmMessage": "Confirm payment and credit points?",
+            "rejectMessage": "Reject this charge request?"
         }
     }
 }

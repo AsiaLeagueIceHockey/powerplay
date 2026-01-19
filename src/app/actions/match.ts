@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { calculateRefundPercent } from "./points";
 
 // Type definitions for match data
 export interface MatchRink {
@@ -37,7 +38,8 @@ export interface MatchClub {
 export interface Match {
   id: string;
   start_time: string;
-  fee: number;
+  fee: number;  // deprecated, use entry_points
+  entry_points: number;
   max_skaters: number;
   max_goalies: number;
   status: "open" | "closed" | "canceled";
@@ -63,6 +65,7 @@ export async function getMatches(): Promise<Match[]> {
       id,
       start_time,
       fee,
+      entry_points,
       max_skaters,
       max_goalies,
       status,
@@ -121,6 +124,7 @@ export async function getMatch(id: string): Promise<Match | null> {
       id,
       start_time,
       fee,
+      entry_points,
       max_skaters,
       max_goalies,
       status,
@@ -200,15 +204,76 @@ export async function joinMatch(matchId: string, position: string) {
     return { error: "Already joined this match" };
   }
 
+  // Get match entry_points
+  const { data: match } = await supabase
+    .from("matches")
+    .select("entry_points, status")
+    .eq("id", matchId)
+    .single();
+
+  if (!match) {
+    return { error: "Match not found" };
+  }
+
+  if (match.status !== "open") {
+    return { error: "Match is not open for registration" };
+  }
+
+  const entryPoints = match.entry_points || 0;
+
+  // Get user's current points
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("points")
+    .eq("id", user.id)
+    .single();
+
+  const userPoints = profile?.points || 0;
+
+  if (entryPoints > 0 && userPoints < entryPoints) {
+    return { error: "Insufficient points", code: "INSUFFICIENT_POINTS" };
+  }
+
+  // Deduct points if entry_points > 0
+  if (entryPoints > 0) {
+    const newBalance = userPoints - entryPoints;
+    
+    const { error: pointsError } = await supabase
+      .from("profiles")
+      .update({ points: newBalance })
+      .eq("id", user.id);
+
+    if (pointsError) {
+      return { error: "Failed to deduct points" };
+    }
+
+    // Record transaction
+    await supabase.from("point_transactions").insert({
+      user_id: user.id,
+      type: "use",
+      amount: -entryPoints,
+      balance_after: newBalance,
+      description: "경기 참가",
+      reference_id: matchId,
+    });
+  }
+
   const { error } = await supabase.from("participants").insert({
     match_id: matchId,
     user_id: user.id,
     position: position,
     status: "applied",
-    payment_status: false,
+    payment_status: entryPoints > 0,  // Auto-mark as paid if using points
   });
 
   if (error) {
+    // Rollback points if participant insert failed
+    if (entryPoints > 0) {
+      await supabase
+        .from("profiles")
+        .update({ points: userPoints })
+        .eq("id", user.id);
+    }
     return { error: error.message };
   }
 
@@ -226,6 +291,39 @@ export async function cancelJoin(matchId: string) {
     return { error: "Not authenticated" };
   }
 
+  // Check if user is a participant
+  const { data: participant } = await supabase
+    .from("participants")
+    .select("id")
+    .eq("match_id", matchId)
+    .eq("user_id", user.id)
+    .single();
+
+  if (!participant) {
+    return { error: "Not a participant" };
+  }
+
+  // Get match info for refund calculation
+  const { data: match } = await supabase
+    .from("matches")
+    .select("entry_points, start_time")
+    .eq("id", matchId)
+    .single();
+
+  if (!match) {
+    return { error: "Match not found" };
+  }
+
+  const entryPoints = match.entry_points || 0;
+  let refundAmount = 0;
+
+  // Calculate refund based on policy
+  if (entryPoints > 0) {
+    const refundPercent = await calculateRefundPercent(match.start_time);
+    refundAmount = Math.floor(entryPoints * refundPercent / 100);
+  }
+
+  // Delete participation
   const { error } = await supabase
     .from("participants")
     .delete()
@@ -236,5 +334,32 @@ export async function cancelJoin(matchId: string) {
     return { error: error.message };
   }
 
-  return { success: true };
+  // Refund points if applicable
+  if (refundAmount > 0) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("points")
+      .eq("id", user.id)
+      .single();
+
+    const currentPoints = profile?.points || 0;
+    const newBalance = currentPoints + refundAmount;
+
+    await supabase
+      .from("profiles")
+      .update({ points: newBalance })
+      .eq("id", user.id);
+
+    // Record transaction
+    await supabase.from("point_transactions").insert({
+      user_id: user.id,
+      type: "refund",
+      amount: refundAmount,
+      balance_after: newBalance,
+      description: `경기 취소 환불 (${Math.floor(refundAmount / entryPoints * 100)}%)`,
+      reference_id: matchId,
+    });
+  }
+
+  return { success: true, refundAmount };
 }

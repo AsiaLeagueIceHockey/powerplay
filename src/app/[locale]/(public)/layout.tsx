@@ -22,13 +22,15 @@ export default async function PublicLayout({
 
   // user 정보가 필요한 쿼리는 순차 실행 (의존 관계)
   let isAdmin = false;
+  let userPoints = 0;
   if (user) {
     const { data: profile } = await supabase
       .from("profiles")
-      .select("role")
+      .select("role, points")
       .eq("id", user.id)
       .single();
-    isAdmin = profile?.role === "admin";
+    isAdmin = profile?.role === "admin" || profile?.role === "superuser";
+    userPoints = profile?.points ?? 0;
   }
 
   return (
@@ -44,7 +46,7 @@ export default async function PublicLayout({
           </a>
 
           {/* User Menu - Right */}
-          <UserHeaderMenu user={user} locale={locale} isAdmin={isAdmin} />
+          <UserHeaderMenu user={user} locale={locale} isAdmin={isAdmin} points={userPoints} />
         </div>
       </header>
 
@@ -53,4 +55,5 @@ export default async function PublicLayout({
     </div>
   );
 }
+
 

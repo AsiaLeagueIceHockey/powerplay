@@ -107,32 +107,29 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
         />
       </div>
 
-      {/* Fee */}
+      {/* Entry Points (참가 포인트) */}
       <div>
         <label className="block text-sm font-medium mb-2 text-zinc-300">
-          {t("admin.form.fee")}
+          {t("admin.form.entryPoints")}
         </label>
-        <input
-          type="number"
-          name="fee"
-          defaultValue={30000}
-          min={0}
-          className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-        />
+        <div className="relative">
+          <input
+            type="number"
+            name="entry_points"
+            defaultValue={30000}
+            min={0}
+            step={1000}
+            className="w-full px-4 py-3 pr-8 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+          />
+          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500">P</span>
+        </div>
+        <p className="text-xs text-zinc-500 mt-1">
+          {locale === "ko" 
+            ? "참가자가 사용할 포인트 (0 = 무료)" 
+            : "Points required to join (0 = free)"}
+        </p>
       </div>
 
-      {/* Bank Account */}
-      <div>
-        <label className="block text-sm font-medium mb-2 text-zinc-300">
-          {t("admin.form.bankAccount")}
-        </label>
-        <input
-          type="text"
-          name="bank_account"
-          className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-          placeholder={t("admin.form.bankAccountPlaceholder")}
-        />
-      </div>
 
       {/* Position Limits (Consolidated) */}
       <div className="grid grid-cols-2 gap-4">

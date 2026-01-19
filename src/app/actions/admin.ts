@@ -33,25 +33,24 @@ export async function createMatch(formData: FormData) {
     return { error: "Not authenticated" };
   }
 
-  // Verify admin role
+  // Verify admin or superuser role
   const { data: profile } = await supabase
     .from("profiles")
     .select("role")
     .eq("id", user.id)
     .single();
 
-  if (profile?.role !== "admin") {
+  if (profile?.role !== "admin" && profile?.role !== "superuser") {
     return { error: "Unauthorized" };
   }
 
   const rinkId = formData.get("rink_id") as string;
   const clubId = formData.get("club_id") as string;
   const startTimeInput = formData.get("start_time") as string;
-  const fee = parseInt(formData.get("fee") as string) || 0;
+  const entryPoints = parseInt(formData.get("entry_points") as string) || 0;
   const maxSkaters = parseInt(formData.get("max_skaters") as string) || 20;
   const maxGoalies = parseInt(formData.get("max_goalies") as string) || 2;
   const description = formData.get("description") as string;
-  const bankAccount = formData.get("bank_account") as string;
 
   // datetime-local 입력은 KST로 가정, UTC로 변환하여 저장
   // 입력: "2026-01-11T00:00" (KST) → 저장: "2026-01-10T15:00:00.000Z" (UTC)
@@ -63,11 +62,11 @@ export async function createMatch(formData: FormData) {
       rink_id: rinkId || null,
       club_id: clubId || null,
       start_time: startTimeUTC,
-      fee,
+      fee: entryPoints, // Keep fee for backward compatibility
+      entry_points: entryPoints,
       max_skaters: maxSkaters,
       max_goalies: maxGoalies,
       description: description || null,
-      bank_account: bankAccount || null,
       status: "open",
       created_by: user.id,
     })

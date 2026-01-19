@@ -111,10 +111,33 @@ export function MatchApplication({
 
   // 3. Position Select Mode
   if (showSelect) {
+    // Check if the error is about insufficient points
+    const isInsufficientPoints = error?.includes("Insufficient") || error?.includes("INSUFFICIENT");
+
     return (
       <div className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900 shadow-sm">
         <h3 className="mb-4 font-bold text-lg">포지션 선택</h3>
-        {error && <p className="mb-4 text-sm text-red-500">{error}</p>}
+        
+        {/* Insufficient Points Warning */}
+        {isInsufficientPoints && (
+          <div className="mb-4 p-4 rounded-lg bg-amber-50 border border-amber-200 dark:bg-amber-900/20 dark:border-amber-800">
+            <p className="text-amber-700 dark:text-amber-300 font-medium mb-2">
+              💰 포인트가 부족합니다
+            </p>
+            <p className="text-sm text-amber-600 dark:text-amber-400 mb-3">
+              이 경기에 참가하려면 포인트 충전이 필요합니다.
+            </p>
+            <button
+              onClick={() => router.push(`/${locale}/mypage/points/charge`)}
+              className="inline-block px-4 py-2 bg-amber-500 text-white rounded-lg text-sm font-medium hover:bg-amber-600 transition"
+            >
+              포인트 충전하러 가기 →
+            </button>
+          </div>
+        )}
+        
+        {/* Other errors */}
+        {error && !isInsufficientPoints && <p className="mb-4 text-sm text-red-500">{error}</p>}
         
         <div className="flex gap-3 mb-4">
           <button
