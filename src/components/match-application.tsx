@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { joinMatch, cancelJoin } from "@/app/actions/match";
+import { joinMatch, cancelJoin, joinWaitlist } from "@/app/actions/match";
 
 interface MatchApplicationProps {
   matchId: string;
@@ -15,8 +15,10 @@ interface MatchApplicationProps {
   };
   isJoined: boolean;
   currentPosition?: string;
+  currentStatus?: string;
   matchStatus: string;
   onboardingCompleted?: boolean;
+  isFull?: boolean;
 }
 
 export function MatchApplication({
@@ -24,16 +26,20 @@ export function MatchApplication({
   positions,
   isJoined,
   currentPosition,
+  currentStatus,
   matchStatus,
   onboardingCompleted = true,
+  isFull = false,
 }: MatchApplicationProps) {
   const t = useTranslations("match");
+  const tParticipant = useTranslations("participant");
   const tAuth = useTranslations("auth");
   const locale = useLocale();
   const router = useRouter();
   
   const [loading, setLoading] = useState(false);
   const [showSelect, setShowSelect] = useState(false);
+  const [showWaitlistSelect, setShowWaitlistSelect] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleJoin = async (pos: string) => {
@@ -45,6 +51,19 @@ export function MatchApplication({
     } else {
       router.refresh();
       setShowSelect(false);
+    }
+    setLoading(false);
+  };
+
+  const handleWaitlist = async (pos: string) => {
+    setLoading(true);
+    setError(null);
+    const res = await joinWaitlist(matchId, pos);
+    if (res.error) {
+      setError(res.error);
+    } else {
+      router.refresh();
+      setShowWaitlistSelect(false);
     }
     setLoading(false);
   };
@@ -84,7 +103,69 @@ export function MatchApplication({
     return null; 
   }
 
-  // 2. If User Joined => Green Box with Inline Cancel
+  // 2a. If User is on waitlist (waiting status) => Blue box
+  if (isJoined && currentStatus === "waiting") {
+    return (
+      <div className="rounded-2xl border border-blue-200 bg-blue-50 p-6 dark:border-blue-900/50 dark:bg-blue-900/10">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <span className="text-blue-600 dark:text-blue-400 font-bold">⏳</span>
+            <span className="font-bold text-blue-700 dark:text-blue-300 text-lg">
+              {t(`position.${currentPosition}`)}로 대기 중
+            </span>
+          </div>
+          
+          <button
+            onClick={handleCancel}
+            disabled={loading}
+            className="px-4 py-2 bg-white text-red-500 border border-red-200 rounded-lg text-sm font-semibold hover:bg-red-50 hover:border-red-300 transition-colors disabled:opacity-50 dark:bg-zinc-800 dark:border-red-900/50 dark:text-red-400 dark:hover:bg-red-900/20"
+          >
+            {loading ? "..." : "대기 취소"}
+          </button>
+        </div>
+        <p className="text-sm text-blue-600 dark:text-blue-400">
+          참가자가 취소하면 순서대로 참가 기회가 주어집니다.
+        </p>
+        {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
+      </div>
+    );
+  }
+
+  // 2b. If User Joined with pending_payment => Yellow box
+  if (isJoined && currentStatus === "pending_payment") {
+    return (
+      <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6 dark:border-amber-900/50 dark:bg-amber-900/10">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <span className="text-amber-600 dark:text-amber-400 font-bold">⏳</span>
+            <span className="font-bold text-amber-700 dark:text-amber-300 text-lg">
+              {t(`position.${currentPosition}`)}로 신청 (입금 대기중)
+            </span>
+          </div>
+          
+          <button
+            onClick={handleCancel}
+            disabled={loading}
+            className="px-4 py-2 bg-white text-red-500 border border-red-200 rounded-lg text-sm font-semibold hover:bg-red-50 hover:border-red-300 transition-colors disabled:opacity-50 dark:bg-zinc-800 dark:border-red-900/50 dark:text-red-400 dark:hover:bg-red-900/20"
+          >
+            {loading ? "..." : "신청 취소"}
+          </button>
+        </div>
+        <p className="text-sm text-amber-600 dark:text-amber-400 mb-3">
+          포인트 충전 후 입금 확인이 되면 참가가 확정됩니다.
+        </p>
+        <button
+          onClick={() => router.push(`/${locale}/mypage/points/charge`)}
+          className="w-full py-3 bg-amber-500 text-white rounded-lg font-medium hover:bg-amber-600 transition"
+        >
+          포인트 충전하러 가기 →
+        </button>
+        {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
+      </div>
+    );
+  }
+
+  // 2c. If User Joined with confirmed => Green Box with Inline Cancel
   if (isJoined) {
     return (
       <div className="rounded-2xl border border-green-200 bg-green-50 p-6 dark:border-green-900/50 dark:bg-green-900/10">
@@ -92,7 +173,7 @@ export function MatchApplication({
           <div className="flex items-center gap-2">
             <span className="text-green-600 dark:text-green-400 font-bold">✓</span>
             <span className="font-bold text-green-700 dark:text-green-300 text-lg">
-              {t(`position.${currentPosition}`)}로 신청 완료
+              {t(`position.${currentPosition}`)}로 참가 확정
             </span>
           </div>
           
@@ -109,7 +190,49 @@ export function MatchApplication({
     );
   }
 
-  // 3. Position Select Mode
+  // 3a. Waitlist Position Select Mode
+  if (showWaitlistSelect) {
+    return (
+      <div className="rounded-2xl border border-blue-200 bg-blue-50 p-6 dark:border-blue-800 dark:bg-blue-900/20 shadow-sm">
+        <h3 className="mb-4 font-bold text-lg text-blue-800 dark:text-blue-200">대기 포지션 선택</h3>
+        
+        {error && <p className="mb-4 text-sm text-red-500">{error}</p>}
+        
+        <div className="flex gap-3 mb-4">
+          <button
+            onClick={() => handleWaitlist("FW")}
+            disabled={loading}
+            className="flex-1 py-4 rounded-xl border border-blue-300 bg-white text-blue-700 font-bold hover:bg-blue-100 disabled:opacity-50 transition dark:bg-blue-900/30 dark:border-blue-700 dark:text-blue-300"
+          >
+            FW
+          </button>
+          <button
+            onClick={() => handleWaitlist("DF")}
+            disabled={loading}
+            className="flex-1 py-4 rounded-xl border border-blue-300 bg-white text-blue-700 font-bold hover:bg-blue-100 disabled:opacity-50 transition dark:bg-blue-900/30 dark:border-blue-700 dark:text-blue-300"
+          >
+            DF
+          </button>
+          <button
+            onClick={() => handleWaitlist("G")}
+            disabled={loading}
+            className="flex-1 py-4 rounded-xl border border-blue-300 bg-white text-blue-700 font-bold hover:bg-blue-100 disabled:opacity-50 transition dark:bg-blue-900/30 dark:border-blue-700 dark:text-blue-300"
+          >
+            G
+          </button>
+        </div>
+
+        <button
+          onClick={() => setShowWaitlistSelect(false)}
+          className="w-full py-3 text-zinc-500 font-medium hover:bg-blue-100 rounded-lg transition dark:text-zinc-400 dark:hover:bg-blue-800/30"
+        >
+          취소
+        </button>
+      </div>
+    );
+  }
+
+  // 3b. Position Select Mode (Regular Join)
   if (showSelect) {
     // Check if the error is about insufficient points
     const isInsufficientPoints = error?.includes("Insufficient") || error?.includes("INSUFFICIENT");
@@ -173,7 +296,19 @@ export function MatchApplication({
     );
   }
 
-  // 4. Default: Join Button
+  // 4a. If match is full, show Waitlist button
+  if (isFull) {
+    return (
+      <button
+        onClick={() => setShowWaitlistSelect(true)}
+        className="w-full py-4 bg-blue-600 text-white rounded-2xl text-lg font-bold hover:bg-blue-700 transition shadow-sm"
+      >
+        {locale === "ko" ? "대기 신청" : "Join Waitlist"}
+      </button>
+    );
+  }
+
+  // 4b. Default: Join Button
   return (
     <button
       onClick={() => setShowSelect(true)}

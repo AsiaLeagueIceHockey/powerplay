@@ -66,18 +66,21 @@ export default async function MatchPage({
     timeZone: "Asia/Seoul",
   });
 
-  // Participant Lists (filtered by active status)
+  // Participant Lists (filtered by active status - including pending_payment for visibility)
   const players = {
     fw: match.participants?.filter(
-      (p) => p.position === "FW" && ["applied", "confirmed"].includes(p.status)
+      (p) => p.position === "FW" && ["pending_payment", "confirmed"].includes(p.status)
     ) || [],
     df: match.participants?.filter(
-      (p) => p.position === "DF" && ["applied", "confirmed"].includes(p.status)
+      (p) => p.position === "DF" && ["pending_payment", "confirmed"].includes(p.status)
     ) || [],
     g: match.participants?.filter(
-      (p) => p.position === "G" && ["applied", "confirmed"].includes(p.status)
+      (p) => p.position === "G" && ["pending_payment", "confirmed"].includes(p.status)
     ) || [],
   };
+
+  // Waitlist participants
+  const waitlist = match.participants?.filter((p) => p.status === "waiting") || [];
 
   // Calculate remaining spots from actual participant counts
   const skaterCount = players.fw.length + players.df.length;
@@ -85,6 +88,9 @@ export default async function MatchPage({
     skaters: match.max_skaters - skaterCount,
     g: match.max_goalies - players.g.length,
   };
+
+  // Check if match is full (no spots for skaters AND goalies)
+  const isFull = remaining.skaters <= 0 && remaining.g <= 0;
 
   // User Status
   const userParticipant = match.participants?.find((p) => p.user?.id === user?.id);
@@ -207,8 +213,10 @@ export default async function MatchPage({
         }}
         isJoined={isJoined}
         currentPosition={userParticipant?.position}
+        currentStatus={userParticipant?.status}
         matchStatus={match.status}
         onboardingCompleted={onboardingCompleted}
+        isFull={isFull}
       />
 
       {/* Participant List Header */}
@@ -239,6 +247,9 @@ export default async function MatchPage({
                    <span className="font-medium">
                      {p.user?.full_name || p.user?.email?.split('@')[0]}
                    </span>
+                   {p.status === "pending_payment" && (
+                     <span className="text-xs bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 px-2 py-0.5 rounded">{t("participant.status.pending_payment")}</span>
+                   )}
                    {p.id === userParticipant?.id && (
                      <span className="ml-auto text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">Me</span>
                    )}
@@ -269,6 +280,9 @@ export default async function MatchPage({
                    <span className="font-medium">
                      {p.user?.full_name || p.user?.email?.split('@')[0]}
                    </span>
+                   {p.status === "pending_payment" && (
+                     <span className="text-xs bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 px-2 py-0.5 rounded">{t("participant.status.pending_payment")}</span>
+                   )}
                    {p.id === userParticipant?.id && (
                      <span className="ml-auto text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">Me</span>
                    )}
@@ -299,6 +313,9 @@ export default async function MatchPage({
                    <span className="font-medium">
                      {p.user?.full_name || p.user?.email?.split('@')[0]}
                    </span>
+                   {p.status === "pending_payment" && (
+                     <span className="text-xs bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 px-2 py-0.5 rounded">{t("participant.status.pending_payment")}</span>
+                   )}
                    {p.id === userParticipant?.id && (
                      <span className="ml-auto text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">Me</span>
                    )}
@@ -307,6 +324,37 @@ export default async function MatchPage({
              </ul>
            )}
         </div>
+
+        {/* Waitlist Section */}
+        {waitlist.length > 0 && (
+          <div className="bg-white dark:bg-zinc-900 border border-blue-200 dark:border-blue-800 rounded-2xl p-5 shadow-sm">
+            <div className="flex items-center space-x-2 mb-4">
+              <span className="px-2 py-1 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 rounded text-xs font-bold">
+                {locale === "ko" ? "대기자" : "Waitlist"}
+              </span>
+              <span className="text-zinc-500 text-sm">({waitlist.length})</span>
+            </div>
+            
+            <ul className="space-y-3">
+              {waitlist.map((p, i) => (
+                <li key={p.id} className="flex items-center space-x-3 text-sm p-3 bg-blue-50 dark:bg-blue-950/50 rounded-lg">
+                  <div className="w-6 h-6 bg-blue-200 dark:bg-blue-700 rounded-full flex items-center justify-center text-xs font-bold text-blue-700 dark:text-blue-200">
+                    {i + 1}
+                  </div>
+                  <span className="font-medium">
+                    {p.user?.full_name || p.user?.email?.split('@')[0]}
+                  </span>
+                  <span className="text-xs bg-zinc-200 text-zinc-600 dark:bg-zinc-700 dark:text-zinc-400 px-2 py-0.5 rounded">
+                    {t(`match.position.${p.position}`)}
+                  </span>
+                  {p.id === userParticipant?.id && (
+                    <span className="ml-auto text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded">Me</span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
     </div>
   );

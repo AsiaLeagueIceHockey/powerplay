@@ -7,7 +7,7 @@ import { useTranslations } from "next-intl";
 interface Participant {
   id: string;
   position: "FW" | "DF" | "G";
-  status: "applied" | "confirmed" | "waiting" | "canceled";
+  status: "applied" | "confirmed" | "pending_payment" | "waiting" | "canceled";
   payment_status: boolean;
   user: {
     id: string;

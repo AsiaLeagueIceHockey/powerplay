@@ -14,7 +14,7 @@ export interface MyMatch {
   participation: {
     id: string;
     position: "FW" | "DF" | "G";
-    status: "applied" | "confirmed" | "waiting" | "canceled";
+    status: "applied" | "confirmed" | "pending_payment" | "waiting" | "canceled";
     payment_status: boolean;
   };
 }

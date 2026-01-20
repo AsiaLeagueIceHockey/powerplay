@@ -77,6 +77,7 @@
         "status": {
             "applied": "신청 완료",
             "confirmed": "확정",
+            "pending_payment": "입금 대기",
             "waiting": "대기",
             "canceled": "취소됨"
         },
@@ -190,6 +191,14 @@
             "reject": "거부",
             "confirmMessage": "입금을 확인하고 포인트를 지급하시겠습니까?",
             "rejectMessage": "충전 요청을 거부하시겠습니까?"
+        },
+        "pendingParticipants": {
+            "title": "미입금 참가자 관리",
+            "noParticipants": "미입금 참가자가 없습니다",
+            "match": "경기",
+            "currentBalance": "현재 포인트",
+            "confirmPayment": "입금 확인",
+            "cancel": "취소"
         }
     }
 }

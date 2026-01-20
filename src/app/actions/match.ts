@@ -18,7 +18,7 @@ export interface MatchRink {
 export interface MatchParticipant {
   id: string;
   position: "FW" | "DF" | "G";
-  status: "applied" | "confirmed" | "waiting" | "canceled";
+  status: "applied" | "confirmed" | "pending_payment" | "waiting" | "canceled";
   payment_status: boolean;
   team_color: "Black" | "White" | null;
   user: {
@@ -181,7 +181,12 @@ export async function getMatch(id: string): Promise<Match | null> {
   } as Match;
 }
 
-export async function joinMatch(matchId: string, position: string) {
+export async function joinMatch(matchId: string, position: string): Promise<{ 
+  success?: boolean; 
+  error?: string; 
+  code?: string;
+  status?: 'confirmed' | 'pending_payment';
+}> {
   const supabase = await createClient();
 
   const {
@@ -229,13 +234,15 @@ export async function joinMatch(matchId: string, position: string) {
     .single();
 
   const userPoints = profile?.points || 0;
+  const hasEnoughPoints = entryPoints === 0 || userPoints >= entryPoints;
 
-  if (entryPoints > 0 && userPoints < entryPoints) {
-    return { error: "Insufficient points", code: "INSUFFICIENT_POINTS" };
-  }
+  // Determine status based on points
+  // confirmed: 포인트 충분하면 즉시 확정 + 차감
+  // pending_payment: 포인트 부족하면 입금 대기 상태
+  const participantStatus = hasEnoughPoints ? "confirmed" : "pending_payment";
 
-  // Deduct points if entry_points > 0
-  if (entryPoints > 0) {
+  // Deduct points only if confirmed and entry_points > 0
+  if (hasEnoughPoints && entryPoints > 0) {
     const newBalance = userPoints - entryPoints;
     
     const { error: pointsError } = await supabase
@@ -262,13 +269,13 @@ export async function joinMatch(matchId: string, position: string) {
     match_id: matchId,
     user_id: user.id,
     position: position,
-    status: "applied",
-    payment_status: entryPoints > 0,  // Auto-mark as paid if using points
+    status: participantStatus,
+    payment_status: hasEnoughPoints,
   });
 
   if (error) {
-    // Rollback points if participant insert failed
-    if (entryPoints > 0) {
+    // Rollback points if participant insert failed and we deducted
+    if (hasEnoughPoints && entryPoints > 0) {
       await supabase
         .from("profiles")
         .update({ points: userPoints })
@@ -277,7 +284,7 @@ export async function joinMatch(matchId: string, position: string) {
     return { error: error.message };
   }
 
-  return { success: true };
+  return { success: true, status: participantStatus };
 }
 
 export async function cancelJoin(matchId: string) {
@@ -291,10 +298,10 @@ export async function cancelJoin(matchId: string) {
     return { error: "Not authenticated" };
   }
 
-  // Check if user is a participant
+  // Check if user is a participant and get status
   const { data: participant } = await supabase
     .from("participants")
-    .select("id")
+    .select("id, status")
     .eq("match_id", matchId)
     .eq("user_id", user.id)
     .single();
@@ -302,6 +309,8 @@ export async function cancelJoin(matchId: string) {
   if (!participant) {
     return { error: "Not a participant" };
   }
+
+  const isPendingPayment = participant.status === "pending_payment";
 
   // Get match info for refund calculation
   const { data: match } = await supabase
@@ -317,8 +326,8 @@ export async function cancelJoin(matchId: string) {
   const entryPoints = match.entry_points || 0;
   let refundAmount = 0;
 
-  // Calculate refund based on policy
-  if (entryPoints > 0) {
+  // Calculate refund based on policy (only if not pending_payment - they didn't pay yet)
+  if (!isPendingPayment && entryPoints > 0) {
     const refundPercent = await calculateRefundPercent(match.start_time);
     refundAmount = Math.floor(entryPoints * refundPercent / 100);
   }
@@ -362,4 +371,61 @@ export async function cancelJoin(matchId: string) {
   }
 
   return { success: true, refundAmount };
+}
+
+export async function joinWaitlist(matchId: string, position: string): Promise<{ 
+  success?: boolean; 
+  error?: string; 
+}> {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "Not authenticated" };
+  }
+
+  // Check if already joined (including waiting)
+  const { data: existing } = await supabase
+    .from("participants")
+    .select("id, status")
+    .eq("match_id", matchId)
+    .eq("user_id", user.id)
+    .single();
+
+  if (existing) {
+    return { error: "Already joined this match" };
+  }
+
+  // Get match to verify it exists and is open
+  const { data: match } = await supabase
+    .from("matches")
+    .select("id, status")
+    .eq("id", matchId)
+    .single();
+
+  if (!match) {
+    return { error: "Match not found" };
+  }
+
+  if (match.status !== "open") {
+    return { error: "Match is not open for registration" };
+  }
+
+  // Insert as waiting - no points deducted for waitlist
+  const { error } = await supabase.from("participants").insert({
+    match_id: matchId,
+    user_id: user.id,
+    position: position,
+    status: "waiting",
+    payment_status: false,
+  });
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  return { success: true };
 }

@@ -77,6 +77,7 @@
         "status": {
             "applied": "Applied",
             "confirmed": "Confirmed",
+            "pending_payment": "Pending Payment",
             "waiting": "Waiting",
             "canceled": "Canceled"
         },
@@ -190,6 +191,14 @@
             "reject": "Reject",
             "confirmMessage": "Confirm payment and credit points?",
             "rejectMessage": "Reject this charge request?"
+        },
+        "pendingParticipants": {
+            "title": "Pending Payment Participants",
+            "noParticipants": "No pending payment participants",
+            "match": "Match",
+            "currentBalance": "Current Balance",
+            "confirmPayment": "Confirm Payment",
+            "cancel": "Cancel"
         }
     }
 }

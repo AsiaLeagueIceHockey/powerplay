@@ -386,3 +386,196 @@ export async function rejectPointCharge(
   revalidatePath("/admin/charge-requests");
   return { success: true };
 }
+
+// ==================== 미입금 참가자 관리 ====================
+
+export interface PendingParticipant {
+  id: string;
+  match_id: string;
+  position: string;
+  created_at: string;
+  user: {
+    id: string;
+    email: string;
+    full_name: string | null;
+    points: number;
+  } | null;
+  match: {
+    id: string;
+    start_time: string;
+    entry_points: number;
+    rink: {
+      name_ko: string;
+      name_en: string;
+    } | null;
+  } | null;
+}
+
+/**
+ * 미입금 참가자 목록 조회 (SuperUser 전용)
+ */
+export async function getPendingPaymentParticipants(): Promise<PendingParticipant[]> {
+  const supabase = await createClient();
+
+  const isSuperUser = await checkIsSuperUser();
+  if (!isSuperUser) {
+    return [];
+  }
+
+  const { data, error } = await supabase
+    .from("participants")
+    .select(`
+      id,
+      match_id,
+      position,
+      created_at,
+      user:user_id(id, email, full_name, points),
+      match:match_id(id, start_time, entry_points, rink:rink_id(name_ko, name_en))
+    `)
+    .eq("status", "pending_payment")
+    .order("created_at", { ascending: true });
+
+  if (error) {
+    console.error("Error fetching pending payment participants:", error);
+    return [];
+  }
+
+  return (data || []).map((item) => {
+    const user = Array.isArray(item.user) ? item.user[0] : item.user;
+    const match = Array.isArray(item.match) ? item.match[0] : item.match;
+    const rink = match?.rink ? (Array.isArray(match.rink) ? match.rink[0] : match.rink) : null;
+    
+    return {
+      ...item,
+      user,
+      match: match ? { ...match, rink } : null,
+    };
+  }) as PendingParticipant[];
+}
+
+/**
+ * 참가자 입금 확인 (SuperUser 전용)
+ * - 사용자 포인트에서 차감
+ * - 참가 상태를 confirmed로 변경
+ */
+export async function confirmParticipantPayment(
+  participantId: string
+): Promise<{ success: boolean; error?: string }> {
+  const supabase = await createClient();
+
+  const isSuperUser = await checkIsSuperUser();
+  if (!isSuperUser) {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  // Get participant info
+  const { data: participant, error: fetchError } = await supabase
+    .from("participants")
+    .select(`
+      id,
+      user_id,
+      match_id,
+      match:match_id(entry_points)
+    `)
+    .eq("id", participantId)
+    .eq("status", "pending_payment")
+    .single();
+
+  if (fetchError || !participant) {
+    return { success: false, error: "Participant not found or already confirmed" };
+  }
+
+  const match = Array.isArray(participant.match) ? participant.match[0] : participant.match;
+  const entryPoints = match?.entry_points || 0;
+
+  // Get user's current points
+  const { data: userProfile, error: profileError } = await supabase
+    .from("profiles")
+    .select("points")
+    .eq("id", participant.user_id)
+    .single();
+
+  if (profileError || !userProfile) {
+    return { success: false, error: "User profile not found" };
+  }
+
+  const currentPoints = userProfile.points || 0;
+
+  // Check if user has enough points
+  if (currentPoints < entryPoints) {
+    return { success: false, error: `Insufficient points (${currentPoints}/${entryPoints})` };
+  }
+
+  const newBalance = currentPoints - entryPoints;
+
+  // 1. Deduct points
+  const { error: updateError } = await supabase
+    .from("profiles")
+    .update({ points: newBalance })
+    .eq("id", participant.user_id);
+
+  if (updateError) {
+    console.error("Error updating points:", updateError);
+    return { success: false, error: "Failed to deduct points" };
+  }
+
+  // 2. Update participant status to confirmed
+  const { error: participantError } = await supabase
+    .from("participants")
+    .update({
+      status: "confirmed",
+      payment_status: true,
+    })
+    .eq("id", participantId);
+
+  if (participantError) {
+    // Rollback points
+    await supabase
+      .from("profiles")
+      .update({ points: currentPoints })
+      .eq("id", participant.user_id);
+    console.error("Error updating participant:", participantError);
+    return { success: false, error: "Failed to confirm participant" };
+  }
+
+  // 3. Record transaction
+  await supabase.from("point_transactions").insert({
+    user_id: participant.user_id,
+    type: "use",
+    amount: -entryPoints,
+    balance_after: newBalance,
+    description: "경기 참가 (관리자 확인)",
+    reference_id: participant.match_id,
+  });
+
+  revalidatePath("/admin/charge-requests");
+  return { success: true };
+}
+
+/**
+ * 미입금 참가자 취소 (SuperUser 전용)
+ */
+export async function cancelPendingParticipant(
+  participantId: string
+): Promise<{ success: boolean; error?: string }> {
+  const supabase = await createClient();
+
+  const isSuperUser = await checkIsSuperUser();
+  if (!isSuperUser) {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  const { error } = await supabase
+    .from("participants")
+    .delete()
+    .eq("id", participantId)
+    .eq("status", "pending_payment");
+
+  if (error) {
+    console.error("Error canceling pending participant:", error);
+    return { success: false, error: error.message };
+  }
+
+  revalidatePath("/admin/charge-requests");
+  return { success: true };
+}

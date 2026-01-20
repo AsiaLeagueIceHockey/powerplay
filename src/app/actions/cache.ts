@@ -94,11 +94,12 @@ export async function getCachedMatches(): Promise<Match[]> {
   }
 
   // Fetch ALL participants for all matches in ONE query (fixes N+1!)
+  // Only count 'confirmed' status for participant counts
   const { data: allParticipants } = await supabase
     .from("participants")
     .select("match_id, position")
     .in("match_id", matchIds)
-    .in("status", ["applied", "confirmed"]);
+    .eq("status", "confirmed");
 
   // Group participants by match_id
   const participantsByMatch = new Map<string, { fw: number; df: number; g: number }>();
