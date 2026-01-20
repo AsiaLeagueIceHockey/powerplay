@@ -109,6 +109,16 @@ export function SettingsForm({ bankAccount, refundRules: initialRules }: Setting
         <p className="text-sm text-zinc-400 mb-4">
           경기 시작 기준 시간별 환불 비율을 설정합니다. 숫자가 큰 시간부터 적용됩니다.
         </p>
+
+        {/* Fixed Policy Notice */}
+        <div className="mb-6 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+          <h3 className="text-blue-400 font-bold mb-1">📢 기본 환불 정책 (시스템 고정)</h3>
+          <p className="text-zinc-300 text-sm">
+            경기 전일 23:59:59 (자정)까지 취소 시 <span className="text-white font-bold">100% 자동 환불</span>됩니다.
+            <br />
+            아래 설정은 <span className="text-amber-400">경기 당일</span>에 적용될 환불 규정입니다.
+          </p>
+        </div>
         
         <div className="space-y-3">
           {rules.map((rule, i) => (

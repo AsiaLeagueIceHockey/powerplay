@@ -203,6 +203,29 @@ export default async function MatchPage({
         </div>
       )}
 
+      {/* Refund Policy Section */}
+      <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-sm">
+        <h2 className="text-lg font-bold mb-3">{locale === "ko" ? "취소 및 환불 규정" : "Cancellation & Refund Policy"}</h2>
+        <div className="space-y-2 text-sm text-zinc-600 dark:text-zinc-300">
+          <div className="flex items-start gap-2">
+            <span className="text-green-600 dark:text-green-400 font-bold mt-0.5">✓</span>
+            <p>
+              {locale === "ko" 
+                ? "경기 전일 23:59까지 취소 시: 100% 환불" 
+                : "Cancellation by 23:59 the day before the match: 100% Refund"}
+            </p>
+          </div>
+          <div className="flex items-start gap-2">
+            <span className="text-red-500 font-bold mt-0.5">!</span>
+            <p>
+              {locale === "ko" 
+                ? "경기 당일 취소 시: 환불 불가 (또는 운영진 문의)" 
+                : "Cancellation on the match day: No Refund (or contact admin)"}
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Application - Inline status and button */}
       <MatchApplication 
         matchId={match.id} 
