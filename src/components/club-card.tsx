@@ -47,7 +47,7 @@ export function ClubCard({ club, initialIsMember }: ClubCardProps) {
   return (
     <Link
       href={`/${locale}/clubs/${club.id}`}
-      className="block flex flex-col justify-between h-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 hover:border-blue-500 transition-colors shadow-sm"
+      className="block flex flex-col justify-between h-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 hover:border-blue-500 hover:shadow-md transition-all duration-300 shadow-sm"
     >
       <div>
         {/* Logo + Header */}

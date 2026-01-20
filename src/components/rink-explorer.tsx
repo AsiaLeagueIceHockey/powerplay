@@ -86,7 +86,7 @@ export function RinkExplorer({ rinks, matches }: RinkExplorerProps) {
                 {filteredRinks.map((rink) => {
                     const upcomingCount = matches.filter(m => m.rink?.id === rink.id && m.status === 'open').length;
                     return (
-                        <div key={rink.id} className="bg-white dark:bg-zinc-900 p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm hover:border-blue-300 transition-colors">
+                        <div key={rink.id} className="bg-white dark:bg-zinc-900 p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm transition-all duration-300 hover:border-blue-500 hover:shadow-md">
                             <h3 className="font-bold text-lg text-zinc-900 dark:text-white mb-1">{rink.name_ko}</h3>
                             <p className="text-sm text-zinc-500 flex items-start gap-1 mb-3">
                                 <MapPin className="w-3.5 h-3.5 mt-0.5 shrink-0" />
