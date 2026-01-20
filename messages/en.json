@@ -39,10 +39,21 @@
         "title": "Profile",
         "email": "Email",
         "fullName": "Full Name",
+        "phone": "Phone Number",
+        "birthDate": "Birth Date (YYYY-MM-DD)",
         "position": "Position",
         "preferredLang": "Preferred Language",
         "save": "Save",
         "saving": "Saving...",
+        "terms": {
+            "title": "Terms Agreement",
+            "agree": "I agree to the collection and use of personal information",
+            "required": "(Required)"
+        },
+        "placeholder": {
+            "phone": "010-1234-5678",
+            "birthDate": "YYYY-MM-DD"
+        },
         "saved": "Saved successfully"
     },
     "match": {
@@ -68,7 +79,7 @@
         "spots": "{count} spots",
         "viewMap": "View Map",
         "noParticipants": "No participants",
-        "confirmCancel": "Are you sure you want to cancel?",
+        "confirmCancel": "100% refund available until midnight the day before the match. Cancel?",
         "insufficientPoints": "Insufficient points",
         "goToCharge": "Charge Points",
         "refundPolicy": "Refund Policy"

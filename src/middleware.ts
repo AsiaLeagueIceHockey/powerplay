@@ -23,6 +23,30 @@ export async function middleware(request: NextRequest) {
     }
   }
 
+  // GLOBAL ONBOARDING CHECK
+  if (user) {
+    // Exclude paths: onboarding, auth, logout, static files
+    // already handled by matcher config mostly, but be specific about app routes
+    const isExcluded = 
+      pathname.includes("/onboarding") || 
+      pathname.includes("/auth") || 
+      pathname.includes("/login") ||
+      pathname.includes("/signup");
+
+    if (!isExcluded) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("onboarding_completed")
+        .eq("id", user.id)
+        .single();
+        
+      if (profile && !profile.onboarding_completed) {
+        const locale = pathname.split("/")[1] || "ko";
+        return NextResponse.redirect(new URL(`/${locale}/onboarding`, request.url));
+      }
+    }
+  }
+
   // Then, handle internationalization
   const intlResponse = intlMiddleware(request);
 

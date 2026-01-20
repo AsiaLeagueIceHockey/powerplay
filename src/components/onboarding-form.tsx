@@ -16,6 +16,9 @@ interface Profile {
   preferred_lang: "ko" | "en" | null;
   role: "user" | "admin";
   onboarding_completed?: boolean;
+  phone?: string | null;
+  birth_date?: string | null;
+  terms_agreed?: boolean;
 }
 
 interface OnboardingFormProps {
@@ -41,19 +44,32 @@ export function OnboardingForm({ profile, clubs, myClubs, locale }: OnboardingFo
     fullName: string;
     position: "FW" | "DF" | "G" | null;
     preferredLang: string;
+    phone: string;
+    birthDate: string;
+    termsAgreed: boolean;
   }>({
     fullName: profile?.full_name || "",
     position: profile?.position || null,
     preferredLang: profile?.preferred_lang || "ko",
+    phone: profile?.phone || "",
+    birthDate: profile?.birth_date || "",
+    termsAgreed: profile?.terms_agreed || false,
   });
 
   const handleStep1Submit = async () => {
+    if (!formData.termsAgreed) {
+      alert(t("terms.required"));
+      return;
+    }
     setLoading(true);
     
     const fd = new FormData();
     fd.set("fullName", formData.fullName);
     fd.set("position", formData.position || "");
     fd.set("preferredLang", formData.preferredLang);
+    fd.set("phone", formData.phone);
+    fd.set("birthDate", formData.birthDate);
+    fd.set("termsAgreed", formData.termsAgreed.toString());
     
     await updateProfile(fd);
     setLoading(false);
@@ -84,6 +100,9 @@ export function OnboardingForm({ profile, clubs, myClubs, locale }: OnboardingFo
     fd.set("fullName", formData.fullName);
     fd.set("position", formData.position || "");
     fd.set("preferredLang", formData.preferredLang);
+    fd.set("phone", formData.phone);
+    fd.set("birthDate", formData.birthDate);
+    fd.set("termsAgreed", formData.termsAgreed.toString());
     fd.set("onboarding_completed", "true");
     await updateProfile(fd);
     
@@ -91,11 +110,14 @@ export function OnboardingForm({ profile, clubs, myClubs, locale }: OnboardingFo
   };
 
   const handleSkip = async () => {
-    // Mark onboarding as complete without changes
+    // Mark onboarding as complete without changes (if valid)
     const fd = new FormData();
     fd.set("fullName", profile?.full_name || "");
     fd.set("position", profile?.position || "");
     fd.set("preferredLang", profile?.preferred_lang || "ko");
+    fd.set("phone", profile?.phone || "");
+    fd.set("birthDate", profile?.birth_date || "");
+    fd.set("termsAgreed", String(profile?.terms_agreed || false));
     fd.set("onboarding_completed", "true");
     await updateProfile(fd);
     
@@ -128,12 +150,34 @@ export function OnboardingForm({ profile, clubs, myClubs, locale }: OnboardingFo
 
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-2">{t("fullName")}</label>
+              <label className="block text-sm font-medium mb-2">{t("fullName")} <span className="text-red-500">*</span></label>
               <input
                 type="text"
                 value={formData.fullName}
                 onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                placeholder="이름을 입력하세요"
+                placeholder="홍길동"
+                className="w-full px-4 py-3 rounded-lg border border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800 focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">{t("phone")} <span className="text-red-500">*</span></label>
+              <input
+                type="tel"
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                placeholder={t("placeholder.phone")}
+                className="w-full px-4 py-3 rounded-lg border border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800 focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">{t("birthDate")} <span className="text-red-500">*</span></label>
+              <input
+                type="date"
+                value={formData.birthDate}
+                onChange={(e) => setFormData({ ...formData, birthDate: e.target.value })}
+                placeholder={t("placeholder.birthDate")}
                 className="w-full px-4 py-3 rounded-lg border border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800 focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -163,11 +207,27 @@ export function OnboardingForm({ profile, clubs, myClubs, locale }: OnboardingFo
                 <option value="en">English</option>
               </select>
             </div>
+
+            {/* Terms Agreement */}
+            <div className="pt-2">
+              <label className="flex items-center space-x-3 p-3 border border-zinc-200 dark:border-zinc-800 rounded-lg cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition">
+                <input
+                  type="checkbox"
+                  checked={formData.termsAgreed}
+                  onChange={(e) => setFormData({ ...formData, termsAgreed: e.target.checked })}
+                  className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
+                />
+                <div className="text-sm">
+                  <span className="font-bold">{t("terms.title")}</span>
+                  <p className="text-zinc-500">{t("terms.agree")}</p>
+                </div>
+              </label>
+            </div>
           </div>
 
           <button
             onClick={handleStep1Submit}
-            disabled={loading || !formData.fullName}
+            disabled={loading || !formData.fullName || !formData.phone || !formData.birthDate || !formData.termsAgreed}
             className="w-full py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <>다음 <ChevronRight className="w-5 h-5" /></>}

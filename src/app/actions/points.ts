@@ -278,12 +278,23 @@ export async function getRefundPolicy(): Promise<RefundPolicy | null> {
 export async function calculateRefundPercent(matchStartTime: string): Promise<number> {
   const policy = await getRefundPolicy();
   
-  if (!policy || !policy.rules || policy.rules.length === 0) {
-    return 100; // 정책이 없으면 전액 환불
-  }
+  // 1. Check for "Day Before Midnight" rule (P3 Requirement)
+  // 경기 당일 00:00 (전일 자정) 이전이면 100% 환불
+  const matchStart = new Date(matchStartTime);
+  const matchDayMidnight = new Date(matchStart);
+  matchDayMidnight.setHours(0, 0, 0, 0); // 경기 당일 00:00:00
   
   const now = new Date();
-  const matchStart = new Date(matchStartTime);
+  
+  if (now < matchDayMidnight) {
+    return 100;
+  }
+
+  // 2. Fallback to existing policy for other cases (e.g. partial refund)
+  if (!policy || !policy.rules || policy.rules.length === 0) {
+    return 0; // 경기 당일이 지났고, 별도 정책 없으면 환불 불가 (기본값 변경 고려)
+  }
+  
   const hoursDiff = (matchStart.getTime() - now.getTime()) / (1000 * 60 * 60);
   
   // 규칙을 hoursBeforeMatch 내림차순으로 정렬

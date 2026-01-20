@@ -390,9 +390,9 @@ UPDATE profiles SET role = 'superuser' WHERE email = 'your-email@example.com';
 
 | 항목 | 상세 | 상태 |
 |------|------|------|
-| **대기자 신청 기능** | 정원 마감 시 "대기 신청" 버튼 표시 | `[ ]` |
-| **participant.status: waiting** | 대기자 상태 추가 | `[ ]` |
-| **대기자 목록 표시** | 운영자에게 대기자 명단 표시 | `[ ]` |
+| **대기자 신청 기능** | 정원 마감 시 "대기 신청" 버튼 표시 | `[x]` |
+| **participant.status: waiting** | 대기자 상태 추가 | `[x]` |
+| **대기자 목록 표시** | 운영자 및 사용자에게 대기자 명단 표시 | `[x]` |
 | **자동 승격** (P2) | 취소 발생 시 대기자 자동 승격 + 알림 (나중에) | `[ ]` |
 
 ---
@@ -409,19 +409,19 @@ UPDATE profiles SET role = 'superuser' WHERE email = 'your-email@example.com';
 | 필드 | 설명 | 현재 |
 |------|------|------|
 | `full_name` | 실명 (별명보다 실명 선호) | `[x]` |
-| `phone` | 휴대폰번호 | `[ ]` |
-| `birth_date` | 생년월일 (나이 확인용) | `[ ]` |
+| `phone` | 휴대폰번호 | `[x]` |
+| `birth_date` | 생년월일 (나이 확인용) | `[x]` |
 | `avatar_url` | 프로필 사진 (나중에 대화연결 용이) | `[ ]` (optional) |
 | `position` | 주포지션 (운영진 참고용) | `[x]` |
-| `terms_agreed` | 약관 동의 (개인정보 수집) | `[ ]` |
+| `terms_agreed` | 약관 동의 (개인정보 수집) | `[x]` |
 
 #### 구현 상세:
 
 | 항목 | 상세 | 상태 |
 |------|------|------|
-| **profiles 테이블 확장** | phone, birth_date, terms_agreed 컬럼 추가 | `[ ]` |
-| **온보딩 페이지 수정** | 필수 정보 입력 폼 + 약관 동의 체크박스 | `[ ]` |
-| **전역 온보딩 체크** | 모든 페이지에서 온보딩 미완료 시 온보딩 페이지로 리다이렉트 | `[ ]` |
+| **profiles 테이블 확장** | phone, birth_date, terms_agreed 컬럼 추가 | `[x]` |
+| **온보딩 페이지 수정** | 필수 정보 입력 폼 + 약관 동의 체크박스 | `[x]` |
+| **전역 온보딩 체크** | 모든 페이지에서 온보딩 미완료 시 온보딩 페이지로 리다이렉트 | `[x]` |
 
 ---
 
@@ -436,8 +436,8 @@ UPDATE profiles SET role = 'superuser' WHERE email = 'your-email@example.com';
 
 | 항목 | 상세 | 상태 |
 |------|------|------|
-| **refund_policy 구조 변경** | `hoursBeforeMatch` → `daysBeforeMatch` 또는 `deadlineType: 'midnight'` | `[ ]` |
-| **환불 계산 함수 수정** | `calculateRefundPercent()` - 경기 전날 자정 기준으로 계산 | `[ ]` |
+| **refund_policy 구조 변경** | `hoursBeforeMatch` → `daysBeforeMatch` 또는 `deadlineType: 'midnight'` (코드 레벨 적용) | `[x]` |
+| **환불 계산 함수 수정** | `calculateRefundPercent()` - 경기 전날 자정 기준으로 계산 | `[x]` |
 | **설정 UI 수정** | 관리자 설정에서 "X일 전 자정까지" 형식으로 입력 | `[ ]` |
 
 ---

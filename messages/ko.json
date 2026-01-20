@@ -38,11 +38,22 @@
     "profile": {
         "title": "프로필",
         "email": "이메일",
-        "fullName": "이름",
+        "fullName": "이름 (실명)",
+        "phone": "휴대폰 번호",
+        "birthDate": "생년월일 (예: 1990-01-01)",
         "position": "포지션",
         "preferredLang": "선호 언어",
         "save": "저장",
         "saving": "저장 중...",
+        "terms": {
+            "title": "이용약관 동의",
+            "agree": "개인정보 수집 및 이용에 동의합니다",
+            "required": "(필수)"
+        },
+        "placeholder": {
+            "phone": "010-1234-5678",
+            "birthDate": "YYYY-MM-DD"
+        },
         "saved": "저장되었습니다"
     },
     "match": {
@@ -68,7 +79,7 @@
         "spots": "{count}석",
         "viewMap": "지도 보기",
         "noParticipants": "참가자가 없습니다",
-        "confirmCancel": "신청을 취소하시겠습니까?",
+        "confirmCancel": "경기 전일 자정까지 취소 시 100% 환불됩니다. 취소하시겠습니까?",
         "insufficientPoints": "포인트가 부족합니다",
         "goToCharge": "충전하러 가기",
         "refundPolicy": "환불 정책"
