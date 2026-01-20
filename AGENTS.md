@@ -442,6 +442,20 @@ UPDATE profiles SET role = 'superuser' WHERE email = 'your-email@example.com';
 
 ---
 
+### 🟢 P4. SEO 및 도메인 변경 (Domain Migration)
+
+**요청사항:**
+- "도메인도 https://powerplay.kr/ 로 신규로 변경했어"
+- 검색엔진 최적화(SEO) 및 OG 이미지 교체
+
+#### 구현 상세:
+
+| 항목 | 상세 | 상태 |
+|------|------|------|
+| **도메인 변경** | 코드 내 Fallback URL 변경 (`pphockey` -> `powerplay.kr`) | `[x]` |
+| **SEO 설정** | `src/app/robots.ts`, `sitemap.ts`, `layout.tsx` 업데이트 | `[x]` |
+| **OG 이미지** | 신규 디자인(한국어 부제) 적용 (`public/og-image.png`) | `[x]` |
+
 ### 📌 구현 우선순위 요약
 
 ```

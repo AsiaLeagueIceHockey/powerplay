@@ -21,7 +21,7 @@ export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://pphockey.vercel.app";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://powerplay.kr";
 
 export async function generateMetadata({
   params,
