@@ -73,6 +73,12 @@ export async function generateMetadata({
       index: true,
       follow: true,
     },
+    verification: {
+      google: process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION,
+      other: {
+        "naver-site-verification": process.env.NEXT_PUBLIC_NAVER_VERIFICATION || "",
+      },
+    },
   };
 }
 

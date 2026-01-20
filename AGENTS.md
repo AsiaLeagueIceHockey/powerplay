@@ -455,6 +455,7 @@ UPDATE profiles SET role = 'superuser' WHERE email = 'your-email@example.com';
 | **도메인 변경** | 코드 내 Fallback URL 변경 (`pphockey` -> `powerplay.kr`) | `[x]` |
 | **SEO 설정** | `src/app/robots.ts`, `sitemap.ts`, `layout.tsx` 업데이트 | `[x]` |
 | **OG 이미지** | 신규 디자인(한국어 부제) 적용 (`public/og-image.png`) | `[x]` |
+| **등록 가이드** | `SEO_GUIDE.md` 및 `layout.tsx` 검증 태그 추가 | `[x]` |
 
 ### 📌 구현 우선순위 요약
 
