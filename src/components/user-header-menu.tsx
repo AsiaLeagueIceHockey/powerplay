@@ -110,6 +110,16 @@ export function UserHeaderMenu({
 
           {isOpen && (
             <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-zinc-800 rounded-lg shadow-xl border border-zinc-200 dark:border-zinc-700 py-1 z-50">
+              {/* Mobile Only: Username Display */}
+              <div className="md:hidden px-4 py-3 border-b border-zinc-100 dark:border-zinc-700 mb-1">
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 font-medium mb-0.5">
+                  {locale === "ko" ? "로그인 정보" : "Signed in as"}
+                </p>
+                <p className="text-sm font-bold text-zinc-900 dark:text-white truncate">
+                  {displayName}
+                </p>
+              </div>
+
               <div className="px-4 py-2 text-xs font-semibold text-zinc-400 uppercase tracking-wider">
                 {locale === "ko" ? "언어 설정" : "Language"}
               </div>
