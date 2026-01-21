@@ -138,7 +138,9 @@ export default async function PointsPage({
                 <div>
                   <p className="font-medium">{req.amount.toLocaleString()}P</p>
                   <p className="text-xs text-zinc-500">
-                    {new Date(req.created_at).toLocaleDateString(locale === "ko" ? "ko-KR" : "en-US")}
+                    {new Date(req.created_at).toLocaleDateString(locale === "ko" ? "ko-KR" : "en-US", {
+                      timeZone: "Asia/Seoul"
+                    })}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -181,11 +183,13 @@ export default async function PointsPage({
                 <div>
                   <p className="font-medium">{tx.description || t(`transaction.${tx.type}`)}</p>
                   <p className="text-xs text-zinc-500">
-                    {new Date(tx.created_at).toLocaleDateString(locale === "ko" ? "ko-KR" : "en-US", {
+                    {new Date(tx.created_at).toLocaleString(locale === "ko" ? "ko-KR" : "en-US", {
+                      timeZone: "Asia/Seoul",
                       month: "short",
                       day: "numeric",
                       hour: "2-digit",
                       minute: "2-digit",
+                      hour12: false
                     })}
                   </p>
                 </div>

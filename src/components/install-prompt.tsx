@@ -2,12 +2,17 @@
 
 import { useEffect, useState } from "react";
 import { Download, X } from "lucide-react";
+import { useNotification } from "@/contexts/notification-context";
+import Image from "next/image";
 
 export function InstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [isVisible, setIsVisible] = useState(false);
+  const [isIOS, setIsIOS] = useState(false);
+  const { openGuide } = useNotification();
 
   useEffect(() => {
+    // Android / Desktop PWA Prompt
     const handler = (e: any) => {
       // Prevent Chrome 67 and earlier from automatically showing the prompt
       e.preventDefault();
@@ -18,6 +23,23 @@ export function InstallPrompt() {
     };
 
     window.addEventListener("beforeinstallprompt", handler);
+
+    // iOS Detection
+    const userAgent = window.navigator.userAgent.toLowerCase();
+    const isIosDevice = /iphone|ipad|ipod/.test(userAgent);
+    const isStandalone = (window.navigator as any).standalone;
+    
+    // Show prompt if iOS and NOT standalone (in browser)
+    if (isIosDevice && !isStandalone) {
+        setIsIOS(true);
+        // Delay slightly to not annoy immediately? Or show immediately? 
+        // User asked for "banner like android".
+        // Check if previously dismissed?
+        const dismissed = localStorage.getItem("install_prompt_dismissed");
+        if (!dismissed) {
+             setIsVisible(true);
+        }
+    }
 
     window.addEventListener("appinstalled", () => {
       // Log app installed to analytics if needed
@@ -31,6 +53,14 @@ export function InstallPrompt() {
   }, []);
 
   const handleInstallClick = async () => {
+    if (isIOS) {
+        // Show the guide modal which has iOS instructions
+        openGuide();
+        // Don't close the banner immediately? Or close it?
+        // User might want to keep it until they actually install.
+        return;
+    }
+
     if (!deferredPrompt) return;
 
     // Show the install prompt
@@ -49,32 +79,48 @@ export function InstallPrompt() {
 
   if (!isVisible) return null;
 
+  const handleDismiss = () => {
+    setIsVisible(false);
+    if (isIOS) {
+        localStorage.setItem("install_prompt_dismissed", "true");
+    }
+  };
+
   return (
     <div className="fixed bottom-4 left-4 right-4 z-50 animate-in slide-in-from-bottom-5 duration-300">
-      <div className="bg-zinc-900 dark:bg-zinc-800 text-white p-4 rounded-xl shadow-2xl flex items-center justify-between gap-4 border border-zinc-800 dark:border-zinc-700">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-blue-600 rounded-lg">
-            <Download className="w-5 h-5" />
+      <div className="relative bg-zinc-900 dark:bg-zinc-800 text-white p-5 rounded-2xl shadow-2xl flex items-center justify-between gap-4 border border-zinc-800 dark:border-zinc-700">
+        
+        {/* Close Button - Top Right */}
+        <button
+            onClick={handleDismiss}
+            className="absolute -top-2 -right-2 p-1.5 bg-zinc-800 text-zinc-400 hover:text-white rounded-full border border-zinc-700 shadow-md transition"
+        >
+            <X className="w-4 h-4" />
+        </button>
+
+        <div className="flex items-center gap-4">
+          <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-white flex-shrink-0 shadow-inner">
+             <Image 
+               src="/favicon.png" 
+               alt="Power Play" 
+               fill
+               className="object-cover p-1"
+             />
           </div>
           <div>
-            <p className="font-bold text-sm">앱으로 더 편하게 이용하세요</p>
-            <p className="text-xs text-zinc-400">홈 화면에 추가하여 앱처럼 사용하기</p>
+            <p className="font-bold text-base">Power Play 앱 설치</p>
+            <p className="text-xs text-zinc-400">
+                {isIOS ? "홈 화면에 추가하여 앱처럼 사용하세요" : "더 빠르고 편리하게 이용하세요"}
+            </p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setIsVisible(false)}
-            className="p-2 text-zinc-400 hover:text-white transition"
-          >
-            <X className="w-5 h-5" />
-          </button>
-          <button
+        
+        <button
             onClick={handleInstallClick}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-bold transition whitespace-nowrap"
+            className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 active:scale-95 rounded-xl text-sm font-bold transition whitespace-nowrap shadow-lg shadow-blue-900/20"
           >
             설치하기
-          </button>
-        </div>
+        </button>
       </div>
     </div>
   );
