@@ -8,6 +8,7 @@ import { ScrollToTop } from "@/components/scroll-to-top";
 import { PushServiceWorkerRegister } from "@/components/push-manager";
 import { NotificationProvider } from "@/contexts/notification-context";
 import { NotificationGuideModal } from "@/components/notification-guide-modal";
+import { InstallPrompt } from "@/components/install-prompt";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -124,6 +125,7 @@ export default async function LocaleLayout({
             <PushServiceWorkerRegister />
             {children}
             <NotificationGuideModal />
+            <InstallPrompt />
           </NotificationProvider>
         </NextIntlClientProvider>
       </body>
