@@ -9,7 +9,7 @@ export function InstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [isVisible, setIsVisible] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
-  const { openGuide } = useNotification();
+  const { openGuide, isOpen } = useNotification();
 
   useEffect(() => {
     // Android / Desktop PWA Prompt
@@ -75,7 +75,7 @@ export function InstallPrompt() {
     setIsVisible(false);
   };
 
-  if (!isVisible) return null;
+  if (!isVisible || isOpen) return null;
 
   const handleDismiss = () => {
     setIsVisible(false);
@@ -97,7 +97,7 @@ export function InstallPrompt() {
         </button>
 
         <div className="flex items-center gap-4">
-          <div className="relative w-12 h-12 rounded-xl overflow-hidden shadow-sm border border-zinc-200 dark:border-zinc-700">
+          <div className="relative w-12 h-12 rounded-xl overflow-hidden shadow-sm border border-zinc-200 dark:border-zinc-700 flex-shrink-0">
              <Image 
                src="/favicon.png" 
                alt="Power Play" 
