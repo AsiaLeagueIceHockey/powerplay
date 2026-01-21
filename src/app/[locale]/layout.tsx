@@ -6,6 +6,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Metadata } from "next";
 import { ScrollToTop } from "@/components/scroll-to-top";
 import { PushServiceWorkerRegister } from "@/components/push-manager";
+import { NotificationProvider } from "@/contexts/notification-context";
+import { NotificationGuideModal } from "@/components/notification-guide-modal";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -20,6 +22,17 @@ const geistMono = Geist_Mono({
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
+
+export const viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#09090b" }, // zinc-950
+  ],
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false, // App-like feel
+};
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://powerplay.kr";
 
@@ -47,6 +60,7 @@ export async function generateMetadata({
       icon: "/favicon.png",
       apple: "/favicon.png",
     },
+    manifest: "/manifest.json",
     openGraph: {
       title,
       description,
@@ -105,9 +119,12 @@ export default async function LocaleLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100`}
       >
         <NextIntlClientProvider messages={messages}>
-          <ScrollToTop />
-          <PushServiceWorkerRegister />
-          {children}
+          <NotificationProvider>
+            <ScrollToTop />
+            <PushServiceWorkerRegister />
+            {children}
+            <NotificationGuideModal />
+          </NotificationProvider>
         </NextIntlClientProvider>
       </body>
     </html>

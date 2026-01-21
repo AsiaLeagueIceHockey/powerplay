@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import type { BankAccountInfo, RefundPolicy, RefundRule } from "./points";
+import { sendPushNotification } from "@/app/actions/push";
 
 // ==================== SuperUser 권한 확인 ====================
 
@@ -346,6 +347,15 @@ export async function confirmPointCharge(
   }
 
   revalidatePath("/admin/charge-requests");
+
+  // 알림 발송: 사용자에게 (Trigger 2: 포인트 충전 완료)
+  await sendPushNotification(
+    chargeRequest.user_id,
+    "충전 완료 💰",
+    `${chargeRequest.amount.toLocaleString()}P가 충전되었습니다. 현재 잔액: ${newBalance.toLocaleString()}P`,
+    "/mypage/points"
+  );
+
   return { success: true };
 }
 
@@ -549,6 +559,24 @@ export async function confirmParticipantPayment(
   });
 
   revalidatePath("/admin/charge-requests");
+
+  // 알림 발송: 사용자에게 (Trigger 3: 포인트 차감 및 참가 확정)
+  // 1. 포인트 충전 완료 (개념상) - 이미 차감되었지만, "자동 결제됨" 의미
+  // 2. 참가 확정
+  if (participant && participant.match) {
+    // @ts-ignore
+    const matchTime = new Date(participant.match.start_time).toLocaleString("ko-KR", {
+      month: "short", day: "numeric", hour: "2-digit", minute: "2-digit"
+    });
+    
+    await sendPushNotification(
+      participant.user_id,
+      "참가 확정 ✅",
+      `대기하시던 경기(${matchTime}) 참가가 확정되었습니다. (${entryPoints.toLocaleString()}P 차감)`,
+      `/match/${participant.match_id}`
+    );
+  }
+
   return { success: true };
 }
 

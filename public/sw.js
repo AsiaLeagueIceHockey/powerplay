@@ -1,22 +1,23 @@
+
 self.addEventListener('push', function(event) {
   if (event.data) {
     const data = event.data.json();
-    const title = data.title || 'Power Play';
     const options = {
-      body: data.body || 'New notification',
-      icon: '/icon-192.png', // Ensure this exists or use favicon
-      badge: '/badge.png',   // Optional
+      body: data.body,
+      icon: '/favicon.png',
+      badge: '/favicon.png',
       data: {
-        url: data.url || '/'
+        dateOfArrival: Date.now(),
+        primaryKey: '2',
+        url: data.url
       }
     };
-
     event.waitUntil(
-      self.registration.showNotification(title, options)
+      self.registration.showNotification(data.title, options)
     );
   }
 });
-
+ 
 self.addEventListener('notificationclick', function(event) {
   event.notification.close();
   event.waitUntil(

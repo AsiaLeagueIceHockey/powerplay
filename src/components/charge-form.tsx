@@ -159,7 +159,7 @@ export function ChargeForm({ bankAccount }: { bankAccount: BankAccountInfo | nul
                     alert(locale === "ko" ? "계좌번호가 복사되었습니다!" : "Account copied!");
                   });
                 }}
-                className="px-3 py-2 bg-zinc-200 dark:bg-zinc-700 rounded-lg text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-300 dark:hover:bg-zinc-600 transition flex items-center gap-1"
+                className="px-3 py-2 bg-zinc-200 dark:bg-zinc-700 rounded-lg text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-300 dark:hover:bg-zinc-600 transition flex items-center gap-1 whitespace-nowrap flex-shrink-0"
               >
                 📋 {locale === "ko" ? "복사" : "Copy"}
               </button>

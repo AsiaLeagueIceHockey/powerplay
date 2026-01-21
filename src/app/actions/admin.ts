@@ -138,6 +138,36 @@ export async function updateMatch(matchId: string, formData: FormData) {
 
   revalidatePath("/admin/matches");
   revalidatePath(`/admin/matches/${matchId}/edit`);
+  // 알림 발송 (Trigger 5: 경기 취소)
+  if (status === "canceled") {
+    // 1. Get all participants
+    const { data: participants } = await supabase
+      .from("participants")
+      .select("user_id")
+      .eq("match_id", matchId)
+      .in("status", ["applied", "confirmed", "pending_payment"]);
+
+    // 2. Send notifications
+    if (participants && participants.length > 0) {
+      const matchDate = new Date(startTimeUTC).toLocaleString("ko-KR", {
+        month: "short", day: "numeric", hour: "2-digit", minute: "2-digit"
+      });
+      
+      await Promise.allSettled(
+        participants.map((p) =>
+          sendPushNotification(
+            p.user_id,
+            "경기 취소 알림 🚫",
+            `신청하신 ${matchDate} 경기가 취소되었습니다. 환불 규정에 따라 처리될 예정입니다.`,
+            `/mypage`
+          )
+        )
+      );
+    }
+  }
+
+  revalidatePath("/admin/matches");
+  revalidatePath(`/admin/matches/${matchId}/edit`);
   return { success: true };
 }
 

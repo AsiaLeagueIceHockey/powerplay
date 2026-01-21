@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { calculateRefundPercent } from "./points";
+import { sendPushNotification } from "@/app/actions/push";
 
 // Type definitions for match data
 export interface MatchRink {
@@ -284,6 +285,32 @@ export async function joinMatch(matchId: string, position: string): Promise<{
     return { error: error.message };
   }
 
+
+
+  // 알림 발송 (Trigger 3: 참가 확정)
+  if (participantStatus === "confirmed") {
+    // Get rink info for notification
+    const { data: rinkMatch } = await supabase
+      .from("matches")
+      .select("start_time, rink:rinks(name_ko)")
+      .eq("id", matchId)
+      .single();
+      
+    // @ts-ignore
+    const rinkName = rinkMatch?.rink?.name_ko || "경기";
+    // @ts-ignore
+    const startTime = new Date(rinkMatch?.start_time).toLocaleString("ko-KR", {
+      month: "short", day: "numeric", hour: "2-digit", minute: "2-digit"
+    });
+
+    await sendPushNotification(
+      user.id,
+      "경기 참가 확정 🏒",
+      `${rinkName} (${startTime}) 참가 신청이 완료되었습니다.`,
+      `/match/${matchId}`
+    );
+  }
+
   return { success: true, status: participantStatus };
 }
 
@@ -369,6 +396,16 @@ export async function cancelJoin(matchId: string) {
       reference_id: matchId,
     });
   }
+
+  // 알림 발송 (Trigger 4: 참가 취소 및 포인트 반환)
+  await sendPushNotification(
+    user.id,
+    "참가 취소 완료 ↩️",
+    refundAmount > 0 
+      ? `경기가 취소되었으며 ${refundAmount.toLocaleString()}P가 환불되었습니다.`
+      : `경기 참가가 취소되었습니다.`,
+    `/mypage`
+  );
 
   return { success: true, refundAmount };
 }

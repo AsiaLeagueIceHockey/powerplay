@@ -5,6 +5,9 @@ import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { signOut } from "@/app/actions/auth";
 import { DeleteAccountModal } from "./delete-account-modal";
+import { useNotification } from "@/contexts/notification-context";
+
+import { CircleDollarSign, User as UserIcon, ChevronDown, Wrench, Bell, LogOut, Ticket } from "lucide-react";
 
 interface User {
   email?: string;
@@ -26,6 +29,7 @@ export function UserHeaderMenu({
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const { openGuide } = useNotification();
   const router = useRouter();
   const pathname = usePathname();
   const menuRef = useRef<HTMLDivElement>(null);
@@ -75,120 +79,111 @@ export function UserHeaderMenu({
   return (
     <>
       <div className="flex items-center gap-2 flex-shrink-0">
-        {/* Points Display */}
-        <Link
-          href={`/${locale}/mypage/points`}
-          className="flex items-center gap-1 px-3 py-1.5 bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 rounded-lg hover:bg-amber-100 dark:hover:bg-amber-900/30 transition text-sm font-medium whitespace-nowrap"
-        >
-          <span>💰</span>
-          <span>{points.toLocaleString()}P</span>
-        </Link>
-
-        {/* User Menu */}
         <div className="relative" ref={menuRef}>
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="flex items-center space-x-2 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 px-3 py-2 rounded-lg transition"
+            className="flex items-center gap-2 px-3 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition group"
+            title={locale === "ko" ? "마이페이지 / 설정" : "My Page / Settings"}
           >
-            <div className="w-8 h-8 bg-zinc-200 dark:bg-zinc-700 rounded-full flex items-center justify-center text-zinc-500 dark:text-zinc-300 flex-shrink-0">
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                />
-              </svg>
+            <div className="w-8 h-8 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-full flex items-center justify-center text-zinc-500 dark:text-zinc-400 group-hover:border-zinc-300 dark:group-hover:border-zinc-600 transition">
+              <UserIcon size={18} />
             </div>
-            <span className="font-medium text-sm hidden md:block">{displayName}</span>
+            <div className="flex items-center gap-1 text-sm font-medium text-zinc-700 dark:text-zinc-200">
+              <span className="max-w-[100px] truncate">{displayName}</span>
+              <span className="text-zinc-400 font-normal">{locale === "ko" ? "님" : ""}</span>
+            </div>
+            <ChevronDown size={14} className={`text-zinc-400 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
           </button>
 
           {isOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-zinc-800 rounded-lg shadow-xl border border-zinc-200 dark:border-zinc-700 py-1 z-50">
-              {/* Mobile Only: Username Display */}
-              <div className="md:hidden px-4 py-3 border-b border-zinc-100 dark:border-zinc-700 mb-1">
-                <p className="text-xs text-zinc-500 dark:text-zinc-400 font-medium mb-0.5">
-                  {locale === "ko" ? "로그인 정보" : "Signed in as"}
+            <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-zinc-800 rounded-xl shadow-xl border border-zinc-200 dark:border-zinc-700 py-2 z-20 animate-in fade-in zoom-in-95 duration-100">
+              
+              {/* User Info Header (Mobile/Compact context) */}
+              <div className="px-4 py-2 mb-2 border-b border-zinc-100 dark:border-zinc-700/50">
+                <p className="text-xs text-zinc-400 font-medium mb-0.5">
+                  {locale === "ko" ? "내 계정" : "My Account"}
                 </p>
-                <p className="text-sm font-bold text-zinc-900 dark:text-white truncate">
-                  {displayName}
+                <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate">
+                  {user.email}
                 </p>
               </div>
 
-              <div className="px-4 py-2 text-xs font-semibold text-zinc-400 uppercase tracking-wider">
-                {locale === "ko" ? "언어 설정" : "Language"}
-              </div>
-              <div className="flex px-4 py-2 space-x-2">
-                <button
-                  onClick={() => switchLocale("ko")}
-                  className={`flex-1 py-1 text-xs rounded-md border ${
-                    locale === "ko"
-                      ? "bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-900/30 dark:border-blue-800 dark:text-blue-300"
-                      : "border-zinc-200 text-zinc-600 hover:bg-zinc-50 dark:border-zinc-600 dark:text-zinc-400 dark:hover:bg-zinc-700"
-                  }`}
-                >
-                  한국어
-                </button>
-                <button
-                  onClick={() => switchLocale("en")}
-                  className={`flex-1 py-1 text-xs rounded-md border ${
-                    locale === "en"
-                      ? "bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-900/30 dark:border-blue-800 dark:text-blue-300"
-                      : "border-zinc-200 text-zinc-600 hover:bg-zinc-50 dark:border-zinc-600 dark:text-zinc-400 dark:hover:bg-zinc-700"
-                  }`}
-                >
-                  English
-                </button>
-              </div>
-
-              <div className="border-t border-zinc-100 dark:border-zinc-700 my-1"></div>
-
-              {/* 포인트 메뉴 */}
-              <button
-                onClick={() => {
-                  router.push(`/${locale}/mypage/points`);
-                  setIsOpen(false);
-                }}
-                className="block w-full text-left px-4 py-2 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700"
+              {/* 1. 마이페이지 (사람) */}
+              <Link
+                href={`/${locale}/mypage`}
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-3 px-4 py-2.5 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700/50 transition-colors"
               >
-                {locale === "ko" ? "💰 포인트 관리" : "💰 Points"}
-              </button>
+                <div className="w-8 h-8 rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 flex items-center justify-center flex-shrink-0">
+                  <UserIcon size={16} />
+                </div>
+                <span>{locale === "ko" ? "마이페이지" : "My Page"}</span>
+              </Link>
 
-              {/* 관리자 신청 / 관리자 페이지 */}
-              {isAdmin ? (
-                <button
-                  onClick={() => {
-                    router.push(`/${locale}/admin`);
-                    setIsOpen(false);
-                  }}
-                  className="block w-full text-left px-4 py-2 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700"
+              {/* 2. 포인트 (동전) */}
+              <Link
+                href={`/${locale}/mypage/points`}
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-3 px-4 py-2.5 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700/50 transition-colors"
+              >
+                <div className="w-8 h-8 rounded-full bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 flex items-center justify-center flex-shrink-0">
+                  <CircleDollarSign size={16} />
+                </div>
+                <div className="flex flex-col leading-none gap-1">
+                  <span className="font-medium">{locale === "ko" ? "포인트" : "Points"}</span>
+                  <span className="text-xs text-zinc-500 font-mono">{points.toLocaleString()} P</span>
+                </div>
+              </Link>
+
+              {/* 3. 관리자 (툴) */}
+              {isAdmin && (
+                <Link
+                  href={`/${locale}/admin`}
+                  onClick={() => setIsOpen(false)}
+                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700/50 transition-colors"
                 >
-                  {locale === "ko" ? "🛠️ 관리자 페이지" : "🛠️ Admin Page"}
-                </button>
-              ) : (
-                <button
-                  onClick={() => {
-                    router.push(`/${locale}/admin-apply`);
-                    setIsOpen(false);
-                  }}
-                  className="block w-full text-left px-4 py-2 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700"
+                  <div className="w-8 h-8 rounded-full bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 flex items-center justify-center flex-shrink-0">
+                    <Wrench size={16} />
+                  </div>
+                  <span>{locale === "ko" ? "관리자 페이지" : "Admin Page"}</span>
+                </Link>
+              )}
+              {!isAdmin && (
+                <Link
+                  href={`/${locale}/admin-apply`}
+                  onClick={() => setIsOpen(false)}
+                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700/50 transition-colors"
                 >
-                  {locale === "ko" ? "🎫 관리자 신청" : "🎫 Apply for Admin"}
-                </button>
+                  <div className="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 flex items-center justify-center flex-shrink-0">
+                    <Ticket size={16} />
+                  </div>
+                  <span>{locale === "ko" ? "관리자 신청" : "Apply for Admin"}</span>
+                </Link>
               )}
 
-              <div className="border-t border-zinc-100 dark:border-zinc-700 my-1"></div>
+               {/* 알림 설정 */}
+               <button
+                  onClick={() => {
+                    openGuide();
+                    setIsOpen(false);
+                  }}
+                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700/50 transition-colors text-left"
+                >
+                  <div className="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 flex items-center justify-center flex-shrink-0">
+                    <Bell size={16} />
+                  </div>
+                  <span>{locale === "ko" ? "알림 설정 가이드" : "Notification Guide"}</span>
+               </button>
 
+              <div className="border-t border-zinc-100 dark:border-zinc-700/50 my-2"></div>
+
+              {/* 로그아웃 (아이콘 없음 or 간단히) */}
               <button
                 onClick={handleSignOut}
-                className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
+                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 transition-colors"
               >
-                {locale === "ko" ? "로그아웃" : "Logout"}
+                <LogOut size={16} />
+                <span>{locale === "ko" ? "로그아웃" : "Logout"}</span>
               </button>
 
               {/* 회원 탈퇴 */}
@@ -197,7 +192,7 @@ export function UserHeaderMenu({
                   setIsOpen(false);
                   setShowDeleteModal(true);
                 }}
-                className="w-full text-left px-4 py-2 text-xs text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-700"
+                className="w-full text-left px-4 py-1 text-[10px] text-zinc-400 hover:text-red-500 transition-colors"
               >
                 {locale === "ko" ? "회원탈퇴" : "Delete Account"}
               </button>

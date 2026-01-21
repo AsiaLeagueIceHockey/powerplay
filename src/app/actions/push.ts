@@ -43,9 +43,17 @@ export async function saveSubscription(subscription: PushSubscriptionData) {
   });
 
   if (error) {
-    // If unique constraint violation (endpoint already exists), just ignore or update
+    // If unique constraint violation (endpoint already exists), update the user_id
     if (error.code === "23505") {
-      // Already subscribed
+      const { error: updateError } = await supabase
+        .from("push_subscriptions")
+        .update({ user_id: user.id })
+        .eq("endpoint", subscription.endpoint);
+        
+      if (updateError) {
+        console.error("Error updating subscription owner:", updateError);
+        return { error: updateError.message };
+      }
       return { success: true };
     }
     console.error("Error saving subscription:", error);
@@ -53,6 +61,30 @@ export async function saveSubscription(subscription: PushSubscriptionData) {
   }
 
   return { success: true };
+}
+
+export async function sendPushToSuperUsers(
+  title: string,
+  body: string,
+  url: string = "/admin"
+) {
+  const supabase = await createClient();
+
+  // Get all superusers
+  const { data: superusers, error } = await supabase
+    .from("profiles")
+    .select("id")
+    .eq("role", "superuser");
+
+  if (error || !superusers || superusers.length === 0) {
+    return { success: false };
+  }
+
+  const results = await Promise.allSettled(
+    superusers.map((admin) => sendPushNotification(admin.id, title, body, url))
+  );
+
+  return { success: true, sent: results.filter(r => r.status === "fulfilled").length };
 }
 
 export async function sendPushNotification(

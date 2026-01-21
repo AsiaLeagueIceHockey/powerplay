@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { sendPushToSuperUsers } from "@/app/actions/push";
 
 // ==================== 타입 정의 ====================
 
@@ -137,10 +138,19 @@ export async function requestPointCharge(
     .select()
     .single();
 
+
+
   if (error) {
     console.error("Error creating charge request:", error);
     return { success: false, error: error.message };
   }
+
+  // 알림 발송: 슈퍼유저에게
+  await sendPushToSuperUsers(
+    "💰 포인트 충전 요청",
+    `${user.email}님이 ${amount.toLocaleString()}P 충전을 요청했습니다.`,
+    "/admin/charge-requests"
+  );
 
   revalidatePath("/mypage/points");
   return { success: true, chargeRequest: data as ChargeRequest };
