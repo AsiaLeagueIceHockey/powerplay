@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import { usePathname } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 
 interface NotificationContextType {
   isOpen: boolean;
@@ -36,12 +37,15 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     // verification logic inside component will handle "already subscribed" UI
     
     // Auto-show only on first visit (main page) if not seen
-    if (!hasSeenGuide && pathname === "/ko" || pathname === "/en" || pathname === "/") {
+    if (!hasSeenGuide && (pathname === "/ko" || pathname === "/en" || pathname === "/")) {
        // Wait a bit before showing to not overwhelm
-       const timer = setTimeout(() => {
-         // Optionally check subscription status here? 
-         // For now, simpler to just show the onboarding banner/modal logic
-         if (Notification.permission === "default") {
+       const timer = setTimeout(async () => {
+         // Check if user is logged in
+         const supabase = createClient();
+         const { data: { user } } = await supabase.auth.getUser();
+
+         // Only show if logged in AND permission is default
+         if (user && Notification.permission === "default") {
              setShouldShowOnboarding(true);
              setIsOpen(true); 
          }
