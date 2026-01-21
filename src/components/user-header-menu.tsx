@@ -164,7 +164,7 @@ export function UserHeaderMenu({
                {/* 알림 설정 */}
                <button
                   onClick={() => {
-                    openGuide();
+                    openGuide("notification");
                     setIsOpen(false);
                   }}
                   className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700/50 transition-colors text-left"

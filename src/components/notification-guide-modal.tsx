@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useNotification } from "@/contexts/notification-context";
 import { saveSubscription } from "@/app/actions/push";
-import { X, Bell, Share, PlusSquare, CheckCircle } from "lucide-react";
+import { X, Bell, Share, PlusSquare, CheckCircle, Download } from "lucide-react";
 
 // Helper to convert VAPID key
 function urlBase64ToUint8Array(base64String: string) {
@@ -22,7 +22,7 @@ function urlBase64ToUint8Array(base64String: string) {
 }
 
 export function NotificationGuideModal() {
-  const { isOpen, closeGuide, markOnboardingComplete } = useNotification();
+  const { isOpen, closeGuide, markOnboardingComplete, guideType } = useNotification();
   const [os, setOs] = useState<"ios" | "android" | "other">("other");
   const [isStandalone, setIsStandalone] = useState(false);
   const [permissionState, setPermissionState] = useState<NotificationPermission>("default");
@@ -103,8 +103,17 @@ export function NotificationGuideModal() {
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-zinc-100 dark:border-zinc-800">
           <h2 className="text-lg font-bold flex items-center gap-2">
-            <Bell className="w-5 h-5 text-blue-500 fill-blue-500/20" />
-            알림 설정 가이드
+            {guideType === "install" ? (
+                <>
+                    <Download className="w-5 h-5 text-blue-500" />
+                    앱 설치 방법
+                </>
+            ) : (
+                <>
+                    <Bell className="w-5 h-5 text-blue-500 fill-blue-500/20" />
+                    알림 설정 가이드
+                </>
+            )}
           </h2>
           <button onClick={handleClose} className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 p-1">
             <X className="w-5 h-5" />
@@ -129,17 +138,28 @@ export function NotificationGuideModal() {
              </div>
           ) : (
             <>
-              {/* iOS Browser Case: Needs PWA Install */}
-              {os === "ios" && !isStandalone && (
+              {/* Manual Install Instructions (iOS or explicitly requested) */}
+              {(guideType === "install" || (os === "ios" && !isStandalone)) && (
                 <div className="space-y-6">
-                  <div className="p-4 bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-100 dark:border-amber-900/50">
-                    <p className="font-semibold text-amber-800 dark:text-amber-200 mb-1">
-                      ⚠️ 아이폰 알림 필수 조건
-                    </p>
-                    <p className="text-sm text-amber-700 dark:text-amber-300">
-                      아이폰에서는 <strong>홈 화면에 추가</strong>해야만 알림을 받을 수 있습니다.
-                    </p>
-                  </div>
+                  {guideType === "install" ? (
+                    <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-100 dark:border-blue-900/50">
+                        <p className="font-semibold text-blue-800 dark:text-blue-200 mb-1">
+                          앱을 설치하면 더 편리합니다!
+                        </p>
+                        <p className="text-sm text-blue-700 dark:text-blue-300">
+                          아래 순서대로 <strong>홈 화면에 추가</strong>해주세요.
+                        </p>
+                    </div>
+                  ) : (
+                    <div className="p-4 bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-100 dark:border-amber-900/50">
+                        <p className="font-semibold text-amber-800 dark:text-amber-200 mb-1">
+                        ⚠️ 아이폰 알림 필수 조건
+                        </p>
+                        <p className="text-sm text-amber-700 dark:text-amber-300">
+                        아이폰에서는 <strong>홈 화면에 추가</strong>해야만 알림을 받을 수 있습니다.
+                        </p>
+                    </div>
+                  )}
 
                   <div className="space-y-4">
                     <div className="flex items-start gap-4">
@@ -167,11 +187,17 @@ export function NotificationGuideModal() {
                       </div>
                     </div>
                   </div>
+                  
+                  {guideType === "install" && (
+                    <button onClick={handleClose} className="w-full py-3 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 rounded-xl font-medium transition mt-4">
+                        닫기
+                    </button>
+                  )}
                 </div>
               )}
 
-              {/* iOS PWA or Android or Desktop: One-click setup */}
-              {(os !== "ios" || isStandalone) && (
+              {/* Push Permission Request (Only shown if NOT install mode AND (Not iOS OR Already Standalone)) */}
+              {guideType !== 'install' && (os !== "ios" || isStandalone) && (
                 <div className="text-center py-4">
                   <div className="mb-6">
                     <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">

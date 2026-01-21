@@ -5,7 +5,8 @@ import { usePathname } from "next/navigation";
 
 interface NotificationContextType {
   isOpen: boolean;
-  openGuide: () => void;
+  guideType: "notification" | "install";
+  openGuide: (type?: "notification" | "install") => void;
   closeGuide: () => void;
   shouldShowOnboarding: boolean;
   markOnboardingComplete: () => void;
@@ -15,9 +16,13 @@ const NotificationContext = createContext<NotificationContextType | undefined>(u
 
 export function NotificationProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [guideType, setGuideType] = useState<"notification" | "install">("notification");
   const pathname = usePathname();
 
-  const openGuide = () => setIsOpen(true);
+  const openGuide = (type: "notification" | "install" = "notification") => {
+    setGuideType(type);
+    setIsOpen(true);
+  };
   const closeGuide = () => setIsOpen(false);
 
   // Onboarding Logic
@@ -51,7 +56,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <NotificationContext.Provider value={{ isOpen, openGuide, closeGuide, shouldShowOnboarding, markOnboardingComplete }}>
+    <NotificationContext.Provider value={{ isOpen, guideType, openGuide, closeGuide, shouldShowOnboarding, markOnboardingComplete }}>
       {children}
     </NotificationContext.Provider>
   );

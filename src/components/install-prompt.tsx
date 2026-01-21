@@ -54,10 +54,8 @@ export function InstallPrompt() {
 
   const handleInstallClick = async () => {
     if (isIOS) {
-        // Show the guide modal which has iOS instructions
-        openGuide();
-        // Don't close the banner immediately? Or close it?
-        // User might want to keep it until they actually install.
+        // Show the guide modal in INSTALL mode
+        openGuide("install");
         return;
     }
 
@@ -99,12 +97,12 @@ export function InstallPrompt() {
         </button>
 
         <div className="flex items-center gap-4">
-          <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-white flex-shrink-0 shadow-inner">
+          <div className="relative w-12 h-12 rounded-xl overflow-hidden shadow-sm border border-zinc-200 dark:border-zinc-700">
              <Image 
                src="/favicon.png" 
                alt="Power Play" 
                fill
-               className="object-cover p-1"
+               className="object-cover"
              />
           </div>
           <div>
