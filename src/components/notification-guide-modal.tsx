@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useNotification } from "@/contexts/notification-context";
 import { saveSubscription } from "@/app/actions/push";
-import { X, Bell, Share, PlusSquare, CheckCircle, Download } from "lucide-react";
+import { X, Bell, Share, PlusSquare, CheckCircle, Download, RefreshCw } from "lucide-react";
 
 // Helper to convert VAPID key
 function urlBase64ToUint8Array(base64String: string) {
@@ -22,7 +22,7 @@ function urlBase64ToUint8Array(base64String: string) {
 }
 
 export function NotificationGuideModal() {
-  const { isOpen, closeGuide, markOnboardingComplete, guideType } = useNotification();
+  const { isOpen, closeGuide, markOnboardingComplete, guideType, hasDbSubscription, refreshSubscriptionStatus } = useNotification();
   const [os, setOs] = useState<"ios" | "android" | "other">("other");
   const [isStandalone, setIsStandalone] = useState(false);
   const [permissionState, setPermissionState] = useState<NotificationPermission>("default");
@@ -47,7 +47,12 @@ export function NotificationGuideModal() {
     if ("Notification" in window) {
       setPermissionState(Notification.permission);
     }
-  }, [isOpen]);
+
+    // Refresh DB subscription status when modal opens
+    if (isOpen) {
+      refreshSubscriptionStatus();
+    }
+  }, [isOpen, refreshSubscriptionStatus]);
 
   const handleSubscribe = async () => {
     if (!process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY) {
@@ -57,9 +62,12 @@ export function NotificationGuideModal() {
 
     setLoading(true);
     try {
-      // 1. Request Permission
-      const permission = await Notification.requestPermission();
-      setPermissionState(permission);
+      // 1. Request Permission (or use existing)
+      let permission = Notification.permission;
+      if (permission === "default") {
+        permission = await Notification.requestPermission();
+        setPermissionState(permission);
+      }
 
       if (permission === "granted") {
         // 2. Register Service Worker & Subscribe
@@ -97,6 +105,11 @@ export function NotificationGuideModal() {
 
   if (!isOpen) return null;
 
+  // Determine if truly complete: permission granted AND DB subscription exists
+  const isFullySubscribed = permissionState === "granted" && hasDbSubscription;
+  // Permission granted but no DB subscription - needs re-registration
+  const needsReRegistration = permissionState === "granted" && !hasDbSubscription;
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
       <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-md w-full overflow-hidden flex flex-col max-h-[90vh]">
@@ -122,8 +135,8 @@ export function NotificationGuideModal() {
 
         {/* Content */}
         <div className="p-6 overflow-y-auto">
-          {/* Status Banner */}
-          {permissionState === "granted" ? (
+          {/* Fully Subscribed - permission granted AND DB subscription exists */}
+          {isFullySubscribed ? (
              <div className="flex flex-col items-center text-center py-6 mx-auto">
                <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 text-green-600 rounded-full flex items-center justify-center mb-4">
                  <CheckCircle className="w-8 h-8" />
@@ -136,6 +149,28 @@ export function NotificationGuideModal() {
                  확인
                </button>
              </div>
+          ) : needsReRegistration ? (
+            /* Permission granted but no DB subscription - re-registration needed */
+            <div className="text-center py-4">
+              <div className="mb-6">
+                <div className="w-16 h-16 bg-amber-100 dark:bg-amber-900/30 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <RefreshCw className="w-8 h-8" />
+                </div>
+                <h3 className="text-xl font-bold mb-2">알림 재등록 필요</h3>
+                <p className="text-zinc-500 dark:text-zinc-400">
+                  알림 권한은 허용되어 있지만<br/>기기 등록이 필요합니다.
+                </p>
+              </div>
+
+              <button
+                onClick={handleSubscribe}
+                disabled={loading}
+                className="w-full py-3 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-bold text-lg transition shadow-lg shadow-amber-500/30 flex items-center justify-center gap-2"
+              >
+                {loading ? "설정 중..." : "기기 등록하기"}
+                {!loading && <Bell className="w-5 h-5 fill-white/20" />}
+              </button>
+            </div>
           ) : (
             <>
               {/* Manual Install Instructions (iOS or explicitly requested) */}
