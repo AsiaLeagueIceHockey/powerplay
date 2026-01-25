@@ -1,12 +1,19 @@
 import { redirect } from "next/navigation";
 import { getTranslations, getLocale } from "next-intl/server";
-import { getUser } from "@/app/actions/auth";
+import { getUser, getProfile } from "@/app/actions/auth";
 import { getMyMatches } from "@/app/actions/mypage";
 import { MyMatchList } from "@/components/my-match-list";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { NotificationStatus } from "@/components/notification-status";
+import { ProfileEditor } from "@/components/profile-editor";
 
 export default async function MyPage() {
+  // ... (existing code, ensure getUser/getProfile calls are optimized if needed, but here we reuse getUser from auth)
+  // Wait, getUser returns User object, we need Profile object specifically for 'bio'.
+  // MyPage currently calls getUser, let's see if we need getProfile.
+  // The existing code calls getUser() at top.
+  // We need to fetch the full profile to get the bio.
+  const profile = await getProfile(); // Import this!
   const user = await getUser();
   const locale = await getLocale();
 
@@ -23,13 +30,18 @@ export default async function MyPage() {
       <div className="mb-8">
         <h1 className="text-2xl font-bold mb-2 text-zinc-900 dark:text-white">
           <span className="text-blue-600 dark:text-blue-400">
-            {user.user_metadata?.full_name || user.email?.split("@")[0]}
+            {profile?.full_name || user.email?.split("@")[0]}
           </span>
           {locale === "ko" ? "님, 안녕하세요! 👋" : ", Welcome back! 👋"}
         </h1>
         <p className="text-zinc-600 dark:text-zinc-400">
           {t("mypage.subtitle")}
         </p>
+      </div>
+
+      {/* Profile Editor (Bio) */}
+      <div className="mb-8">
+        <ProfileEditor initialBio={profile?.bio || null} />
       </div>
 
       {/* My Matches */}

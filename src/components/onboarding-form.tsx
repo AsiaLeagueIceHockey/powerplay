@@ -7,6 +7,7 @@ import { updateProfile } from "@/app/actions/auth";
 import { joinClub } from "@/app/actions/clubs";
 import type { Club, ClubMembership } from "@/app/actions/types";
 import { Check, Users, ChevronRight, Loader2 } from "lucide-react";
+import { BirthDatePicker } from "@/components/birth-date-picker";
 
 interface Profile {
   id: string;
@@ -173,12 +174,10 @@ export function OnboardingForm({ profile, clubs, myClubs, locale }: OnboardingFo
 
             <div>
               <label className="block text-sm font-medium mb-2">{t("birthDate")} <span className="text-red-500">*</span></label>
-              <input
-                type="date"
+              <BirthDatePicker 
                 value={formData.birthDate}
-                onChange={(e) => setFormData({ ...formData, birthDate: e.target.value })}
+                onChange={(date) => setFormData({ ...formData, birthDate: date })}
                 placeholder={t("placeholder.birthDate")}
-                className="w-full px-4 py-3 rounded-lg border border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800 focus:ring-2 focus:ring-blue-500"
               />
             </div>
 

@@ -140,26 +140,20 @@ export async function updateProfile(formData: FormData) {
     return { error: "Not authenticated" };
   }
 
-  const fullName = formData.get("fullName") as string;
-  const position = formData.get("position") as string;
-  const preferredLang = formData.get("preferredLang") as string;
-  const phone = formData.get("phone") as string;
-  const birthDate = formData.get("birthDate") as string;
-  const termsAgreed = formData.get("termsAgreed") === "true";
-  const onboardingCompleted = formData.get("onboarding_completed") === "true";
+  // Build updateData dynamically based on what's provided in formData
+  const updateData: Record<string, unknown> = {};
 
-  const updateData: Record<string, unknown> = {
-    full_name: fullName,
-    position: position || null,
-    preferred_lang: preferredLang,
-    phone: phone || null,
-    birth_date: birthDate || null,
-    terms_agreed: termsAgreed,
-  };
+  if (formData.has("fullName")) updateData.full_name = formData.get("fullName");
+  if (formData.has("position")) updateData.position = formData.get("position") || null;
+  if (formData.has("preferredLang")) updateData.preferred_lang = formData.get("preferredLang");
+  if (formData.has("phone")) updateData.phone = formData.get("phone") || null;
+  if (formData.has("birthDate")) updateData.birth_date = formData.get("birthDate") || null;
+  if (formData.has("termsAgreed")) updateData.terms_agreed = formData.get("termsAgreed") === "true";
+  if (formData.has("bio")) updateData.bio = formData.get("bio") || null;
 
   // Only set onboarding_completed if explicitly provided
   if (formData.has("onboarding_completed")) {
-    updateData.onboarding_completed = onboardingCompleted;
+    updateData.onboarding_completed = formData.get("onboarding_completed") === "true";
   }
 
   const { error } = await supabase

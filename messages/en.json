@@ -54,6 +54,10 @@
             "phone": "010-1234-5678",
             "birthDate": "YYYY-MM-DD"
         },
+        "bio": {
+            "title": "Self Introduction",
+            "placeholder": "Tell us about yourself. (ex. Your team, main position, division info, etc.)"
+        },
         "saved": "Saved successfully"
     },
     "match": {
