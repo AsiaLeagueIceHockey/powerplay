@@ -90,6 +90,18 @@ async function sendWithRetry(
     }
   }
   
+  // Enhanced Logging for Debugging Vercel Issues
+  if (lastError) {
+    const errorDetails = {
+      message: lastError.message,
+      statusCode: lastError.statusCode,
+      headers: lastError.headers,
+      body: lastError.body, // Contains specific error info from FCM/APNs
+      endpoint: subscription.endpoint.substring(0, 60) + "..."
+    };
+    console.error("[PUSH_FAIL] WebPush Error Details:", JSON.stringify(errorDetails, null, 2));
+  }
+  
   throw lastError;
 }
 
@@ -270,7 +282,9 @@ export async function sendPushNotification(
             .eq("id", sub.id);
           console.log(`[PUSH] Removed expired subscription: ${sub.id}`);
         }
-        errors.push(err.message || "Unknown error");
+        // Capture detailed error for database log
+        const errorMsg = `[${err.statusCode || '?'}] ${err.message}` + (err.body ? ` | Body: ${err.body}` : "");
+        errors.push(errorMsg);
         throw err;
       }
     })

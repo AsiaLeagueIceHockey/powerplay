@@ -12,6 +12,14 @@ export function InstallPrompt() {
   const { openGuide, isOpen } = useNotification();
 
   useEffect(() => {
+    // Check if mobile device
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    
+    // Don't show on desktop
+    if (!isMobile) {
+      return;
+    }
+
     // Android / Desktop PWA Prompt
     const handler = (e: any) => {
       // Prevent Chrome 67 and earlier from automatically showing the prompt

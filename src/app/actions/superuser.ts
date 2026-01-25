@@ -511,25 +511,34 @@ export async function confirmParticipantPayment(
 
   const currentPoints = userProfile.points || 0;
 
-  // Check if user has enough points
-  if (currentPoints < entryPoints) {
-    return { success: false, error: `Insufficient points (${currentPoints}/${entryPoints})` };
-  }
 
-  const newBalance = currentPoints - entryPoints;
 
-  // 1. Deduct points
-  const { error: updateError } = await supabase
-    .from("profiles")
-    .update({ points: newBalance })
-    .eq("id", participant.user_id);
+  // IMPORTANT: For pending_payment confirmation, we DO NOT check insufficient funds.
+  // Instead, we perform a 2-step process: 
+  // 1. Charge points (Deposit)
+  // 2. Use points (Payment)
+  
+  // 1. Log Charge (Auto Deposit)
+  await supabase.from("point_transactions").insert({
+    user_id: participant.user_id,
+    type: "charge",
+    amount: entryPoints,
+    balance_after: currentPoints + entryPoints,
+    description: "경기 참가비 입금 확인 (자동 충전)",
+    reference_id: participant.match_id,
+  });
 
-  if (updateError) {
-    console.error("Error updating points:", updateError);
-    return { success: false, error: "Failed to deduct points" };
-  }
+  // 2. Log Use (Payment)
+  await supabase.from("point_transactions").insert({
+    user_id: participant.user_id,
+    type: "use",
+    amount: -entryPoints,
+    balance_after: currentPoints, // Back to original balance
+    description: "경기 참가 확정 (자동 결제)",
+    reference_id: participant.match_id,
+  });
 
-  // 2. Update participant status to confirmed
+  // 3. Update Participant Status and Payment Status
   const { error: participantError } = await supabase
     .from("participants")
     .update({
@@ -539,30 +548,16 @@ export async function confirmParticipantPayment(
     .eq("id", participantId);
 
   if (participantError) {
-    // Rollback points
-    await supabase
-      .from("profiles")
-      .update({ points: currentPoints })
-      .eq("id", participant.user_id);
     console.error("Error updating participant:", participantError);
     return { success: false, error: "Failed to confirm participant" };
   }
 
-  // 3. Record transaction
-  await supabase.from("point_transactions").insert({
-    user_id: participant.user_id,
-    type: "use",
-    amount: -entryPoints,
-    balance_after: newBalance,
-    description: "경기 참가 (관리자 확인)",
-    reference_id: participant.match_id,
-  });
+  // 4. Update Profile (Optional validation, keeping balance same)
+  // No need to update profile points as the net change is 0.
 
   revalidatePath("/admin/charge-requests");
 
-  // 알림 발송: 사용자에게 (Trigger 3: 포인트 차감 및 참가 확정)
-  // 1. 포인트 충전 완료 (개념상) - 이미 차감되었지만, "자동 결제됨" 의미
-  // 2. 참가 확정
+  // 알림 발송: 사용자에게
   if (participant && participant.match) {
     // @ts-ignore
     const matchTime = new Date(participant.match.start_time).toLocaleString("ko-KR", {
@@ -572,7 +567,7 @@ export async function confirmParticipantPayment(
     await sendPushNotification(
       participant.user_id,
       "참가 확정 ✅",
-      `대기하시던 경기(${matchTime}) 참가가 확정되었습니다. (${entryPoints.toLocaleString()}P 차감)`,
+      `대기하시던 경기(${matchTime}) 참가가 확정되었습니다.`,
       `/match/${participant.match_id}`
     );
   }

@@ -81,7 +81,7 @@ export function PushPermissionButton({
         setIsSubscribed(true);
         alert("알림이 설정되었습니다.");
       } else {
-        alert("알림 설정 실패: " + result.error);
+        alert(`알림 설정 실패: ${result.error}\n(잠시 후 다시 시도하거나, 브라우저의 알림 권한을 확인해주세요)`);
       }
     } catch (error) {
       console.error("Subscription failed:", error);
