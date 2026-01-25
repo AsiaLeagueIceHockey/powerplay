@@ -6,7 +6,8 @@
         "signup": "Sign Up",
         "profile": "Profile",
         "myPage": "My Page",
-        "admin": "Admin"
+        "admin": "Admin",
+        "save": "Save"
     },
     "home": {
         "title": "Matches",
