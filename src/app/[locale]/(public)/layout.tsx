@@ -1,6 +1,7 @@
-import { Link } from "@/i18n/navigation";
-import { getTranslations, setRequestLocale } from "next-intl/server";
-import { UserHeaderMenu } from "@/components/user-header-menu";
+import { Suspense } from "react";
+import { setRequestLocale } from "next-intl/server";
+import { UserHeaderSkeleton } from "@/components/skeletons";
+import { UserHeaderLoader } from "@/components/user-header-loader";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function PublicLayout({
@@ -13,25 +14,12 @@ export default async function PublicLayout({
   const { locale } = await params;
   setRequestLocale(locale);
   
-  // 병렬 데이터 페칭
-  const supabase = await createClient();
-  const [, { data: { user } }] = await Promise.all([
-    getTranslations("common"),
-    supabase.auth.getUser(),
-  ]);
-
-  // user 정보가 필요한 쿼리는 순차 실행 (의존 관계)
-  let isAdmin = false;
-  let userPoints = 0;
-  if (user) {
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("role, points")
-      .eq("id", user.id)
-      .single();
-    isAdmin = profile?.role === "admin" || profile?.role === "superuser";
-    userPoints = profile?.points ?? 0;
-  }
+  // 병렬 데이터 페칭 - User 정보는 이제 Suspense로 처리하므로 여기서 기다리지 않음
+  // const supabase = await createClient();
+  // const [, { data: { user } }] = await Promise.all([
+  //   getTranslations("common"),
+  //   supabase.auth.getUser(),
+  // ]);
 
   return (
     <div className="min-h-screen">
@@ -45,8 +33,10 @@ export default async function PublicLayout({
             </span>
           </a>
 
-          {/* User Menu - Right */}
-          <UserHeaderMenu user={user} locale={locale} isAdmin={isAdmin} points={userPoints} />
+          {/* User Menu - Right (Suspense Streaming) */}
+          <Suspense fallback={<UserHeaderSkeleton />}>
+            <UserHeaderLoader locale={locale} />
+          </Suspense>
         </div>
       </header>
 

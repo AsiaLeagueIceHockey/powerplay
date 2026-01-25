@@ -101,3 +101,12 @@ export function HomePageSkeleton() {
     </div>
   );
 }
+
+export function UserHeaderSkeleton() {
+  return (
+    <div className="flex items-center gap-2 px-3 py-2">
+      <div className="w-8 h-8 rounded-full bg-zinc-200 dark:bg-zinc-800 animate-pulse" />
+      <div className="hidden sm:block w-24 h-4 rounded bg-zinc-200 dark:bg-zinc-800 animate-pulse" />
+    </div>
+  );
+}

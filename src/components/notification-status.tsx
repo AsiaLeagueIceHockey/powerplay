@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { getSubscriptionStatus } from "@/app/actions/push";
 import { useNotification } from "@/contexts/notification-context";
-import { Bell, BellOff, Smartphone, RefreshCw } from "lucide-react";
+import { Bell, BellOff, Smartphone, BookOpen } from "lucide-react";
 
 export function NotificationStatus() {
   const [status, setStatus] = useState<{
@@ -90,8 +90,8 @@ export function NotificationStatus() {
         >
           {hasSubscription ? (
             <>
-              <RefreshCw className="w-4 h-4" />
-              기기 추가
+              <BookOpen className="w-4 h-4" />
+              알림 설정 가이드
             </>
           ) : (
             <>
