@@ -79,7 +79,7 @@ export function DateFilter() {
         }`}
       >
         <span className="text-sm font-bold whitespace-nowrap">
-          {locale === "ko" ? "전체" : "All"}
+          {locale === "ko" ? "예정" : "Upcoming"}
         </span>
       </button>
 

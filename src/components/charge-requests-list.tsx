@@ -64,11 +64,19 @@ export function ChargeRequestsList({
   const handleConfirm = async (item: UnifiedItem) => {
     setLoadingId(item.id);
     try {
+      let result;
       if (item.type === "charge") {
-        await confirmPointCharge(item.id);
+        result = await confirmPointCharge(item.id);
       } else {
-        await confirmParticipantPayment(item.id);
+        result = await confirmParticipantPayment(item.id);
       }
+      
+      if (!result.success) {
+        alert(`처리 실패: ${result.error || "알 수 없는 오류"}`);
+        setLoadingId(null);
+        return;
+      }
+      
       startTransition(() => {
         router.refresh();
       });
@@ -82,11 +90,19 @@ export function ChargeRequestsList({
   const handleReject = async (item: UnifiedItem) => {
     setLoadingId(`reject-${item.id}`);
     try {
+      let result;
       if (item.type === "charge") {
-        await rejectPointCharge(item.id);
+        result = await rejectPointCharge(item.id);
       } else {
-        await cancelPendingParticipant(item.id);
+        result = await cancelPendingParticipant(item.id);
       }
+      
+      if (!result.success) {
+        alert(`처리 실패: ${result.error || "알 수 없는 오류"}`);
+        setLoadingId(null);
+        return;
+      }
+      
       startTransition(() => {
         router.refresh();
       });
