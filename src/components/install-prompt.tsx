@@ -26,8 +26,11 @@ export function InstallPrompt() {
       e.preventDefault();
       // Stash the event so it can be triggered later.
       setDeferredPrompt(e);
-      // Update UI to notify the user they can add to home screen
-      setIsVisible(true);
+      // Check if previously dismissed
+      const dismissed = localStorage.getItem("install_prompt_dismissed");
+      if (!dismissed) {
+        setIsVisible(true);
+      }
     };
 
     window.addEventListener("beforeinstallprompt", handler);
@@ -40,9 +43,7 @@ export function InstallPrompt() {
     // Show prompt if iOS and NOT standalone (in browser)
     if (isIosDevice && !isStandalone) {
         setIsIOS(true);
-        // Delay slightly to not annoy immediately? Or show immediately? 
-        // User asked for "banner like android".
-        // Check if previously dismissed?
+        // Check if previously dismissed
         const dismissed = localStorage.getItem("install_prompt_dismissed");
         if (!dismissed) {
              setIsVisible(true);
@@ -53,6 +54,8 @@ export function InstallPrompt() {
       // Log app installed to analytics if needed
       setDeferredPrompt(null);
       setIsVisible(false);
+      // Also mark as dismissed when installed
+      localStorage.setItem("install_prompt_dismissed", "true");
     });
 
     return () => {
@@ -87,9 +90,8 @@ export function InstallPrompt() {
 
   const handleDismiss = () => {
     setIsVisible(false);
-    if (isIOS) {
-        localStorage.setItem("install_prompt_dismissed", "true");
-    }
+    // Save dismiss state for both iOS and Android
+    localStorage.setItem("install_prompt_dismissed", "true");
   };
 
   return (

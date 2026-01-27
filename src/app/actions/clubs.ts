@@ -102,14 +102,14 @@ export async function createClub(formData: FormData) {
     return { error: "Not authenticated" };
   }
 
-  // Check if admin
+  // Check if admin or superuser
   const { data: profile } = await supabase
     .from("profiles")
     .select("role")
     .eq("id", user.id)
     .single();
 
-  if (profile?.role !== "admin") {
+  if (profile?.role !== "admin" && profile?.role !== "superuser") {
     return { error: "Admin access required" };
   }
 
@@ -357,7 +357,7 @@ export async function createClubNotice(clubId: string, title: string, content: s
     .eq("user_id", user.id)
     .single();
 
-  const isSystemAdmin = profile?.role === "admin";
+  const isSystemAdmin = profile?.role === "admin" || profile?.role === "superuser";
   const isClubAdmin = membership?.role === "admin";
 
   if (!isSystemAdmin && !isClubAdmin) {

@@ -520,14 +520,14 @@ export async function createRink(formData: FormData) {
     return { error: "Not authenticated" };
   }
 
-  // Verify admin role
+  // Verify admin or superuser role
   const { data: profile } = await supabase
     .from("profiles")
     .select("role")
     .eq("id", user.id)
     .single();
 
-  if (profile?.role !== "admin") {
+  if (profile?.role !== "admin" && profile?.role !== "superuser") {
     return { error: "Unauthorized" };
   }
 
@@ -578,14 +578,14 @@ export async function updateRink(rinkId: string, formData: FormData) {
     return { error: "Not authenticated" };
   }
 
-  // Verify admin role
+  // Verify admin or superuser role
   const { data: profile } = await supabase
     .from("profiles")
     .select("role")
     .eq("id", user.id)
     .single();
 
-  if (profile?.role !== "admin") {
+  if (profile?.role !== "admin" && profile?.role !== "superuser") {
     return { error: "Unauthorized" };
   }
 
@@ -631,14 +631,14 @@ export async function deleteRink(rinkId: string) {
     return { error: "Not authenticated" };
   }
 
-  // Verify admin role
+  // Verify admin or superuser role
   const { data: profile } = await supabase
     .from("profiles")
     .select("role")
     .eq("id", user.id)
     .single();
 
-  if (profile?.role !== "admin") {
+  if (profile?.role !== "admin" && profile?.role !== "superuser") {
     return { error: "Unauthorized" };
   }
 

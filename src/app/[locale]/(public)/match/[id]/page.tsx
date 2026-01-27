@@ -6,7 +6,6 @@ import { createClient } from "@/lib/supabase/server";
 import { MatchApplication } from "@/components/match-application";
 import { AdminControls } from "@/components/admin-controls";
 import { MatchShareButton } from "@/components/match-share-button";
-import { CopyBankAccount } from "@/components/copy-bank-account";
 import { RinkMap } from "@/components/rink-map";
 
 export default async function MatchPage({
@@ -146,13 +145,7 @@ export default async function MatchPage({
             </span>
           </div>
           
-          {/* Bank Account with Copy */}
-          {match.bank_account && (
-            <div className="flex justify-between items-center text-sm">
-              <span className="text-zinc-500">{locale === 'ko' ? '입금 계좌' : 'Bank Account'}</span>
-              <CopyBankAccount bankAccount={match.bank_account} locale={locale} />
-            </div>
-          )}
+
           
           <div className="border-t border-zinc-100 dark:border-zinc-800 my-2"></div>
 

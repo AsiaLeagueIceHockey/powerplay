@@ -146,19 +146,7 @@ export function MatchEditForm({
         />
       </div>
 
-      {/* Bank Account */}
-      <div>
-        <label className="block text-sm font-medium mb-2 text-zinc-300">
-          {t("admin.form.bankAccount")}
-        </label>
-        <input
-          type="text"
-          name="bank_account"
-          defaultValue={match.bank_account || ""}
-          className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-          placeholder={t("admin.form.bankAccountPlaceholder")}
-        />
-      </div>
+
 
       {/* Position Limits (Consolidated) */}
       <div className="grid grid-cols-2 gap-4">

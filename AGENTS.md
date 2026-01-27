@@ -319,6 +319,12 @@ src/
 | `admin` | 동호회 관리자 (경기/링크/동호회 CRUD) |
 | `superuser` | 플랫폼 관리자 (admin 권한 + 포인트 충전 확인 + 플랫폼 설정) |
 
+> ⚠️ **중요**: `superuser`는 `admin`의 상위 개념입니다.
+> - **superuser는 admin이 할 수 있는 모든 작업을 수행할 수 있습니다.**
+> - 코드에서 권한 체크 시 반드시 `superuser`도 포함해야 합니다.
+> - 예시: `if (role !== "admin" && role !== "superuser")` 또는 `if (!["admin", "superuser"].includes(role))`
+> - superuser 전용 기능(포인트 충전 확인 등)은 별도로 `checkIsSuperUser()`로 체크합니다.
+
 ### 주요 파일
 
 | 경로 | 설명 |

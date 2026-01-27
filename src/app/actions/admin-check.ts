@@ -19,5 +19,6 @@ export async function checkIsAdmin(): Promise<boolean> {
     .eq("id", user.id)
     .single();
 
-  return profile?.role === "admin";
+  // superuser는 admin의 상위 개념으로 admin 권한을 포함
+  return profile?.role === "admin" || profile?.role === "superuser";
 }
