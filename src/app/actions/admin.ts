@@ -47,10 +47,19 @@ export async function createMatch(formData: FormData) {
   const rinkId = formData.get("rink_id") as string;
   const clubId = formData.get("club_id") as string;
   const startTimeInput = formData.get("start_time") as string;
-  const entryPoints = parseInt(formData.get("entry_points") as string) || 0;
-  const maxSkaters = parseInt(formData.get("max_skaters") as string) || 20;
-  const maxGoalies = parseInt(formData.get("max_goalies") as string) || 2;
+  // Remove commas from entry_points before parsing
+  const entryPointsStr = (formData.get("entry_points") as string)?.replace(/,/g, "");
+  const entryPoints = entryPointsStr ? parseInt(entryPointsStr) : 0;
+
+  const skatersInput = formData.get("max_skaters") as string;
+  const skatersParsed = parseInt(skatersInput);
+  const maxSkaters = isNaN(skatersParsed) ? 20 : skatersParsed;
+
+  const goaliesInput = formData.get("max_goalies") as string;
+  const goaliesParsed = parseInt(goaliesInput);
+  const maxGoalies = isNaN(goaliesParsed) ? 2 : goaliesParsed;
   const description = formData.get("description") as string;
+  const bankAccount = formData.get("bank_account") as string;
 
   // datetime-local 입력은 KST로 가정, UTC로 변환하여 저장
   // 입력: "2026-01-11T00:00" (KST) → 저장: "2026-01-10T15:00:00.000Z" (UTC)
@@ -69,6 +78,7 @@ export async function createMatch(formData: FormData) {
       description: description || null,
       status: "open",
       created_by: user.id,
+      bank_account: bankAccount || null,
     })
     .select()
     .single();
@@ -107,9 +117,15 @@ export async function updateMatch(matchId: string, formData: FormData) {
 
   const rinkId = formData.get("rink_id") as string;
   const startTimeInput = formData.get("start_time") as string;
-  const fee = parseInt(formData.get("fee") as string) || 0;
-  const maxSkaters = parseInt(formData.get("max_skaters") as string) || 20;
-  const maxGoalies = parseInt(formData.get("max_goalies") as string) || 2;
+  const fee = parseInt((formData.get("fee") as string)?.replace(/,/g, "")) || 0;
+  
+  const skatersInput = formData.get("max_skaters") as string;
+  const skatersParsed = parseInt(skatersInput);
+  const maxSkaters = isNaN(skatersParsed) ? 20 : skatersParsed;
+
+  const goaliesInput = formData.get("max_goalies") as string;
+  const goaliesParsed = parseInt(goaliesInput);
+  const maxGoalies = isNaN(goaliesParsed) ? 2 : goaliesParsed;
   const description = formData.get("description") as string;
   const bankAccount = formData.get("bank_account") as string;
   const status = formData.get("status") as string;

@@ -137,16 +137,21 @@ export function MatchEditForm({
         <label className="block text-sm font-medium mb-2 text-zinc-300">
           {t("admin.form.fee")}
         </label>
-        <input
-          type="number"
-          name="fee"
-          defaultValue={match.fee}
-          min={0}
-          className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-        />
+        <div className="relative">
+          <input
+            type="text"
+            name="fee"
+            defaultValue={match.fee?.toLocaleString()}
+            onChange={(e) => {
+              const value = e.target.value.replace(/[^0-9]/g, "");
+              e.target.value = value ? Number(value).toLocaleString() : "";
+            }}
+            className="w-full px-4 py-3 pr-8 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+            placeholder="0"
+          />
+          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500">P</span>
+        </div>
       </div>
-
-
 
       {/* Position Limits (Consolidated) */}
       <div className="grid grid-cols-2 gap-4">
@@ -154,26 +159,49 @@ export function MatchEditForm({
           <label className="block text-sm font-medium mb-2 text-zinc-300">
             {t("admin.form.maxSkaters")}
           </label>
-          <input
-            type="number"
-            name="max_skaters"
-            defaultValue={match.max_skaters}
-            min={0}
-            className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-          />
+          <div className="relative">
+            <input
+              type="number"
+              name="max_skaters"
+              defaultValue={match.max_skaters}
+              min={0}
+              className="w-full px-4 py-3 pr-8 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+            />
+            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 text-sm">명</span>
+          </div>
         </div>
         <div>
           <label className="block text-sm font-medium mb-2 text-zinc-300">
             {t("admin.form.maxGoalies")}
           </label>
-          <input
-            type="number"
-            name="max_goalies"
-            defaultValue={match.max_goalies}
-            min={0}
-            className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-          />
+          <div className="relative">
+            <input
+              type="number"
+              name="max_goalies"
+              defaultValue={match.max_goalies}
+              min={0}
+              className="w-full px-4 py-3 pr-8 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+            />
+            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 text-sm">명</span>
+          </div>
         </div>
+      </div>
+
+      {/* 정산 계좌번호 */}
+      <div>
+        <label className="block text-sm font-medium mb-2 text-zinc-300">
+          정산 받을 계좌번호
+        </label>
+        <input
+          type="text"
+          name="bank_account"
+          defaultValue={match.bank_account || ""}
+          className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+          placeholder="예: 카카오뱅크 3333-00-0000000 홍길동"
+        />
+        <p className="text-xs text-zinc-500 mt-1">
+          경기 수익금을 정산 받을 계좌를 입력해주세요. (은행명, 계좌번호, 예금주)
+        </p>
       </div>
 
       {/* Description */}
