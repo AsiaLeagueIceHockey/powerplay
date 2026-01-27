@@ -3,11 +3,13 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useLocale } from "next-intl";
 
-export function DateFilter() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
+interface DateFilterProps {
+  selectedDate: string | null;
+  onSelect: (date: string | null) => void;
+}
+
+export function DateFilter({ selectedDate, onSelect }: DateFilterProps) {
   const locale = useLocale();
-  const selectedDate = searchParams.get("date");
 
   // Generate next 14 days starting from today (KST)
   const dates = Array.from({ length: 14 }, (_, i) => {
@@ -39,24 +41,19 @@ export function DateFilter() {
     return formatDateString(date) === formatDateString(today);
   };
 
-
-
   const isSunday = (date: Date) => {
     return date.getDay() === 0;
   };
 
   const handleDateClick = (date: Date) => {
     const dateStr = formatDateString(date);
-    const params = new URLSearchParams(searchParams.toString());
     
     // If clicking the currently selected date, clear filter
     if (selectedDate === dateStr) {
-      params.delete("date");
+      onSelect(null);
     } else {
-      params.set("date", dateStr);
+      onSelect(dateStr);
     }
-    
-    router.push(`?${params.toString()}`);
   };
 
   return (
@@ -71,7 +68,7 @@ export function DateFilter() {
       `}</style>
       {/* 'All' Button */}
       <button
-        onClick={() => router.push("?")}
+        onClick={() => onSelect(null)}
         className={`flex flex-col items-center justify-center min-w-[52px] py-2 px-3 rounded-xl transition-all ${
           !selectedDate
             ? "bg-zinc-900 text-white shadow-lg dark:bg-white dark:text-zinc-900"

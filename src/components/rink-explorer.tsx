@@ -1,12 +1,10 @@
-"use client";
-
 import { useState } from "react";
 import { Rink } from "@/app/actions/types";
 import { Match } from "@/app/actions/match";
-import { RinkMap } from "@/components/rink-map";
 import { useTranslations } from "next-intl";
 import { Map as MapIcon, List, Search, MapPin } from "lucide-react";
 import Link from "next/link";
+import { DynamicRinkMap } from "@/components/dynamic-rink-map";
 
 interface RinkExplorerProps {
   rinks: Rink[];
@@ -74,7 +72,7 @@ export function RinkExplorer({ rinks, matches }: RinkExplorerProps) {
       {/* Content Area */}
       <div className="flex-1 relative border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden bg-zinc-50 dark:bg-zinc-900">
         {viewMode === "map" ? (
-          <RinkMap rinks={rinks} matches={matches} />
+          <DynamicRinkMap rinks={rinks} matches={matches} />
         ) : (
           <div className="h-full overflow-y-auto p-4">
             {filteredRinks.length === 0 ? (

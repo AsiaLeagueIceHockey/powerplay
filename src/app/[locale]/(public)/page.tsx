@@ -7,6 +7,7 @@ import { Suspense } from "react";
 import { HomePageSkeleton } from "@/components/skeletons";
 
 // Separate async component for data fetching (enables streaming)
+// Separate async component for data fetching (enables streaming)
 async function HomeContent({ locale, selectedDate }: { locale: string; selectedDate?: string }) {
   // 병렬 데이터 페칭 (캐싱 적용)
   const [allMatches, rinks, clubs, myClubs] = await Promise.all([
@@ -18,25 +19,13 @@ async function HomeContent({ locale, selectedDate }: { locale: string; selectedD
 
   const myClubIds = new Set(myClubs.map(c => c.club_id));
 
-  // Filter matches by selected date (KST) for the Match List View
-  const filteredMatches = selectedDate
-    ? allMatches.filter((match) => {
-        const matchDate = new Date(match.start_time);
-        const year = matchDate.getFullYear();
-        const month = String(matchDate.getMonth() + 1).padStart(2, "0");
-        const day = String(matchDate.getDate()).padStart(2, "0");
-        const matchDateString = `${year}-${month}-${day}`;
-        return matchDateString === selectedDate;
-      })
-    : allMatches;
-
   return (
     <HomeClient 
-      matches={filteredMatches} 
-      allMatches={allMatches} 
+      matches={allMatches} // Pass all matches, filtering will happen on client
       rinks={rinks} 
       clubs={clubs}
       myClubIds={Array.from(myClubIds)}
+      initialDate={selectedDate}
     />
   );
 }

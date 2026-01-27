@@ -38,8 +38,9 @@ export const config = {
   matcher: [
     // Match all pathnames except for
     // - API routes
-    // - Static files
+    // - Static files (images, fonts, etc.)
     // - Internal Next.js paths
-    "/((?!api|_next|_vercel|.*\\..*).*)",
+    // - PWA files (manifest, favicon, sw.js, workbox flow etc.)
+    "/((?!api|_next/static|_next/image|favicon.ico|manifest.json|sw.js|workbox-.*|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };

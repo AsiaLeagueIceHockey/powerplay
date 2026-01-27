@@ -14,26 +14,52 @@ import { Club } from "@/app/actions/types";
 import { ClubCard } from "@/components/club-card";
 
 interface HomeClientProps {
-  matches: Match[]; // These are already filtered by date from the server if date param exists
+  matches: Match[]; // This is now ALL matches passed from server
   rinks: Rink[];
   clubs: Club[];
-  allMatches: Match[]; // Unfiltered matches for the Rink Explorer counts? Or just reuse matches? 
+  allMatches?: Match[]; // Optional, for backward compatibility if needed, but we'll use 'matches' as source
   myClubIds?: string[];
+  initialDate?: string;
 }
 
-export function HomeClient({ matches: filteredMatches, rinks, clubs, allMatches, myClubIds = [] }: HomeClientProps) {
+export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds = [], initialDate }: HomeClientProps) {
   const t = useTranslations("home");
   const router = useRouter();
   const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState<"match" | "rink" | "club">("match");
   const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
+  
+  // Client-side filtering state
+  const [selectedDate, setSelectedDate] = useState<string | null>(initialDate || null);
 
-  const handleDateSelect = (dateStr: string) => {
+  const handleDateSelect = (dateStr: string | null) => {
+    setSelectedDate(dateStr);
+    
+    // Update URL without refresh
     const params = new URLSearchParams(searchParams.toString());
-    params.set("date", dateStr);
-    router.push(`?${params.toString()}`);
-    setViewMode("list"); // Switch to list view after selecting date
+    if (dateStr) {
+      params.set("date", dateStr);
+    } else {
+      params.delete("date");
+    }
+    window.history.replaceState(null, "", `?${params.toString()}`);
+
+    if (dateStr) {
+        setViewMode("list");
+    }
   };
+
+  // Filter matches based on selectedDate
+  const filteredMatches = selectedDate
+    ? allMatchesSource.filter((match) => {
+        const matchDate = new Date(match.start_time);
+        const year = matchDate.getFullYear();
+        const month = String(matchDate.getMonth() + 1).padStart(2, "0");
+        const day = String(matchDate.getDate()).padStart(2, "0");
+        const matchDateString = `${year}-${month}-${day}`;
+        return matchDateString === selectedDate;
+      })
+    : allMatchesSource;
 
   return (
     <div className="flex flex-col gap-6">
@@ -124,7 +150,7 @@ export function HomeClient({ matches: filteredMatches, rinks, clubs, allMatches,
                <>
                  {/* Date Filter (horizontal scrollable dates) */}
                  <div className="sticky top-0 z-10 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-sm py-2">
-                   <DateFilter />
+                   <DateFilter selectedDate={selectedDate} onSelect={handleDateSelect} />
                  </div>
                  
                  {filteredMatches.length === 0 ? (
@@ -142,15 +168,15 @@ export function HomeClient({ matches: filteredMatches, rinks, clubs, allMatches,
              ) : (
                /* Calendar View */
                <CalendarView 
-                 matches={allMatches} 
-                 onDateSelect={handleDateSelect} 
+                 matches={allMatchesSource} 
+                 onDateSelect={(date) => handleDateSelect(date)} 
                />
              )}
           </div>
         ) : activeTab === "rink" ? (
           <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
              {/* Rink Tab: Rink Explorer */}
-             <RinkExplorer rinks={rinks} matches={allMatches} />
+             <RinkExplorer rinks={rinks} matches={allMatchesSource} />
           </div>
         ) : (
           <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">

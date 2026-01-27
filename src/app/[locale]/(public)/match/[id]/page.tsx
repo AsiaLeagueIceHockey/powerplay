@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { MatchApplication } from "@/components/match-application";
 import { AdminControls } from "@/components/admin-controls";
 import { MatchShareButton } from "@/components/match-share-button";
-import { RinkMap } from "@/components/rink-map";
+import { DynamicRinkMap } from "@/components/dynamic-rink-map";
 
 export default async function MatchPage({
   params,
@@ -179,7 +179,7 @@ export default async function MatchPage({
             {/* Embedded Map */}
             {match.rink && match.rink.lat && match.rink.lng && (
                 <div className="w-full h-48 rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-800">
-                    <RinkMap rinks={[match.rink]} /> 
+                    <DynamicRinkMap rinks={[match.rink]} /> 
                 </div>
             )}
           </div>
