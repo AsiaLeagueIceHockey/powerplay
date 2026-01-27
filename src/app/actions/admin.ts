@@ -94,14 +94,14 @@ export async function updateMatch(matchId: string, formData: FormData) {
     return { error: "Not authenticated" };
   }
 
-  // Verify admin role
+  // Verify admin or superuser role
   const { data: profile } = await supabase
     .from("profiles")
     .select("role")
     .eq("id", user.id)
     .single();
 
-  if (profile?.role !== "admin") {
+  if (profile?.role !== "admin" && profile?.role !== "superuser") {
     return { error: "Unauthorized" };
   }
 
@@ -186,14 +186,14 @@ export async function updatePaymentStatus(
     return { error: "Not authenticated" };
   }
 
-  // Verify admin role
+  // Verify admin or superuser role
   const { data: profile } = await supabase
     .from("profiles")
     .select("role")
     .eq("id", user.id)
     .single();
 
-  if (profile?.role !== "admin") {
+  if (profile?.role !== "admin" && profile?.role !== "superuser") {
     return { error: "Unauthorized" };
   }
 
@@ -254,14 +254,14 @@ export async function deleteMatch(matchId: string) {
     return { error: "Not authenticated" };
   }
 
-  // Verify admin role
+  // Verify admin or superuser role
   const { data: profile } = await supabase
     .from("profiles")
     .select("role")
     .eq("id", user.id)
     .single();
 
-  if (profile?.role !== "admin") {
+  if (profile?.role !== "admin" && profile?.role !== "superuser") {
     return { error: "Unauthorized" };
   }
 
@@ -288,14 +288,14 @@ export async function getAdminMatches() {
     return [];
   }
 
-  // Verify admin role
+  // Verify admin or superuser role
   const { data: profile } = await supabase
     .from("profiles")
     .select("role")
     .eq("id", user.id)
     .single();
 
-  if (profile?.role !== "admin") {
+  if (profile?.role !== "admin" && profile?.role !== "superuser") {
     return [];
   }
 
