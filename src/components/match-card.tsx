@@ -117,7 +117,7 @@ export function MatchCard({ match }: { match: Match }) {
 
       {/* Fee */}
       <div className="text-sm text-zinc-600 dark:text-zinc-400">
-        {t("fee")}: {(match.entry_points || match.fee).toLocaleString()}P
+        {t("fee")}: {(match.entry_points || match.fee).toLocaleString()} {locale === "ko" ? "원" : "KRW"}
       </div>
     </Link>
   );

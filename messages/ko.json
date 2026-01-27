@@ -75,8 +75,8 @@
             "NONE": "선택 안함"
         },
         "skater": "플레이어",
-        "fee": "참가 포인트",
-        "entryPoints": "참가 포인트",
+        "fee": "참가비",
+        "entryPoints": "참가비",
         "remaining": "잔여석",
         "join": "참가 신청",
         "cancel": "신청 취소",
@@ -85,8 +85,8 @@
         "viewMap": "지도 보기",
         "noParticipants": "참가자가 없습니다",
         "confirmCancel": "경기 전일 자정까지 취소 시 100% 환불됩니다. 취소하시겠습니까?",
-        "insufficientPoints": "포인트가 부족합니다",
-        "goToCharge": "충전하러 가기",
+        "insufficientPoints": "잔액이 부족합니다",
+        "goToCharge": "충전하기",
         "refundPolicy": "환불 정책"
     },
     "participant": {
@@ -109,11 +109,11 @@
         "browseMatches": "경기 둘러보기"
     },
     "points": {
-        "title": "포인트",
-        "balance": "보유 포인트",
+        "title": "내 지갑",
+        "balance": "보유 금액",
         "charge": "충전하기",
-        "history": "포인트 내역",
-        "noHistory": "포인트 내역이 없습니다",
+        "history": "이용 내역",
+        "noHistory": "이용 내역이 없습니다",
         "transaction": {
             "charge": "충전",
             "use": "사용",
@@ -121,7 +121,7 @@
             "admin_adjustment": "관리자 조정"
         },
         "chargeRequest": {
-            "title": "포인트 충전",
+            "title": "금액 충전",
             "amount": "충전 금액",
             "depositorName": "입금자명",
             "depositorNamePlaceholder": "이체 시 입금자명",
@@ -133,7 +133,7 @@
             "rejected": "거부됨",
             "canceled": "취소됨",
             "cancel": "신청 취소",
-            "note": "계좌이체 후 입금자명을 정확히 입력해주세요. 관리자 확인 후 포인트가 적립됩니다.",
+            "note": "계좌이체 후 입금자명을 정확히 입력해주세요. 관리자 확인 후 금액이 충전됩니다.",
             "quickAmounts": "빠른 선택",
             "customAmount": "직접 입력",
             "myRequests": "내 충전 신청 내역"
@@ -164,8 +164,8 @@
             "rink": "링크",
             "selectRink": "링크 선택",
             "dateTime": "날짜 및 시간",
-            "fee": "참가 포인트",
-            "entryPoints": "참가 포인트",
+            "fee": "참가비",
+            "entryPoints": "참가비",
             "maxSkaters": "모집 인원 (플레이어)",
             "maxGoalies": "모집 인원 (골리)",
             "description": "설명",
@@ -205,14 +205,14 @@
             "requestedAt": "신청일",
             "confirm": "입금 확인",
             "reject": "거부",
-            "confirmMessage": "입금을 확인하고 포인트를 지급하시겠습니까?",
+            "confirmMessage": "입금을 확인하고 금액을 충전하시겠습니까?",
             "rejectMessage": "충전 요청을 거부하시겠습니까?"
         },
         "pendingParticipants": {
             "title": "미입금 참가자 관리",
             "noParticipants": "미입금 참가자가 없습니다",
             "match": "경기",
-            "currentBalance": "현재 포인트",
+            "currentBalance": "현재 잔액",
             "confirmPayment": "입금 확인",
             "cancel": "취소"
         }

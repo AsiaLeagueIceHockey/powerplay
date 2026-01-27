@@ -75,8 +75,8 @@
             "NONE": "None"
         },
         "skater": "Skater",
-        "fee": "Entry Points",
-        "entryPoints": "Entry Points",
+        "fee": "Entry Fee",
+        "entryPoints": "Entry Fee",
         "remaining": "Spots left",
         "join": "Join",
         "cancel": "Cancel",
@@ -85,8 +85,8 @@
         "viewMap": "View Map",
         "noParticipants": "No participants",
         "confirmCancel": "100% refund available until midnight the day before the match. Cancel?",
-        "insufficientPoints": "Insufficient points",
-        "goToCharge": "Charge Points",
+        "insufficientPoints": "Insufficient balance",
+        "goToCharge": "Charge Credits",
         "refundPolicy": "Refund Policy"
     },
     "participant": {
@@ -109,11 +109,11 @@
         "browseMatches": "Browse matches"
     },
     "points": {
-        "title": "Points",
+        "title": "Wallet",
         "balance": "Balance",
         "charge": "Charge",
         "history": "History",
-        "noHistory": "No point history",
+        "noHistory": "No history",
         "transaction": {
             "charge": "Charge",
             "use": "Use",
@@ -121,7 +121,7 @@
             "admin_adjustment": "Admin Adjustment"
         },
         "chargeRequest": {
-            "title": "Charge Points",
+            "title": "Charge Credits",
             "amount": "Amount",
             "depositorName": "Depositor Name",
             "depositorNamePlaceholder": "Name used for bank transfer",
@@ -133,7 +133,7 @@
             "rejected": "Rejected",
             "canceled": "Canceled",
             "cancel": "Cancel Request",
-            "note": "After bank transfer, enter your depositor name exactly. Points will be credited after admin confirmation.",
+            "note": "After bank transfer, enter your depositor name exactly. Credits will be added after admin confirmation.",
             "quickAmounts": "Quick Select",
             "customAmount": "Custom Amount",
             "myRequests": "My Charge Requests"
@@ -164,8 +164,8 @@
             "rink": "Rink",
             "selectRink": "Select a rink",
             "dateTime": "Date & Time",
-            "fee": "Entry Points",
-            "entryPoints": "Entry Points",
+            "fee": "Entry Fee",
+            "entryPoints": "Entry Fee",
             "maxSkaters": "Max Skaters",
             "maxGoalies": "Max Goalies",
             "description": "Description",
@@ -205,7 +205,7 @@
             "requestedAt": "Requested At",
             "confirm": "Confirm Payment",
             "reject": "Reject",
-            "confirmMessage": "Confirm payment and credit points?",
+            "confirmMessage": "Confirm payment and credit amount?",
             "rejectMessage": "Reject this charge request?"
         },
         "pendingParticipants": {

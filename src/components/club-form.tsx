@@ -154,7 +154,7 @@ export function ClubForm({ locale, club }: ClubFormProps) {
           name="name"
           defaultValue={club?.name || ""}
           required
-          placeholder="예: 하키러브"
+          placeholder="예: 파워플레이"
           className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
         />
       </div>

@@ -37,6 +37,8 @@ export default async function PointsPage({
 
   const points = profile?.points ?? 0;
 
+  const currencyUnit = locale === "ko" ? "원" : "KRW";
+
   // 거래 타입에 따른 색상
   const getTypeColor = (type: string) => {
     switch (type) {
@@ -70,7 +72,7 @@ export default async function PointsPage({
       {/* 포인트 잔액 카드 */}
       <div className="bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl p-6 text-white shadow-lg">
         <p className="text-amber-100 text-sm mb-1">{t("balance")}</p>
-        <p className="text-4xl font-bold">{points.toLocaleString()}P</p>
+        <p className="text-4xl font-bold">{points.toLocaleString()}{currencyUnit}</p>
         <Link
           href={`/${locale}/mypage/points/charge`}
           className="inline-block mt-4 px-6 py-2 bg-white text-amber-600 rounded-lg font-medium hover:bg-amber-50 transition"
@@ -136,7 +138,7 @@ export default async function PointsPage({
                 className="flex items-center justify-between py-3 border-b border-zinc-100 dark:border-zinc-800 last:border-0"
               >
                 <div>
-                  <p className="font-medium">{req.amount.toLocaleString()}P</p>
+                  <p className="font-medium">{req.amount.toLocaleString()}{currencyUnit}</p>
                   <p className="text-xs text-zinc-500">
                     {new Date(req.created_at).toLocaleDateString(locale === "ko" ? "ko-KR" : "en-US", {
                       timeZone: "Asia/Seoul"
@@ -195,10 +197,10 @@ export default async function PointsPage({
                 </div>
                 <div className="text-right">
                   <p className={`font-bold ${getTypeColor(tx.type)}`}>
-                    {tx.amount > 0 ? "+" : ""}{tx.amount.toLocaleString()}P
+                    {tx.amount > 0 ? "+" : ""}{tx.amount.toLocaleString()}{currencyUnit}
                   </p>
                   <p className="text-xs text-zinc-400">
-                    {tx.balance_after.toLocaleString()}P
+                    {tx.balance_after.toLocaleString()}{currencyUnit}
                   </p>
                 </div>
               </div>

@@ -164,11 +164,11 @@ export function ChargeRequestsList({
             </div>
             <div className="text-right">
               <p className="text-xl text-amber-400 font-bold">
-                {item.amount.toLocaleString()}P
+                {item.amount.toLocaleString()}{locale === "ko" ? "원" : "KRW"}
               </p>
               {item.type === "participant" && item.currentBalance !== undefined && (
                 <p className="text-xs text-zinc-500">
-                  현재 잔액: {item.currentBalance.toLocaleString()}P
+                  현재 잔액: {item.currentBalance.toLocaleString()}{locale === "ko" ? "원" : "KRW"}
                 </p>
               )}
             </div>

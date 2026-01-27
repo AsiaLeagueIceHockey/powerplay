@@ -131,7 +131,9 @@ export function UserHeaderMenu({
                 </div>
                 <div className="flex flex-col leading-none gap-1">
                   <span className="font-medium">{locale === "ko" ? "포인트" : "Points"}</span>
-                  <span className="text-xs text-zinc-500 font-mono">{points.toLocaleString()} P</span>
+                  <span className="text-xs text-zinc-500 font-mono">
+                    {points.toLocaleString()} {locale === "ko" ? "원" : "KRW"}
+                  </span>
                 </div>
               </Link>
 

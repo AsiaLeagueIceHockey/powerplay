@@ -124,12 +124,14 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
             className="w-full px-4 py-3 pr-8 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
             placeholder="0"
           />
-          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500">P</span>
+          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500">
+            {locale === "ko" ? "원" : "KRW"}
+          </span>
         </div>
         <p className="text-xs text-zinc-500 mt-1">
           {locale === "ko" 
-            ? "참가자가 사용할 포인트 (0 = 무료)" 
-            : "Points required to join (0 = free)"}
+            ? "참가비 (0 = 무료)" 
+            : "Entry fee (0 = free)"}
         </p>
       </div>
 

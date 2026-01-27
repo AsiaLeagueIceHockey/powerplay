@@ -19,6 +19,8 @@ export function ChargeForm({ bankAccount }: { bankAccount: BankAccountInfo | nul
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
+  const currencyUnit = locale === "ko" ? "원" : "KRW";
+
   const handleQuickAmount = (value: number) => {
     setAmount(value);
     setCustomAmount("");
@@ -40,7 +42,7 @@ export function ChargeForm({ bankAccount }: { bankAccount: BankAccountInfo | nul
     setIsSubmitting(true);
 
     if (amount < 1000) {
-      setError(locale === "ko" ? "최소 1,000P 이상 충전해주세요" : "Minimum 1,000P required");
+      setError(locale === "ko" ? "최소 1,000원 이상 충전해주세요" : "Minimum 1,000 KRW required");
       setIsSubmitting(false);
       return;
     }
@@ -74,8 +76,8 @@ export function ChargeForm({ bankAccount }: { bankAccount: BankAccountInfo | nul
         </h2>
         <p className="text-green-600 dark:text-green-300">
           {locale === "ko"
-            ? "입금 확인 후 포인트가 적립됩니다."
-            : "Points will be credited after payment confirmation."}
+            ? "입금 확인 후 금액이 충전됩니다."
+            : "Credits will be added after payment confirmation."}
         </p>
       </div>
     );
@@ -106,7 +108,7 @@ export function ChargeForm({ bankAccount }: { bankAccount: BankAccountInfo | nul
                   : "bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:border-amber-300"
               }`}
             >
-              {value.toLocaleString()}P
+              {value.toLocaleString()}{currencyUnit}
             </button>
           ))}
         </div>
@@ -125,7 +127,7 @@ export function ChargeForm({ bankAccount }: { bankAccount: BankAccountInfo | nul
             placeholder="0"
             className="w-full px-4 py-3 pr-10 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
           />
-          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500">P</span>
+          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500">{currencyUnit}</span>
         </div>
       </div>
 
@@ -133,7 +135,7 @@ export function ChargeForm({ bankAccount }: { bankAccount: BankAccountInfo | nul
       <div className="bg-amber-50 dark:bg-amber-900/20 p-4 rounded-lg">
         <p className="text-sm text-amber-700 dark:text-amber-300">{t("amount")}</p>
         <p className="text-3xl font-bold text-amber-600 dark:text-amber-400">
-          {amount.toLocaleString()}P
+          {amount.toLocaleString()}{currencyUnit}
         </p>
       </div>
 
