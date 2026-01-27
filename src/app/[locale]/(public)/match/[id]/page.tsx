@@ -141,7 +141,7 @@ export default async function MatchPage({
           <div className="flex justify-between items-center text-sm">
             <span className="text-zinc-500">{t("match.fee")}</span>
             <span className="font-semibold text-lg">
-              {(match.entry_points || match.fee).toLocaleString()}P
+              {(match.entry_points || match.fee).toLocaleString()}{locale === "ko" ? "원" : "KRW"}
             </span>
           </div>
           

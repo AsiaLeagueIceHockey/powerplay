@@ -141,16 +141,16 @@ export function JoinButton({
         {isInsufficientPoints && (
           <div className="mb-4 p-4 rounded-lg bg-amber-50 border border-amber-200 dark:bg-amber-900/20 dark:border-amber-800">
             <p className="text-amber-700 dark:text-amber-300 font-medium mb-2">
-              💰 포인트가 부족합니다
+              💰 잔액이 부족합니다
             </p>
             <p className="text-sm text-amber-600 dark:text-amber-400 mb-3">
-              이 경기에 참가하려면 포인트 충전이 필요합니다.
+              이 경기에 참가하려면 충전이 필요합니다.
             </p>
             <button
               onClick={() => router.push(`/${locale}/mypage/points/charge`)}
               className="inline-block px-4 py-2 bg-amber-500 text-white rounded-lg text-sm font-medium hover:bg-amber-600 transition"
             >
-              포인트 충전하러 가기 →
+              충전하러 가기 →
             </button>
           </div>
         )}
