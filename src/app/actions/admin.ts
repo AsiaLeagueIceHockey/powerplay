@@ -166,7 +166,8 @@ export async function updateMatch(matchId: string, formData: FormData) {
     // 2. Send notifications
     if (participants && participants.length > 0) {
       const matchDate = new Date(startTimeUTC).toLocaleString("ko-KR", {
-        month: "short", day: "numeric", hour: "2-digit", minute: "2-digit"
+        month: "short", day: "numeric", hour: "2-digit", minute: "2-digit",
+        timeZone: "Asia/Seoul"
       });
       
       await Promise.allSettled(
@@ -244,7 +245,8 @@ export async function updatePaymentStatus(
     // @ts-ignore
     const rinkName = match.rink?.name_ko || "Unknown Rink";
     const startTime = new Date(match.start_time).toLocaleString("ko-KR", {
-        month: "short", day: "numeric", hour: "2-digit", minute: "2-digit"
+        month: "short", day: "numeric", hour: "2-digit", minute: "2-digit",
+        timeZone: "Asia/Seoul"
     });
 
     await sendPushNotification(

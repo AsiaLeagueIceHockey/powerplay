@@ -148,7 +148,7 @@ export async function requestPointCharge(
   // 알림 발송: 슈퍼유저에게
   await sendPushToSuperUsers(
     "💰 포인트 충전 요청",
-    `${user.email}님이 ${amount.toLocaleString()}P 충전을 요청했습니다.`,
+    `${user.email}님이 ${amount.toLocaleString()}원 충전을 요청했습니다.`,
     "/admin/charge-requests"
   );
 

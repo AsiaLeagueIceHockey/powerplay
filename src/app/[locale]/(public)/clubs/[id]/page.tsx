@@ -47,7 +47,7 @@ export default async function ClubDetailPage({
 
             {/* Club Info */}
             <div className="flex-1">
-              <h1 className="text-2xl font-bold mb-2 text-zinc-900 dark:text-white flex items-center gap-3">
+              <h1 className="text-xl font-bold mb-2 text-zinc-900 dark:text-white flex items-center gap-3">
                 {club.name}
                 {club.member_count !== undefined && (
                   <span className="flex items-center text-sm font-medium text-zinc-500 bg-zinc-100 dark:bg-zinc-800 px-3 py-1 rounded-full">

@@ -352,7 +352,7 @@ export async function confirmPointCharge(
   await sendPushNotification(
     chargeRequest.user_id,
     "충전 완료 💰",
-    `${chargeRequest.amount.toLocaleString()}P가 충전되었습니다. 현재 잔액: ${newBalance.toLocaleString()}P`,
+    `${chargeRequest.amount.toLocaleString()}원이 충전되었습니다. 현재 잔액: ${newBalance.toLocaleString()}원`,
     "/mypage/points"
   );
 
@@ -561,7 +561,8 @@ export async function confirmParticipantPayment(
   if (participant && participant.match) {
     // @ts-ignore
     const matchTime = new Date(participant.match.start_time).toLocaleString("ko-KR", {
-      month: "short", day: "numeric", hour: "2-digit", minute: "2-digit"
+      month: "short", day: "numeric", hour: "2-digit", minute: "2-digit",
+      timeZone: "Asia/Seoul"
     });
     
     await sendPushNotification(

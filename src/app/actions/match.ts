@@ -300,7 +300,8 @@ export async function joinMatch(matchId: string, position: string): Promise<{
     const rinkName = rinkMatch?.rink?.name_ko || "경기";
     // @ts-ignore
     const startTime = new Date(rinkMatch?.start_time).toLocaleString("ko-KR", {
-      month: "short", day: "numeric", hour: "2-digit", minute: "2-digit"
+      month: "short", day: "numeric", hour: "2-digit", minute: "2-digit",
+      timeZone: "Asia/Seoul"
     });
 
     await sendPushNotification(
@@ -402,7 +403,7 @@ export async function cancelJoin(matchId: string) {
     user.id,
     "참가 취소 완료 ↩️",
     refundAmount > 0 
-      ? `경기가 취소되었으며 ${refundAmount.toLocaleString()}P가 환불되었습니다.`
+      ? `경기가 취소되었으며 ${refundAmount.toLocaleString()}원이 환불되었습니다.`
       : `경기 참가가 취소되었습니다.`,
     `/mypage`
   );
