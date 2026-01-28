@@ -20,9 +20,10 @@ interface HomeClientProps {
   allMatches?: Match[]; // Optional, for backward compatibility if needed, but we'll use 'matches' as source
   myClubIds?: string[];
   initialDate?: string;
+  userRole?: string | null;
 }
 
-export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds = [], initialDate }: HomeClientProps) {
+export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds = [], initialDate, userRole }: HomeClientProps) {
   const locale = useLocale();
   const t = useTranslations("home");
   const router = useRouter();
@@ -178,15 +179,49 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
           <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
             {/* Club Tab */}
             <div className="mb-6">
-              <button
-                onClick={() => router.push(`/${locale}/admin-apply`)}
-                className="w-full py-4 px-6 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-sm transition-all transform hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 group"
-              >
-                <span className="font-bold text-base">관리자가 되어 동호회를 홍보해보세요!</span>
-                <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
-              </button>
+              {["admin", "superuser"].includes(userRole || "") ? (
+                <button
+                  onClick={() => router.push(`/${locale}/admin/matches`)}
+                  className="w-full py-4 px-6 bg-amber-50 dark:bg-amber-950/30 hover:bg-amber-100 dark:hover:bg-amber-950/50 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800/50 rounded-xl shadow-sm transition-all transform hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 group"
+                >
+                  <span className="font-bold text-base">관리자 페이지로 이동</span>
+                  <svg
+                    className="w-5 h-5 group-hover:translate-x-1 transition-transform"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M13 7l5 5m0 0l-5 5m5-5H6"
+                    />
+                  </svg>
+                </button>
+              ) : (
+                <button
+                  onClick={() => router.push(`/${locale}/admin-apply`)}
+                  className="w-full py-4 px-6 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-sm transition-all transform hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 group"
+                >
+                  <span className="font-bold text-base">
+                    관리자가 되어 동호회를 홍보해보세요!
+                  </span>
+                  <svg
+                    className="w-5 h-5 group-hover:translate-x-1 transition-transform"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M13 7l5 5m0 0l-5 5m5-5H6"
+                    />
+                  </svg>
+                </button>
+              )}
             </div>
 
             {clubs.length === 0 ? (
