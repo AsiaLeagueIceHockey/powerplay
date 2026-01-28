@@ -23,7 +23,7 @@ export function DateFilter({ selectedDate, onSelect }: DateFilterProps) {
   };
 
   const formatWeekday = (date: Date) => {
-    const weekdays = locale === "ko" 
+    const weekdays = locale === "ko"
       ? ["일", "월", "화", "수", "목", "금", "토"]
       : ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     return weekdays[date.getDay()];
@@ -47,7 +47,7 @@ export function DateFilter({ selectedDate, onSelect }: DateFilterProps) {
 
   const handleDateClick = (date: Date) => {
     const dateStr = formatDateString(date);
-    
+
     // If clicking the currently selected date, clear filter
     if (selectedDate === dateStr) {
       onSelect(null);
@@ -57,7 +57,7 @@ export function DateFilter({ selectedDate, onSelect }: DateFilterProps) {
   };
 
   return (
-    <div 
+    <div
       className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4"
       style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
     >
@@ -69,14 +69,13 @@ export function DateFilter({ selectedDate, onSelect }: DateFilterProps) {
       {/* 'All' Button */}
       <button
         onClick={() => onSelect(null)}
-        className={`flex flex-col items-center justify-center min-w-[52px] py-2 px-3 rounded-xl transition-all ${
-          !selectedDate
+        className={`flex flex-col items-center justify-center min-w-[52px] py-2 px-3 rounded-xl transition-all ${!selectedDate
             ? "bg-zinc-900 text-white shadow-lg dark:bg-white dark:text-zinc-900"
             : "bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700"
-        }`}
+          }`}
       >
         <span className="text-sm font-bold whitespace-nowrap">
-          {locale === "ko" ? "예정" : "Upcoming"}
+          {locale === "ko" ? "전체" : "All"}
         </span>
       </button>
 
@@ -86,29 +85,27 @@ export function DateFilter({ selectedDate, onSelect }: DateFilterProps) {
         const selected = selectedDate === dateStr;
         const today = isToday(date);
         const sunday = isSunday(date);
-        
+
         return (
           <button
             key={dateStr}
             onClick={() => handleDateClick(date)}
-            className={`flex flex-col items-center min-w-[52px] py-2 px-3 rounded-xl transition-all ${
-              selected
+            className={`flex flex-col items-center min-w-[52px] py-2 px-3 rounded-xl transition-all ${selected
                 ? "bg-blue-600 text-white shadow-lg"
                 : "bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700"
-            }`}
+              }`}
           >
             <span className={`text-lg font-bold ${selected ? "text-white" : ""}`}>
               {formatDay(date)}
             </span>
-            <span className={`text-xs ${
-              selected 
-                ? "text-blue-100" 
+            <span className={`text-xs ${selected
+                ? "text-blue-100"
                 : sunday
                   ? "text-red-500 dark:text-red-400 font-semibold"
-                  : today 
-                    ? "text-blue-600 dark:text-blue-400 font-semibold" 
+                  : today
+                    ? "text-blue-600 dark:text-blue-400 font-semibold"
                     : ""
-            }`}>
+              }`}>
               {today ? (locale === 'ko' ? "오늘" : "Today") : formatWeekday(date)}
             </span>
           </button>
