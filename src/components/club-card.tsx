@@ -6,7 +6,8 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useLocale } from "next-intl";
-import { MessageCircle, Users, Building2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { MessageCircle, Users, Building2, ChevronDown, ChevronUp } from "lucide-react";
 
 interface ClubCardProps {
   club: Club;
@@ -16,7 +17,9 @@ interface ClubCardProps {
 export function ClubCard({ club, initialIsMember }: ClubCardProps) {
   const [isMember, setIsMember] = useState(initialIsMember);
   const [loading, setLoading] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const locale = useLocale();
+  const router = useRouter();
 
   const handleJoin = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -43,11 +46,17 @@ export function ClubCard({ club, initialIsMember }: ClubCardProps) {
     }
     setLoading(false);
   };
+  
+  const toggleExpand = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsExpanded(!isExpanded);
+  }
 
   return (
-    <Link
-      href={`/${locale}/clubs/${club.id}`}
-      className="block flex flex-col justify-between h-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 hover:border-blue-500 hover:shadow-md transition-all duration-300 shadow-sm"
+    <div
+      onClick={() => router.push(`/${locale}/clubs/${club.id}`)}
+      className="block flex flex-col justify-between h-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 hover:border-blue-500 hover:shadow-md transition-all duration-300 shadow-sm cursor-pointer"
     >
       <div>
         {/* Logo + Header */}
@@ -80,9 +89,34 @@ export function ClubCard({ club, initialIsMember }: ClubCardProps) {
           </div>
         </div>
 
-        <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4 line-clamp-2 min-h-[40px]">
-          {club.description || (locale === "ko" ? "소개글이 없습니다." : "No description yet.")}
-        </p>
+        {/* Description with Expand/Collapse */}
+        <div className="relative mb-4">
+             <p className={`text-sm text-zinc-600 dark:text-zinc-400 transition-all ${isExpanded ? "" : "line-clamp-2"}`}>
+                {club.description || (locale === "ko" ? "소개글이 없습니다." : "No description yet.")}
+             </p>
+             
+             {/* Simple logic: if description is long enough to potentially clamp (rough heuristic or always show if content exists) */
+             /* Since we can't easily detect line overflow in SSR/hydration safe way without complex observation, 
+                we'll show the toggle if there is a description. Ideally we'd measure. 
+                For now, let's assume if length > 50 chars it might need expanding or just always allow expanding if description exists.
+             */}
+             {club.description && club.description.length > 50 && (
+                <button 
+                    onClick={toggleExpand}
+                    className="flex items-center gap-1 text-xs text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300 mt-1 font-medium bg-zinc-50 dark:bg-zinc-800/50 px-2 py-1 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                >
+                    {isExpanded ? (
+                        <>
+                            {locale === "ko" ? "접기" : "Show Less"} <ChevronUp className="w-3 h-3" />
+                        </>
+                    ) : (
+                        <>
+                           {locale === "ko" ? "더보기" : "Show More"} <ChevronDown className="w-3 h-3" />
+                        </>
+                    )}
+                </button>
+             )}
+        </div>
       </div>
 
       <div className="flex gap-2 mt-auto">
@@ -121,6 +155,6 @@ export function ClubCard({ club, initialIsMember }: ClubCardProps) {
           </a>
         )}
       </div>
-    </Link>
+    </div>
   );
 }

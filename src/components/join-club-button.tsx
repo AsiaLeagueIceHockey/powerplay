@@ -10,7 +10,7 @@ interface JoinClubButtonProps {
   initialIsMember: boolean;
 }
 
-export function JoinClubButton({ club, initialIsMember }: JoinClubButtonProps) {
+export function JoinClubButton({ club, initialIsMember, className }: JoinClubButtonProps & { className?: string }) {
   const [isMember, setIsMember] = useState(initialIsMember);
   const [loading, setLoading] = useState(false);
   const locale = useLocale();
@@ -49,7 +49,7 @@ export function JoinClubButton({ club, initialIsMember }: JoinClubButtonProps) {
         isMember 
           ? "bg-zinc-100 text-zinc-400 cursor-default" 
           : "bg-blue-600 text-white hover:bg-blue-700 shadow-sm"
-      }`}
+      } ${className || ""}`}
     >
       {loading
         ? "..."
