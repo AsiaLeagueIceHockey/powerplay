@@ -8,7 +8,7 @@ import { DateFilter } from "@/components/date-filter";
 import { MatchCard } from "@/components/match-card";
 import { CalendarView } from "@/components/calendar-view";
 import { RinkExplorer } from "@/components/rink-explorer";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { List, CalendarDays } from "lucide-react";
 import { Club } from "@/app/actions/types";
 import { ClubCard } from "@/components/club-card";
@@ -68,8 +68,8 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
         <button
           onClick={() => setActiveTab("match")}
           className={`flex-1 pb-3 text-lg font-bold transition-all relative ${activeTab === "match"
-              ? "text-zinc-900 dark:text-white"
-              : "text-zinc-400 hover:text-zinc-600"
+            ? "text-zinc-900 dark:text-white"
+            : "text-zinc-400 hover:text-zinc-600"
             }`}
         >
           <span className="flex items-center justify-center gap-2">
@@ -84,8 +84,8 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
         <button
           onClick={() => setActiveTab("rink")}
           className={`flex-1 pb-3 text-lg font-bold transition-all relative ${activeTab === "rink"
-              ? "text-zinc-900 dark:text-white"
-              : "text-zinc-400 hover:text-zinc-600"
+            ? "text-zinc-900 dark:text-white"
+            : "text-zinc-400 hover:text-zinc-600"
             }`}
         >
           <span className="flex items-center justify-center gap-2">
@@ -98,8 +98,8 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
         <button
           onClick={() => setActiveTab("club")}
           className={`flex-1 pb-3 text-lg font-bold transition-all relative ${activeTab === "club"
-              ? "text-zinc-900 dark:text-white"
-              : "text-zinc-400 hover:text-zinc-600"
+            ? "text-zinc-900 dark:text-white"
+            : "text-zinc-400 hover:text-zinc-600"
             }`}
         >
           <span className="flex items-center justify-center gap-2">
@@ -121,8 +121,8 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
                 <button
                   onClick={() => setViewMode("list")}
                   className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${viewMode === "list"
-                      ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-700 dark:text-white"
-                      : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
+                    ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-700 dark:text-white"
+                    : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
                     }`}
                 >
                   <List className="w-4 h-4" />
@@ -131,8 +131,8 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
                 <button
                   onClick={() => setViewMode("calendar")}
                   className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${viewMode === "calendar"
-                      ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-700 dark:text-white"
-                      : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
+                    ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-700 dark:text-white"
+                    : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
                     }`}
                 >
                   <CalendarDays className="w-4 h-4" />
@@ -176,6 +176,18 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
         ) : (
           <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
             {/* Club Tab */}
+            <div className="mb-6">
+              <button
+                onClick={() => router.push(`/${useLocale()}/admin-apply`)}
+                className="w-full py-4 px-6 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl shadow-lg transition-all transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 group"
+              >
+                <span className="font-bold text-lg">관리자 신청을 통해 동호회를 홍보해보세요!</span>
+                <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </button>
+            </div>
+
             {clubs.length === 0 ? (
               <div className="text-center py-20 bg-zinc-50 dark:bg-zinc-900 rounded-xl border border-zinc-100 dark:border-zinc-800">
                 <p className="text-zinc-500">등록된 동호회가 없습니다.</p>

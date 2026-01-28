@@ -67,17 +67,7 @@ export async function getCachedClubs(): Promise<Club[]> {
 export async function getCachedMatches(): Promise<Match[]> {
   const supabase = await createClient();
 
-  // Calculate today 00:00 in KST, then convert to UTC for DB query
-  const now = new Date();
-  const kstOffset = 9 * 60 * 60 * 1000; // KST is UTC+9
-  const nowKST = new Date(now.getTime() + kstOffset);
-  const todayMidnightKST = new Date(
-    Date.UTC(nowKST.getUTCFullYear(), nowKST.getUTCMonth(), nowKST.getUTCDate())
-  );
-  // Convert back to UTC for database comparison
-  const todayMidnightUTC = new Date(todayMidnightKST.getTime() - kstOffset);
-
-  // Fetch matches - only those starting from today (KST) onwards
+  // Fetch matches - all matches for history
   const { data: matches, error } = await supabase
     .from("matches")
     .select(`
@@ -91,7 +81,6 @@ export async function getCachedMatches(): Promise<Match[]> {
       rink:rink_id(id, name_ko, name_en, address, lat, lng, rink_type),
       club:club_id(id, name, kakao_open_chat_url, logo_url)
     `)
-    .gte("start_time", todayMidnightUTC.toISOString())
     .order("start_time", { ascending: true });
 
   if (error) {
@@ -100,7 +89,7 @@ export async function getCachedMatches(): Promise<Match[]> {
   }
 
   const matchIds = (matches || []).map(m => m.id);
-  
+
   if (matchIds.length === 0) {
     return [];
   }
@@ -116,7 +105,7 @@ export async function getCachedMatches(): Promise<Match[]> {
   // Group participants by match_id
   const participantsByMatch = new Map<string, { fw: number; df: number; g: number }>();
   matchIds.forEach(id => participantsByMatch.set(id, { fw: 0, df: 0, g: 0 }));
-  
+
   (allParticipants || []).forEach(p => {
     const counts = participantsByMatch.get(p.match_id);
     if (counts) {
@@ -130,7 +119,7 @@ export async function getCachedMatches(): Promise<Match[]> {
   return (matches || []).map(match => {
     const rink = Array.isArray(match.rink) ? match.rink[0] : match.rink;
     const club = Array.isArray(match.club) ? match.club[0] : match.club;
-    
+
     return {
       ...match,
       rink: rink as MatchRink | null,
