@@ -100,7 +100,7 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
             }`}
         >
           <span className="flex items-center justify-center gap-2">
-            경기
+            {t("tabs.match")}
             {/* Optional Badge */}
             {/* <span className="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded-full">{filteredMatches.length}</span> */}
           </span>
@@ -116,7 +116,7 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
             }`}
         >
           <span className="flex items-center justify-center gap-2">
-            링크장
+            {t("tabs.rink")}
           </span>
           {activeTab === "rink" && (
             <span className="absolute bottom-0 left-0 w-full h-0.5 bg-zinc-900 dark:bg-white" />
@@ -130,7 +130,7 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
             }`}
         >
           <span className="flex items-center justify-center gap-2">
-            동호회
+            {t("tabs.club")}
           </span>
           {activeTab === "club" && (
             <span className="absolute bottom-0 left-0 w-full h-0.5 bg-zinc-900 dark:bg-white" />
@@ -215,7 +215,7 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
                   onClick={() => router.push(`/${locale}/admin/matches`)}
                   className="w-full py-4 px-6 bg-amber-50 dark:bg-amber-950/30 hover:bg-amber-100 dark:hover:bg-amber-950/50 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800/50 rounded-xl shadow-sm transition-all transform hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 group"
                 >
-                  <span className="font-bold text-base">관리자 페이지로 이동</span>
+                  <span className="font-bold text-base">{t("admin.goToAdmin")}</span>
                   <svg
                     className="w-5 h-5 group-hover:translate-x-1 transition-transform"
                     fill="none"
@@ -236,7 +236,7 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
                   className="w-full py-4 px-6 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-sm transition-all transform hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 group"
                 >
                   <span className="font-bold text-base">
-                    관리자가 되어 동호회를 홍보해보세요!
+                    {t("admin.becomeAdmin")}
                   </span>
                   <svg
                     className="w-5 h-5 group-hover:translate-x-1 transition-transform"
@@ -257,7 +257,7 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
 
             {clubs.length === 0 ? (
               <div className="text-center py-20 bg-zinc-50 dark:bg-zinc-900 rounded-xl border border-zinc-100 dark:border-zinc-800">
-                <p className="text-zinc-500">등록된 동호회가 없습니다.</p>
+                <p className="text-zinc-500">{t("noClubs")}</p>
               </div>
             ) : (
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

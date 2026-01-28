@@ -16,7 +16,17 @@
         "viewList": "목록",
         "viewMap": "지도",
         "viewCalendar": "캘린더",
-        "unknownRink": "알 수 없는 링크장"
+        "unknownRink": "알 수 없는 링크장",
+        "tabs": {
+            "match": "경기",
+            "rink": "링크장",
+            "club": "동호회"
+        },
+        "admin": {
+            "goToAdmin": "관리자 페이지로 이동",
+            "becomeAdmin": "관리자가 되어 동호회를 홍보해보세요!"
+        },
+        "noClubs": "등록된 동호회가 없습니다"
     },
     "auth": {
         "login": "로그인",

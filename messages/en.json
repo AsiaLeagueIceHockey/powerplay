@@ -16,7 +16,17 @@
         "viewList": "List",
         "viewMap": "Map",
         "viewCalendar": "Calendar",
-        "unknownRink": "Unknown Rink"
+        "unknownRink": "Unknown Rink",
+        "tabs": {
+            "match": "Matches",
+            "rink": "Rinks",
+            "club": "Clubs"
+        },
+        "admin": {
+            "goToAdmin": "Go to Admin Page",
+            "becomeAdmin": "Become an Admin & Promote Your Club!"
+        },
+        "noClubs": "No clubs registered"
     },
     "auth": {
         "login": "Log In",
