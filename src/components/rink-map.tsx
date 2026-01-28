@@ -20,7 +20,7 @@ function RinkDetailCard({ rink, matches, onClose }: { rink: Rink; matches: Match
     .slice(0, 3); // Top 3
 
   return (
-    <div className="absolute bottom-0 left-0 right-0 p-4 bg-white dark:bg-zinc-900 rounded-t-2xl shadow-[0_-4px_20px_rgba(0,0,0,0.1)] z-20 md:bottom-auto md:left-4 md:top-4 md:right-auto md:w-80 md:rounded-xl animate-in slide-in-from-bottom-10 md:slide-in-from-left-2 fade-in duration-300 border border-zinc-200 dark:border-zinc-800">
+    <div className="absolute bottom-4 left-4 right-4 p-4 bg-white dark:bg-zinc-900 rounded-xl shadow-lg z-20 md:bottom-auto md:left-4 md:top-4 md:right-auto md:w-80 animate-in slide-in-from-bottom-10 md:slide-in-from-left-2 fade-in duration-300 border border-zinc-200 dark:border-zinc-800 max-h-[40%] overflow-y-auto">
       <button 
         onClick={onClose}
         className="absolute top-3 right-3 p-1 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
@@ -137,7 +137,7 @@ function RinkMapContent({ rinks, matches = [] }: RinkMapProps) {
   }
 
   return (
-    <div className="relative w-full h-[600px] rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-900">
+    <div className="relative w-full h-full min-h-[500px] rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-900">
       <MapContainer className="w-full h-full">
         <NaverMap
             defaultCenter={initialCenter}

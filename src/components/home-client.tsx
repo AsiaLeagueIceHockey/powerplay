@@ -28,15 +28,30 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
   const t = useTranslations("home");
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [activeTab, setActiveTab] = useState<"match" | "rink" | "club">("match");
+  const [activeTab, setActiveTabState] = useState<"match" | "rink" | "club">(() => {
+    const tabParam = searchParams.get("tab");
+    if (tabParam === "rink") return "rink";
+    if (tabParam === "club") return "club";
+    return "match";
+  });
   const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
 
   // Client-side filtering state
   const [selectedDate, setSelectedDate] = useState<string | null>(initialDate || null);
 
+  const setActiveTab = (tab: "match" | "rink" | "club") => {
+    setActiveTabState(tab);
+    
+    // Update URL without refresh
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("tab", tab);
+    // Keep date param if it exists
+    window.history.replaceState(null, "", `?${params.toString()}`);
+  }
+
   const handleDateSelect = (dateStr: string | null) => {
     setSelectedDate(dateStr);
-
+    
     // Update URL without refresh
     const params = new URLSearchParams(searchParams.toString());
     if (dateStr) {
@@ -44,10 +59,17 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
     } else {
       params.delete("date");
     }
+    // Ensure active tab param is preserved or defaulted
+    if (!params.has("tab")) {
+       params.set("tab", activeTab);
+    }
     window.history.replaceState(null, "", `?${params.toString()}`);
 
     if (dateStr) {
-      setViewMode("list");
+        setViewMode("list");
+        if (activeTab !== "match") {
+            setActiveTab("match");
+        }
     }
   };
 
