@@ -3,7 +3,7 @@
 import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { getSubscriptionStatus } from "@/app/actions/push";
+import { getSubscriptionStatus, saveSubscription } from "@/app/actions/push";
 
 interface NotificationContextType {
   isOpen: boolean;
@@ -54,7 +54,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       // Check if user is logged in
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
-      
+
       if (!user) return;
 
       // Check DB subscription status
@@ -65,11 +65,31 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       // 1. No DB subscription exists (regardless of browser permission)
       // 2. Not iOS non-standalone (they need to add to home screen first)
       if (status.count === 0) {
+        // Auto-Resync Attempt: If permission is granted, try to sync silently
+        if ("Notification" in window && Notification.permission === "granted") {
+          try {
+            const registration = await navigator.serviceWorker.ready;
+            const subscription = await registration.pushManager.getSubscription();
+
+            if (subscription) {
+              const result = await saveSubscription(JSON.parse(JSON.stringify(subscription)));
+              if (result.success) {
+                console.log("[Notification] Auto-synced missing subscription");
+                setHasDbSubscription(true);
+                return; // Suppress modal on success
+              }
+            }
+          } catch (err) {
+            console.error("[Notification] Auto-sync failed:", err);
+            // Fallthrough to show modal
+          }
+        }
+
         const userAgent = navigator.userAgent.toLowerCase();
         const isIos = /iphone|ipad|ipod/.test(userAgent);
-        const isStandalone = window.matchMedia("(display-mode: standalone)").matches || 
-                            (navigator as any).standalone === true;
-        
+        const isStandalone = window.matchMedia("(display-mode: standalone)").matches ||
+          (navigator as any).standalone === true;
+
         // If iOS and not standalone, don't auto-show (they need PWA first)
         if (isIos && !isStandalone) {
           return;
@@ -92,12 +112,12 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <NotificationContext.Provider value={{ 
-      isOpen, 
-      guideType, 
-      openGuide, 
-      closeGuide, 
-      shouldShowOnboarding, 
+    <NotificationContext.Provider value={{
+      isOpen,
+      guideType,
+      openGuide,
+      closeGuide,
+      shouldShowOnboarding,
       markOnboardingComplete,
       hasDbSubscription,
       refreshSubscriptionStatus

@@ -118,7 +118,7 @@ export async function updateMatch(matchId: string, formData: FormData) {
   const rinkId = formData.get("rink_id") as string;
   const startTimeInput = formData.get("start_time") as string;
   const fee = parseInt((formData.get("fee") as string)?.replace(/,/g, "")) || 0;
-  
+
   const skatersInput = formData.get("max_skaters") as string;
   const skatersParsed = parseInt(skatersInput);
   const maxSkaters = isNaN(skatersParsed) ? 20 : skatersParsed;
@@ -169,7 +169,7 @@ export async function updateMatch(matchId: string, formData: FormData) {
         month: "short", day: "numeric", hour: "2-digit", minute: "2-digit",
         timeZone: "Asia/Seoul"
       });
-      
+
       await Promise.allSettled(
         participants.map((p) =>
           sendPushNotification(
@@ -245,8 +245,8 @@ export async function updatePaymentStatus(
     // @ts-ignore
     const rinkName = match.rink?.name_ko || "Unknown Rink";
     const startTime = new Date(match.start_time).toLocaleString("ko-KR", {
-        month: "short", day: "numeric", hour: "2-digit", minute: "2-digit",
-        timeZone: "Asia/Seoul"
+      month: "short", day: "numeric", hour: "2-digit", minute: "2-digit",
+      timeZone: "Asia/Seoul"
     });
 
     await sendPushNotification(
@@ -391,10 +391,10 @@ export async function getAdminMatches() {
 // Parse Naver Map URL to extract coordinates and place info
 export async function parseNaverMapUrl(url: string): Promise<{
   success: boolean;
-  data?: { 
-    lat: number; 
-    lng: number; 
-    address: string; 
+  data?: {
+    lat: number;
+    lng: number;
+    address: string;
     mapUrl: string;
     name?: string; // Place name if available
   };
@@ -420,10 +420,10 @@ export async function parseNaverMapUrl(url: string): Promise<{
     if (!latitude || !longitude) {
       // Extract place ID from URL path (e.g., /place/1450992971 or /entry/place/1450992971)
       const placeIdMatch = finalUrl.match(/\/place\/(\d+)/);
-      
+
       if (placeIdMatch) {
         const placeId = placeIdMatch[1];
-        
+
         try {
           // Call Naver Place Summary API
           const placeResponse = await fetch(
@@ -439,19 +439,19 @@ export async function parseNaverMapUrl(url: string): Promise<{
           if (placeResponse.ok) {
             const placeData = await placeResponse.json();
             const detail = placeData?.data?.placeDetail;
-            
+
             if (detail) {
               // Extract coordinates
               if (detail.coordinate) {
                 latitude = detail.coordinate.latitude;
                 longitude = detail.coordinate.longitude;
               }
-              
+
               // Extract name
               if (detail.name) {
                 placeName = detail.name;
               }
-              
+
               // Extract address (prefer road address)
               if (detail.address) {
                 address = detail.address.roadAddress || detail.address.address || "";
@@ -466,9 +466,9 @@ export async function parseNaverMapUrl(url: string): Promise<{
 
     // Final validation
     if (!latitude || !longitude || isNaN(latitude) || isNaN(longitude)) {
-      return { 
-        success: false, 
-        error: "좌표를 추출할 수 없습니다. 올바른 네이버 지도 URL인지 확인해주세요." 
+      return {
+        success: false,
+        error: "좌표를 추출할 수 없습니다. 올바른 네이버 지도 URL인지 확인해주세요."
       };
     }
 
@@ -687,4 +687,157 @@ export async function getRink(rinkId: string) {
   }
 
   return data;
+}
+
+// ==================== ADMIN MANAGEMENT (SuperUser Only) ====================
+
+// Get all admins
+export async function getAdmins() {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return [];
+  }
+
+  // Verify superuser role
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  if (profile?.role !== "superuser") {
+    return [];
+  }
+
+  // Fetch all profiles with role 'admin'
+  const { data: admins, error } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("role", "admin")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Error fetching admins:", error);
+    return [];
+  }
+
+  return admins || [];
+}
+
+interface AdminClub {
+  id: string;
+  name: string;
+  logo_url: string | null;
+  description: string | null;
+  role: string | null;
+  joined_at: string;
+}
+
+interface AdminMatch {
+  id: string;
+  start_time: string;
+  status: "open" | "closed" | "canceled";
+  rink: {
+    name_ko: string;
+  } | null;
+}
+
+// Get admin detail (clubs and matches)
+export async function getAdminDetail(targetUserId: string): Promise<{
+  profile: any;
+  clubs: AdminClub[];
+  matches: AdminMatch[];
+} | null> {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return null;
+  }
+
+  // Verify superuser role
+  const { data: myProfile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  if (myProfile?.role !== "superuser") {
+    return null;
+  }
+
+  // 1. Get Target User Profile
+  const { data: targetProfile, error: profileError } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("id", targetUserId)
+    .single();
+
+  if (profileError || !targetProfile) {
+    console.error("Error fetching admin profile:", profileError);
+    return null;
+  }
+
+  // 2. Get Clubs they belong to
+  const { data: clubMemberships, error: clubError } = await supabase
+    .from("club_memberships")
+    .select(`
+      role,
+      joined_at,
+      club:clubs (
+        id,
+        name,
+        logo_url,
+        description
+      )
+    `)
+    .eq("user_id", targetUserId);
+
+  if (clubError) {
+    console.error("Error fetching admin clubs:", clubError);
+  }
+
+  // 3. Get Matches they created
+  const { data: hostedMatches, error: matchError } = await supabase
+    .from("matches")
+    .select(`
+      id,
+      start_time,
+      status,
+      rink:rinks (name_ko)
+    `)
+    .eq("created_by", targetUserId)
+    .order("start_time", { ascending: false });
+
+  if (matchError) {
+    console.error("Error fetching admin matches:", matchError);
+  }
+
+  return {
+    profile: targetProfile,
+    clubs: (clubMemberships || []).map((m) => {
+      // @ts-ignore
+      const club = Array.isArray(m.club) ? m.club[0] : m.club;
+      return {
+        id: club?.id,
+        name: club?.name,
+        logo_url: club?.logo_url,
+        description: club?.description,
+        role: m.role,
+        joined_at: m.joined_at,
+      };
+    }) as AdminClub[],
+    matches: (hostedMatches || []).map((match) => ({
+      ...match,
+      rink: Array.isArray(match.rink) ? match.rink[0] : match.rink,
+    })) as AdminMatch[],
+  };
 }

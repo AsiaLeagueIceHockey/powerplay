@@ -12,7 +12,7 @@ export default async function AdminLayout({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  
+
   // 병렬 데이터 페칭
   const supabase = await createClient();
   const [, { data: { user } }] = await Promise.all([
@@ -64,12 +64,18 @@ export default async function AdminLayout({
             >
               🏟️ 링크 관리
             </Link>
-            
+
             {/* SuperUser Only Menus */}
             {isSuperUser && (
               <>
                 <div className="border-t border-zinc-800 my-3"></div>
                 <div className="px-4 py-1 text-xs text-amber-500 font-medium uppercase">SuperUser</div>
+                <Link
+                  href={`/${locale}/admin/admins`}
+                  className="block rounded-lg px-4 py-2.5 text-sm font-medium text-zinc-300 hover:bg-zinc-800 hover:text-white"
+                >
+                  🛡️ 관리자 관리
+                </Link>
                 <Link
                   href={`/${locale}/admin/charge-requests`}
                   className="block rounded-lg px-4 py-2.5 text-sm font-medium text-zinc-300 hover:bg-zinc-800 hover:text-white"
@@ -85,7 +91,7 @@ export default async function AdminLayout({
               </>
             )}
           </nav>
-          
+
           {/* User Menu at bottom of sidebar */}
           <div className="absolute bottom-4 left-4 right-4">
             <div className="border-t border-zinc-800 pt-4">
@@ -123,6 +129,13 @@ export default async function AdminLayout({
         </Link>
         {isSuperUser && (
           <>
+            <Link
+              href={`/${locale}/admin/admins`}
+              className="flex flex-col items-center gap-1 px-3 py-2 text-amber-400 hover:text-amber-300"
+            >
+              <span className="text-xl">🛡️</span>
+              <span className="text-xs">관리자</span>
+            </Link>
             <Link
               href={`/${locale}/admin/charge-requests`}
               className="flex flex-col items-center gap-1 px-3 py-2 text-amber-400 hover:text-amber-300"

@@ -23,6 +23,7 @@ interface HomeClientProps {
 }
 
 export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds = [], initialDate }: HomeClientProps) {
+  const locale = useLocale();
   const t = useTranslations("home");
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -178,10 +179,10 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
             {/* Club Tab */}
             <div className="mb-6">
               <button
-                onClick={() => router.push(`/${useLocale()}/admin-apply`)}
-                className="w-full py-4 px-6 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl shadow-lg transition-all transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 group"
+                onClick={() => router.push(`/${locale}/admin-apply`)}
+                className="w-full py-4 px-6 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-sm transition-all transform hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 group"
               >
-                <span className="font-bold text-lg">관리자 신청을 통해 동호회를 홍보해보세요!</span>
+                <span className="font-bold text-base">관리자가 되어 동호회를 홍보해보세요!</span>
                 <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
