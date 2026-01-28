@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Match } from "@/app/actions/match";
 import { Rink } from "@/app/actions/types";
@@ -9,7 +9,7 @@ import { MatchCard } from "@/components/match-card";
 import { CalendarView } from "@/components/calendar-view";
 import { RinkExplorer } from "@/components/rink-explorer";
 import { useTranslations, useLocale } from "next-intl";
-import { List, CalendarDays } from "lucide-react";
+import { List, CalendarDays, Loader2 } from "lucide-react";
 import { Club } from "@/app/actions/types";
 import { ClubCard } from "@/components/club-card";
 
@@ -28,6 +28,8 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
   const t = useTranslations("home");
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [isPending, startTransition] = useTransition();
+
   const [activeTab, setActiveTabState] = useState<"match" | "rink" | "club">(() => {
     const tabParam = searchParams.get("tab");
     if (tabParam === "rink") return "rink";
@@ -40,37 +42,38 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
   const [selectedDate, setSelectedDate] = useState<string | null>(initialDate || null);
 
   const setActiveTab = (tab: "match" | "rink" | "club") => {
-    setActiveTabState(tab);
-    
-    // Update URL without refresh
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("tab", tab);
-    // Keep date param if it exists
-    window.history.replaceState(null, "", `?${params.toString()}`);
+    startTransition(() => {
+        setActiveTabState(tab);
+        const params = new URLSearchParams(searchParams.toString());
+        params.set("tab", tab);
+        window.history.replaceState(null, "", `?${params.toString()}`);
+    });
   }
 
   const handleDateSelect = (dateStr: string | null) => {
-    setSelectedDate(dateStr);
-    
-    // Update URL without refresh
-    const params = new URLSearchParams(searchParams.toString());
-    if (dateStr) {
-      params.set("date", dateStr);
-    } else {
-      params.delete("date");
-    }
-    // Ensure active tab param is preserved or defaulted
-    if (!params.has("tab")) {
-       params.set("tab", activeTab);
-    }
-    window.history.replaceState(null, "", `?${params.toString()}`);
-
-    if (dateStr) {
-        setViewMode("list");
-        if (activeTab !== "match") {
-            setActiveTab("match");
+    startTransition(() => {
+        setSelectedDate(dateStr);
+        
+        // Update URL without refresh
+        const params = new URLSearchParams(searchParams.toString());
+        if (dateStr) {
+          params.set("date", dateStr);
+        } else {
+          params.delete("date");
         }
-    }
+        // Ensure active tab param is preserved or defaulted
+        if (!params.has("tab")) {
+           params.set("tab", activeTab);
+        }
+        window.history.replaceState(null, "", `?${params.toString()}`);
+
+        if (dateStr) {
+            setViewMode("list");
+            if (activeTab !== "match") {
+                setActiveTabState("match"); // Direct update to avoid double transition or race
+            }
+        }
+    });
   };
 
   // Filter matches based on selectedDate
@@ -136,7 +139,13 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
       </div>
 
       {/* Tab Content */}
-      <div className="min-h-[500px]">
+      <div className="relative min-h-[500px]">
+        {isPending && (
+            <div className="absolute inset-0 z-50 flex items-start justify-center pt-20 bg-white/50 dark:bg-zinc-950/50 backdrop-blur-sm transition-all duration-300">
+                <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+            </div>
+        )}
+        <div className={`transition-all duration-300 ${isPending ? 'opacity-50' : 'opacity-100'}`}>
         {activeTab === "match" ? (
           <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
             {/* View Mode Toggle */}
@@ -263,6 +272,7 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
             )}
           </div>
         )}
+        </div>
       </div>
     </div>
   );

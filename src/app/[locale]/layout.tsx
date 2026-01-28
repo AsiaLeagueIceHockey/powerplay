@@ -10,6 +10,7 @@ import { NotificationProvider } from "@/contexts/notification-context";
 import { NotificationGuideModal } from "@/components/notification-guide-modal";
 import { InstallPrompt } from "@/components/install-prompt";
 import { OnboardingGuard } from "@/components/onboarding-guard";
+import NextTopLoader from "nextjs-toploader";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -121,6 +122,7 @@ export default async function LocaleLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100`}
       >
         <NextIntlClientProvider messages={messages}>
+          <NextTopLoader color="#2563EB" showSpinner={false} />
           <NotificationProvider>
             <ScrollToTop />
             <PushServiceWorkerRegister />
