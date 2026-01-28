@@ -45,7 +45,7 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
       <h2 className="text-xl font-bold text-white mb-4 border-b border-zinc-700 pb-2">
         {t("admin.form.create")}
       </h2>
-      
+
       {error && (
         <div className="p-4 bg-red-900/50 border border-red-800 text-red-200 rounded-lg">
           {error}
@@ -98,13 +98,103 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
         <label className="block text-sm font-medium mb-2 text-zinc-300">
           {t("admin.form.dateTime")}
         </label>
-        <input
-          type="datetime-local"
-          name="start_time"
-          required
-          step="600"
-          className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 appearance-none [-webkit-appearance:none] [&::-webkit-date-and-time-value]:text-left"
-        />
+        <div className="flex gap-2">
+          {/* Date Picker */}
+          <div className="flex-1">
+            <input
+              type="date"
+              required
+              className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 appearance-none [-webkit-appearance:none]"
+              onChange={(e) => {
+                const date = e.target.value;
+                const form = e.target.closest('form');
+                if (form) {
+                  const hour = (form.querySelector('select[name="_hour"]') as HTMLSelectElement).value;
+                  const minute = (form.querySelector('select[name="_minute"]') as HTMLSelectElement).value;
+                  const startTimeInput = form.querySelector('input[name="start_time"]') as HTMLInputElement;
+                  if (date && hour && minute) {
+                    startTimeInput.value = `${date}T${hour}:${minute}`;
+                  } else {
+                    startTimeInput.value = "";
+                  }
+                }
+              }}
+            />
+          </div>
+
+          {/* Hour Select */}
+          <div className="w-24">
+            <div className="relative">
+              <select
+                name="_hour"
+                required
+                defaultValue=""
+                className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 appearance-none"
+                onChange={(e) => {
+                  const hour = e.target.value;
+                  const form = e.target.closest('form');
+                  if (form) {
+                    const date = (form.querySelector('input[type="date"]') as HTMLInputElement).value;
+                    const minute = (form.querySelector('select[name="_minute"]') as HTMLSelectElement).value;
+                    const startTimeInput = form.querySelector('input[name="start_time"]') as HTMLInputElement;
+                    if (date && hour && minute) {
+                      startTimeInput.value = `${date}T${hour}:${minute}`;
+                    } else {
+                      startTimeInput.value = "";
+                    }
+                  }
+                }}
+              >
+                <option value="" disabled>시</option>
+                {Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, '0')).map(hour => (
+                  <option key={hour} value={hour}>{hour}시</option>
+                ))}
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-zinc-400">
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          {/* Minute Select (10 min intervals) */}
+          <div className="w-24">
+            <div className="relative">
+              <select
+                name="_minute"
+                required
+                defaultValue=""
+                className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 appearance-none"
+                onChange={(e) => {
+                  const minute = e.target.value;
+                  const form = e.target.closest('form');
+                  if (form) {
+                    const date = (form.querySelector('input[type="date"]') as HTMLInputElement).value;
+                    const hour = (form.querySelector('select[name="_hour"]') as HTMLSelectElement).value;
+                    const startTimeInput = form.querySelector('input[name="start_time"]') as HTMLInputElement;
+                    if (date && hour && minute) {
+                      startTimeInput.value = `${date}T${hour}:${minute}`;
+                    } else {
+                      startTimeInput.value = "";
+                    }
+                  }
+                }}
+              >
+                <option value="" disabled>분</option>
+                {['00', '10', '20', '30', '40', '50'].map(min => (
+                  <option key={min} value={min}>{min}분</option>
+                ))}
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-zinc-400">
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+        <input type="hidden" name="start_time" />
       </div>
 
       {/* Entry Points (참가 포인트) */}
@@ -129,8 +219,8 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
           </span>
         </div>
         <p className="text-xs text-zinc-500 mt-1">
-          {locale === "ko" 
-            ? "참가비 (0 = 무료)" 
+          {locale === "ko"
+            ? "참가비 (0 = 무료)"
             : "Entry fee (0 = free)"}
         </p>
       </div>
