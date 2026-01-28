@@ -1,5 +1,5 @@
 import { setRequestLocale } from "next-intl/server";
-import { getClubs } from "@/app/actions/clubs";
+import { getAdminClubs } from "@/app/actions/clubs";
 import Link from "next/link";
 import { Users, MessageCircle } from "lucide-react";
 
@@ -10,7 +10,7 @@ export default async function AdminClubsPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const clubs = await getClubs();
+  const clubs = await getAdminClubs();
 
   return (
     <div>

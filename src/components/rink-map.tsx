@@ -20,15 +20,18 @@ function RinkDetailCard({ rink, matches, onClose }: { rink: Rink; matches: Match
     .slice(0, 3); // Top 3
 
   return (
-    <div className="absolute bottom-4 left-4 right-4 p-4 bg-white dark:bg-zinc-900 rounded-xl shadow-lg z-20 md:bottom-auto md:left-4 md:top-4 md:right-auto md:w-80 animate-in slide-in-from-bottom-10 md:slide-in-from-left-2 fade-in duration-300 border border-zinc-200 dark:border-zinc-800 max-h-[40%] overflow-y-auto">
+    <div className="absolute bottom-4 left-4 right-4 z-20 md:bottom-auto md:left-4 md:top-4 md:right-auto md:w-80 animate-in slide-in-from-bottom-10 md:slide-in-from-left-2 fade-in duration-300">
+      {/* Floating Close Button */}
       <button 
         onClick={onClose}
-        className="absolute top-3 right-3 p-1 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+        className="absolute -top-12 right-0 p-2 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white rounded-full shadow-lg border border-zinc-200 dark:border-zinc-700 hover:scale-105 transition-transform"
+        aria-label="닫기"
       >
         <X className="w-5 h-5" />
       </button>
 
-      <div className="pr-8">
+      {/* Card Content */}
+      <div className="p-4 bg-white dark:bg-zinc-900 rounded-xl shadow-lg border border-zinc-200 dark:border-zinc-800 max-h-[60vh] overflow-y-auto">
         <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-1">{rink.name_ko}</h3>
         <p className="text-sm text-zinc-500 dark:text-zinc-400 flex items-start gap-1.5 mb-4">
           <MapPin className="w-4 h-4 mt-0.5 shrink-0" />

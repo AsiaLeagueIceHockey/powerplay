@@ -74,6 +74,78 @@ export async function getClubs(): Promise<Club[]> {
   return clubsWithCounts;
 }
 
+export async function getAdminClubs(): Promise<Club[]> {
+  const supabase = await createClient();
+  
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return [];
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  // Superuser sees all clubs
+  if (profile?.role === "superuser") {
+    return getClubs();
+  }
+
+  // Regular Admin sees:
+  // 1. Clubs they created
+  // 2. Clubs they are a member of (any role, or specific role? User asked: "joined people". Assuming any member for now, or maybe expecting admins of clubs. The prompt says "admin user joined to that club". Usually implies club admin, but prompt says "joined". Let's assume all joined clubs are visible to the user IF they are an app-admin, or maybe just restrict to clubs they manage?
+  // Re-reading request: "Among admins... creator... and admin users who are joined".
+  // It suggests visibility. I will include all joined clubs.
+
+  // 1. Created clubs
+  const { data: createdClubs } = await supabase
+    .from("clubs")
+    .select("*")
+    .eq("created_by", user.id);
+
+  // 2. Joined clubs
+  const { data: memberships } = await supabase
+    .from("club_memberships")
+    .select("club:clubs(*)")
+    .eq("user_id", user.id);
+  
+  const joinedClubs = (memberships || []).map((m) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const clubData = (m as any).club;
+    return Array.isArray(clubData) ? clubData[0] : clubData;
+  }).filter((c): c is Club => !!c);
+  
+  const createdClubsList = createdClubs as Club[] || [];
+
+  // Merge and Deduplicate
+  const clubMap = new Map<string, Club>();
+  createdClubsList.forEach(c => clubMap.set(c.id, c));
+  joinedClubs.forEach(c => clubMap.set(c.id, c));
+  
+  const uniqueClubs = Array.from(clubMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+
+  // Attach member counts
+  const clubsWithCounts = await Promise.all(
+    uniqueClubs.map(async (club) => {
+      // Optimize: maybe fetch counts in bulk if possible, but n+1 is fine for admin list usually
+      const { count } = await supabase
+        .from("club_memberships")
+        .select("*", { count: "exact", head: true })
+        .eq("club_id", club.id);
+
+      return {
+        ...club,
+        member_count: count || 0,
+      } as Club;
+    })
+  );
+
+  return clubsWithCounts;
+}
+
 export async function getClub(id: string): Promise<Club | null> {
   const supabase = await createClient();
 
