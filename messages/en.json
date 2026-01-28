@@ -119,8 +119,10 @@
         "browseMatches": "Browse matches"
     },
     "points": {
-        "title": "Wallet",
-        "balance": "Balance",
+        "title": "Credits",
+        "balance": "Credits",
+        "infoTitle": "What are Credits?",
+        "infoDesc": "Credits can be used to pay for match entry fees within Power Play.",
         "charge": "Charge",
         "history": "History",
         "noHistory": "No history",

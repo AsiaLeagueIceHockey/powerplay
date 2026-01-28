@@ -119,8 +119,10 @@
         "browseMatches": "경기 둘러보기"
     },
     "points": {
-        "title": "내 지갑",
-        "balance": "보유 금액",
+        "title": "충전 금액",
+        "balance": "충전 금액",
+        "infoTitle": "충전 금액이란?",
+        "infoDesc": "파워 플레이 내에서 매치 참가비 결제 등에 사용할 수 있는 금액입니다.",
         "charge": "충전하기",
         "history": "이용 내역",
         "noHistory": "이용 내역이 없습니다",

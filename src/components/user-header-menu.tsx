@@ -6,6 +6,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { signOut } from "@/app/actions/auth";
 import { DeleteAccountModal } from "./delete-account-modal";
 import { useNotification } from "@/contexts/notification-context";
+import { useTranslations } from "next-intl";
 
 import { CircleDollarSign, User as UserIcon, ChevronDown, Wrench, Bell, LogOut, Ticket } from "lucide-react";
 
@@ -28,6 +29,7 @@ export function UserHeaderMenu({
   points?: number;
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  const tPoints = useTranslations("points");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const { openGuide } = useNotification();
   const router = useRouter();
@@ -130,7 +132,7 @@ export function UserHeaderMenu({
                   <CircleDollarSign size={16} />
                 </div>
                 <div className="flex flex-col leading-none gap-1">
-                  <span className="font-medium">{locale === "ko" ? "포인트" : "Points"}</span>
+                  <span className="font-medium">{tPoints("balance")}</span>
                   <span className="text-xs text-zinc-500 font-mono">
                     {points.toLocaleString()} {locale === "ko" ? "원" : "KRW"}
                   </span>

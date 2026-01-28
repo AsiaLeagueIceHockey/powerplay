@@ -86,12 +86,10 @@ export default async function PointsPage({
         <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
         <div className="text-sm text-zinc-700 dark:text-zinc-300 space-y-1">
           <p className="font-semibold text-blue-800 dark:text-blue-300">
-            {locale === "ko" ? "파워플레이 포인트란?" : "What are Power Play Points?"}
+            {t("infoTitle")}
           </p>
           <p>
-            {locale === "ko" 
-              ? "파워플레이 내에서 매치 참가비 결제 등에 사용할 수 있는 전용 포인트입니다." 
-              : "Points are used within Power Play to pay for match entry fees."}
+            {t("infoDesc")}
           </p>
         </div>
       </div>
