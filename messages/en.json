@@ -159,6 +159,30 @@
         }
     },
     "admin": {
+        "menu": {
+            "dashboard": "Power Play Admin",
+            "matches": "Matches",
+            "clubs": "Clubs",
+            "rinks": "Rinks",
+            "admins": "Admins",
+            "chargeRequests": "Charge Requests",
+            "settings": "Settings",
+            "matchesShort": "Matches",
+            "clubsShort": "Clubs",
+            "rinksShort": "Rinks",
+            "adminsShort": "Admins",
+            "chargeRequestsShort": "Charge",
+            "settingsShort": "Settings"
+        },
+        "clubs": {
+            "title": "Club Management",
+            "create": "New Club",
+            "noClubs": "No clubs registered",
+            "createFirst": "Register First Club",
+            "members": "{count} Members",
+            "openChat": "Open Chat",
+            "edit": "Edit"
+        },
         "matches": {
             "title": "Match Management",
             "create": "Create Match",

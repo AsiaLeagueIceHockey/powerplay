@@ -15,7 +15,7 @@ export default async function AdminLayout({
 
   // 병렬 데이터 페칭
   const supabase = await createClient();
-  const [, { data: { user } }] = await Promise.all([
+  const [t, { data: { user } }] = await Promise.all([
     getTranslations("admin"),
     supabase.auth.getUser(),
   ]);
@@ -35,7 +35,7 @@ export default async function AdminLayout({
     <div className="min-h-screen bg-zinc-900 text-zinc-100">
       {/* Mobile Header */}
       <header className="sticky top-0 z-50 flex items-center justify-between border-b border-zinc-800 bg-zinc-900/95 px-4 py-3 backdrop-blur md:hidden">
-        <span className="text-lg font-bold">🏒 파워플레이 관리자</span>
+        <span className="text-lg font-bold">🏒 {t("menu.dashboard")}</span>
         <AdminUserMenu user={user} locale={locale} />
       </header>
 
@@ -43,26 +43,26 @@ export default async function AdminLayout({
         {/* Desktop Sidebar - Hidden on mobile */}
         <aside className="hidden w-64 shrink-0 border-r border-zinc-800 bg-zinc-950 p-4 md:block md:min-h-screen">
           <div className="mb-8 flex items-center justify-between">
-            <span className="text-xl font-bold">🏒 파워플레이 관리자</span>
+            <span className="text-xl font-bold">🏒 {t("menu.dashboard")}</span>
           </div>
           <nav className="space-y-1">
             <Link
               href={`/${locale}/admin/matches`}
               className="block rounded-lg px-4 py-2.5 text-sm font-medium text-zinc-300 hover:bg-zinc-800 hover:text-white"
             >
-              🏒 경기 관리
+              🏒 {t("menu.matches")}
             </Link>
             <Link
               href={`/${locale}/admin/clubs`}
               className="block rounded-lg px-4 py-2.5 text-sm font-medium text-zinc-300 hover:bg-zinc-800 hover:text-white"
             >
-              👥 동호회 관리
+              👥 {t("menu.clubs")}
             </Link>
             <Link
               href={`/${locale}/admin/rinks`}
               className="block rounded-lg px-4 py-2.5 text-sm font-medium text-zinc-300 hover:bg-zinc-800 hover:text-white"
             >
-              🏟️ 링크 관리
+              🏟️ {t("menu.rinks")}
             </Link>
 
             {/* SuperUser Only Menus */}
@@ -74,19 +74,19 @@ export default async function AdminLayout({
                   href={`/${locale}/admin/admins`}
                   className="block rounded-lg px-4 py-2.5 text-sm font-medium text-zinc-300 hover:bg-zinc-800 hover:text-white"
                 >
-                  🛡️ 관리자 관리
+                  🛡️ {t("menu.admins")}
                 </Link>
                 <Link
                   href={`/${locale}/admin/charge-requests`}
                   className="block rounded-lg px-4 py-2.5 text-sm font-medium text-zinc-300 hover:bg-zinc-800 hover:text-white"
                 >
-                  💰 충전 요청 관리
+                  💰 {t("menu.chargeRequests")}
                 </Link>
                 <Link
                   href={`/${locale}/admin/settings`}
                   className="block rounded-lg px-4 py-2.5 text-sm font-medium text-zinc-300 hover:bg-zinc-800 hover:text-white"
                 >
-                  ⚙️ 플랫폼 설정
+                  ⚙️ {t("menu.settings")}
                 </Link>
               </>
             )}
@@ -111,21 +111,21 @@ export default async function AdminLayout({
           className="flex flex-col items-center gap-1 px-4 py-2 text-zinc-400 hover:text-white"
         >
           <span className="text-xl">🏒</span>
-          <span className="text-xs">경기</span>
+          <span className="text-xs">{t("menu.matchesShort")}</span>
         </Link>
         <Link
           href={`/${locale}/admin/clubs`}
           className="flex flex-col items-center gap-1 px-4 py-2 text-zinc-400 hover:text-white"
         >
           <span className="text-xl">👥</span>
-          <span className="text-xs">동호회</span>
+          <span className="text-xs">{t("menu.clubsShort")}</span>
         </Link>
         <Link
           href={`/${locale}/admin/rinks`}
           className="flex flex-col items-center gap-1 px-4 py-2 text-zinc-400 hover:text-white"
         >
           <span className="text-xl">🏟️</span>
-          <span className="text-xs">링크</span>
+          <span className="text-xs">{t("menu.rinksShort")}</span>
         </Link>
         {isSuperUser && (
           <>
@@ -134,21 +134,21 @@ export default async function AdminLayout({
               className="flex flex-col items-center gap-1 px-3 py-2 text-amber-400 hover:text-amber-300"
             >
               <span className="text-xl">🛡️</span>
-              <span className="text-xs">관리자</span>
+              <span className="text-xs">{t("menu.adminsShort")}</span>
             </Link>
             <Link
               href={`/${locale}/admin/charge-requests`}
               className="flex flex-col items-center gap-1 px-3 py-2 text-amber-400 hover:text-amber-300"
             >
               <span className="text-xl">💰</span>
-              <span className="text-xs">충전</span>
+              <span className="text-xs">{t("menu.chargeRequestsShort")}</span>
             </Link>
             <Link
               href={`/${locale}/admin/settings`}
               className="flex flex-col items-center gap-1 px-3 py-2 text-amber-400 hover:text-amber-300"
             >
               <span className="text-xl">⚙️</span>
-              <span className="text-xs">설정</span>
+              <span className="text-xs">{t("menu.settingsShort")}</span>
             </Link>
           </>
         )}
