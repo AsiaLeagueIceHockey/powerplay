@@ -194,6 +194,9 @@
             "participants": "Participants",
             "actions": "Actions",
             "edit": "Edit",
+            "delete": "Delete",
+            "viewParticipants": "View Participants ▼",
+            "hideParticipants": "Hide Participants ▲",
             "backToList": "Back to list",
             "createNew": "Create New Match"
         },

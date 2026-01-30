@@ -194,6 +194,9 @@
             "participants": "참가자",
             "actions": "관리",
             "edit": "수정",
+            "delete": "삭제",
+            "viewParticipants": "참가자 목록 확인 ▼",
+            "hideParticipants": "참가자 목록 닫기 ▲",
             "backToList": "목록으로",
             "createNew": "새 경기 생성"
         },

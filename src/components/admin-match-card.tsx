@@ -3,8 +3,10 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { AdminParticipantList } from "./admin-participant-list";
 import { deleteMatch } from "@/app/actions/admin";
+import { AdminNewBadge, markMatchAsSeen } from "./admin-new-badge";
 
 interface Match {
   id: string;
@@ -34,7 +36,11 @@ export function AdminMatchCard({
 }) {
   const [showParticipants, setShowParticipants] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [badgeKey, setBadgeKey] = useState(0);
   const router = useRouter();
+  const t = useTranslations("admin");
+
+  const totalParticipants = match.participants?.length || 0;
 
   const handleDelete = async () => {
     if (!confirm(locale === "ko" ? "정말 이 경기를 삭제하시겠습니까?" : "Are you sure you want to delete this match?")) {
@@ -50,6 +56,15 @@ export function AdminMatchCard({
       router.refresh();
       // Optional: Give UI feedback or wait for refresh
     }
+  };
+
+  const handleToggleParticipants = () => {
+    if (!showParticipants) {
+      // 참가자 목록을 열 때 현재 참가자 수를 localStorage에 저장
+      markMatchAsSeen(match.id, totalParticipants);
+      setBadgeKey(prev => prev + 1); // 뱃지 리렌더링
+    }
+    setShowParticipants(!showParticipants);
   };
 
   const formatDate = (dateString: string) => {
@@ -109,7 +124,10 @@ export function AdminMatchCard({
   };
 
   return (
-    <div className="bg-zinc-800 border border-zinc-700 rounded-lg p-5 shadow-sm">
+    <div className="bg-zinc-800 border border-zinc-700 rounded-lg p-5 shadow-sm relative">
+      {/* New Participant Badge */}
+      <AdminNewBadge key={badgeKey} matchId={match.id} currentCount={totalParticipants} />
+
       <div className="flex justify-between items-start mb-4">
         <div>
           <h3 className="font-bold text-lg text-zinc-100">
@@ -152,22 +170,22 @@ export function AdminMatchCard({
             href={`/${locale}/admin/matches/${match.id}/edit`}
             className="block w-full py-2.5 text-center bg-zinc-100 dark:bg-zinc-200 text-zinc-900 rounded-lg text-sm font-bold hover:bg-white transition-colors"
           >
-            {locale === "ko" ? "수정" : "Edit"}
+            {t("matches.edit")}
           </Link>
           <button
             onClick={handleDelete}
             disabled={isDeleting}
             className="block w-full py-2.5 text-center bg-red-100/10 border border-red-900/50 text-red-500 rounded-lg text-sm font-bold hover:bg-red-900/20 transition-colors disabled:opacity-50"
           >
-             {isDeleting ? "..." : (locale === "ko" ? "삭제" : "Delete")}
+             {isDeleting ? "..." : t("matches.delete")}
           </button>
         </div>
 
         <button
-          onClick={() => setShowParticipants(!showParticipants)}
+          onClick={handleToggleParticipants}
           className="block w-full py-2.5 text-center bg-zinc-700 text-zinc-200 rounded-lg text-sm font-medium hover:bg-zinc-600 transition-colors"
         >
-          {showParticipants ? "참가자 목록 닫기 ▲" : "참가자 목록 확인 ▼"}
+          {showParticipants ? t("matches.hideParticipants") : t("matches.viewParticipants")}
         </button>
       </div>
 
@@ -179,3 +197,4 @@ export function AdminMatchCard({
     </div>
   );
 }
+

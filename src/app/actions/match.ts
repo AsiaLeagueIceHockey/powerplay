@@ -288,22 +288,31 @@ export async function joinMatch(matchId: string, position: string): Promise<{
 
 
   // 알림 발송 (Trigger 3: 참가 확정)
-  if (participantStatus === "confirmed") {
-    // Get rink info for notification
-    const { data: rinkMatch } = await supabase
-      .from("matches")
-      .select("start_time, rink:rinks(name_ko)")
-      .eq("id", matchId)
-      .single();
-      
-    // @ts-ignore
-    const rinkName = rinkMatch?.rink?.name_ko || "경기";
-    // @ts-ignore
-    const startTime = new Date(rinkMatch?.start_time).toLocaleString("ko-KR", {
-      month: "short", day: "numeric", hour: "2-digit", minute: "2-digit",
-      timeZone: "Asia/Seoul"
-    });
+  // Get match details for notifications
+  const { data: matchDetails } = await supabase
+    .from("matches")
+    .select("start_time, created_by, rink:rinks(name_ko)")
+    .eq("id", matchId)
+    .single();
 
+  // @ts-ignore
+  const rinkName = matchDetails?.rink?.name_ko || "경기";
+  // @ts-ignore
+  const startTime = new Date(matchDetails?.start_time).toLocaleString("ko-KR", {
+    month: "short", day: "numeric", hour: "2-digit", minute: "2-digit",
+    timeZone: "Asia/Seoul"
+  });
+
+  // Get participant's name for admin notification
+  const { data: participantProfile } = await supabase
+    .from("profiles")
+    .select("full_name")
+    .eq("id", user.id)
+    .single();
+  
+  const participantName = participantProfile?.full_name || user.email?.split("@")[0] || "참가자";
+
+  if (participantStatus === "confirmed") {
     const notificationBody = entryPoints > 0
       ? `${rinkName} (${startTime}) 참가가 확정되었습니다. (${entryPoints.toLocaleString()}원 차감)`
       : `${rinkName} (${startTime}) 참가 신청이 완료되었습니다.`;
@@ -313,6 +322,16 @@ export async function joinMatch(matchId: string, position: string): Promise<{
       "경기 참가 확정 🏒",
       notificationBody,
       `/match/${matchId}`
+    );
+  }
+
+  // 알림 발송: 경기 생성자(어드민)에게 새 참가자 알림
+  if (matchDetails?.created_by && matchDetails.created_by !== user.id) {
+    await sendPushNotification(
+      matchDetails.created_by,
+      "새 참가자 🏒",
+      `${participantName}님이 ${rinkName} (${startTime}) 경기에 신청했습니다.`,
+      `/admin/matches`
     );
   }
 
