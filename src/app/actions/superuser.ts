@@ -448,6 +448,13 @@ export async function rejectPointCharge(
     data: { user: adminUser },
   } = await supabase.auth.getUser();
 
+  // Get charge request details for notification
+  const { data: chargeRequest } = await supabase
+    .from("point_charge_requests")
+    .select("user_id, amount")
+    .eq("id", requestId)
+    .single();
+
   const { error } = await supabase
     .from("point_charge_requests")
     .update({
@@ -462,6 +469,20 @@ export async function rejectPointCharge(
   if (error) {
     console.error("Error rejecting charge request:", error);
     return { success: false, error: error.message };
+  }
+
+  // 알림 발송: 사용자에게 (충전 요청 거부)
+  if (chargeRequest) {
+    const rejectMessage = reason
+      ? `${chargeRequest.amount.toLocaleString()}원 충전 요청이 거부되었습니다. 사유: ${reason}`
+      : `${chargeRequest.amount.toLocaleString()}원 충전 요청이 거부되었습니다. 입금자명 확인 후 다시 신청해주세요.`;
+
+    await sendPushNotification(
+      chargeRequest.user_id,
+      "충전 요청 거부 ❌",
+      rejectMessage,
+      "/mypage/points"
+    );
   }
 
   revalidatePath("/admin/charge-requests");

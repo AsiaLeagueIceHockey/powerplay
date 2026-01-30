@@ -31,22 +31,21 @@ export function ScheduleView({ matches, rinks }: ScheduleViewProps) {
   return (
     <div className="flex flex-col gap-4">
       {/* View Toggle */}
-      <div className="flex justify-between items-center bg-white p-2 rounded-lg border border-zinc-200 shadow-sm dark:bg-zinc-900 dark:border-zinc-800">
-        <label className="flex items-center gap-2 text-sm text-zinc-600 cursor-pointer dark:text-zinc-400">
-             {viewMode === 'list' && (
-                <>
-                <input 
-                    type="checkbox" 
-                    checked={groupByRink} 
-                    onChange={(e) => setGroupByRink(e.target.checked)}
-                    className="rounded border-zinc-300 text-blue-600 focus:ring-blue-500"
-                />
-                링크장별 보기
-                </>
-             )}
-        </label>
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 bg-white p-3 rounded-lg border border-zinc-200 shadow-sm dark:bg-zinc-900 dark:border-zinc-800">
+        {viewMode === 'list' && (
+          <label className="flex items-center gap-2 text-sm text-zinc-600 cursor-pointer dark:text-zinc-400">
+            <input 
+              type="checkbox" 
+              checked={groupByRink} 
+              onChange={(e) => setGroupByRink(e.target.checked)}
+              className="rounded border-zinc-300 text-blue-600 focus:ring-blue-500"
+            />
+            링크장별 보기
+          </label>
+        )}
+        {viewMode === 'map' && <div />}
 
-        <div className="flex items-center bg-zinc-100 p-1 rounded-lg dark:bg-zinc-800">
+        <div className="flex items-center bg-zinc-100 p-1 rounded-lg dark:bg-zinc-800 self-end sm:self-auto">
           <button
             onClick={() => setViewMode("list")}
             className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${

@@ -2,7 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
-import { sendPushToSuperUsers } from "@/app/actions/push";
+import { sendPushToSuperUsers, sendPushNotification } from "@/app/actions/push";
 
 // ==================== 타입 정의 ====================
 
@@ -205,6 +205,14 @@ export async function requestPointCharge(
     "💰 포인트 충전 요청",
     `${user.email}님이 ${amount.toLocaleString()}원 충전을 요청했습니다.`,
     "/admin/charge-requests"
+  );
+
+  // 알림 발송: 사용자에게 (충전 신청 확인)
+  await sendPushNotification(
+    user.id,
+    "충전 신청 완료 📝",
+    `${amount.toLocaleString()}원 충전을 신청했습니다. 입금 확인 후 충전이 완료됩니다.`,
+    "/mypage/points"
   );
 
   revalidatePath("/mypage/points");

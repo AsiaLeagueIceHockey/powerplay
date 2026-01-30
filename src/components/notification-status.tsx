@@ -43,7 +43,7 @@ export function NotificationStatus() {
         ? "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800" 
         : "bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800"
     }`}>
-      <div className="flex items-start gap-3">
+      <div className="flex items-start gap-3 mb-3">
         <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
           hasSubscription 
             ? "bg-green-100 dark:bg-green-900/40 text-green-600 dark:text-green-400" 
@@ -79,28 +79,29 @@ export function NotificationStatus() {
             </p>
           )}
         </div>
-
-        <button
-          onClick={() => openGuide("notification")}
-          className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition flex-shrink-0 ${
-            hasSubscription
-              ? "bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-900/60"
-              : "bg-amber-500 text-white hover:bg-amber-600"
-          }`}
-        >
-          {hasSubscription ? (
-            <>
-              <BookOpen className="w-4 h-4" />
-              알림 설정 가이드
-            </>
-          ) : (
-            <>
-              <Bell className="w-4 h-4" />
-              알림 받기
-            </>
-          )}
-        </button>
       </div>
+
+      {/* Button on new line to prevent truncation */}
+      <button
+        onClick={() => openGuide("notification")}
+        className={`w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition ${
+          hasSubscription
+            ? "bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-900/60"
+            : "bg-amber-500 text-white hover:bg-amber-600"
+        }`}
+      >
+        {hasSubscription ? (
+          <>
+            <BookOpen className="w-4 h-4" />
+            알림 설정 가이드
+          </>
+        ) : (
+          <>
+            <Bell className="w-4 h-4" />
+            알림 받기
+          </>
+        )}
+      </button>
     </div>
   );
 }

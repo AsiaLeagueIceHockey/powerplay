@@ -118,6 +118,7 @@ interface PushSubscriptionData {
 
 // ============================================
 // Save Subscription
+// 복합 키 (endpoint, user_id) 지원으로 멀티 계정 알림 가능
 // ============================================
 export async function saveSubscription(subscription: PushSubscriptionData) {
   const supabase = await createClient();
@@ -130,27 +131,20 @@ export async function saveSubscription(subscription: PushSubscriptionData) {
     return { error: "Not authenticated" };
   }
 
-  const { error } = await supabase.from("push_subscriptions").insert({
-    user_id: user.id,
-    endpoint: subscription.endpoint,
-    p256dh: subscription.keys.p256dh,
-    auth: subscription.keys.auth,
-  });
+  // upsert: 같은 (endpoint, user_id) 조합이 있으면 업데이트, 없으면 삽입
+  const { error } = await supabase.from("push_subscriptions").upsert(
+    {
+      user_id: user.id,
+      endpoint: subscription.endpoint,
+      p256dh: subscription.keys.p256dh,
+      auth: subscription.keys.auth,
+    },
+    {
+      onConflict: "endpoint,user_id", // 복합 키 기준 upsert
+    }
+  );
 
   if (error) {
-    // If unique constraint violation (endpoint already exists), update the user_id
-    if (error.code === "23505") {
-      const { error: updateError } = await supabase
-        .from("push_subscriptions")
-        .update({ user_id: user.id })
-        .eq("endpoint", subscription.endpoint);
-        
-      if (updateError) {
-        console.error("Error updating subscription owner:", updateError);
-        return { error: updateError.message };
-      }
-      return { success: true };
-    }
     console.error("Error saving subscription:", error);
     return { error: error.message };
   }

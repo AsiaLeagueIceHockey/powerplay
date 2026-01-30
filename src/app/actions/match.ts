@@ -304,10 +304,14 @@ export async function joinMatch(matchId: string, position: string): Promise<{
       timeZone: "Asia/Seoul"
     });
 
+    const notificationBody = entryPoints > 0
+      ? `${rinkName} (${startTime}) 참가가 확정되었습니다. (${entryPoints.toLocaleString()}원 차감)`
+      : `${rinkName} (${startTime}) 참가 신청이 완료되었습니다.`;
+
     await sendPushNotification(
       user.id,
       "경기 참가 확정 🏒",
-      `${rinkName} (${startTime}) 참가 신청이 완료되었습니다.`,
+      notificationBody,
       `/match/${matchId}`
     );
   }
@@ -399,14 +403,28 @@ export async function cancelJoin(matchId: string) {
   }
 
   // 알림 발송 (Trigger 4: 참가 취소 및 포인트 반환)
-  await sendPushNotification(
-    user.id,
-    "참가 취소 완료 ↩️",
-    refundAmount > 0 
-      ? `경기가 취소되었으며 ${refundAmount.toLocaleString()}원이 환불되었습니다.`
-      : `경기 참가가 취소되었습니다.`,
-    `/mypage`
-  );
+  if (refundAmount > 0) {
+    await sendPushNotification(
+      user.id,
+      "환불 완료 💰",
+      `경기 취소로 ${refundAmount.toLocaleString()}원이 환불되었습니다.`,
+      `/mypage/points`
+    );
+  } else if (isPendingPayment) {
+    await sendPushNotification(
+      user.id,
+      "신청 취소 완료 ↩️",
+      `입금 대기 중이던 경기 신청이 취소되었습니다.`,
+      `/mypage`
+    );
+  } else {
+    await sendPushNotification(
+      user.id,
+      "취소 완료 (환불 불가) ❌",
+      `경기 당일 취소로 환불이 불가하며, 신청이 취소되었습니다.`,
+      `/mypage`
+    );
+  }
 
   return { success: true, refundAmount };
 }
@@ -463,6 +481,29 @@ export async function joinWaitlist(matchId: string, position: string): Promise<{
 
   if (error) {
     return { error: error.message };
+  }
+
+  // 알림 발송: 대기명단 등록 완료
+  const { data: matchInfo } = await supabase
+    .from("matches")
+    .select("start_time, rink:rinks(name_ko)")
+    .eq("id", matchId)
+    .single();
+
+  if (matchInfo) {
+    // @ts-ignore
+    const rinkName = matchInfo.rink?.name_ko || "경기";
+    const startTime = new Date(matchInfo.start_time).toLocaleString("ko-KR", {
+      month: "short", day: "numeric", hour: "2-digit", minute: "2-digit",
+      timeZone: "Asia/Seoul"
+    });
+
+    await sendPushNotification(
+      user.id,
+      "대기명단 등록 완료 ⏳",
+      `${rinkName} (${startTime}) 대기명단에 등록되었습니다. 자리 발생 시 알려드립니다.`,
+      `/match/${matchId}`
+    );
   }
 
   return { success: true };
