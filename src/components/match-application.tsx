@@ -17,6 +17,9 @@ interface MatchApplicationProps {
   currentPosition?: string;
   currentStatus?: string;
   matchStatus: string;
+  matchStartTime: string;
+  entryPoints?: number;
+  userPoints?: number;
   onboardingCompleted?: boolean;
   isFull?: boolean;
 }
@@ -28,6 +31,9 @@ export function MatchApplication({
   currentPosition,
   currentStatus,
   matchStatus,
+  matchStartTime,
+  entryPoints = 0,
+  userPoints = 0,
   onboardingCompleted = true,
   isFull = false,
 }: MatchApplicationProps) {
@@ -68,8 +74,22 @@ export function MatchApplication({
     setLoading(false);
   };
 
+  // Check if refund is available (before 23:59 the day before the match)
+  const isRefundAvailable = () => {
+    const matchStart = new Date(matchStartTime);
+    const matchDayMidnight = new Date(matchStart);
+    matchDayMidnight.setHours(0, 0, 0, 0); // 경기 당일 00:00:00
+    const now = new Date();
+    return now < matchDayMidnight;
+  };
+
   const handleCancel = async () => {
-    if (!confirm(t("confirmCancel"))) return;
+    const refundable = isRefundAvailable();
+    const confirmMessage = refundable 
+      ? t("confirmCancel") 
+      : t("confirmCancelNoRefund");
+    
+    if (!confirm(confirmMessage)) return;
     setLoading(true);
     const res = await cancelJoin(matchId);
     if (res.error) {
@@ -133,32 +153,69 @@ export function MatchApplication({
 
   // 2b. If User Joined with pending_payment => Yellow box
   if (isJoined && currentStatus === "pending_payment") {
+    const shortageAmount = Math.max(0, entryPoints - userPoints);
+    const currencyUnit = locale === "ko" ? "원" : "KRW";
+    
     return (
       <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6 dark:border-amber-900/50 dark:bg-amber-900/10">
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
           <div className="flex items-center gap-2">
             <span className="text-amber-600 dark:text-amber-400 font-bold">⏳</span>
             <span className="font-bold text-amber-700 dark:text-amber-300 text-lg">
-              {t(`position.${currentPosition}`)}로 신청 (입금 대기중)
+              {t(`position.${currentPosition}`)} {locale === "ko" ? "입금 대기" : "Pending Payment"}
             </span>
           </div>
           
           <button
             onClick={handleCancel}
             disabled={loading}
-            className="px-4 py-2 bg-white text-red-500 border border-red-200 rounded-lg text-sm font-semibold hover:bg-red-50 hover:border-red-300 transition-colors disabled:opacity-50 dark:bg-zinc-800 dark:border-red-900/50 dark:text-red-400 dark:hover:bg-red-900/20"
+            className="px-4 py-2 bg-white text-red-500 border border-red-200 rounded-lg text-sm font-semibold hover:bg-red-50 hover:border-red-300 transition-colors disabled:opacity-50 dark:bg-zinc-800 dark:border-red-900/50 dark:text-red-400 dark:hover:bg-red-900/20 whitespace-nowrap"
           >
-            {loading ? "..." : "신청 취소"}
+            {loading ? "..." : (locale === "ko" ? "신청 취소" : "Cancel")}
           </button>
         </div>
+        
+        {/* 부족 금액 안내 */}
+        <div className="bg-white dark:bg-zinc-800 rounded-lg p-4 mb-4 border border-amber-200 dark:border-amber-800">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-sm text-zinc-600 dark:text-zinc-400">
+              {locale === "ko" ? "경기 참가비" : "Entry Fee"}
+            </span>
+            <span className="font-semibold">
+              {entryPoints.toLocaleString()}{currencyUnit}
+            </span>
+          </div>
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-sm text-zinc-600 dark:text-zinc-400">
+              {locale === "ko" ? "현재 잔액" : "Current Balance"}
+            </span>
+            <span className="font-semibold">
+              {userPoints.toLocaleString()}{currencyUnit}
+            </span>
+          </div>
+          <div className="border-t border-amber-200 dark:border-amber-700 pt-2">
+            <div className="flex justify-between items-center">
+              <span className="text-sm font-medium text-amber-700 dark:text-amber-300">
+                {locale === "ko" ? "💰 필요 충전 금액" : "💰 Amount Needed"}
+              </span>
+              <span className="font-bold text-lg text-amber-600 dark:text-amber-400">
+                {shortageAmount.toLocaleString()}{currencyUnit}
+              </span>
+            </div>
+          </div>
+        </div>
+        
         <p className="text-sm text-amber-600 dark:text-amber-400 mb-3">
-          금액 충전 후 입금 확인이 되면 참가가 확정됩니다.
+          {locale === "ko" 
+            ? "충전 후 입금 확인이 되면 경기 참가가 자동으로 확정됩니다." 
+            : "Your match participation will be automatically confirmed after payment is verified."}
         </p>
+        
         <button
           onClick={() => router.push(`/${locale}/mypage/points/charge`)}
           className="w-full py-3 bg-amber-500 text-white rounded-lg font-medium hover:bg-amber-600 transition"
         >
-          충전하러 가기 →
+          {locale === "ko" ? "충전하러 가기 →" : "Go to Charge →"}
         </button>
         {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
       </div>

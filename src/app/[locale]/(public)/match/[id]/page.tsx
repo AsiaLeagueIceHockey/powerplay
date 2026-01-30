@@ -29,15 +29,17 @@ export default async function MatchPage({
     notFound();
   }
   
-  // Get user profile for onboarding status (only if user exists)
+  // Get user profile for onboarding status and points (only if user exists)
   let onboardingCompleted = true;
+  let userPoints = 0;
   if (user) {
     const { data: profile } = await supabase
       .from("profiles")
-      .select("onboarding_completed")
+      .select("onboarding_completed, points")
       .eq("id", user.id)
       .single();
     onboardingCompleted = profile?.onboarding_completed ?? false;
+    userPoints = profile?.points ?? 0;
   }
 
   // Format Date Logic (KST)
@@ -231,6 +233,9 @@ export default async function MatchPage({
         currentPosition={userParticipant?.position}
         currentStatus={userParticipant?.status}
         matchStatus={match.status}
+        matchStartTime={match.start_time}
+        entryPoints={match.entry_points || 0}
+        userPoints={userPoints}
         onboardingCompleted={onboardingCompleted}
         isFull={isFull}
       />

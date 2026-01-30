@@ -7,13 +7,23 @@ import { requestPointCharge, type BankAccountInfo } from "@/app/actions/points";
 
 const QUICK_AMOUNTS = [10000, 30000, 50000, 100000];
 
-export function ChargeForm({ bankAccount }: { bankAccount: BankAccountInfo | null }) {
+interface ChargeFormProps {
+  bankAccount: BankAccountInfo | null;
+  initialAmount?: number;
+}
+
+export function ChargeForm({ bankAccount, initialAmount = 30000 }: ChargeFormProps) {
   const t = useTranslations("points.chargeRequest");
   const locale = useLocale();
   const router = useRouter();
   
-  const [amount, setAmount] = useState<number>(30000);
-  const [customAmount, setCustomAmount] = useState("");
+  // Use exact initialAmount (no rounding)
+  const defaultAmount = initialAmount > 0 ? initialAmount : 30000;
+  
+  const [amount, setAmount] = useState<number>(defaultAmount);
+  const [customAmount, setCustomAmount] = useState(
+    QUICK_AMOUNTS.includes(defaultAmount) ? "" : defaultAmount.toLocaleString()
+  );
   const [depositorName, setDepositorName] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -29,7 +39,7 @@ export function ChargeForm({ bankAccount }: { bankAccount: BankAccountInfo | nul
   const handleCustomAmount = (value: string) => {
     const num = parseInt(value.replace(/[^0-9]/g, ""));
     if (!isNaN(num)) {
-      setCustomAmount(value);
+      setCustomAmount(num.toLocaleString());
       setAmount(num);
     } else if (value === "") {
       setCustomAmount("");

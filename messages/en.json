@@ -95,6 +95,7 @@
         "viewMap": "View Map",
         "noParticipants": "No participants",
         "confirmCancel": "100% refund available until midnight the day before the match. Cancel?",
+        "confirmCancelNoRefund": "No refund is available at this time.\n\nRefund Policy: 100% refund only for cancellations made by 23:59 the day before the match.\n\nDo you still want to cancel?",
         "insufficientPoints": "Insufficient balance",
         "goToCharge": "Charge Credits",
         "refundPolicy": "Refund Policy"

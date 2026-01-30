@@ -25,6 +25,15 @@ export interface ChargeRequest {
   updated_at: string;
 }
 
+export interface UserPendingMatch {
+  id: string;
+  match_id: string;
+  position: string;
+  entry_points: number;
+  start_time: string;
+  rink_name: string;
+}
+
 // ==================== 포인트 조회 ====================
 
 /**
@@ -90,6 +99,52 @@ export async function getPointHistory(
     transactions: transactions as PointTransaction[],
     total: count ?? 0,
   };
+}
+
+/**
+ * 사용자의 pending_payment 경기 목록 조회
+ */
+export async function getUserPendingMatches(): Promise<UserPendingMatch[]> {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return [];
+  }
+
+  const { data: participants, error } = await supabase
+    .from("participants")
+    .select(`
+      id,
+      match_id,
+      position,
+      match:match_id(entry_points, start_time, rink:rink_id(name_ko, name_en))
+    `)
+    .eq("user_id", user.id)
+    .eq("status", "pending_payment")
+    .order("created_at", { ascending: true });
+
+  if (error) {
+    console.error("Error fetching pending matches:", error);
+    return [];
+  }
+
+  return (participants || []).map((p) => {
+    const match = Array.isArray(p.match) ? p.match[0] : p.match;
+    const rink = match?.rink ? (Array.isArray(match.rink) ? match.rink[0] : match.rink) : null;
+    
+    return {
+      id: p.id,
+      match_id: p.match_id,
+      position: p.position,
+      entry_points: match?.entry_points || 0,
+      start_time: match?.start_time || "",
+      rink_name: rink?.name_ko || "Unknown",
+    };
+  });
 }
 
 // ==================== 충전 요청 ====================
@@ -284,11 +339,10 @@ export async function getRefundPolicy(): Promise<RefundPolicy | null> {
 
 /**
  * 경기 취소 시 환불 비율 계산
+ * - 경기 전일 23:59까지 (경기 당일 00:00 이전): 100% 환불
+ * - 경기 당일 이후: 환불 불가 (0%)
  */
 export async function calculateRefundPercent(matchStartTime: string): Promise<number> {
-  const policy = await getRefundPolicy();
-  
-  // 1. Check for "Day Before Midnight" rule (P3 Requirement)
   // 경기 당일 00:00 (전일 자정) 이전이면 100% 환불
   const matchStart = new Date(matchStartTime);
   const matchDayMidnight = new Date(matchStart);
@@ -300,23 +354,6 @@ export async function calculateRefundPercent(matchStartTime: string): Promise<nu
     return 100;
   }
 
-  // 2. Fallback to existing policy for other cases (e.g. partial refund)
-  if (!policy || !policy.rules || policy.rules.length === 0) {
-    return 0; // 경기 당일이 지났고, 별도 정책 없으면 환불 불가 (기본값 변경 고려)
-  }
-  
-  const hoursDiff = (matchStart.getTime() - now.getTime()) / (1000 * 60 * 60);
-  
-  // 규칙을 hoursBeforeMatch 내림차순으로 정렬
-  const sortedRules = [...policy.rules].sort(
-    (a, b) => b.hoursBeforeMatch - a.hoursBeforeMatch
-  );
-  
-  for (const rule of sortedRules) {
-    if (hoursDiff >= rule.hoursBeforeMatch) {
-      return rule.refundPercent;
-    }
-  }
-  
-  return 0; // 기본값: 환불 불가
+  // 경기 당일 이후: 환불 불가
+  return 0;
 }

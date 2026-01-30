@@ -116,7 +116,7 @@ export function ChargeRequestsList({
   if (items.length === 0) {
     return (
       <div className="bg-zinc-800 rounded-lg p-8 text-center text-zinc-400">
-        대기 중인 요청이 없습니다.
+        {locale === "ko" ? "대기 중인 요청이 없습니다." : "No pending requests."}
       </div>
     );
   }

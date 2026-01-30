@@ -257,10 +257,11 @@ export async function getAllChargeRequests(
 
 /**
  * 입금 확인 및 포인트 적립 (SuperUser 전용)
+ * + 포인트 충전 후 pending_payment 경기들 자동 확정
  */
 export async function confirmPointCharge(
   requestId: string
-): Promise<{ success: boolean; error?: string }> {
+): Promise<{ success: boolean; error?: string; autoConfirmedMatches?: number }> {
   const supabase = await createClient();
 
   const isSuperUser = await checkIsSuperUser();
@@ -346,17 +347,87 @@ export async function confirmPointCharge(
     // 거래 내역 실패는 치명적이지 않으므로 계속 진행
   }
 
+  // 4. ⭐ 자동 경기 확정: pending_payment 경기들 처리
+  let autoConfirmedCount = 0;
+  let currentBalance = newBalance;
+
+  // pending_payment 경기 조회 (경기 시작 시간 순)
+  const { data: pendingParticipants } = await supabase
+    .from("participants")
+    .select(`
+      id,
+      match_id,
+      user_id,
+      position,
+      match:match_id(id, entry_points, start_time, rink:rink_id(name_ko))
+    `)
+    .eq("user_id", chargeRequest.user_id)
+    .eq("status", "pending_payment")
+    .order("created_at", { ascending: true });
+
+  if (pendingParticipants && pendingParticipants.length > 0) {
+    // 경기 시작 시간 순으로 정렬
+    const sortedParticipants = [...pendingParticipants].sort((a, b) => {
+      const matchA = Array.isArray(a.match) ? a.match[0] : a.match;
+      const matchB = Array.isArray(b.match) ? b.match[0] : b.match;
+      return new Date(matchA?.start_time || 0).getTime() - new Date(matchB?.start_time || 0).getTime();
+    });
+
+    for (const participant of sortedParticipants) {
+      const match = Array.isArray(participant.match) ? participant.match[0] : participant.match;
+      const entryPoints = match?.entry_points || 0;
+
+      if (currentBalance >= entryPoints && entryPoints > 0) {
+        // 포인트 차감
+        currentBalance -= entryPoints;
+
+        // 참가자 상태 업데이트
+        await supabase
+          .from("participants")
+          .update({
+            status: "confirmed",
+            payment_status: true,
+          })
+          .eq("id", participant.id);
+
+        // 거래 내역 추가
+        await supabase.from("point_transactions").insert({
+          user_id: chargeRequest.user_id,
+          type: "use",
+          amount: -entryPoints,
+          balance_after: currentBalance,
+          description: "경기 참가 (자동 확정)",
+          reference_id: participant.match_id,
+        });
+
+        autoConfirmedCount++;
+      }
+    }
+
+    // 최종 잔액 업데이트
+    if (autoConfirmedCount > 0) {
+      await supabase
+        .from("profiles")
+        .update({ points: currentBalance })
+        .eq("id", chargeRequest.user_id);
+    }
+  }
+
   revalidatePath("/admin/charge-requests");
 
-  // 알림 발송: 사용자에게 (Trigger 2: 포인트 충전 완료)
+  // 알림 발송: 사용자에게 (포인트 충전 완료 + 자동 확정 경기 수)
+  const notificationMessage = autoConfirmedCount > 0
+    ? `${chargeRequest.amount.toLocaleString()}원이 충전되었습니다. ${autoConfirmedCount}개의 경기 참가가 자동 확정되었습니다.`
+    : `${chargeRequest.amount.toLocaleString()}원이 충전되었습니다. 현재 잔액: ${currentBalance.toLocaleString()}원`;
+
   await sendPushNotification(
     chargeRequest.user_id,
-    "충전 완료 💰",
-    `${chargeRequest.amount.toLocaleString()}원이 충전되었습니다. 현재 잔액: ${newBalance.toLocaleString()}원`,
+    autoConfirmedCount > 0 ? "충전 완료 + 경기 확정 ✅" : "충전 완료 💰",
+    notificationMessage,
     "/mypage/points"
   );
 
-  return { success: true };
+  return { success: true, autoConfirmedMatches: autoConfirmedCount };
 }
 
 /**
