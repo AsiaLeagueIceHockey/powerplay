@@ -161,11 +161,18 @@ export default async function MatchPage({
           </div>
           <div className="flex justify-between items-center text-sm">
             <span className="text-zinc-500">{t("match.position.G")}</span>
-            <span className={`font-semibold ${remaining.g === 0 ? 'text-red-500' : 'text-green-600 dark:text-green-400'}`}>
-              {remaining.g <= 0 
-                ? (locale === 'ko' ? '마감' : 'Full') 
-                : (locale === 'ko' ? `${remaining.g}자리 남음` : `${remaining.g} spots left`)}
-            </span>
+            <div className="flex items-center gap-2">
+              {match.goalie_free && (
+                <span className="px-2 py-0.5 text-xs font-bold bg-green-100 text-green-700 rounded-full dark:bg-green-900/30 dark:text-green-400">
+                  {t("match.goalieFree")}
+                </span>
+              )}
+              <span className={`font-semibold ${remaining.g === 0 ? 'text-red-500' : 'text-green-600 dark:text-green-400'}`}>
+                {remaining.g <= 0 
+                  ? (locale === 'ko' ? '마감' : 'Full') 
+                  : (locale === 'ko' ? `${remaining.g}자리 남음` : `${remaining.g} spots left`)}
+              </span>
+            </div>
           </div>
 
           <div className="pt-2">
@@ -238,6 +245,7 @@ export default async function MatchPage({
         userPoints={userPoints}
         onboardingCompleted={onboardingCompleted}
         isFull={isFull}
+        goalieFree={match.goalie_free === true}
       />
 
       {/* Participant List Header */}

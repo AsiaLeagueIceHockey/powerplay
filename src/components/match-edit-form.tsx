@@ -20,6 +20,7 @@ interface Match {
   status: "open" | "closed" | "canceled";
   description: string | null;
   bank_account?: string | null;
+  goalie_free?: boolean;
   rink: Rink | null;
 }
 
@@ -187,6 +188,26 @@ export function MatchEditForm({
             <span className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 text-sm">명</span>
           </div>
         </div>
+      </div>
+
+      {/* Goalie Free Option */}
+      <div className="flex items-center gap-3 p-4 bg-zinc-900/50 rounded-lg border border-zinc-700">
+        <input
+          type="checkbox"
+          name="goalie_free"
+          id="goalie_free_edit"
+          value="true"
+          defaultChecked={match.goalie_free === true}
+          className="w-5 h-5 rounded border-zinc-600 bg-zinc-800 text-blue-600 focus:ring-blue-500"
+        />
+        <label htmlFor="goalie_free_edit" className="flex flex-col">
+          <span className="text-sm font-medium text-zinc-200">
+            🧤 {t("match.goalieFreeLabel")}
+          </span>
+          <span className="text-xs text-zinc-400">
+            {t("match.goalieFreeDesc")}
+          </span>
+        </label>
       </div>
 
       {/* 정산 계좌번호 */}

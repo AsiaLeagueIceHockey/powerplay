@@ -261,6 +261,25 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
         </div>
       </div>
 
+      {/* Goalie Free Option */}
+      <div className="flex items-center gap-3 p-4 bg-zinc-900/50 rounded-lg border border-zinc-700">
+        <input
+          type="checkbox"
+          name="goalie_free"
+          id="goalie_free"
+          value="true"
+          className="w-5 h-5 rounded border-zinc-600 bg-zinc-800 text-blue-600 focus:ring-blue-500"
+        />
+        <label htmlFor="goalie_free" className="flex flex-col">
+          <span className="text-sm font-medium text-zinc-200">
+            🧤 {t("match.goalieFreeLabel")}
+          </span>
+          <span className="text-xs text-zinc-400">
+            {t("match.goalieFreeDesc")}
+          </span>
+        </label>
+      </div>
+
       {/* 정산 계좌번호 */}
       <div>
         <label className="block text-sm font-medium mb-2 text-zinc-300">

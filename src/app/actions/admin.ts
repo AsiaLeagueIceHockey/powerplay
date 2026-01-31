@@ -60,6 +60,7 @@ export async function createMatch(formData: FormData) {
   const maxGoalies = isNaN(goaliesParsed) ? 2 : goaliesParsed;
   const description = formData.get("description") as string;
   const bankAccount = formData.get("bank_account") as string;
+  const goalieFree = formData.get("goalie_free") === "true";
 
   // datetime-local 입력은 KST로 가정, UTC로 변환하여 저장
   // 입력: "2026-01-11T00:00" (KST) → 저장: "2026-01-10T15:00:00.000Z" (UTC)
@@ -79,6 +80,7 @@ export async function createMatch(formData: FormData) {
       status: "open",
       created_by: user.id,
       bank_account: bankAccount || null,
+      goalie_free: goalieFree,
     })
     .select()
     .single();
@@ -129,6 +131,7 @@ export async function updateMatch(matchId: string, formData: FormData) {
   const description = formData.get("description") as string;
   const bankAccount = formData.get("bank_account") as string;
   const status = formData.get("status") as string;
+  const goalieFree = formData.get("goalie_free") === "true";
 
   // datetime-local 입력은 KST로 가정, UTC로 변환하여 저장
   const startTimeUTC = new Date(startTimeInput + "+09:00").toISOString();
@@ -144,6 +147,7 @@ export async function updateMatch(matchId: string, formData: FormData) {
       description: description || null,
       bank_account: bankAccount || null,
       status: status as "open" | "closed" | "canceled",
+      goalie_free: goalieFree,
     })
     .eq("id", matchId);
 

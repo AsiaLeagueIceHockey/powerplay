@@ -22,6 +22,7 @@ interface MatchApplicationProps {
   userPoints?: number;
   onboardingCompleted?: boolean;
   isFull?: boolean;
+  goalieFree?: boolean;
 }
 
 export function MatchApplication({
@@ -36,6 +37,7 @@ export function MatchApplication({
   userPoints = 0,
   onboardingCompleted = true,
   isFull = false,
+  goalieFree = false,
 }: MatchApplicationProps) {
   const t = useTranslations("match");
   const tParticipant = useTranslations("participant");
@@ -337,9 +339,14 @@ export function MatchApplication({
           <button
             onClick={() => handleJoin("G")}
             disabled={!positions.G || loading}
-            className="flex-1 py-4 rounded-xl border border-purple-200 bg-purple-50 text-purple-700 font-bold hover:bg-purple-100 disabled:opacity-50 disabled:grayscale transition dark:bg-purple-900/20 dark:border-purple-800 dark:text-purple-300"
+            className="flex-1 py-4 rounded-xl border border-purple-200 bg-purple-50 text-purple-700 font-bold hover:bg-purple-100 disabled:opacity-50 disabled:grayscale transition dark:bg-purple-900/20 dark:border-purple-800 dark:text-purple-300 relative"
           >
-             G
+            G
+            {goalieFree && (
+              <span className="absolute -top-2 -right-2 px-1.5 py-0.5 text-[10px] font-bold bg-green-500 text-white rounded-full">
+                {t("goalieFree")}
+              </span>
+            )}
           </button>
         </div>
 

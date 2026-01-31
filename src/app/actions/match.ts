@@ -46,6 +46,7 @@ export interface Match {
   status: "open" | "closed" | "canceled";
   description: string | null;
   bank_account?: string | null;
+  goalie_free?: boolean;
   rink: MatchRink | null;
   club?: MatchClub | null;
   participants_count?: {
@@ -131,6 +132,7 @@ export async function getMatch(id: string): Promise<Match | null> {
       status,
       description,
       bank_account,
+      goalie_free,
       rink:rink_id(id, name_ko, name_en, map_url, lat, lng),
       club:club_id(id, name, kakao_open_chat_url, logo_url)
     `
@@ -210,10 +212,10 @@ export async function joinMatch(matchId: string, position: string): Promise<{
     return { error: "Already joined this match" };
   }
 
-  // Get match entry_points
+  // Get match entry_points and goalie_free setting
   const { data: match } = await supabase
     .from("matches")
-    .select("entry_points, status")
+    .select("entry_points, status, goalie_free")
     .eq("id", matchId)
     .single();
 
@@ -225,7 +227,9 @@ export async function joinMatch(matchId: string, position: string): Promise<{
     return { error: "Match is not open for registration" };
   }
 
-  const entryPoints = match.entry_points || 0;
+  // 골리이고 goalie_free가 true면 무료
+  const isGoalieAndFree = position === "G" && match.goalie_free === true;
+  const entryPoints = isGoalieAndFree ? 0 : (match.entry_points || 0);
 
   // Get user's current points
   const { data: profile } = await supabase
