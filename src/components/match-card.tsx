@@ -44,8 +44,8 @@ export function MatchCard({ match }: { match: Match }) {
 
   const counts = match.participants_count || { fw: 0, df: 0, g: 0 };
   const currentSkaters = counts.fw + counts.df;
-  const remainingSkaters = match.max_skaters - currentSkaters;
-  const remainingGoalies = match.max_goalies - counts.g;
+  const remainingSkaters = Math.max(0, match.max_skaters - currentSkaters);
+  const remainingGoalies = Math.max(0, match.max_goalies - counts.g);
 
   return (
     <Link

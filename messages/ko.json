@@ -228,7 +228,8 @@
             "creating": "생성 중...",
             "save": "저장",
             "saving": "저장 중...",
-            "status": "상태"
+            "status": "상태",
+            "minParticipantsError": "현재 참가 인원보다 적게 설정할 수 없습니다."
         },
         "participants": {
             "title": "참가자 목록",

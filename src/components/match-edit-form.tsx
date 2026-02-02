@@ -16,6 +16,11 @@ interface Match {
   start_time: string;
   fee: number;
   max_skaters: number;
+  participants_count?: {
+    fw: number;
+    df: number;
+    g: number;
+  };
   max_goalies: number;
   status: "open" | "closed" | "canceled";
   description: string | null;
@@ -60,6 +65,21 @@ export function MatchEditForm({
     setError(null);
 
     const formData = new FormData(e.currentTarget);
+    const maxSkaters = Number(formData.get("max_skaters"));
+    const maxGoalies = Number(formData.get("max_goalies"));
+
+    // Validation: Current > Max Check
+    const currentSkaters = (match.participants_count?.fw || 0) + (match.participants_count?.df || 0);
+    const currentGoalies = match.participants_count?.g || 0;
+
+    if (maxSkaters < currentSkaters || maxGoalies < currentGoalies) {
+        setError(t("admin.form.minParticipantsError"));
+        setLoading(false);
+        // Scroll to top to see error
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+    }
+
     const result = await updateMatch(match.id, formData);
 
     if (result.error) {

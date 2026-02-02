@@ -23,7 +23,14 @@ At the beginning of every new thread or task, you MUST read `AGENTS.md` to under
 - Follow the coding standards and conventions defined in `AGENTS.md`.
 - If you make architectural changes or add new features, keep notes to update `AGENTS.md` later.
 
-## 3. End of Thread: Update Context
+## 3. User Context & Escalation
+
+**IMPORTANT**: The user is a 4-year Full Stack Developer.
+- If you encounter ambiguous logic, bugs that require deeper investigation, or if you are stuck, **DO NOT HESITATE TO ASK THE USER**.
+- You can explain technical details/hypotheses freely.
+- Validating assumptions with the user is the standard workflow.
+
+## 4. End of Thread: Update Context
 
 Before finishing your session or task, you MUST update `AGENTS.md` to record your work. This is critical for the continuity of the project.
 
