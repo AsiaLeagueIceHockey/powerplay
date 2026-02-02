@@ -28,23 +28,23 @@ export function FeedbackBanner() {
         href="https://open.kakao.com/o/gsvw6tei"
         target="_blank"
         rel="noopener noreferrer"
-        className="block bg-[#FFEB3B] hover:bg-[#FDD835] rounded-xl p-4 shadow-sm transition-colors text-[#3A1D1D]"
+        className="block bg-[#3A1D1D] hover:bg-[#2d1616] rounded-xl p-4 shadow-sm transition-colors text-white"
       >
         <div className="flex items-center gap-3">
-          <div className="bg-[#3A1D1D] text-[#FFEB3B] w-10 h-10 rounded-[14px] flex items-center justify-center flex-shrink-0">
+          <div className="bg-[#FFEB3B] text-[#3A1D1D] w-10 h-10 rounded-[14px] flex items-center justify-center flex-shrink-0">
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12 2C6.48 2 2 6.48 2 12c0 3.1 1.76 5.86 4.46 7.54L4 22l6.54-1.54c.48.09.97.14 1.46.14 5.52 0 10-4.48 10-10S17.52 2 12 2z" />
             </svg>
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-bold text-[#3A1D1D] text-sm leading-tight mb-0.5">
+            <p className="font-bold text-white text-sm leading-tight mb-0.5">
               {t("common.feedback.title")}
             </p>
-            <p className="text-[#3A1D1D]/80 text-xs truncate">
+            <p className="text-zinc-300 text-xs truncate">
               {t("common.feedback.description")}
             </p>
           </div>
-          <svg className="w-5 h-5 text-[#3A1D1D]/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
         </div>
