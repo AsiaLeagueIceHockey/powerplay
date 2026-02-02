@@ -466,7 +466,129 @@ export async function cancelJoin(matchId: string) {
     );
   }
 
+  // ... (previous notifications)
+
+  // Trigger Waitlist Promotion (Fire and forget-ish, but usually safest to await in serverless. 
+  // To speed up for user, we could potentially not await, but Vercel might kill it. 
+  // Let's await it as it's fast enough.)
+  try {
+    await promoteWaitlistUser(matchId, participant.position);
+  } catch (error) {
+    console.error("Failed to promote waitlist user:", error);
+  }
+
   return { success: true, refundAmount };
+}
+
+// Helper: Promote the next user on the waitlist
+async function promoteWaitlistUser(matchId: string, position: string) {
+  const supabase = await createClient();
+
+  // 1. Find oldest waiting user for this position
+  const { data: waiter } = await supabase
+    .from("participants")
+    .select("id, user_id")
+    .eq("match_id", matchId)
+    .eq("status", "waiting")
+    .eq("position", position)
+    .order("created_at", { ascending: true })
+    .limit(1)
+    .single();
+
+  if (!waiter) return; // No one waiting
+
+  // 2. Get Match Info & User Points
+  const { data: match } = await supabase
+    .from("matches")
+    .select("entry_points, start_time, goalie_free, rink:rinks(name_ko)")
+    .eq("id", matchId)
+    .single();
+    
+  if (!match) return;
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("points")
+    .eq("id", waiter.user_id)
+    .single();
+
+  const userPoints = profile?.points || 0;
+  
+  // Logic: Check Cost
+  const isGoalieAndFree = position === "G" && match.goalie_free === true;
+  const entryPoints = isGoalieAndFree ? 0 : (match.entry_points || 0);
+  const hasEnoughPoints = entryPoints === 0 || userPoints >= entryPoints;
+
+  // 3. Process Promotion
+  if (hasEnoughPoints) {
+    // A. Direct Confirm
+    if (entryPoints > 0) {
+       // Deduct Points
+       const newBalance = userPoints - entryPoints;
+       const { error: pointError } = await supabase
+        .from("profiles")
+        .update({ points: newBalance })
+        .eq("id", waiter.user_id);
+      
+       if (pointError) {
+         console.error("Waitlist promo point deduction failed", pointError);
+         return; 
+       }
+
+       // Transaction
+       await supabase.from("point_transactions").insert({
+        user_id: waiter.user_id,
+        type: "use",
+        amount: -entryPoints,
+        balance_after: newBalance,
+        description: "대기 승격 및 참가비 결제",
+        reference_id: matchId,
+      });
+    }
+
+    // Update Status
+    await supabase
+      .from("participants")
+      .update({ status: "confirmed", payment_status: true })
+      .eq("id", waiter.id);
+
+    // Notify
+    // @ts-ignore
+    const rinkName = match.rink?.name_ko || "경기";
+    const startTime = new Date(match.start_time).toLocaleString("ko-KR", {
+      month: "short", day: "numeric", hour: "2-digit", minute: "2-digit",
+      timeZone: "Asia/Seoul"
+    });
+    
+    await sendPushNotification(
+      waiter.user_id,
+      "대기 전환 및 참가 확정 🎉",
+      `${rinkName} (${startTime}) 빈자리가 생겨 대기에서 참가로 전환되었습니다! (${entryPoints > 0 ? entryPoints.toLocaleString() + "원 차감" : "무료"})`,
+      `/match/${matchId}`
+    );
+
+  } else {
+    // B. Pending Payment
+    await supabase
+      .from("participants")
+      .update({ status: "pending_payment", payment_status: false })
+      .eq("id", waiter.id);
+
+    // Notify
+    // @ts-ignore
+    const rinkName = match.rink?.name_ko || "경기";
+    const startTime = new Date(match.start_time).toLocaleString("ko-KR", {
+      month: "short", day: "numeric", hour: "2-digit", minute: "2-digit",
+      timeZone: "Asia/Seoul"
+    });
+
+    await sendPushNotification(
+      waiter.user_id,
+      "대기 전환 (입금 필요) ⚡️",
+      `${rinkName} (${startTime}) 빈 자리가 생겨 대기에서 참가로 전환되었습니다. 경기에 참가하기 위해 결제가 필요합니다!`,
+      `/match/${matchId}`
+    );
+  }
 }
 
 export async function joinWaitlist(matchId: string, position: string): Promise<{ 

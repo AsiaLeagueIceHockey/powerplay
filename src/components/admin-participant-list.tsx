@@ -1,7 +1,5 @@
 "use client";
 
-import { useState } from "react";
-import { updatePaymentStatus } from "@/app/actions/admin";
 import { useTranslations } from "next-intl";
 
 interface Participant {
