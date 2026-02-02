@@ -33,7 +33,7 @@ export default async function ClubDetailPage({
           {/* Top Row: Title + Logo */}
           <div className="flex justify-between items-center gap-3">
             <div className="flex-1 min-w-0">
-              <h1 className="text-lg font-bold text-zinc-900 dark:text-white flex items-center gap-2 flex-wrap tracking-tight break-keep">
+              <h1 className="text-xl font-bold text-zinc-900 dark:text-white flex items-center gap-2 flex-wrap tracking-tight break-keep">
                 {club.name}
                 {club.member_count !== undefined && (
                   <span className="flex items-center text-xs font-medium text-zinc-500 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-full shrink-0">

@@ -64,10 +64,17 @@ export function MatchCard({ match }: { match: Match }) {
         </span>
       </div>
 
-      {/* Rink Name */}
-      <h3 className="mb-1 text-lg font-semibold group-hover:text-blue-600 dark:group-hover:text-blue-400">
-        {rinkName || "Unknown Rink"}
-      </h3>
+      {/* Rink Name & Address */}
+      <div className="mb-2">
+        <h3 className="text-lg font-semibold group-hover:text-blue-600 dark:group-hover:text-blue-400 leading-tight">
+          {rinkName || "Unknown Rink"}
+        </h3>
+        {match.rink?.address && (
+          <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+            {match.rink.address.split(" ").slice(0, 2).join(" ")}
+          </p>
+        )}
+      </div>
 
       {/* Club Name with Logo */}
       {match.club && (

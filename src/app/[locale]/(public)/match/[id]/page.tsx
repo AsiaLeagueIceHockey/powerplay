@@ -191,6 +191,13 @@ export default async function MatchPage({
                     <DynamicRinkMap rinks={[match.rink]} /> 
                 </div>
             )}
+
+            {/* Address */}
+            {match.rink?.address && (
+                <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">
+                  {match.rink.address}
+                </p>
+            )}
           </div>
         </div>
       </div>

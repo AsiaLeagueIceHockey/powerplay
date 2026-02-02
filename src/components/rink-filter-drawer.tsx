@@ -107,9 +107,16 @@ export function RinkFilterDrawer({
                     : "bg-white border-zinc-200 text-zinc-700 hover:bg-zinc-50 dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-800"
                 }`}
               >
-                <span className="font-semibold text-left">
-                  {locale === "ko" ? rink.name_ko : rink.name_en}
-                </span>
+                <div className="flex flex-col">
+                  <span className="font-semibold text-left">
+                    {locale === "ko" ? rink.name_ko : rink.name_en}
+                  </span>
+                  {rink.address && (
+                    <span className="text-xs text-zinc-500 dark:text-zinc-400 font-normal text-left">
+                      {rink.address.split(" ").slice(0, 2).join(" ")}
+                    </span>
+                  )}
+                </div>
                 {isSelected && (
                   <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-white">
                     <Check className="w-4 h-4" />

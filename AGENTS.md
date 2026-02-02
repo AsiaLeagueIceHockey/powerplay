@@ -532,3 +532,14 @@ UPDATE profiles SET role = 'superuser' WHERE email = 'your-email@example.com';
     - Updated `handleDismiss` and installation handler to store `Date.now()` instead of `"true"`.
 - **Next Steps**: Monitor user feedback to see if the prompt is too intrusive or helpful.
 
+### [2026-02-03] Refine Rink Filter, Terminology, and Match Detail
+- **Summary**: Refined the Rink Filter logic to only show rinks for future matches, standardized "경기장" to "링크장", improved filter UI, and improved address availability.
+- **Changes**:
+  - **Rink Filter Logic**: Modified `home-client.tsx` and `rink-filter-drawer.tsx` to exclude rinks that only have past matches.
+  - **Terminology**: Replaced all instances of "경기장" with "링크장" in `ko.json` and components for consistency.
+  - **Filter UI**: Updated the filter chip container to use horizontal scrolling (`overflow-x-auto`) to fit multiple filters on one line.
+  - **Address Display**:
+    - **Rink Filter & Match Card**: Display "District" (e.g., "Seoul Gangnam-gu") below the rink name.
+    - **Match Detail**: Added full address display below the map, aligned left with proper spacing.
+  - **Bug Fix**: Updated `getMatch` in `src/app/actions/match.ts` to include the `address` field in the Rink query, fixing the missing address issue in the detail page.
+- **Next Steps**: Verify user feedback on address visibility and filter usability.

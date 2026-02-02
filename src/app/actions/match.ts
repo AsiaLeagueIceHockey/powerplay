@@ -133,7 +133,7 @@ export async function getMatch(id: string): Promise<Match | null> {
       description,
       bank_account,
       goalie_free,
-      rink:rink_id(id, name_ko, name_en, map_url, lat, lng),
+      rink:rink_id(id, name_ko, name_en, map_url, address, lat, lng),
       club:club_id(id, name, kakao_open_chat_url, logo_url)
     `
     )
