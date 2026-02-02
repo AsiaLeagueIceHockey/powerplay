@@ -293,7 +293,7 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
           required
         />
         <p className="text-xs text-zinc-500 mt-1">
-          경기 수익금을 정산 받을 계좌를 입력해주세요. (은행명, 계좌번호, 예금주)
+          경기 참가비을 정산 받을 계좌를 입력해주세요. (은행명, 계좌번호, 예금주)
         </p>
       </div>
 

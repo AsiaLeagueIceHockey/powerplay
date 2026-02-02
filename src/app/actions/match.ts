@@ -353,10 +353,10 @@ export async function cancelJoin(matchId: string) {
     return { error: "Not authenticated" };
   }
 
-  // Check if user is a participant and get status
+  // Check if user is a participant and get status AND position
   const { data: participant } = await supabase
     .from("participants")
-    .select("id, status")
+    .select("id, status, position")
     .eq("match_id", matchId)
     .eq("user_id", user.id)
     .single();
@@ -367,10 +367,10 @@ export async function cancelJoin(matchId: string) {
 
   const isPendingPayment = participant.status === "pending_payment";
 
-  // Get match info for refund calculation
+  // Get match info for refund calculation including goalie_free
   const { data: match } = await supabase
     .from("matches")
-    .select("entry_points, start_time")
+    .select("entry_points, start_time, goalie_free")
     .eq("id", matchId)
     .single();
 
@@ -378,13 +378,16 @@ export async function cancelJoin(matchId: string) {
     return { error: "Match not found" };
   }
 
-  const entryPoints = match.entry_points || 0;
+  // 골리이고 goalie_free가 true면 참가비는 0원 처리
+  const isGoalieAndFree = participant.position === "G" && match.goalie_free === true;
+  const activeEntryPoints = isGoalieAndFree ? 0 : (match.entry_points || 0);
+
   let refundAmount = 0;
 
   // Calculate refund based on policy (only if not pending_payment - they didn't pay yet)
-  if (!isPendingPayment && entryPoints > 0) {
+  if (!isPendingPayment && activeEntryPoints > 0) {
     const refundPercent = await calculateRefundPercent(match.start_time);
-    refundAmount = Math.floor(entryPoints * refundPercent / 100);
+    refundAmount = Math.floor(activeEntryPoints * refundPercent / 100);
   }
 
   // Delete participation
@@ -415,12 +418,17 @@ export async function cancelJoin(matchId: string) {
       .eq("id", user.id);
 
     // Record transaction
+    // Use activeEntryPoints specifically for the description percentage calculation
+    const refundPercentage = activeEntryPoints > 0 
+      ? Math.floor(refundAmount / activeEntryPoints * 100) 
+      : 0;
+
     await supabase.from("point_transactions").insert({
       user_id: user.id,
       type: "refund",
       amount: refundAmount,
       balance_after: newBalance,
-      description: `경기 취소 환불 (${Math.floor(refundAmount / entryPoints * 100)}%)`,
+      description: `경기 취소 환불 (${refundPercentage}%)`,
       reference_id: matchId,
     });
   }
@@ -440,7 +448,16 @@ export async function cancelJoin(matchId: string) {
       `입금 대기 중이던 경기 신청이 취소되었습니다.`,
       `/mypage`
     );
+  } else if (isGoalieAndFree) {
+    // 무료 골리 참가 취소
+    await sendPushNotification(
+      user.id,
+      "취소 완료 ↩️",
+      `무료로 참가한 경기가 취소되었습니다.`,
+      `/mypage`
+    );
   } else {
+    // 유료 참가자지만 환불 금액이 0원인 경우 (당일 취소 등)
     await sendPushNotification(
       user.id,
       "취소 완료 (환불 불가) ❌",
