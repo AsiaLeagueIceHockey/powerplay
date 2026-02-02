@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useNotification } from "@/contexts/notification-context";
 import { saveSubscription } from "@/app/actions/push";
-import { X, Bell, Share, PlusSquare, CheckCircle, Download, RefreshCw } from "lucide-react";
+import { X, Bell, Share, PlusSquare, CheckCircle, Download, RefreshCw, Compass } from "lucide-react";
 
 // Helper to convert VAPID key
 function urlBase64ToUint8Array(base64String: string) {
@@ -200,12 +200,22 @@ export function NotificationGuideModal() {
                     <div className="flex items-start gap-4">
                       <div className="w-8 h-8 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center font-bold flex-shrink-0">1</div>
                       <div>
+                        <p className="font-medium mb-1">Safari 브라우저에서 열기</p>
+                        <div className="flex items-center gap-2 text-sm text-zinc-500">
+                           <Compass className="w-4 h-4 shrink-0" />
+                           <span>인앱 브라우저(카톡, 인스타 등)라면 Safari로 접속해주세요.</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-4">
+                      <div className="w-8 h-8 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center font-bold flex-shrink-0">2</div>
+                      <div>
                         <p className="font-medium mb-1">브라우저 하단 공유 버튼 클릭</p>
                         <Share className="w-6 h-6 text-blue-500" />
                       </div>
                     </div>
                     <div className="flex items-start gap-4">
-                      <div className="w-8 h-8 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center font-bold flex-shrink-0">2</div>
+                      <div className="w-8 h-8 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center font-bold flex-shrink-0">3</div>
                       <div>
                         <p className="font-medium mb-1">'홈 화면에 추가' 선택</p>
                         <div className="flex items-center gap-2 text-sm text-zinc-500">
@@ -215,7 +225,7 @@ export function NotificationGuideModal() {
                       </div>
                     </div>
                     <div className="flex items-start gap-4">
-                      <div className="w-8 h-8 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center font-bold flex-shrink-0">3</div>
+                      <div className="w-8 h-8 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center font-bold flex-shrink-0">4</div>
                       <div>
                         <p className="font-medium mb-1">홈 화면의 아이콘으로 앱 실행</p>
                         <p className="text-sm text-zinc-500">새로 설치된 앱으로 접속해주세요.</p>

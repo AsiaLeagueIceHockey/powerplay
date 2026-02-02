@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { NaverMap, Marker, useNavermaps, Container as MapContainer, NavermapsProvider } from "react-naver-maps";
 import { Rink, Club } from "../app/actions/types";
 import { Match } from "../app/actions/match";
@@ -118,6 +118,16 @@ function RinkMapContent({ rinks, matches = [], clubs = [] }: RinkMapProps) {
   const [myLocation, setMyLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [selectedRink, setSelectedRink] = useState<Rink | null>(null);
 
+  // Auto-scroll when a rink is selected to show the bottom sheet
+  useEffect(() => {
+    if (selectedRink && containerRef.current) {
+        // Delay slightly to ensure render/animation allows for correct scrolling
+        setTimeout(() => {
+            containerRef.current?.scrollIntoView({ block: "end", behavior: "smooth" });
+        }, 300); 
+    }
+  }, [selectedRink]);
+
   // Determine initial center
   // If single rink (Detail View), center on it.
   // If multiple rinks (Explorer View), default to Seoul (will update with Geolocation).
@@ -197,13 +207,7 @@ function RinkMapContent({ rinks, matches = [], clubs = [] }: RinkMapProps) {
                   key={rink.id}
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   position={new navermaps.LatLng(rink.lat, rink.lng) as any}
-                  onClick={() => {
-                    setSelectedRink(rink);
-                    // Scroll container into view to show the bottom sheet
-                    setTimeout(() => {
-                        containerRef.current?.scrollIntoView({ block: "end", behavior: "smooth" });
-                    }, 50);
-                  }}
+                  onClick={() => setSelectedRink(rink)}
                   zIndex={isSelected ? 100 : isActive ? 50 : 10}
                   icon={{
                     content: `
