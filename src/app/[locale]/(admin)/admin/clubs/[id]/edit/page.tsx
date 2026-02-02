@@ -1,5 +1,6 @@
 import { setRequestLocale } from "next-intl/server";
 import { getClub, getClubNotices } from "@/app/actions/clubs";
+import { getRinks } from "@/app/actions/rink";
 import { ClubForm } from "@/components/club-form";
 import { AdminClubNotices } from "@/components/admin-club-notices";
 import Link from "next/link";
@@ -13,9 +14,10 @@ export default async function EditClubPage({
   const { locale, id } = await params;
   setRequestLocale(locale);
   
-  const [club, notices] = await Promise.all([
+  const [club, notices, rinks] = await Promise.all([
      getClub(id),
-     getClubNotices(id)
+     getClubNotices(id),
+     getRinks()
   ]);
   
   if (!club) {
@@ -35,7 +37,7 @@ export default async function EditClubPage({
 
       <h1 className="text-2xl font-bold mb-6">🏒 동호회 수정</h1>
 
-      <ClubForm locale={locale} club={club} />
+      <ClubForm locale={locale} club={club} allRinks={rinks} />
 
       <AdminClubNotices clubId={club.id} notices={notices} />
     </div>

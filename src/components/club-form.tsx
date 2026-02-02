@@ -3,22 +3,30 @@
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { createClub, updateClub, uploadClubLogo } from "@/app/actions/clubs";
-import { Loader2, MessageCircle, Upload, User, Phone, X, Image as ImageIcon } from "lucide-react";
-import type { Club } from "@/app/actions/types";
+import { Loader2, MessageCircle, Upload, User, Phone, X, Image as ImageIcon, Check } from "lucide-react";
+import type { Club, Rink } from "@/app/actions/types";
 import Image from "next/image";
 
 interface ClubFormProps {
   locale: string;
   club?: Club;
+  allRinks: Rink[];
 }
 
-export function ClubForm({ locale, club }: ClubFormProps) {
+export function ClubForm({ locale, club, allRinks }: ClubFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [logoUrl, setLogoUrl] = useState<string>(club?.logo_url || "");
+  const [selectedRinkIds, setSelectedRinkIds] = useState<string[]>(club?.rinks?.map((r) => r.id) || []);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const toggleRink = (id: string) => {
+    setSelectedRinkIds((prev) =>
+      prev.includes(id) ? prev.filter((pid) => pid !== id) : [...prev, id]
+    );
+  };
 
   const isEdit = !!club;
 
@@ -219,6 +227,63 @@ export function ClubForm({ locale, club }: ClubFormProps) {
           placeholder="https://open.kakao.com/o/..."
           className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
         />
+      </div>
+
+      {/* Rink Selection (Hidden inputs included) */}
+      {selectedRinkIds.map((id) => (
+        <input key={id} type="hidden" name="rink_id" value={id} />
+      ))}
+
+      <div>
+        <label className="block text-sm font-medium mb-2 text-zinc-300">
+          주 이용 링크장 (선택)
+        </label>
+        <p className="text-xs text-zinc-500 mb-2">
+          동호회가 주로 사용하는 링크장을 선택해주세요.
+        </p>
+        <div className="border border-zinc-700 rounded-lg overflow-hidden">
+          <div className="max-h-60 overflow-y-auto p-2 space-y-1 custom-scrollbar bg-zinc-800">
+            {allRinks.map((rink) => (
+              <div
+                key={rink.id}
+                onClick={() => toggleRink(rink.id)}
+                className={`flex items-center p-3 rounded-md cursor-pointer transition-colors ${
+                  selectedRinkIds.includes(rink.id)
+                    ? "bg-blue-900/40 border border-blue-500/50"
+                    : "hover:bg-zinc-700 border border-transparent"
+                }`}
+              >
+                <div
+                  className={`w-5 h-5 rounded border flex items-center justify-center mr-3 transition-colors ${
+                    selectedRinkIds.includes(rink.id)
+                      ? "bg-blue-600 border-blue-600"
+                      : "border-zinc-500"
+                  }`}
+                >
+                  {selectedRinkIds.includes(rink.id) && (
+                    <Check className="w-3.5 h-3.5 text-white" />
+                  )}
+                </div>
+                <div className="flex flex-col">
+                  <span
+                    className={`text-sm ${
+                      selectedRinkIds.includes(rink.id)
+                        ? "text-blue-200 font-semibold"
+                        : "text-zinc-300"
+                    }`}
+                  >
+                    {locale === "ko" ? rink.name_ko : rink.name_en}
+                  </span>
+                  {rink.address && (
+                    <span className="text-xs text-zinc-500">
+                      {rink.address.split(" ").slice(0, 2).join(" ")}
+                    </span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* Submit */}

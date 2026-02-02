@@ -128,6 +128,14 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
     return dateMatch && filterMatch;
   });
 
+  const filteredClubs = clubs.filter((club) => {
+    if (selectedRinkIds.length > 0) {
+      if (!club.rinks || club.rinks.length === 0) return false;
+      return club.rinks.some(r => selectedRinkIds.includes(r.id));
+    }
+    return true;
+  });
+
   return (
     <div className="flex flex-col gap-6">
       {/* ... Top Tab Navigation ... */}
@@ -304,7 +312,22 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
           <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
             {/* Club Tab */}
             <div className="mb-6">
-              {/* ... admin buttons ... */}
+              {/* Filter Chips for Clubs */}
+              <div className="flex overflow-x-auto gap-2 px-1 pb-4 no-scrollbar">
+                <button
+                  onClick={() => setIsRinkFilterOpen(true)}
+                  className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium border transition-colors whitespace-nowrap ${
+                    selectedRinkIds.length > 0
+                      ? "bg-blue-600 text-white border-blue-600 shadow-sm"
+                      : "bg-white text-zinc-600 border-zinc-200 hover:bg-zinc-50 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700 dark:hover:bg-zinc-700"
+                  }`}
+                >
+                  {locale === "ko" ? "주 이용 링크장" : "Rinks"} 
+                  {selectedRinkIds.length > 0 && ` (${selectedRinkIds.length})`}
+                  <ChevronDown className={`w-3 h-3 transition-transform ${isRinkFilterOpen ? "rotate-180" : ""}`} />
+                </button>
+              </div>
+
              {["admin", "superuser"].includes(userRole || "") ? (
                 <button
                   onClick={() => router.push(`/${locale}/admin/matches`)}
@@ -350,13 +373,13 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
               )}
             </div>
 
-            {clubs.length === 0 ? (
+            {filteredClubs.length === 0 ? (
               <div className="text-center py-20 bg-zinc-50 dark:bg-zinc-900 rounded-xl border border-zinc-100 dark:border-zinc-800">
                 <p className="text-zinc-500">{t("noClubs")}</p>
               </div>
             ) : (
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {clubs.map((club) => (
+                {filteredClubs.map((club) => (
                   <ClubCard
                     key={club.id}
                     club={club}
@@ -374,7 +397,11 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
       <RinkFilterDrawer
         isOpen={isRinkFilterOpen}
         onClose={() => setIsRinkFilterOpen(false)}
-        rinks={rinks.filter(r => allMatchesSource.some(m => m.rink?.id === r.id && isMatchVisibleByDate(m)))}
+        rinks={
+          activeTab === "club"
+            ? rinks.filter(r => clubs.some(c => c.rinks?.some(cr => cr.id === r.id)))
+            : rinks.filter(r => allMatchesSource.some(m => m.rink?.id === r.id && isMatchVisibleByDate(m)))
+        }
         selectedRinkIds={selectedRinkIds}
         onSelectRinkIds={setSelectedRinkIds}
       />

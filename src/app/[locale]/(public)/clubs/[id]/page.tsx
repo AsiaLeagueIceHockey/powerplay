@@ -65,6 +65,22 @@ export default async function ClubDetailPage({
             {club.description || (locale === "ko" ? "소개글이 없습니다." : "No description.")}
           </p>
 
+          {/* Main Rinks */}
+          {club.rinks && club.rinks.length > 0 && (
+             <div className="flex flex-col gap-2 mt-2">
+                 <h4 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                    {locale === "ko" ? "주 이용 링크장" : "Main Rinks"}
+                 </h4>
+                 <div className="flex flex-wrap gap-2">
+                    {club.rinks.map(rink => (
+                        <div key={rink.id} className="text-sm px-3 py-1.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 rounded-lg border border-zinc-200 dark:border-zinc-700">
+                            {locale === "ko" ? rink.name_ko : rink.name_en}
+                        </div>
+                    ))}
+                 </div>
+             </div>
+          )}
+
           {/* Bottom Row: Actions */}
           <div className="flex flex-col gap-3 mt-2">
              <JoinClubButton club={club} initialIsMember={isMember} className="w-full justify-center" />

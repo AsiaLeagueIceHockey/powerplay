@@ -117,6 +117,22 @@ export function ClubCard({ club, initialIsMember }: ClubCardProps) {
                 </button>
              )}
         </div>
+        
+        {/* Rinks */}
+        {club.rinks && club.rinks.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mb-4">
+                {club.rinks.slice(0, 3).map(rink => (
+                    <span key={rink.id} className="text-xs px-2 py-1 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 rounded-md border border-zinc-200 dark:border-zinc-700">
+                        {locale === "ko" ? rink.name_ko : rink.name_en}
+                    </span>
+                ))}
+                {club.rinks.length > 3 && (
+                    <span className="text-xs px-2 py-1 bg-zinc-100 dark:bg-zinc-800 text-zinc-500 rounded-md border border-zinc-200 dark:border-zinc-700">
+                        +{club.rinks.length - 3}
+                    </span>
+                )}
+            </div>
+        )}
       </div>
 
       <div className="flex gap-2 mt-auto">

@@ -21,6 +21,7 @@ export interface Club {
   created_by?: string;
   created_at?: string;
   member_count?: number;
+  rinks?: Rink[];
 }
 
 export interface ClubMembership {

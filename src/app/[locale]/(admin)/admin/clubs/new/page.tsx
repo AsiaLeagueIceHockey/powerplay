@@ -1,5 +1,6 @@
 import { setRequestLocale } from "next-intl/server";
 import { ClubForm } from "@/components/club-form";
+import { getRinks } from "@/app/actions/rink";
 import Link from "next/link";
 
 export default async function NewClubPage({
@@ -9,6 +10,7 @@ export default async function NewClubPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  const rinks = await getRinks();
 
   return (
     <div>
@@ -23,7 +25,7 @@ export default async function NewClubPage({
 
       <h1 className="text-2xl font-bold mb-6">🏒 새 동호회 등록</h1>
 
-      <ClubForm locale={locale} />
+      <ClubForm locale={locale} allRinks={rinks} />
     </div>
   );
 }

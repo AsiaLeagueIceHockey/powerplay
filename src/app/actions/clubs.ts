@@ -48,7 +48,7 @@ export async function getClubs(): Promise<Club[]> {
 
   const { data: clubs, error } = await supabase
     .from("clubs")
-    .select("*")
+    .select("*, club_rinks(rink:rinks(*))")
     .order("name", { ascending: true });
 
   if (error) {
@@ -64,9 +64,14 @@ export async function getClubs(): Promise<Club[]> {
         .select("*", { count: "exact", head: true })
         .eq("club_id", club.id);
 
+      // Transform club_rinks to rinks
+      // @ts-ignore
+      const rinks = club.club_rinks?.map((cr) => cr.rink).filter(Boolean) || [];
+
       return {
         ...club,
         member_count: count || 0,
+        rinks,
       } as Club;
     })
   );
@@ -103,7 +108,7 @@ export async function getAdminClubs(): Promise<Club[]> {
   // 1. Created clubs
   const { data: createdClubs } = await supabase
     .from("clubs")
-    .select("*")
+    .select("*, club_rinks(rink:rinks(*))")
     .eq("created_by", user.id)
     .order("name", { ascending: true });
 
@@ -117,9 +122,14 @@ export async function getAdminClubs(): Promise<Club[]> {
         .select("*", { count: "exact", head: true })
         .eq("club_id", club.id);
 
+      // Transform club_rinks to rinks
+      // @ts-ignore
+      const rinks = club.club_rinks?.map((cr) => cr.rink).filter(Boolean) || [];
+
       return {
         ...club,
         member_count: count || 0,
+        rinks,
       } as Club;
     })
   );
@@ -132,7 +142,7 @@ export async function getClub(id: string): Promise<Club | null> {
 
   const { data: club, error } = await supabase
     .from("clubs")
-    .select("*")
+    .select("*, club_rinks(rink:rinks(*))")
     .eq("id", id)
     .single();
 
@@ -141,7 +151,14 @@ export async function getClub(id: string): Promise<Club | null> {
     return null;
   }
 
-  return club as Club;
+  // Transform club_rinks to rinks
+  // @ts-ignore
+  const rinks = club.club_rinks?.map((cr) => cr.rink).filter(Boolean) || [];
+
+  return {
+      ...club,
+      rinks,
+  } as Club;
 }
 
 export async function createClub(formData: FormData) {
@@ -172,6 +189,7 @@ export async function createClub(formData: FormData) {
   const logoUrl = formData.get("logo_url") as string;
   const repName = formData.get("rep_name") as string;
   const repPhone = formData.get("rep_phone") as string;
+  const rinkIds = formData.getAll("rink_id") as string[];
 
   if (!name?.trim()) {
     return { error: "Club name is required" };
@@ -203,6 +221,15 @@ export async function createClub(formData: FormData) {
     role: "admin",
   });
 
+  // Insert associated rinks
+  if (rinkIds.length > 0) {
+    const clubRinks = rinkIds.map((rinkId) => ({
+      club_id: club.id,
+      rink_id: rinkId,
+    }));
+    await supabase.from("club_rinks").insert(clubRinks);
+  }
+
   return { success: true, club };
 }
 
@@ -223,6 +250,7 @@ export async function updateClub(id: string, formData: FormData) {
   const logoUrl = formData.get("logo_url") as string;
   const repName = formData.get("rep_name") as string;
   const repPhone = formData.get("rep_phone") as string;
+  const rinkIds = formData.getAll("rink_id") as string[];
 
   const { error } = await supabase
     .from("clubs")
@@ -238,6 +266,19 @@ export async function updateClub(id: string, formData: FormData) {
 
   if (error) {
     return { error: error.message };
+  }
+
+  // Update Rinks
+  // 1. Delete existing
+  await supabase.from("club_rinks").delete().eq("club_id", id);
+
+  // 2. Insert new
+  if (rinkIds.length > 0) {
+    const clubRinks = rinkIds.map((rinkId) => ({
+      club_id: id,
+      rink_id: rinkId,
+    }));
+    await supabase.from("club_rinks").insert(clubRinks);
   }
 
   return { success: true };

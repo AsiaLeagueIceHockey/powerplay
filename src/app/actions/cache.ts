@@ -41,7 +41,8 @@ export async function getCachedClubs(): Promise<Club[]> {
     .from("clubs")
     .select(`
       *,
-      club_memberships(count)
+      club_memberships(count),
+      club_rinks(rink:rinks(*))
     `)
     .order("name", { ascending: true });
 
@@ -50,11 +51,14 @@ export async function getCachedClubs(): Promise<Club[]> {
     return [];
   }
 
-  // Transform to include member_count
+  // Transform to include member_count and rinks
   return (clubs || []).map((club) => ({
     ...club,
     member_count: club.club_memberships?.[0]?.count || 0,
+    // @ts-ignore
+    rinks: club.club_rinks?.map((cr) => cr.rink).filter(Boolean) || [],
     club_memberships: undefined, // Remove nested data
+    club_rinks: undefined,
   })) as Club[];
 }
 
