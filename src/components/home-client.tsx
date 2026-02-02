@@ -9,7 +9,8 @@ import { MatchCard } from "@/components/match-card";
 import { CalendarView } from "@/components/calendar-view";
 import { RinkExplorer } from "@/components/rink-explorer";
 import { useTranslations, useLocale } from "next-intl";
-import { List, CalendarDays, Loader2 } from "lucide-react";
+import { RinkFilterDrawer } from "@/components/rink-filter-drawer";
+import { List, CalendarDays, Loader2, ChevronDown } from "lucide-react";
 import { Club } from "@/app/actions/types";
 import { ClubCard } from "@/components/club-card";
 
@@ -41,6 +42,10 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
   // Client-side filtering state
   const [selectedDate, setSelectedDate] = useState<string | null>(initialDate || null);
   const [activeFilters, setActiveFilters] = useState<Set<string>>(new Set());
+  
+  // Rink Filter State
+  const [selectedRinkIds, setSelectedRinkIds] = useState<string[]>([]);
+  const [isRinkFilterOpen, setIsRinkFilterOpen] = useState(false);
 
   const setActiveTab = (tab: "match" | "rink" | "club") => {
     startTransition(() => {
@@ -54,15 +59,12 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
   const handleDateSelect = (dateStr: string | null) => {
     startTransition(() => {
         setSelectedDate(dateStr);
-        
-        // Update URL without refresh
         const params = new URLSearchParams(searchParams.toString());
         if (dateStr) {
           params.set("date", dateStr);
         } else {
           params.delete("date");
         }
-        // Ensure active tab param is preserved or defaulted
         if (!params.has("tab")) {
            params.set("tab", activeTab);
         }
@@ -71,26 +73,31 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
         if (dateStr) {
             setViewMode("list");
             if (activeTab !== "match") {
-                setActiveTabState("match"); // Direct update to avoid double transition or race
+                setActiveTabState("match");
             }
         }
     });
   };
 
-  // Filter matches based on selectedDate and activeFilters
-  const filteredMatches = allMatchesSource.filter((match) => {
-    // 1. Date Check
-    let dateMatch = true;
+  // Helper to determining if a match is visible based on date filter
+  const isMatchVisibleByDate = (match: Match) => {
     const matchDate = new Date(match.start_time);
     if (selectedDate) {
       const year = matchDate.getFullYear();
       const month = String(matchDate.getMonth() + 1).padStart(2, "0");
       const day = String(matchDate.getDate()).padStart(2, "0");
       const matchDateString = `${year}-${month}-${day}`;
-      dateMatch = matchDateString === selectedDate;
+      return matchDateString === selectedDate;
     } else {
-      dateMatch = matchDate >= new Date();
+      // Default: Show future matches only (strict current time)
+      return matchDate >= new Date();
     }
+  };
+
+  // Filter matches based on selectedDate and activeFilters
+  const filteredMatches = allMatchesSource.filter((match) => {
+    // 1. Date Check
+    const dateMatch = isMatchVisibleByDate(match);
 
     // 2. Filter Checks (Intersection / AND)
     let filterMatch = true;
@@ -106,13 +113,24 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
         filterMatch = false;
       }
     }
+    
+    // 3. Rink Filter (Intersection / OR within Rinks)
+    if (selectedRinkIds.length > 0) {
+        // If match has no rink or rink ID is not in selected list, exclude it
+        // Note: match.rink might be null, though unlikely for valid matches
+        // Also ensure we handle the type safely
+        const rinkId = match.rink?.id;
+        if (!rinkId || !selectedRinkIds.includes(rinkId)) {
+            filterMatch = false;
+        }
+    }
 
     return dateMatch && filterMatch;
   });
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Top Tab Navigation */}
+      {/* ... Top Tab Navigation ... */}
       <div className="flex border-b border-zinc-200 dark:border-zinc-800">
         <button
           onClick={() => setActiveTab("match")}
@@ -199,30 +217,26 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
             {viewMode === "list" ? (
               <>
                 {/* Date Filter (horizontal scrollable dates) */}
-                <div className="sticky top-0 z-10 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-sm pt-2 pb-0">
+                <div className="sticky top-0 z-10 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-sm pt-2 pb-0" style={{ marginBottom: "8px"}}>
                   <DateFilter selectedDate={selectedDate} onSelect={handleDateSelect} />
                 </div>
 
                 {/* Filter Chips */}
-                <div className="flex flex-wrap gap-2 px-1">
+                <div className="flex overflow-x-auto gap-2 px-1 pb-2 no-scrollbar">
+                  {/* Rink Filter Button */}
                   <button
-                    onClick={() => {
-                      const newFilters = new Set(activeFilters);
-                      if (newFilters.has("skater_spots")) {
-                        newFilters.delete("skater_spots");
-                      } else {
-                        newFilters.add("skater_spots");
-                      }
-                      setActiveFilters(newFilters);
-                    }}
-                    className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors ${
-                      activeFilters.has("skater_spots")
+                    onClick={() => setIsRinkFilterOpen(true)}
+                    className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium border transition-colors whitespace-nowrap ${
+                      selectedRinkIds.length > 0
                         ? "bg-blue-600 text-white border-blue-600 shadow-sm"
                         : "bg-white text-zinc-600 border-zinc-200 hover:bg-zinc-50 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700 dark:hover:bg-zinc-700"
                     }`}
                   >
-                    {t("filter.skaterSpots")}
+                    {locale === "ko" ? "링크장" : "Rink"} 
+                    {selectedRinkIds.length > 0 && ` (${selectedRinkIds.length})`}
+                    <ChevronDown className={`w-3 h-3 transition-transform ${isRinkFilterOpen ? "rotate-180" : ""}`} />
                   </button>
+
                   <button
                     onClick={() => {
                       const newFilters = new Set(activeFilters);
@@ -233,13 +247,31 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
                       }
                       setActiveFilters(newFilters);
                     }}
-                    className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors ${
+                    className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors whitespace-nowrap ${
                       activeFilters.has("goalie_spots")
                         ? "bg-blue-600 text-white border-blue-600 shadow-sm"
                         : "bg-white text-zinc-600 border-zinc-200 hover:bg-zinc-50 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700 dark:hover:bg-zinc-700"
                     }`}
                   >
                     {t("filter.goalieSpots")}
+                  </button>
+                  <button
+                    onClick={() => {
+                      const newFilters = new Set(activeFilters);
+                      if (newFilters.has("skater_spots")) {
+                        newFilters.delete("skater_spots");
+                      } else {
+                        newFilters.add("skater_spots");
+                      }
+                      setActiveFilters(newFilters);
+                    }}
+                    className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors whitespace-nowrap ${
+                      activeFilters.has("skater_spots")
+                        ? "bg-blue-600 text-white border-blue-600 shadow-sm"
+                        : "bg-white text-zinc-600 border-zinc-200 hover:bg-zinc-50 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700 dark:hover:bg-zinc-700"
+                    }`}
+                  >
+                    {t("filter.skaterSpots")}
                   </button>
                 </div>
 
@@ -272,7 +304,8 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
           <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
             {/* Club Tab */}
             <div className="mb-6">
-              {["admin", "superuser"].includes(userRole || "") ? (
+              {/* ... admin buttons ... */}
+             {["admin", "superuser"].includes(userRole || "") ? (
                 <button
                   onClick={() => router.push(`/${locale}/admin/matches`)}
                   className="w-full py-4 px-6 bg-amber-50 dark:bg-amber-950/30 hover:bg-amber-100 dark:hover:bg-amber-950/50 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800/50 rounded-xl shadow-sm transition-all transform hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 group"
@@ -336,6 +369,15 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
         )}
         </div>
       </div>
+      
+      {/* Rink Filter Drawer */}
+      <RinkFilterDrawer
+        isOpen={isRinkFilterOpen}
+        onClose={() => setIsRinkFilterOpen(false)}
+        rinks={rinks.filter(r => allMatchesSource.some(m => m.rink?.id === r.id && isMatchVisibleByDate(m)))}
+        selectedRinkIds={selectedRinkIds}
+        onSelectRinkIds={setSelectedRinkIds}
+      />
     </div>
   );
 }

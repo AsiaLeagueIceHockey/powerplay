@@ -139,7 +139,7 @@ export default async function AdminDetailPage({
                                     >
                                         <div className="flex items-center justify-between mb-1">
                                             <span className="text-sm font-bold text-zinc-200 group-hover:text-blue-400 transition-colors flex items-center gap-1">
-                                                {match.rink?.name_ko || "경기장 미정"}
+                                                {match.rink?.name_ko || "링크장 미정"}
                                                 <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
                                             </span>
                                             <span className={`text-xs px-2 py-0.5 rounded-full border ${match.status === 'open' ? 'bg-green-500/10 text-green-400 border-green-500/20' :
