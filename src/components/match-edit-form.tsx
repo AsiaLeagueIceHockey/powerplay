@@ -322,7 +322,7 @@ export function MatchEditForm({
           placeholder="예: 카카오뱅크 3333-00-0000000 홍길동"
         />
         <p className="text-xs text-zinc-500 mt-1">
-          경기 참가비을 정산 받을 계좌를 입력해주세요. (은행명, 계좌번호, 예금주)
+          경기 참가비를 정산 받을 계좌를 입력해주세요. (은행명, 계좌번호, 예금주)
         </p>
       </div>
 
