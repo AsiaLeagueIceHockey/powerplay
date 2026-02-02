@@ -22,37 +22,6 @@ export function AdminParticipantList({
   participants: Participant[];
 }) {
   const t = useTranslations();
-  const [loading, setLoading] = useState<string | null>(null);
-  const [optimisticParticipants, setOptimisticParticipants] =
-    useState(participants);
-
-  const handleTogglePayment = async (
-    participantId: string,
-    currentStatus: boolean
-  ) => {
-    setLoading(participantId);
-
-    // Optimistic update
-    setOptimisticParticipants((prev) =>
-      prev.map((p) =>
-        p.id === participantId ? { ...p, payment_status: !currentStatus } : p
-      )
-    );
-
-    const result = await updatePaymentStatus(participantId, !currentStatus);
-
-    if (result.error) {
-      // Revert on error
-      setOptimisticParticipants((prev) =>
-        prev.map((p) =>
-          p.id === participantId ? { ...p, payment_status: currentStatus } : p
-        )
-      );
-    }
-
-    setLoading(null);
-  };
-
   const getStatusColor = (status: string) => {
     switch (status) {
       case "confirmed":
@@ -68,7 +37,7 @@ export function AdminParticipantList({
     }
   };
 
-  if (optimisticParticipants.length === 0) {
+  if (participants.length === 0) {
     return (
       <div className="text-center py-8 bg-gray-50 rounded-lg dark:bg-zinc-800">
         <p className="text-gray-500 dark:text-zinc-400">
@@ -80,9 +49,9 @@ export function AdminParticipantList({
 
   // Group by position
   const grouped = {
-    FW: optimisticParticipants.filter((p) => p.position === "FW"),
-    DF: optimisticParticipants.filter((p) => p.position === "DF"),
-    G: optimisticParticipants.filter((p) => p.position === "G"),
+    FW: participants.filter((p) => p.position === "FW"),
+    DF: participants.filter((p) => p.position === "DF"),
+    G: participants.filter((p) => p.position === "G"),
   };
 
   return (
@@ -114,25 +83,7 @@ export function AdminParticipantList({
                     </span>
                   </div>
                   
-                  {/* Payment Toggle */}
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => handleTogglePayment(p.id, p.payment_status)}
-                      disabled={loading === p.id}
-                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                        p.payment_status ? 'bg-green-500' : 'bg-zinc-200'
-                      }`}
-                    >
-                      <span
-                        className={`${
-                          p.payment_status ? 'translate-x-6' : 'translate-x-1'
-                        } inline-block h-4 w-4 transform rounded-full bg-white transition`}
-                      />
-                    </button>
-                    <span className={`text-xs font-medium ${p.payment_status ? 'text-green-600' : 'text-zinc-500'}`}>
-                       {p.payment_status ? t("participant.payment.paid") : t("participant.payment.unpaid")}
-                    </span>
-                  </div>
+                  {/* Payment status is implied by status, no toggle needed */}
                 </div>
               ))}
             </div>

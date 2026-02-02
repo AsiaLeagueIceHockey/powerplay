@@ -2,7 +2,10 @@ import { setRequestLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { checkIsSuperUser, getPendingChargeRequests } from "@/app/actions/superuser";
+import { getPlatformBankAccount } from "@/app/actions/points";
 import { ChargeRequestsList } from "@/components/charge-requests-list";
+import { SettingsForm } from "@/components/settings-form";
+import { getTranslations } from "next-intl/server";
 
 export default async function ChargeRequestsPage({
   params,
@@ -25,6 +28,8 @@ export default async function ChargeRequestsPage({
   }
 
   const chargeRequests = await getPendingChargeRequests();
+  const bankAccount = await getPlatformBankAccount();
+  const t = await getTranslations("admin.settings");
 
   return (
     <div className="space-y-6">
@@ -66,6 +71,13 @@ export default async function ChargeRequestsPage({
         pendingParticipants={[]}
         locale={locale}
       />
+
+      <div className="border-t border-zinc-800 my-8 pt-8">
+        <h2 className="text-xl font-bold text-white mb-6">
+            {t("title")}
+        </h2>
+        <SettingsForm bankAccount={bankAccount} />
+      </div>
     </div>
   );
 }

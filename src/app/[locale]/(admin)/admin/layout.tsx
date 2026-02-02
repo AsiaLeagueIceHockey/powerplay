@@ -83,10 +83,10 @@ export default async function AdminLayout({
                   💰 {t("menu.chargeRequests")}
                 </Link>
                 <Link
-                  href={`/${locale}/admin/settings`}
+                  href={`/${locale}/admin/all-matches`}
                   className="block rounded-lg px-4 py-2.5 text-sm font-medium text-zinc-300 hover:bg-zinc-800 hover:text-white"
                 >
-                  ⚙️ {t("menu.settings")}
+                  🌎 {t("menu.allMatches")}
                 </Link>
               </>
             )}
@@ -144,11 +144,11 @@ export default async function AdminLayout({
               <span className="text-xs">{t("menu.chargeRequestsShort")}</span>
             </Link>
             <Link
-              href={`/${locale}/admin/settings`}
+              href={`/${locale}/admin/all-matches`}
               className="flex flex-col items-center gap-1 px-3 py-2 text-amber-400 hover:text-amber-300"
             >
-              <span className="text-xl">⚙️</span>
-              <span className="text-xs">{t("menu.settingsShort")}</span>
+              <span className="text-xl">🌎</span>
+              <span className="text-xs">{t("menu.allMatchesShort")}</span>
             </Link>
           </>
         )}

@@ -180,6 +180,8 @@
             "admins": "Admins",
             "chargeRequests": "Charge Requests",
             "settings": "Settings",
+            "allMatches": "All Matches",
+            "allMatchesShort": "All",
             "matchesShort": "Matches",
             "clubsShort": "Clubs",
             "rinksShort": "Rinks",

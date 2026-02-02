@@ -104,33 +104,14 @@ export async function getAdminClubs(): Promise<Club[]> {
   const { data: createdClubs } = await supabase
     .from("clubs")
     .select("*")
-    .eq("created_by", user.id);
+    .eq("created_by", user.id)
+    .order("name", { ascending: true });
 
-  // 2. Joined clubs
-  const { data: memberships } = await supabase
-    .from("club_memberships")
-    .select("club:clubs(*)")
-    .eq("user_id", user.id);
-  
-  const joinedClubs = (memberships || []).map((m) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const clubData = (m as any).club;
-    return Array.isArray(clubData) ? clubData[0] : clubData;
-  }).filter((c): c is Club => !!c);
-  
-  const createdClubsList = createdClubs as Club[] || [];
+  // For regular admins, ONLY show clubs they created (as per user request)
+  // No longer showing clubs they joined.
 
-  // Merge and Deduplicate
-  const clubMap = new Map<string, Club>();
-  createdClubsList.forEach(c => clubMap.set(c.id, c));
-  joinedClubs.forEach(c => clubMap.set(c.id, c));
-  
-  const uniqueClubs = Array.from(clubMap.values()).sort((a, b) => a.name.localeCompare(b.name));
-
-  // Attach member counts
   const clubsWithCounts = await Promise.all(
-    uniqueClubs.map(async (club) => {
-      // Optimize: maybe fetch counts in bulk if possible, but n+1 is fine for admin list usually
+    (createdClubs || []).map(async (club) => {
       const { count } = await supabase
         .from("club_memberships")
         .select("*", { count: "exact", head: true })

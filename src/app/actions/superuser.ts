@@ -695,3 +695,93 @@ export async function cancelPendingParticipant(
   revalidatePath("/admin/charge-requests");
   return { success: true };
 }
+
+// ==================== ALL MATCHES (SuperUser Only) ====================
+
+export async function getAllMatchesForSuperuser() {
+  const supabase = await createClient();
+
+  // Verify superuser
+  const isSuperUser = await checkIsSuperUser();
+  if (!isSuperUser) {
+    return [];
+  }
+
+  // Fetch ALL matches
+  const { data: matches, error } = await supabase
+    .from("matches")
+    .select(
+      `
+      id,
+      start_time,
+      fee,
+      max_skaters,
+      max_goalies,
+      status,
+      description,
+      rink:rink_id(name_ko, name_en),
+      created_by
+      `
+    )
+    .order("start_time", { ascending: true });
+
+  if (error) {
+    console.error("Error fetching all matches:", error);
+    return [];
+  }
+
+  // Fetch creator profiles
+  const creatorIds = Array.from(new Set(matches.map(m => m.created_by).filter(Boolean)));
+  const { data: creators } = await supabase
+    .from("profiles")
+    .select("id, full_name, email")
+    .in("id", creatorIds);
+  
+  const creatorMap = new Map(creators?.map(c => [c.id, c]));
+
+  // Fetch participants for each match
+  const matchesWithDetails = await Promise.all(
+    matches.map(async (match) => {
+      const { data: participants } = await supabase
+        .from("participants")
+        .select(`
+          id,
+          position,
+          status,
+          payment_status,
+          team_color,
+          user:user_id(id, full_name, email)
+        `)
+        .eq("match_id", match.id)
+        .order("created_at", { ascending: true }); // Keep order
+      
+      const validParticipants = participants?.filter(p => ["applied", "confirmed"].includes(p.status)) || [];
+
+      // Counts
+      const counts = {
+        fw: validParticipants.filter(p => p.position === 'FW').length || 0,
+        df: validParticipants.filter(p => p.position === 'DF').length || 0,
+        g: validParticipants.filter(p => p.position === 'G').length || 0,
+      };
+
+      // Transform for UI (flatten user array if needed, usually supabase returns object or array depending on query. `user:user_id` implies object if single relation, but type is slightly ambiguous without checking. I'll treat it safely.)
+      const transformedParticipants = (participants || []).map((p) => {
+        const user = Array.isArray(p.user) ? p.user[0] : p.user;
+        return {
+          ...p,
+          user,
+        };
+      });
+
+      return {
+        ...match,
+        rink: Array.isArray(match.rink) ? match.rink[0] : match.rink,
+        creator: creatorMap.get(match.created_by) || { email: "Unknown", full_name: "Unknown" },
+        participants: transformedParticipants, // Include full list for Card
+        participants_count: counts,
+      };
+    })
+  );
+
+  return matchesWithDetails;
+}

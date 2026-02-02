@@ -193,76 +193,7 @@ export async function updateMatch(matchId: string, formData: FormData) {
 }
 
 // Toggle participant payment status
-export async function updatePaymentStatus(
-  participantId: string,
-  paymentStatus: boolean
-) {
-  const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return { error: "Not authenticated" };
-  }
-
-  // Verify admin or superuser role
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single();
-
-  if (profile?.role !== "admin" && profile?.role !== "superuser") {
-    return { error: "Unauthorized" };
-  }
-
-  // Get participant details for notification BEFORE update (to ensure existence)
-  const { data: participant } = await supabase
-    .from("participants")
-    .select(`
-      user_id,
-      match:matches (
-        id,
-        start_time,
-        rink:rinks (name_ko)
-      )
-    `)
-    .eq("id", participantId)
-    .single();
-
-  const { error } = await supabase
-    .from("participants")
-    .update({ payment_status: paymentStatus })
-    .eq("id", participantId);
-
-  if (error) {
-    console.error("Error updating payment status:", error);
-    return { error: error.message };
-  }
-
-  // Send Push Notification if payment confirmed
-  if (paymentStatus && participant && participant.match) {
-    // @ts-ignore
-    const match = Array.isArray(participant.match) ? participant.match[0] : participant.match;
-    // @ts-ignore
-    const rinkName = match.rink?.name_ko || "Unknown Rink";
-    const startTime = new Date(match.start_time).toLocaleString("ko-KR", {
-      month: "short", day: "numeric", hour: "2-digit", minute: "2-digit",
-      timeZone: "Asia/Seoul"
-    });
-
-    await sendPushNotification(
-      participant.user_id,
-      "입금 확인 완료 ✅",
-      `${rinkName} (${startTime}) 경기 입금이 확인되었습니다.`,
-      `/match/${match.id}`
-    );
-  }
-
-  return { success: true };
-}
 
 // Delete a match
 export async function deleteMatch(matchId: string) {
