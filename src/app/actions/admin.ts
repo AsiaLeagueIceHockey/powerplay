@@ -345,6 +345,9 @@ export async function getAdminMatches() {
   }
 
   // Fetch participants for each match
+  const expiredParticipantIds: string[] = [];
+  const now = new Date();
+
   const matchesWithParticipants = await Promise.all(
     matches.map(async (match) => {
       const { data: participants } = await supabase
@@ -362,15 +365,27 @@ export async function getAdminMatches() {
         .eq("match_id", match.id)
         .order("created_at", { ascending: true });
 
-      // Calculate counts
+      // Check for expired pending payments
+      const isExpired = new Date(match.start_time) < now;
+      
+      const processedParticipants = (participants || []).map((p) => {
+        if (isExpired && p.status === "pending_payment") {
+            expiredParticipantIds.push(p.id);
+            // Return as canceled for UI
+            return { ...p, status: "canceled" };
+        }
+        return p;
+      });
+
+      // Calculate counts using processed participants
       const counts = {
-        fw: participants?.filter((p) => p.position === "FW" && ["applied", "confirmed"].includes(p.status)).length || 0,
-        df: participants?.filter((p) => p.position === "DF" && ["applied", "confirmed"].includes(p.status)).length || 0,
-        g: participants?.filter((p) => p.position === "G" && ["applied", "confirmed"].includes(p.status)).length || 0,
+        fw: processedParticipants.filter((p) => p.position === "FW" && ["applied", "confirmed"].includes(p.status)).length || 0,
+        df: processedParticipants.filter((p) => p.position === "DF" && ["applied", "confirmed"].includes(p.status)).length || 0,
+        g: processedParticipants.filter((p) => p.position === "G" && ["applied", "confirmed"].includes(p.status)).length || 0,
       };
 
       // Transform participants similar to getMatch
-      const transformedParticipants = (participants || []).map((p) => {
+      const transformedParticipants = processedParticipants.map((p) => {
         const user = Array.isArray(p.user) ? p.user[0] : p.user;
         return {
           ...p,
@@ -386,6 +401,16 @@ export async function getAdminMatches() {
       };
     })
   );
+
+  // Lazy Expiration: Cancel expired pending matches
+  if (expiredParticipantIds.length > 0) {
+    await supabase
+      .from("participants")
+      .update({ status: "canceled" })
+      .in("id", expiredParticipantIds);
+      
+    console.log(`[LazyExpiration:Admin] Canceled ${expiredParticipantIds.length} expired pending applications.`);
+  }
 
   return matchesWithParticipants;
 }

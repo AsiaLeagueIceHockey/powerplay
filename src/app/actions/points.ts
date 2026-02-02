@@ -121,6 +121,7 @@ export async function getUserPendingMatches(): Promise<UserPendingMatch[]> {
       id,
       match_id,
       position,
+      status,
       match:match_id(entry_points, start_time, rink:rink_id(name_ko, name_en))
     `)
     .eq("user_id", user.id)
@@ -132,19 +133,40 @@ export async function getUserPendingMatches(): Promise<UserPendingMatch[]> {
     return [];
   }
 
-  return (participants || []).map((p) => {
+  const now = new Date();
+  const validMatches: UserPendingMatch[] = [];
+  const expiredParticipantIds: string[] = [];
+
+  (participants || []).forEach((p) => {
     const match = Array.isArray(p.match) ? p.match[0] : p.match;
-    const rink = match?.rink ? (Array.isArray(match.rink) ? match.rink[0] : match.rink) : null;
-    
-    return {
-      id: p.id,
-      match_id: p.match_id,
-      position: p.position,
-      entry_points: match?.entry_points || 0,
-      start_time: match?.start_time || "",
-      rink_name: rink?.name_ko || "Unknown",
-    };
+    // Check expiration
+    if (match?.start_time && new Date(match.start_time) < now) {
+      expiredParticipantIds.push(p.id);
+    } else {
+      const rink = match?.rink ? (Array.isArray(match.rink) ? match.rink[0] : match.rink) : null;
+      validMatches.push({
+        id: p.id,
+        match_id: p.match_id,
+        position: p.position,
+        entry_points: match?.entry_points || 0,
+        start_time: match?.start_time || "",
+        rink_name: rink?.name_ko || "Unknown",
+      });
+    }
   });
+
+  // Lazy Expiration: Cancel expired pending matches
+  if (expiredParticipantIds.length > 0) {
+    // Fire and forget update (or await if strict consistency needed, but assume eventually consistent for UI speed)
+    await supabase
+      .from("participants")
+      .update({ status: "canceled" })
+      .in("id", expiredParticipantIds);
+      
+    console.log(`[LazyExpiration] Canceled ${expiredParticipantIds.length} expired pending applications.`);
+  }
+
+  return validMatches;
 }
 
 // ==================== 충전 요청 ====================

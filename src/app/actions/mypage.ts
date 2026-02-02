@@ -56,26 +56,48 @@ export async function getMyMatches(): Promise<MyMatch[]> {
     return [];
   }
 
-  return (participations || []).map((p) => {
-    const match = Array.isArray(p.match) ? p.match[0] : p.match;
-    const rink = match?.rink
-      ? Array.isArray(match.rink)
-        ? match.rink[0]
-        : match.rink
-      : null;
+  const now = new Date();
+  const validMatches: MyMatch[] = [];
+  const expiredParticipantIds: string[] = [];
 
-    return {
-      id: match?.id || "",
-      start_time: match?.start_time || "",
-      fee: match?.fee || 0,
-      status: match?.status || "open",
-      rink: rink as MyMatch["rink"],
-      participation: {
-        id: p.id,
-        position: p.position,
-        status: p.status,
-        payment_status: p.payment_status,
-      },
-    } as MyMatch;
+  (participations || []).forEach((p) => {
+    const match = Array.isArray(p.match) ? p.match[0] : p.match;
+    // Check if pending_payment and expired
+    if (p.status === "pending_payment" && match?.start_time && new Date(match.start_time) < now) {
+      expiredParticipantIds.push(p.id);
+      // We skip adding this to validMatches so it disappears immediately
+    } else {
+      const rink = match?.rink
+        ? Array.isArray(match.rink)
+          ? match.rink[0]
+          : match.rink
+        : null;
+
+      validMatches.push({
+        id: match?.id || "",
+        start_time: match?.start_time || "",
+        fee: match?.fee || 0,
+        status: match?.status || "open",
+        rink: rink as MyMatch["rink"],
+        participation: {
+          id: p.id,
+          position: p.position,
+          status: p.status,
+          payment_status: p.payment_status,
+        },
+      });
+    }
   });
+
+  // Lazy Expiration: Cancel expired pending matches
+  if (expiredParticipantIds.length > 0) {
+    await supabase
+      .from("participants")
+      .update({ status: "canceled" })
+      .in("id", expiredParticipantIds);
+      
+    console.log(`[LazyExpiration:MyPage] Canceled ${expiredParticipantIds.length} expired pending applications.`);
+  }
+
+  return validMatches;
 }
