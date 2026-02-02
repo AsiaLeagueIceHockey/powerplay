@@ -246,6 +246,7 @@ export default async function MatchPage({
         onboardingCompleted={onboardingCompleted}
         isFull={isFull}
         goalieFree={match.goalie_free === true}
+        isAuthenticated={!!user}
       />
 
       {/* Participant List Header */}

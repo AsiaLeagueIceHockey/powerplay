@@ -23,6 +23,7 @@ interface MatchApplicationProps {
   onboardingCompleted?: boolean;
   isFull?: boolean;
   goalieFree?: boolean;
+  isAuthenticated?: boolean;
 }
 
 export function MatchApplication({
@@ -38,6 +39,7 @@ export function MatchApplication({
   onboardingCompleted = true,
   isFull = false,
   goalieFree = false,
+  isAuthenticated = false,
 }: MatchApplicationProps) {
   const t = useTranslations("match");
   const tParticipant = useTranslations("participant");
@@ -102,6 +104,24 @@ export function MatchApplication({
     setLoading(false);
   };
 
+  // 1. If Match Closed/Canceled => Show nothing or status?
+  // User didn't specify, but typically we disable join.
+  if (matchStatus !== "open" && !isJoined) {
+    return null; 
+  }
+
+  // 0. If Not Authenticated => Show Login Button
+  if (!isAuthenticated) {
+    return (
+      <button
+        onClick={() => router.push(`/${locale}/login`)}
+        className="w-full py-4 bg-zinc-900 text-white rounded-2xl text-lg font-bold hover:bg-zinc-800 transition shadow-sm dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
+      >
+        {locale === "ko" ? "로그인하고 참가하기" : "Login to Join"}
+      </button>
+    );
+  }
+
   // 0. If onboarding not completed => Show onboarding prompt
   if (!onboardingCompleted && !isJoined) {
     return (
@@ -117,12 +137,6 @@ export function MatchApplication({
         </button>
       </div>
     );
-  }
-
-  // 1. If Match Closed/Canceled => Show nothing or status?
-  // User didn't specify, but typically we disable join.
-  if (matchStatus !== "open" && !isJoined) {
-    return null; 
   }
 
   // 2a. If User is on waitlist (waiting status) => Blue box
@@ -322,31 +336,51 @@ export function MatchApplication({
         {error && !isInsufficientPoints && <p className="mb-4 text-sm text-red-500">{error}</p>}
         
         <div className="flex gap-3 mb-4">
+          {/* FW Button */}
           <button
-            onClick={() => handleJoin("FW")}
-            disabled={!positions.FW || loading}
-            className="flex-1 py-4 rounded-xl border border-blue-200 bg-blue-50 text-blue-700 font-bold hover:bg-blue-100 disabled:opacity-50 disabled:grayscale transition dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-300"
+            onClick={() => positions.FW ? handleJoin("FW") : handleWaitlist("FW")}
+            disabled={loading}
+            className={`flex-1 py-4 rounded-xl border font-bold transition flex flex-col items-center justify-center gap-1
+              ${positions.FW 
+                ? "border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-300"
+                : "border-zinc-300 bg-zinc-50 text-zinc-600 hover:bg-zinc-100 dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-400"
+              }`}
           >
-            FW
+            <span>FW</span>
+            {!positions.FW && <span className="text-[10px] bg-zinc-200 text-zinc-600 px-1.5 py-0.5 rounded dark:bg-zinc-700 dark:text-zinc-300">{locale === "ko" ? "대기신청" : "Waitlist"}</span>}
           </button>
+
+          {/* DF Button */}
           <button
-            onClick={() => handleJoin("DF")}
-            disabled={!positions.DF || loading}
-            className="flex-1 py-4 rounded-xl border border-orange-200 bg-orange-50 text-orange-700 font-bold hover:bg-orange-100 disabled:opacity-50 disabled:grayscale transition dark:bg-orange-900/20 dark:border-orange-800 dark:text-orange-300"
+            onClick={() => positions.DF ? handleJoin("DF") : handleWaitlist("DF")}
+            disabled={loading}
+            className={`flex-1 py-4 rounded-xl border font-bold transition flex flex-col items-center justify-center gap-1
+              ${positions.DF
+                ? "border-orange-200 bg-orange-50 text-orange-700 hover:bg-orange-100 dark:bg-orange-900/20 dark:border-orange-800 dark:text-orange-300"
+                : "border-zinc-300 bg-zinc-50 text-zinc-600 hover:bg-zinc-100 dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-400"
+              }`}
           >
-            DF
+            <span>DF</span>
+            {!positions.DF && <span className="text-[10px] bg-zinc-200 text-zinc-600 px-1.5 py-0.5 rounded dark:bg-zinc-700 dark:text-zinc-300">{locale === "ko" ? "대기신청" : "Waitlist"}</span>}
           </button>
+
+          {/* G Button */}
           <button
-            onClick={() => handleJoin("G")}
-            disabled={!positions.G || loading}
-            className="flex-1 py-4 rounded-xl border border-purple-200 bg-purple-50 text-purple-700 font-bold hover:bg-purple-100 disabled:opacity-50 disabled:grayscale transition dark:bg-purple-900/20 dark:border-purple-800 dark:text-purple-300 relative"
+            onClick={() => positions.G ? handleJoin("G") : handleWaitlist("G")}
+            disabled={loading}
+            className={`flex-1 py-4 rounded-xl border font-bold transition flex flex-col items-center justify-center gap-1 relative
+              ${positions.G
+                ? "border-purple-200 bg-purple-50 text-purple-700 hover:bg-purple-100 dark:bg-purple-900/20 dark:border-purple-800 dark:text-purple-300"
+                : "border-zinc-300 bg-zinc-50 text-zinc-600 hover:bg-zinc-100 dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-400"
+              }`}
           >
-            G
-            {goalieFree && (
+            <span>G</span>
+            {positions.G && goalieFree && (
               <span className="absolute -top-2 -right-2 px-1.5 py-0.5 text-[10px] font-bold bg-green-500 text-white rounded-full">
                 {t("goalieFree")}
               </span>
             )}
+            {!positions.G && <span className="text-[10px] bg-zinc-200 text-zinc-600 px-1.5 py-0.5 rounded dark:bg-zinc-700 dark:text-zinc-300">{locale === "ko" ? "대기신청" : "Waitlist"}</span>}
           </button>
         </div>
 
