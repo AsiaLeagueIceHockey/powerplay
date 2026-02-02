@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { Rink } from "@/app/actions/types";
+import { Rink, Club } from "@/app/actions/types";
 import { Match } from "@/app/actions/match";
 
 const RinkMapComponent = dynamic(
@@ -19,6 +19,7 @@ const RinkMapComponent = dynamic(
 interface RinkMapProps {
   rinks: Rink[];
   matches?: Match[];
+  clubs?: Club[];
 }
 
 export function DynamicRinkMap(props: RinkMapProps) {

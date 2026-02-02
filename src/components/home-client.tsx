@@ -201,7 +201,7 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
               <div className="flex items-center bg-zinc-100 dark:bg-zinc-800 p-1 rounded-lg">
                 <button
                   onClick={() => setViewMode("list")}
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${viewMode === "list"
+                  className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-bold transition-colors ${viewMode === "list"
                     ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-700 dark:text-white"
                     : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
                     }`}
@@ -211,7 +211,7 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
                 </button>
                 <button
                   onClick={() => setViewMode("calendar")}
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${viewMode === "calendar"
+                  className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-bold transition-colors ${viewMode === "calendar"
                     ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-700 dark:text-white"
                     : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
                     }`}
@@ -306,7 +306,7 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
         ) : activeTab === "rink" ? (
           <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
             {/* Rink Tab: Rink Explorer */}
-            <RinkExplorer rinks={rinks} matches={allMatchesSource} />
+            <RinkExplorer rinks={rinks} matches={allMatchesSource} clubs={clubs} />
           </div>
         ) : (
           <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
