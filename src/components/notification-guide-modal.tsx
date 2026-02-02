@@ -135,8 +135,8 @@ export function NotificationGuideModal() {
 
         {/* Content */}
         <div className="p-6 overflow-y-auto">
-          {/* Fully Subscribed - permission granted AND DB subscription exists */}
-          {isFullySubscribed ? (
+          {/* Fully Subscribed - permission granted AND DB subscription exists (ONLY if not install mode) */}
+          {isFullySubscribed && guideType !== "install" ? (
              <div className="flex flex-col items-center text-center py-6 mx-auto">
                <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 text-green-600 rounded-full flex items-center justify-center mb-4">
                  <CheckCircle className="w-8 h-8" />
@@ -218,7 +218,7 @@ export function NotificationGuideModal() {
                       <div className="w-8 h-8 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center font-bold flex-shrink-0">3</div>
                       <div>
                         <p className="font-medium mb-1">홈 화면의 아이콘으로 앱 실행</p>
-                        <p className="text-sm text-zinc-500">새로 설치된 앱에서 다시 알림 설정을 눌러주세요.</p>
+                        <p className="text-sm text-zinc-500">새로 설치된 앱으로 접속해주세요.</p>
                       </div>
                     </div>
                   </div>

@@ -510,3 +510,25 @@ UPDATE profiles SET role = 'superuser' WHERE email = 'your-email@example.com';
 **하키러브밴드 (기존):** 공지 → 개개인연락 → 입금확인 → 명단수정 → 재공지 = 사람 갈아서 굴리는 구조  
 **파워플레이 (목표):** 신청 → 결제 → 확정 → 자동카운트 마감 = 플랫폼이 일하는 구조
 
+---
+
+## 📝 Agent Handover Log
+
+> **Latest work log for the next agent.**
+
+<!-- Add new logs below this line -->
+
+### [2026-02-02] Setup Agent Handover Workflow
+- **Summary**: Established the Agent Handover Protocol to ensure context continuity between sessions.
+- **Changes**:
+  - Created `.agent/workflows/agent_handover.md`: Defines the protocol.
+  - Updated `AGENTS.md`: Added the "Agent Handover Log" section.
+### [2026-02-02] Update PWA Install Prompt with TTL
+- **Summary**: Modified the PWA install prompt to reappear after 1 hour if dismissed, instead of being permanently hidden.
+- **Changes**:
+  - Modified `src/components/install-prompt.tsx`:
+    - Added `DISMISS_TTL` (1 hour).
+    - Updated dismissal check to compare current time with stored timestamp.
+    - Updated `handleDismiss` and installation handler to store `Date.now()` instead of `"true"`.
+- **Next Steps**: Monitor user feedback to see if the prompt is too intrusive or helpful.
+
