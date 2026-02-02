@@ -7,7 +7,12 @@
         "profile": "Profile",
         "myPage": "My Page",
         "admin": "Admin",
-        "save": "Save"
+        "save": "Save",
+        "feedback": {
+            "title": "Power Play Open Chat",
+            "description": "Join to ask questions and share feedback.",
+            "action": "Join"
+        }
     },
     "home": {
         "title": "Matches",
@@ -26,7 +31,11 @@
             "goToAdmin": "Go to Admin Page",
             "becomeAdmin": "Become an Admin & Promote Your Club!"
         },
-        "noClubs": "No clubs registered"
+        "noClubs": "No clubs registered",
+        "filter": {
+            "skaterSpots": "🏒 Player Spots",
+            "goalieSpots": "🥅 Goalie Spots"
+        }
     },
     "auth": {
         "login": "Log In",

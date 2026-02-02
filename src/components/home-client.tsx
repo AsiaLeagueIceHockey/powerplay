@@ -40,6 +40,7 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
 
   // Client-side filtering state
   const [selectedDate, setSelectedDate] = useState<string | null>(initialDate || null);
+  const [activeFilters, setActiveFilters] = useState<Set<string>>(new Set());
 
   const setActiveTab = (tab: "match" | "rink" | "club") => {
     startTransition(() => {
@@ -76,17 +77,38 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
     });
   };
 
-  // Filter matches based on selectedDate
-  const filteredMatches = selectedDate
-    ? allMatchesSource.filter((match) => {
-      const matchDate = new Date(match.start_time);
+  // Filter matches based on selectedDate and activeFilters
+  const filteredMatches = allMatchesSource.filter((match) => {
+    // 1. Date Check
+    let dateMatch = true;
+    const matchDate = new Date(match.start_time);
+    if (selectedDate) {
       const year = matchDate.getFullYear();
       const month = String(matchDate.getMonth() + 1).padStart(2, "0");
       const day = String(matchDate.getDate()).padStart(2, "0");
       const matchDateString = `${year}-${month}-${day}`;
-      return matchDateString === selectedDate;
-    })
-    : allMatchesSource.filter((match) => new Date(match.start_time) >= new Date());
+      dateMatch = matchDateString === selectedDate;
+    } else {
+      dateMatch = matchDate >= new Date();
+    }
+
+    // 2. Filter Checks (Intersection / AND)
+    let filterMatch = true;
+    if (activeFilters.has("skater_spots")) {
+      const currentSkaters = (match.participants_count?.fw || 0) + (match.participants_count?.df || 0);
+      if (currentSkaters >= match.max_skaters) {
+        filterMatch = false;
+      }
+    }
+    if (activeFilters.has("goalie_spots")) {
+      const currentGoalies = match.participants_count?.g || 0;
+      if (currentGoalies >= match.max_goalies) {
+        filterMatch = false;
+      }
+    }
+
+    return dateMatch && filterMatch;
+  });
 
   return (
     <div className="flex flex-col gap-6">
@@ -177,8 +199,48 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
             {viewMode === "list" ? (
               <>
                 {/* Date Filter (horizontal scrollable dates) */}
-                <div className="sticky top-0 z-10 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-sm py-2">
+                <div className="sticky top-0 z-10 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-sm pt-2 pb-0">
                   <DateFilter selectedDate={selectedDate} onSelect={handleDateSelect} />
+                </div>
+
+                {/* Filter Chips */}
+                <div className="flex flex-wrap gap-2 px-1">
+                  <button
+                    onClick={() => {
+                      const newFilters = new Set(activeFilters);
+                      if (newFilters.has("skater_spots")) {
+                        newFilters.delete("skater_spots");
+                      } else {
+                        newFilters.add("skater_spots");
+                      }
+                      setActiveFilters(newFilters);
+                    }}
+                    className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors ${
+                      activeFilters.has("skater_spots")
+                        ? "bg-blue-600 text-white border-blue-600 shadow-sm"
+                        : "bg-white text-zinc-600 border-zinc-200 hover:bg-zinc-50 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700 dark:hover:bg-zinc-700"
+                    }`}
+                  >
+                    {t("filter.skaterSpots")}
+                  </button>
+                  <button
+                    onClick={() => {
+                      const newFilters = new Set(activeFilters);
+                      if (newFilters.has("goalie_spots")) {
+                        newFilters.delete("goalie_spots");
+                      } else {
+                        newFilters.add("goalie_spots");
+                      }
+                      setActiveFilters(newFilters);
+                    }}
+                    className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors ${
+                      activeFilters.has("goalie_spots")
+                        ? "bg-blue-600 text-white border-blue-600 shadow-sm"
+                        : "bg-white text-zinc-600 border-zinc-200 hover:bg-zinc-50 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700 dark:hover:bg-zinc-700"
+                    }`}
+                  >
+                    {t("filter.goalieSpots")}
+                  </button>
                 </div>
 
                 {filteredMatches.length === 0 ? (

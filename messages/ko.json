@@ -7,7 +7,12 @@
         "profile": "프로필",
         "myPage": "마이페이지",
         "admin": "관리자",
-        "save": "저장"
+        "save": "저장",
+        "feedback": {
+            "title": "파워플레이 오픈채팅방",
+            "description": "궁금한 점이나 의견을 자유롭게 이야기해주세요.",
+            "action": "참여"
+        }
     },
     "home": {
         "title": "경기 목록",
@@ -26,7 +31,11 @@
             "goToAdmin": "관리자 페이지로 이동",
             "becomeAdmin": "관리자가 되어 동호회를 홍보해보세요!"
         },
-        "noClubs": "등록된 동호회가 없습니다"
+        "noClubs": "등록된 동호회가 없습니다",
+        "filter": {
+            "skaterSpots": "🏒 플레이어 모집중",
+            "goalieSpots": "🥅 골리 모집중"
+        }
     },
     "auth": {
         "login": "로그인",
