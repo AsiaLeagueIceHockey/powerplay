@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { calculateRefundPercent } from "./points";
 import { sendPushNotification } from "@/app/actions/push";
+import { logAndNotify } from "@/lib/audit";
 
 // Type definitions for match data
 export interface MatchRink {
@@ -339,6 +340,14 @@ export async function joinMatch(matchId: string, position: string): Promise<{
     );
   }
 
+  // Audit Log
+  await logAndNotify({
+    userId: user.id,
+    action: "MATCH_JOIN",
+    description: `${participantName}님이 ${rinkName} 경기에 ${participantStatus === "confirmed" ? "참가 확정" : "참가 신청(입금대기)"}했습니다.`,
+    metadata: { matchId, rinkName, status: participantStatus, amount: entryPoints },
+  });
+
   return { success: true, status: participantStatus };
 }
 
@@ -476,6 +485,14 @@ export async function cancelJoin(matchId: string) {
   } catch (error) {
     console.error("Failed to promote waitlist user:", error);
   }
+
+  // Audit Log
+  await logAndNotify({
+    userId: user.id,
+    action: "MATCH_CANCEL",
+    description: `사용자가 경기 참가를 취소했습니다. (환불: ${refundAmount.toLocaleString()}원)`,
+    metadata: { matchId, refundAmount },
+  });
 
   return { success: true, refundAmount };
 }
@@ -666,6 +683,14 @@ export async function joinWaitlist(matchId: string, position: string): Promise<{
       `${rinkName} (${startTime}) 대기명단에 등록되었습니다. 자리 발생 시 알려드립니다.`,
       `/match/${matchId}`
     );
+
+    // Audit Log
+    await logAndNotify({
+      userId: user.id,
+      action: "MATCH_JOIN",
+      description: `사용자가 ${rinkName} 경기 대기명단에 등록했습니다.`,
+      metadata: { matchId, rinkName, status: "waiting" },
+    });
   }
 
   return { success: true };

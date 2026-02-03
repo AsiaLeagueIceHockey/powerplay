@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { Club, ClubMembership, ClubPost } from "./types";
+import { logAndNotify } from "@/lib/audit";
 
 // ============================================
 // Club Logo Upload
@@ -229,6 +230,14 @@ export async function createClub(formData: FormData) {
     }));
     await supabase.from("club_rinks").insert(clubRinks);
   }
+
+  // Audit Log (Background)
+  await logAndNotify({
+    userId: user.id,
+    action: "CLUB_CREATE",
+    description: `${user.email}님이 새 동호회 '${name}'를 생성했습니다.`,
+    metadata: { clubId: club.id, name },
+  });
 
   return { success: true, club };
 }

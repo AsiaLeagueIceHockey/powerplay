@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { sendPushToSuperUsers, sendPushNotification } from "@/app/actions/push";
+import { logAndNotify } from "@/lib/audit";
 
 // ==================== 타입 정의 ====================
 
@@ -222,12 +223,13 @@ export async function requestPointCharge(
     return { success: false, error: error.message };
   }
 
-  // 알림 발송: 슈퍼유저에게
-  await sendPushToSuperUsers(
-    "💰 포인트 충전 요청",
-    `${user.email}님이 ${amount.toLocaleString()}원 충전을 요청했습니다.`,
-    "/admin/charge-requests"
-  );
+  // 알림 발송: 슈퍼유저에게 (Unified Audit Log & Push)
+  await logAndNotify({
+    userId: user.id,
+    action: "POINT_CHARGE_REQUEST",
+    description: `${user.email}님이 ${amount.toLocaleString()}원 충전을 요청했습니다.`,
+    metadata: { requestId: data.id, amount, depositorName },
+  });
 
   // 알림 발송: 사용자에게 (충전 신청 확인)
   await sendPushNotification(
