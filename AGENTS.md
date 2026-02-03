@@ -542,4 +542,12 @@ UPDATE profiles SET role = 'superuser' WHERE email = 'your-email@example.com';
     - **Rink Filter & Match Card**: Display "District" (e.g., "Seoul Gangnam-gu") below the rink name.
     - **Match Detail**: Added full address display below the map, aligned left with proper spacing.
   - **Bug Fix**: Updated `getMatch` in `src/app/actions/match.ts` to include the `address` field in the Rink query, fixing the missing address issue in the detail page.
-- **Next Steps**: Verify user feedback on address visibility and filter usability.
+### [2026-02-03] Enhance Rink Tab Experience & iOS PWA Guide
+- **Summary**: Improved the Rink Tab UI/UX with better map interactions, list view layout, and data integration. Also updated the iOS PWA install guide.
+- **Changes**:
+  - **Rink Tab Features**: Integrated club data into Rink Map & List views.
+  - **Map Interactions**: Added active markers (blue) for future matches/clubs, and auto-scroll to detail card on click.
+  - **UI Improvements**: Redesigned list items (cleaner card, moved map button), standardized toggle button styles.
+  - **Filtering**: Filtered out past matches from map detail and list views.
+  - **iOS Guide**: Added "Open in Safari" step to the PWA install instructions.
+- **Next Steps**: Gather user feedback on the new Rink Tab experience.

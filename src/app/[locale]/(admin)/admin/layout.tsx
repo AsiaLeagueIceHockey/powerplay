@@ -88,6 +88,12 @@ export default async function AdminLayout({
                 >
                   🌎 {t("menu.allMatches")}
                 </Link>
+                <Link
+                  href={`/${locale}/admin/push-test`}
+                  className="block rounded-lg px-4 py-2.5 text-sm font-medium text-zinc-300 hover:bg-zinc-800 hover:text-white"
+                >
+                  🔔 Push Test
+                </Link>
               </>
             )}
           </nav>

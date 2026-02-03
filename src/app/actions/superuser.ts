@@ -773,15 +773,78 @@ export async function getAllMatchesForSuperuser() {
         };
       });
 
-      return {
-        ...match,
-        rink: Array.isArray(match.rink) ? match.rink[0] : match.rink,
-        creator: creatorMap.get(match.created_by) || { email: "Unknown", full_name: "Unknown" },
-        participants: transformedParticipants, // Include full list for Card
-        participants_count: counts,
-      };
     })
   );
 
   return matchesWithDetails;
+}
+
+// ==================== PUSH NOTIFICATION TEST (SuperUser Only) ====================
+
+export interface PushSubscriber {
+  id: string;
+  email: string;
+  full_name: string | null;
+  subscription_count: number;
+}
+
+export async function getPushSubscribers(): Promise<PushSubscriber[]> {
+  const supabase = await createClient();
+
+  const isSuperUser = await checkIsSuperUser();
+  if (!isSuperUser) {
+    return [];
+  }
+
+  // Get distinct user_ids from push_subscriptions
+  const { data, error } = await supabase
+    .from("push_subscriptions")
+    .select("user_id, user:profiles(id, email, full_name)");
+
+  if (error) {
+    console.error("Error fetching subscribers:", error);
+    return [];
+  }
+
+  const subscriberMap = new Map<string, PushSubscriber>();
+
+  data?.forEach((sub) => {
+    if (sub.user) {
+        // @ts-ignore
+      const user = Array.isArray(sub.user) ? sub.user[0] : sub.user;
+      if (user && !subscriberMap.has(user.id)) {
+        subscriberMap.set(user.id, {
+          id: user.id,
+          email: user.email,
+          full_name: user.full_name,
+          subscription_count: 0
+        });
+      }
+      if (user && subscriberMap.has(user.id)) {
+        const entry = subscriberMap.get(user.id)!;
+        entry.subscription_count++;
+      }
+    }
+  });
+
+  return Array.from(subscriberMap.values())
+    .sort((a, b) => (a.full_name || "").localeCompare(b.full_name || ""));
+}
+
+export async function sendTestPushNotification(
+  userId: string,
+  title: string,
+  body: string
+): Promise<{ success: boolean; error?: string; count?: number }> {
+  const isSuperUser = await checkIsSuperUser();
+  if (!isSuperUser) {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  try {
+    const result = await sendPushNotification(userId, title, body, "/");
+    return { success: result.success, error: result.error, count: result.sent };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
 }

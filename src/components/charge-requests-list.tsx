@@ -62,6 +62,12 @@ export function ChargeRequestsList({
   ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   const handleConfirm = async (item: UnifiedItem) => {
+    // Confirmation Dialog
+    const message = `${item.userName} | ${item.amount.toLocaleString()}원\n입금 확인하셨나요?`;
+    if (!window.confirm(message)) {
+        return;
+    }
+
     setLoadingId(item.id);
     try {
       let result;

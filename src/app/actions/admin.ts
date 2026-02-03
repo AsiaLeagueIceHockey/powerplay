@@ -750,8 +750,9 @@ export async function getAdminDetail(targetUserId: string): Promise<{
   const { data: clubMemberships, error: clubError } = await supabase
     .from("club_memberships")
     .select(`
+      club_id,
       role,
-      joined_at,
+      created_at,
       club:clubs (
         id,
         name,
@@ -792,7 +793,7 @@ export async function getAdminDetail(targetUserId: string): Promise<{
         logo_url: club?.logo_url,
         description: club?.description,
         role: m.role,
-        joined_at: m.joined_at,
+        joined_at: m.created_at,
       };
     }) as AdminClub[],
     matches: (hostedMatches || []).map((match) => ({

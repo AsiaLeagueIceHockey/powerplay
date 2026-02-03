@@ -42,8 +42,11 @@ export function MatchShareButton({ match }: MatchShareButtonProps) {
       toastMsg = "Invitation copied to clipboard!";
     }
 
-    // Use Web Share API if available (mobile)
-    if (navigator.share) {
+    // Platform check (Windows share is often buggy/unwanted)
+    const isWindows = typeof navigator !== "undefined" && navigator.userAgent.includes("Windows");
+
+    // Use Web Share API if available (mobile, excluding Windows)
+    if (navigator.share && !isWindows) {
       try {
         await navigator.share({
           title: title,
@@ -63,11 +66,13 @@ export function MatchShareButton({ match }: MatchShareButtonProps) {
     try {
       const fullText = `${title}\n\n${text}\n\n참가 신청하기:\n${window.location.href}`;
       await navigator.clipboard.writeText(fullText);
-      setToastMessage(toastMsg);
+      setToastMessage(locale === "ko" ? "클립보드에 복사되었습니다." : "Copied to clipboard!");
       setShowToast(true);
       setTimeout(() => setShowToast(false), 3000);
     } catch (err) {
       console.error("Failed to copy:", err);
+      // Fallback for insecure context if needed
+      alert(locale === "ko" ? "복사에 실패했습니다." : "Failed to copy.");
     }
   };
 
