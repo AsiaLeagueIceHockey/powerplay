@@ -338,7 +338,7 @@ export async function confirmPointCharge(
     type: "charge",
     amount: chargeRequest.amount,
     balance_after: newBalance,
-    description: "포인트 충전",
+    description: "금액 충전",
     reference_id: requestId,
   });
 
@@ -773,6 +773,13 @@ export async function getAllMatchesForSuperuser() {
         };
       });
 
+      return {
+        ...match,
+        rink: Array.isArray(match.rink) ? match.rink[0] : match.rink,
+        creator: creatorMap.get(match.created_by) || { email: "Unknown", full_name: "Unknown" },
+        participants: transformedParticipants, // Include full list for Card
+        participants_count: counts,
+      };
     })
   );
 
@@ -847,4 +854,120 @@ export async function sendTestPushNotification(
   } catch (error: any) {
     return { success: false, error: error.message };
   }
+}
+
+// ==================== POINT STATUS MANAGEMENT (SuperUser Only) ====================
+
+export interface UserPointStatus {
+  id: string;
+  email: string;
+  full_name: string | null;
+  points: number;
+}
+
+export interface PointTransaction {
+  id: number;
+  type: string;
+  amount: number;
+  balance_after: number;
+  description: string;
+  created_at: string;
+}
+
+export async function getAllUserPoints(search?: string): Promise<UserPointStatus[]> {
+  const supabase = await createClient();
+  const isSuperUser = await checkIsSuperUser();
+  if (!isSuperUser) return [];
+
+  let query = supabase.from("profiles").select("id, email, full_name, points").order("full_name");
+
+  if (search) {
+     query = query.or(`email.ilike.%${search}%,full_name.ilike.%${search}%`);
+  } else {
+     query = query.limit(50);
+  }
+
+  const { data, error } = await query;
+  if (error) {
+    console.error("Error fetching user points:", error);
+    return [];
+  }
+  return data as UserPointStatus[];
+}
+
+export async function getUserTransactionHistory(userId: string): Promise<PointTransaction[]> {
+  const supabase = await createClient();
+  const isSuperUser = await checkIsSuperUser();
+  if (!isSuperUser) return [];
+
+  const { data, error } = await supabase
+    .from("point_transactions")
+    .select("*")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Error fetching transactions:", error);
+    return [];
+  }
+  return data as PointTransaction[];
+}
+
+export async function updateUserPoints(
+  userId: string,
+  newAmount: number,
+  reason: string
+): Promise<{ success: boolean; error?: string }> {
+  const supabase = await createClient();
+  const isSuperUser = await checkIsSuperUser();
+  if (!isSuperUser) return { success: false, error: "Unauthorized" };
+
+  const { data: userProfile, error: profileError } = await supabase
+    .from("profiles")
+    .select("points")
+    .eq("id", userId)
+    .single();
+
+  if (profileError || !userProfile) {
+    return { success: false, error: "User not found" };
+  }
+
+  const currentPoints = userProfile.points || 0;
+  const diff = newAmount - currentPoints;
+
+  if (diff === 0) return { success: true }; // No change
+
+  // Updates
+  const { error: updateError } = await supabase
+    .from("profiles")
+    .update({ points: newAmount })
+    .eq("id", userId);
+
+  if (updateError) return { success: false, error: updateError.message };
+
+  // Log Transaction
+  await supabase.from("point_transactions").insert({
+    user_id: userId,
+    type: diff > 0 ? "charge" : "use", 
+    amount: diff,
+    balance_after: newAmount,
+    description: reason || "관리자 충전 금액 조정",
+    reference_id: null,
+  });
+
+  revalidatePath("/admin/points");
+
+  // Send Push Notification
+  try {
+    await sendPushNotification(
+        userId,
+        "충전 금액 변동 알림 💰",
+        `관리자에 의해 충전 금액이 변경되었습니다.\n${currentPoints.toLocaleString()}원 -> ${newAmount.toLocaleString()}원\n사유: ${reason}`,
+        "/mypage/points"
+    );
+  } catch (e) {
+    console.error("Failed to send push notification:", e);
+  }
+
+  return { success: true };
 }

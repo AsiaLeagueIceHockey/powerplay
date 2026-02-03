@@ -47,7 +47,11 @@ Use `npm run <command>` to execute the following scripts:
 - The protection is implemented in the middleware.
 - **Exception**: The `/admin-apply` route is public.
 
-### 3. Data Patterns
+### 3. Localization (i18n)
+- **Public/User Pages**: Must support both English (en) and Korean (ko). Use `next-intl`.
+- **SuperUser Pages**: Pages under `/admin` accessible only by `superuser` do **NOT** require English translation. Hardcoded Korean is acceptable.
+
+### 4. Data Patterns
 - **Soft Deletes**: Never permanently delete user profiles. Instead, set the `profiles.deleted_at` timestamp.
 - **Parallel Fetching**: For independent data fetching operations, use `Promise.all()` to improve performance.
 - **Schema Changes**: All database schema modifications must be logged in `schema_changes.sql`.

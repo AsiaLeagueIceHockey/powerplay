@@ -5,63 +5,40 @@ import { useRouter } from "next/navigation";
 import { 
   confirmPointCharge, 
   rejectPointCharge, 
-  confirmParticipantPayment, 
-  cancelPendingParticipant,
   type ChargeRequestWithUser,
-  type PendingParticipant
 } from "@/app/actions/superuser";
-import { CircleDollarSign, Users, Loader2, Check, X } from "lucide-react";
+import { CircleDollarSign, Loader2, Check, X } from "lucide-react";
 
-interface UnifiedItem {
+interface Item {
   id: string;
-  type: "charge" | "participant";
   userName: string;
   userEmail?: string;
   amount: number;
   createdAt: string;
-  extra?: string; // depositor name or match info
-  position?: string;
-  currentBalance?: number;
+  depositorName?: string;
 }
 
 export function ChargeRequestsList({ 
   chargeRequests, 
-  pendingParticipants,
   locale 
 }: { 
   chargeRequests: ChargeRequestWithUser[];
-  pendingParticipants: PendingParticipant[];
   locale: string;
 }) {
   const router = useRouter();
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [, startTransition] = useTransition();
 
-  // Merge and sort by created_at
-  const items: UnifiedItem[] = [
-    ...chargeRequests.map((req) => ({
-      id: req.id,
-      type: "charge" as const,
-      userName: req.user?.full_name || "Unknown",
-      userEmail: req.user?.email,
-      amount: req.amount,
-      createdAt: req.created_at,
-      extra: req.depositor_name ? `입금자: ${req.depositor_name}` : undefined,
-    })),
-    ...pendingParticipants.map((p) => ({
-      id: p.id,
-      type: "participant" as const,
-      userName: p.user?.full_name || "Unknown",
-      userEmail: p.user?.email,
-      amount: p.match?.entry_points || 0,
-      createdAt: p.created_at,
-      extra: locale === "ko" ? p.match?.rink?.name_ko : (p.match?.rink?.name_en || p.match?.rink?.name_ko),
-      position: p.position,
-      currentBalance: p.user?.points,
-    })),
-  ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  const items: Item[] = chargeRequests.map((req) => ({
+    id: req.id,
+    userName: req.user?.full_name || "Unknown",
+    userEmail: req.user?.email,
+    amount: req.amount,
+    createdAt: req.created_at,
+    depositorName: req.depositor_name || undefined,
+  })).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
-  const handleConfirm = async (item: UnifiedItem) => {
+  const handleConfirm = async (item: Item) => {
     // Confirmation Dialog
     const message = `${item.userName} | ${item.amount.toLocaleString()}원\n입금 확인하셨나요?`;
     if (!window.confirm(message)) {
@@ -70,12 +47,7 @@ export function ChargeRequestsList({
 
     setLoadingId(item.id);
     try {
-      let result;
-      if (item.type === "charge") {
-        result = await confirmPointCharge(item.id);
-      } else {
-        result = await confirmParticipantPayment(item.id);
-      }
+      const result = await confirmPointCharge(item.id);
       
       if (!result.success) {
         alert(`처리 실패: ${result.error || "알 수 없는 오류"}`);
@@ -93,15 +65,10 @@ export function ChargeRequestsList({
     setLoadingId(null);
   };
 
-  const handleReject = async (item: UnifiedItem) => {
+  const handleReject = async (item: Item) => {
     setLoadingId(`reject-${item.id}`);
     try {
-      let result;
-      if (item.type === "charge") {
-        result = await rejectPointCharge(item.id);
-      } else {
-        result = await cancelPendingParticipant(item.id);
-      }
+      const result = await rejectPointCharge(item.id);
       
       if (!result.success) {
         alert(`처리 실패: ${result.error || "알 수 없는 오류"}`);
@@ -129,28 +96,26 @@ export function ChargeRequestsList({
 
   return (
     <div className="space-y-4">
+      <div className="bg-blue-900/20 border border-blue-800 rounded-lg p-4 text-sm">
+        <h3 className="font-bold text-blue-400 mb-1 flex items-center gap-2">
+            ℹ️ 자동 경기 확정 안내
+        </h3>
+        <p className="text-zinc-300">
+          충전 요청을 승인하면, 해당 사용자의 미입금 경기들이 자동으로 확정됩니다. 별도로 미입금 참가자를 처리할 필요가 없습니다.
+        </p>
+      </div>
+
       {items.map((item) => (
         <div 
-          key={`${item.type}-${item.id}`} 
-          className={`bg-zinc-800 rounded-lg border p-4 ${
-            item.type === "participant" 
-              ? "border-amber-700/50" 
-              : "border-zinc-700"
-          }`}
+          key={item.id} 
+          className="bg-zinc-800 rounded-lg border border-zinc-700 p-4"
         >
           {/* Header with Type Badge */}
           <div className="flex items-center gap-2 mb-3">
-            {item.type === "charge" ? (
-              <span className="inline-flex items-center gap-1.5 px-2 py-1 bg-green-900/30 text-green-400 text-xs font-medium rounded-full">
-                <CircleDollarSign className="w-3.5 h-3.5" />
-                포인트 충전
-              </span>
-            ) : (
-              <span className="inline-flex items-center gap-1.5 px-2 py-1 bg-amber-900/30 text-amber-400 text-xs font-medium rounded-full">
-                <Users className="w-3.5 h-3.5" />
-                경기 참가
-              </span>
-            )}
+            <span className="inline-flex items-center gap-1.5 px-2 py-1 bg-green-900/30 text-green-400 text-xs font-medium rounded-full">
+              <CircleDollarSign className="w-3.5 h-3.5" />
+              포인트 충전
+            </span>
             <span className="text-xs text-zinc-500 ml-auto">
               {new Date(item.createdAt).toLocaleDateString(locale === "ko" ? "ko-KR" : "en-US", {
                 month: "short",
@@ -172,23 +137,13 @@ export function ChargeRequestsList({
               <p className="text-xl text-amber-400 font-bold">
                 {item.amount.toLocaleString()}{locale === "ko" ? "원" : "KRW"}
               </p>
-              {item.type === "participant" && item.currentBalance !== undefined && (
-                <p className="text-xs text-zinc-500">
-                  현재 잔액: {item.currentBalance.toLocaleString()}{locale === "ko" ? "원" : "KRW"}
-                </p>
-              )}
             </div>
           </div>
 
           {/* Extra Info */}
-          {item.extra && (
+          {item.depositorName && (
             <div className="text-sm mb-4 pb-3 border-b border-zinc-700">
-              <span className="text-zinc-300">{item.extra}</span>
-              {item.position && (
-                <span className="text-xs text-amber-400 ml-2 px-1.5 py-0.5 bg-amber-900/30 rounded">
-                  {item.position}
-                </span>
-              )}
+              <span className="text-zinc-300">입금자: {item.depositorName}</span>
             </div>
           )}
 

@@ -77,10 +77,10 @@ export default async function AdminLayout({
                   🛡️ {t("menu.admins")}
                 </Link>
                 <Link
-                  href={`/${locale}/admin/charge-requests`}
+                  href={`/${locale}/admin/points`}
                   className="block rounded-lg px-4 py-2.5 text-sm font-medium text-zinc-300 hover:bg-zinc-800 hover:text-white"
                 >
-                  💰 {t("menu.chargeRequests")}
+                  💰 {t("menu.pointManagement")}
                 </Link>
                 <Link
                   href={`/${locale}/admin/all-matches`}
@@ -143,11 +143,11 @@ export default async function AdminLayout({
               <span className="text-xs">{t("menu.adminsShort")}</span>
             </Link>
             <Link
-              href={`/${locale}/admin/charge-requests`}
+              href={`/${locale}/admin/points`}
               className="flex flex-col items-center gap-1 px-3 py-2 text-amber-400 hover:text-amber-300"
             >
               <span className="text-xl">💰</span>
-              <span className="text-xs">{t("menu.chargeRequestsShort")}</span>
+              <span className="text-xs">{t("menu.pointManagementShort")}</span>
             </Link>
             <Link
               href={`/${locale}/admin/all-matches`}
