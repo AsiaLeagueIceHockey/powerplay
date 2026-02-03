@@ -143,7 +143,7 @@ export function NotificationGuideModal() {
                </div>
                <h3 className="text-xl font-bold mb-2">이미 설정이 완료되었습니다!</h3>
                <p className="text-zinc-500 dark:text-zinc-400">
-                 중요한 알림을 놓치지 않고 받아보실 수 있습니다.
+                 알림을 놓치지 않고 받아보실 수 있습니다.
                </p>
                <button onClick={handleClose} className="mt-6 px-6 py-2 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-black rounded-lg font-medium">
                  확인
