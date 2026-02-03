@@ -122,7 +122,7 @@ export function UserHeaderMenu({
                 <span>{locale === "ko" ? "마이페이지" : "My Page"}</span>
               </Link>
 
-              {/* 2. 포인트 (동전) */}
+              {/* 2. 충전 금액 (동전) */}
               <Link
                 href={`/${locale}/mypage/points`}
                 onClick={() => setIsOpen(false)}
