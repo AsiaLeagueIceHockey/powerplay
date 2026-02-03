@@ -231,11 +231,9 @@ export async function sendPushNotification(
 
   const supabase = await createClient();
 
-  // Get user's subscriptions
+  // Use Secure RPC to get subscriptions (Bypasses RLS)
   const { data: subscriptions, error } = await supabase
-    .from("push_subscriptions")
-    .select("*")
-    .eq("user_id", userId);
+    .rpc("get_user_push_tokens", { target_user_id: userId });
 
   if (error || !subscriptions || subscriptions.length === 0) {
     console.log("No subscriptions found for user:", userId);

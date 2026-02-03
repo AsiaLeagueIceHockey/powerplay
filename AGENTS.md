@@ -293,6 +293,31 @@ src/
 
 ---
 
+## 🔒 Push Notification Security (RPC)
+
+> **Context**: Regular users (e.g., User A) need to trigger notifications to other users (e.g., User B) or Admins. However, RLS policies prevent User A from reading User B's push tokens.
+
+Instead of using a hazardous `SUPABASE_SERVICE_ROLE_KEY` in the application, we use a **SECURITY DEFINER RPC Function**.
+
+### 1. The Problem
+- `push_subscriptions` table has RLS enabled (Users can only see their own).
+- When User A invites User B, User A's session tries to select User B's tokens -> **Blocked**.
+
+### 2. The Solution: `get_user_push_tokens`
+- A PostgreSQL function defined with `SECURITY DEFINER`.
+- It runs with the privileges of the database owner (Admin), bypassing RLS.
+- **Scope**: Strictly limited to selecting `endpoint`, `p256dh`, `auth` for a specific `user_id`.
+
+```typescript
+// src/app/actions/push.ts
+const { data } = await supabase.rpc("get_user_push_tokens", { target_user_id: userId });
+```
+
+### 3. Critical Requirement
+- The SQL file `sql/v18_secure_push_rpc.sql` MUST be applied to the database for push notifications to work.
+
+---
+
 ## 💰 포인트 시스템 (Point System)
 
 > 2026.01.19 구현 완료. 사업자등록 전까지 직접 결제 모듈 대신 포인트 충전 시스템으로 운영.
