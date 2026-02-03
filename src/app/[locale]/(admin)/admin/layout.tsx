@@ -94,6 +94,12 @@ export default async function AdminLayout({
                 >
                   🔔 Push Test
                 </Link>
+                <Link
+                  href={`/${locale}/admin/audit-logs`}
+                  className="block rounded-lg px-4 py-2.5 text-sm font-medium text-zinc-300 hover:bg-zinc-800 hover:text-white"
+                >
+                  📜 운영 로그
+                </Link>
               </>
             )}
           </nav>
@@ -155,6 +161,13 @@ export default async function AdminLayout({
             >
               <span className="text-xl">🌎</span>
               <span className="text-xs">{t("menu.allMatchesShort")}</span>
+            </Link>
+            <Link
+              href={`/${locale}/admin/audit-logs`}
+              className="flex flex-col items-center gap-1 px-3 py-2 text-amber-400 hover:text-amber-300"
+            >
+              <span className="text-xl">📜</span>
+              <span className="text-xs">운영 로그</span>
             </Link>
           </>
         )}

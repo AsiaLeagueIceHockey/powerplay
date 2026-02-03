@@ -971,3 +971,66 @@ export async function updateUserPoints(
 
   return { success: true };
 }
+
+// ==================== Audit Logs (SuperUser Only) ====================
+
+export interface AuditLog {
+  id: string;
+  created_at: string;
+  user_id: string;
+  action_type: string;
+  description: string;
+  metadata: any;
+  user: {
+    id: string;
+    email: string;
+    full_name: string | null;
+  } | null;
+}
+
+export async function getAuditLogs(limit: number = 50): Promise<AuditLog[]> {
+  const supabase = await createClient();
+
+  const isSuperUser = await checkIsSuperUser();
+  if (!isSuperUser) {
+    return [];
+  }
+
+  // 1. Fetch Audit Logs
+  const { data: logs, error } = await supabase
+    .from("audit_logs")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    console.error("Error fetching audit logs:", error);
+    return [];
+  }
+
+  if (!logs || logs.length === 0) {
+    return [];
+  }
+
+  // 2. Fetch User Profiles manually
+  const userIds = Array.from(new Set(logs.map((log) => log.user_id).filter(Boolean)));
+  
+  let userMap = new Map<string, { id: string; email: string; full_name: string | null }>();
+
+  if (userIds.length > 0) {
+    const { data: profiles } = await supabase
+      .from("profiles")
+      .select("id, email, full_name")
+      .in("id", userIds);
+      
+    if (profiles) {
+      profiles.forEach(p => userMap.set(p.id, p));
+    }
+  }
+
+  // 3. Combine
+  return logs.map((log) => ({
+    ...log,
+    user: log.user_id ? userMap.get(log.user_id) || null : null,
+  })) as AuditLog[];
+}
