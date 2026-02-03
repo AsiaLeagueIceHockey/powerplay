@@ -199,7 +199,7 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
         <input type="hidden" name="start_time" />
       </div>
 
-      {/* Entry Points (참가 포인트) */}
+      {/* Entry Points (참가 금액) */}
       <div>
         <label className="block text-sm font-medium mb-2 text-zinc-300">
           {t("admin.form.entryPoints")}

@@ -250,7 +250,7 @@ export function NotificationGuideModal() {
                     </div>
                     <h3 className="text-xl font-bold mb-2">중요 알림 켜기</h3>
                     <p className="text-zinc-500 dark:text-zinc-400">
-                      경기 일정, 포인트 충전, 취소 등<br/>중요한 소식을 푸시 알림으로 받아보세요.
+                      경기 일정, 금액 충전 등<br/>중요한 소식을 푸시 알림으로 받아보세요.
                     </p>
                   </div>
 

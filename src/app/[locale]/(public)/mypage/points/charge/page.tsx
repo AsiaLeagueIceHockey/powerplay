@@ -50,7 +50,7 @@ export default async function ChargePointsPage({
           href={`/${locale}/mypage/points`}
           className="text-sm text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"
         >
-          ← {locale === "ko" ? "포인트로 돌아가기" : "Back to Points"}
+          ← {locale === "ko" ? "충전 금액으로 돌아가기" : "Back to Points"}
         </Link>
         <h1 className="text-2xl font-bold mt-2">{t("title")}</h1>
       </div>
