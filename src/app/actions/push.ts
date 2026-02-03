@@ -251,7 +251,7 @@ export async function sendPushNotification(
   const errors: string[] = [];
 
   const results = await Promise.allSettled(
-    subscriptions.map(async (sub) => {
+    subscriptions.map(async (sub: any) => {
       try {
         await sendWithRetry(
           {
