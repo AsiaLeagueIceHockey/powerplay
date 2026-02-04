@@ -11,6 +11,7 @@ import { NotificationGuideModal } from "@/components/notification-guide-modal";
 import { InstallPrompt } from "@/components/install-prompt";
 import { OnboardingGuard } from "@/components/onboarding-guard";
 import NextTopLoader from "nextjs-toploader";
+import { Analytics } from "@vercel/analytics/next";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -132,6 +133,7 @@ export default async function LocaleLayout({
             <InstallPrompt />
           </NotificationProvider>
         </NextIntlClientProvider>
+        <Analytics />
       </body>
     </html>
   );

@@ -677,7 +677,12 @@ export async function getAdmins() {
   // Fetch all profiles with role 'admin'
   const { data: admins, error } = await supabase
     .from("profiles")
-    .select("*")
+    .select(`
+      *,
+      club_memberships (
+        club:clubs (name)
+      )
+    `)
     .eq("role", "admin")
     .order("created_at", { ascending: false });
 

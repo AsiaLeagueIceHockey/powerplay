@@ -38,6 +38,8 @@ export default async function AdminListPage({
                             <tr className="border-b border-zinc-800 bg-zinc-900/50">
                                 <th className="px-6 py-4 font-medium text-zinc-400">이름</th>
                                 <th className="px-6 py-4 font-medium text-zinc-400">이메일</th>
+                                <th className="px-6 py-4 font-medium text-zinc-400">전화번호</th>
+                                <th className="px-6 py-4 font-medium text-zinc-400">소속 동호회</th>
                                 <th className="px-6 py-4 font-medium text-zinc-400">가입일</th>
                                 <th className="px-6 py-4 font-medium text-zinc-400 text-right">상세보기</th>
                             </tr>
@@ -68,7 +70,17 @@ export default async function AdminListPage({
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 text-zinc-400 font-mono text-xs">
-                                            {admin.id}
+                                            {admin.email}
+                                        </td>
+                                        <td className="px-6 py-4 text-zinc-400 text-sm">
+                                            {admin.phone || "-"}
+                                        </td>
+                                        <td className="px-6 py-4 text-zinc-400 text-sm">
+                                            {/* @ts-ignore - Supabase type inference limitation */}
+                                            {admin.club_memberships?.length > 0 
+                                                // @ts-ignore
+                                                ? admin.club_memberships.map((m) => m.club?.name).join(", ") 
+                                                : "-"}
                                         </td>
                                         <td className="px-6 py-4 text-zinc-400">
                                             {new Date(admin.created_at).toLocaleDateString("ko-KR")}

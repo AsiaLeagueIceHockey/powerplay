@@ -68,7 +68,10 @@
         "terms": {
             "title": "Terms Agreement",
             "agree": "I agree to the collection and use of personal information",
-            "required": "(Required)"
+            "required": "(Required)",
+            "viewDetails": "View Details",
+            "privacyPolicySummary": "[Required] Consent to Collection and Use of Personal Information\n\nItems Collected: Name, Phone Number, Date of Birth, Position, Preferred Language\n\nPurpose of Collection and Use:\n- Service sign-up and identity verification\n- Service announcements\n- Age verification and personalized services\n\nRetention and Use Period: Until membership withdrawal (unless retention is required by relevant laws)\n\nRight to Refuse: You have the right to refuse consent. However, refusal will restrict the use of Power Play membership services.",
+            "termsFullText": "Power Play Terms of Service\n\n1. Purpose\nThese terms regulate the conditions and procedures for using the services provided by the ice hockey match management platform 'Power Play'.\n\n2. Member Obligations\nMembers must provide accurate information and must not use others' information or disrupt service operations.\n\n3. Refund and No-Show Policy\nMembers must comply with the refund policy set for each match (e.g., 100% refund until midnight the day before). No-shows may result in service restrictions.\n\n4. Disclaimer\nThe company is not responsible for injuries or accidents occurring during matches. Liability follows the agreement between the host club and participants."
         },
         "placeholder": {
             "phone": "010-1234-5678",
