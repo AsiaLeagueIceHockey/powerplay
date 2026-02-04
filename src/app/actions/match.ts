@@ -375,6 +375,7 @@ export async function cancelJoin(matchId: string) {
   }
 
   const isPendingPayment = participant.status === "pending_payment";
+  const isWaiting = participant.status === "waiting";
 
   // Get match info for refund calculation including goalie_free
   const { data: match } = await supabase
@@ -393,8 +394,12 @@ export async function cancelJoin(matchId: string) {
 
   let refundAmount = 0;
 
-  // Calculate refund based on policy (only if not pending_payment - they didn't pay yet)
-  if (!isPendingPayment && activeEntryPoints > 0) {
+  // Calculate refund based on policy
+  // Refund only if:
+  // 1. Not pending payment (haven't paid yet)
+  // 2. Not waiting (waitlist doesn't pay upfront)
+  // 3. Entry fee > 0
+  if (!isPendingPayment && !isWaiting && activeEntryPoints > 0) {
     const refundPercent = await calculateRefundPercent(match.start_time);
     refundAmount = Math.floor(activeEntryPoints * refundPercent / 100);
   }
@@ -463,6 +468,14 @@ export async function cancelJoin(matchId: string) {
       user.id,
       "취소 완료 ↩️",
       `무료로 참가한 경기가 취소되었습니다.`,
+      `/mypage`
+    );
+  } else if (isWaiting) {
+    // 대기 취소
+    await sendPushNotification(
+      user.id,
+      "대기 취소 완료 ↩️",
+      `대기 신청이 취소되었습니다.`,
       `/mypage`
     );
   } else {

@@ -40,10 +40,7 @@ export async function logAndNotify({
       // But inside `after`, the request context might be gone.
       // Safer to use SERVICE_ROLE for background logging to ensure permissions.
       
-      const adminKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-      if (!adminKey) {
-        console.warn("[AUDIT] Missing SERVICE_ROLE_KEY. Logging might fail if RLS blocks.");
-      }
+
 
       // We'll try standard client first. If `after` context loses auth, we might need Service Role.
       // However, for simplicity and ensuring "SuperUser" visibility, let's just use standard client 
