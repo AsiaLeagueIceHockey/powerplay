@@ -56,6 +56,7 @@ export function AdminMatchCard({
       setIsProcessing(false);
     } else {
       router.refresh();
+      setIsProcessing(false);
     }
   };
 
@@ -76,6 +77,7 @@ export function AdminMatchCard({
     } else {
       alert(locale === "ko" ? "경기가 취소되고 환불 처리가 완료되었습니다." : "Match canceled and refunds processed.");
       router.refresh();
+      setIsProcessing(false);
     }
   };
 

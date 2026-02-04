@@ -269,10 +269,14 @@ export async function cancelMatchByAdmin(matchId: string) {
     return { error: "Match not found" };
   }
 
-  const { data: participants } = await supabase
+  const { data: participants, error: participantsError } = await supabase
     .from("participants")
-    .select("user_id, status, entry_points") // entry_points might not be on participant, check schema. Usually match has entry_points.
+    .select("user_id, status")
     .eq("match_id", matchId);
+
+  if (participantsError) {
+    return { error: "Failed to fetch participants: " + participantsError.message };
+  }
 
   if (!participants) return { success: true };
 
@@ -327,13 +331,19 @@ export async function cancelMatchByAdmin(matchId: string) {
   await Promise.all(refundPromises);
 
   // 3. Update Match Status
-  const { error } = await supabase
+  const { data: updatedMatch, error } = await supabase
     .from("matches")
     .update({ status: "canceled" })
-    .eq("id", matchId);
+    .eq("id", matchId)
+    .select()
+    .single();
 
   if (error) {
     return { error: error.message };
+  }
+
+  if (!updatedMatch) {
+    return { error: "Failed to update match status. Check permissions." };
   }
 
   revalidatePath("/admin/matches");
