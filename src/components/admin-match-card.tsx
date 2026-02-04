@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { AdminParticipantList } from "./admin-participant-list";
-import { deleteMatch } from "@/app/actions/admin";
+import { deleteMatch, cancelMatchByAdmin } from "@/app/actions/admin";
 import { AdminNewBadge, markMatchAsSeen } from "./admin-new-badge";
 
 interface Match {
@@ -35,26 +35,47 @@ export function AdminMatchCard({
   locale: string;
 }) {
   const [showParticipants, setShowParticipants] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   const [badgeKey, setBadgeKey] = useState(0);
   const router = useRouter();
   const t = useTranslations("admin");
 
   const totalParticipants = match.participants?.length || 0;
+  const hasParticipants = totalParticipants > 0;
+  const isCanceled = match.status === "canceled";
 
   const handleDelete = async () => {
-    if (!confirm(locale === "ko" ? "정말 이 경기를 삭제하시겠습니까?" : "Are you sure you want to delete this match?")) {
+    if (!confirm(locale === "ko" ? "정말 이 경기를 영구 삭제하시겠습니까? (복구 불가)" : "Are you sure you want to permanently delete this match?")) {
       return;
     }
 
-    setIsDeleting(true);
+    setIsProcessing(true);
     const result = await deleteMatch(match.id);
     if (result.error) {
       alert(locale === "ko" ? "삭제 실패: " + result.error : "Delete failed: " + result.error);
-      setIsDeleting(false);
+      setIsProcessing(false);
     } else {
       router.refresh();
-      // Optional: Give UI feedback or wait for refresh
+    }
+  };
+
+  const handleCancel = async () => {
+    const confirmMessage = locale === "ko" 
+      ? `현재 ${totalParticipants}명의 참가자가 있습니다.\n경기를 취소하고 전원 환불 처리하시겠습니까?\n(참가자에게 알림이 발송됩니다)`
+      : `There are ${totalParticipants} participants.\nDo you want to cancel the match and refund everyone?\n(Notifications will be sent)`;
+
+    if (!confirm(confirmMessage)) {
+      return;
+    }
+
+    setIsProcessing(true);
+    const result = await cancelMatchByAdmin(match.id);
+    if (result.error) {
+      alert(locale === "ko" ? "취소 실패: " + result.error : "Cancel failed: " + result.error);
+      setIsProcessing(false);
+    } else {
+      alert(locale === "ko" ? "경기가 취소되고 환불 처리가 완료되었습니다." : "Match canceled and refunds processed.");
+      router.refresh();
     }
   };
 
@@ -166,19 +187,53 @@ export function AdminMatchCard({
 
       <div className="space-y-3">
         <div className="grid grid-cols-2 gap-3">
-          <Link
-            href={`/${locale}/admin/matches/${match.id}/edit`}
-            className="block w-full py-2.5 text-center bg-zinc-100 dark:bg-zinc-200 text-zinc-900 rounded-lg text-sm font-bold hover:bg-white transition-colors"
-          >
-            {t("matches.edit")}
-          </Link>
-          <button
-            onClick={handleDelete}
-            disabled={isDeleting}
-            className="block w-full py-2.5 text-center bg-red-100/10 border border-red-900/50 text-red-500 rounded-lg text-sm font-bold hover:bg-red-900/20 transition-colors disabled:opacity-50"
-          >
-             {isDeleting ? "..." : t("matches.delete")}
-          </button>
+          {isCanceled || isPastMatch ? (
+            <button
+              disabled
+              className="block w-full py-2.5 text-center bg-zinc-800 text-zinc-600 border border-zinc-700 rounded-lg text-sm font-bold cursor-not-allowed"
+            >
+              {t("matches.edit")}
+            </button>
+          ) : (
+            <Link
+              href={`/${locale}/admin/matches/${match.id}/edit`}
+              className="block w-full py-2.5 text-center bg-zinc-100 dark:bg-zinc-200 text-zinc-900 rounded-lg text-sm font-bold hover:bg-white transition-colors"
+            >
+              {t("matches.edit")}
+            </Link>
+          )}
+          
+          {isCanceled ? (
+             <button
+              disabled
+              className="block w-full py-2.5 text-center bg-zinc-700/30 text-zinc-500 border border-zinc-700 rounded-lg text-sm font-bold cursor-not-allowed"
+            >
+              {locale === "ko" ? "취소됨" : "Canceled"}
+            </button>
+          ) : isPastMatch ? (
+             <button
+              disabled
+              className="block w-full py-2.5 text-center bg-zinc-700/30 text-zinc-500 border border-zinc-700 rounded-lg text-sm font-bold cursor-not-allowed"
+            >
+              {locale === "ko" ? "경기 완료" : "Finished"}
+            </button>
+          ) : hasParticipants ? (
+            <button
+              onClick={handleCancel}
+              disabled={isProcessing}
+              className="block w-full py-2.5 text-center bg-orange-500/10 border border-orange-500/50 text-orange-500 rounded-lg text-sm font-bold hover:bg-orange-500/20 transition-colors disabled:opacity-50"
+            >
+               {isProcessing ? "..." : (locale === "ko" ? "경기 취소" : "Cancel Match")}
+            </button>
+          ) : (
+            <button
+              onClick={handleDelete}
+              disabled={isProcessing}
+              className="block w-full py-2.5 text-center bg-red-100/10 border border-red-900/50 text-red-500 rounded-lg text-sm font-bold hover:bg-red-900/20 transition-colors disabled:opacity-50"
+            >
+               {isProcessing ? "..." : t("matches.delete")}
+            </button>
+          )}
         </div>
 
         <button
@@ -188,6 +243,7 @@ export function AdminMatchCard({
           {showParticipants ? t("matches.hideParticipants") : t("matches.viewParticipants")}
         </button>
       </div>
+
 
       {showParticipants && (
         <div className="mt-4 pt-4 border-t border-zinc-700">

@@ -59,6 +59,8 @@ export function MatchEditForm({
     return kstFormatter.format(date).replace(" ", "T");
   };
 
+  const isCanceled = match.status === "canceled";
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
@@ -97,6 +99,19 @@ export function MatchEditForm({
         {t("admin.matches.edit")}
       </h2>
 
+      {/* Canceled Warning */}
+      {isCanceled && (
+        <div className="p-4 bg-red-900/20 border border-red-800/50 text-red-200 rounded-lg flex items-center gap-3">
+          <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+          <div>
+            <p className="font-bold text-sm">{locale === "ko" ? "취소된 경기입니다" : "Match Canceled"}</p>
+            <p className="text-xs opacity-80">{locale === "ko" ? "취소된 경기는 수정하거나 상태를 변경할 수 없습니다." : "Canceled matches cannot be edited or reopened."}</p>
+          </div>
+        </div>
+      )}
+
       {error && (
         <div className="p-4 bg-red-900/50 border border-red-800 text-red-200 rounded-lg">
           {error}
@@ -111,12 +126,18 @@ export function MatchEditForm({
         <select
           name="status"
           defaultValue={match.status}
-          className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+          disabled={isCanceled}
+          className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <option value="open">{t("match.status.open")}</option>
           <option value="closed">{t("match.status.closed")}</option>
-          <option value="canceled">{t("match.status.canceled")}</option>
+          {isCanceled && <option value="canceled">{t("match.status.canceled")}</option>}
         </select>
+        {!isCanceled && (
+             <p className="text-xs text-zinc-500 mt-1">
+            {locale === "ko" ? "* 취소는 목록 페이지에서 가능합니다." : "* Cancellation is available in the list view."}
+          </p>
+        )}
       </div>
 
       {/* Rink Selection */}
@@ -127,7 +148,8 @@ export function MatchEditForm({
         <select
           name="rink_id"
           defaultValue={match.rink?.id || ""}
-          className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+          disabled={isCanceled}
+          className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
         >
           <option value="">{t("admin.form.selectRink")}</option>
           {rinks.map((rink) => (
@@ -157,8 +179,9 @@ export function MatchEditForm({
             <input
               type="date"
               required
+              disabled={isCanceled}
               defaultValue={formatDateTimeLocal(match.start_time).split("T")[0]}
-              className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 appearance-none [-webkit-appearance:none]"
+              className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 appearance-none [-webkit-appearance:none] disabled:opacity-50"
               onChange={(e) => {
                 const date = e.target.value;
                 const form = e.target.closest('form');
@@ -183,8 +206,9 @@ export function MatchEditForm({
                 <select
                   name="_hour"
                   required
+                  disabled={isCanceled}
                   defaultValue={formatDateTimeLocal(match.start_time).split("T")[1].split(":")[0]}
-                  className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 appearance-none"
+                  className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 appearance-none disabled:opacity-50"
                   onChange={(e) => {
                     const hour = e.target.value;
                     const form = e.target.closest('form');
@@ -219,8 +243,9 @@ export function MatchEditForm({
                 <select
                   name="_minute"
                   required
+                  disabled={isCanceled}
                   defaultValue={formatDateTimeLocal(match.start_time).split("T")[1].split(":")[1]}
-                  className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 appearance-none"
+                  className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 appearance-none disabled:opacity-50"
                   onChange={(e) => {
                     const minute = e.target.value;
                     const form = e.target.closest('form');
@@ -261,12 +286,13 @@ export function MatchEditForm({
           <input
             type="text"
             name="fee"
+            disabled={isCanceled}
             defaultValue={match.fee?.toLocaleString()}
             onChange={(e) => {
               const value = e.target.value.replace(/[^0-9]/g, "");
               e.target.value = value ? Number(value).toLocaleString() : "";
             }}
-            className="w-full px-4 py-3 pr-8 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+            className="w-full px-4 py-3 pr-8 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
             placeholder="0"
           />
           <span className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500">
@@ -285,9 +311,10 @@ export function MatchEditForm({
             <input
               type="number"
               name="max_skaters"
+              disabled={isCanceled}
               defaultValue={match.max_skaters}
               min={0}
-              className="w-full px-4 py-3 pr-8 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              className="w-full px-4 py-3 pr-8 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
             />
             <span className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 text-sm">명</span>
           </div>
@@ -300,9 +327,10 @@ export function MatchEditForm({
             <input
               type="number"
               name="max_goalies"
+              disabled={isCanceled}
               defaultValue={match.max_goalies}
               min={0}
-              className="w-full px-4 py-3 pr-8 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              className="w-full px-4 py-3 pr-8 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
             />
             <span className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 text-sm">명</span>
           </div>
@@ -316,8 +344,9 @@ export function MatchEditForm({
           name="goalie_free"
           id="goalie_free_edit"
           value="true"
+          disabled={isCanceled}
           defaultChecked={match.goalie_free === true}
-          className="w-5 h-5 rounded border-zinc-600 bg-zinc-800 text-blue-600 focus:ring-blue-500"
+          className="w-5 h-5 rounded border-zinc-600 bg-zinc-800 text-blue-600 focus:ring-blue-500 disabled:opacity-50"
         />
         <label htmlFor="goalie_free_edit" className="flex flex-col">
           <span className="text-sm font-medium text-zinc-200">
@@ -337,8 +366,9 @@ export function MatchEditForm({
         <input
           type="text"
           name="bank_account"
+          disabled={isCanceled}
           defaultValue={match.bank_account || ""}
-          className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+          className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
           placeholder="예: 카카오뱅크 3333-00-0000000 홍길동"
         />
         <p className="text-xs text-zinc-500 mt-1">
@@ -354,20 +384,23 @@ export function MatchEditForm({
         <textarea
           name="description"
           rows={4}
+          disabled={isCanceled}
           defaultValue={match.description || ""}
-          className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+          className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
           placeholder={t("admin.form.descriptionPlaceholder")}
         />
       </div>
 
       {/* Submit */}
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors font-medium border border-blue-500"
-      >
-        {loading ? t("admin.form.saving") : t("admin.form.save")}
-      </button>
+      {!isCanceled && (
+        <button
+          type="submit"
+          disabled={loading || isCanceled}
+          className="w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors font-medium border border-blue-500"
+        >
+          {loading ? t("admin.form.saving") : t("admin.form.save")}
+        </button>
+      )}
     </form>
   );
 }

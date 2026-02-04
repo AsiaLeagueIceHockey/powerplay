@@ -158,32 +158,72 @@ export async function updateMatch(matchId: string, formData: FormData) {
 
   revalidatePath("/admin/matches");
   revalidatePath(`/admin/matches/${matchId}/edit`);
-  // 알림 발송 (Trigger 5: 경기 취소)
+  // 알림 발송 및 환불 처리 (Trigger 5: 경기 취소)
   if (status === "canceled") {
-    // 1. Get all participants
+    // 1. Get all participants with status
     const { data: participants } = await supabase
       .from("participants")
-      .select("user_id")
+      .select("user_id, status")
       .eq("match_id", matchId)
       .in("status", ["applied", "confirmed", "pending_payment"]);
 
-    // 2. Send notifications
     if (participants && participants.length > 0) {
-      const matchDate = new Date(startTimeUTC).toLocaleString("ko-KR", {
-        month: "short", day: "numeric", hour: "2-digit", minute: "2-digit",
-        timeZone: "Asia/Seoul"
-      });
+      // 2. Fetch match info for refund amount
+      const { data: currentMatch } = await supabase
+        .from("matches")
+        .select("entry_points, start_time, rink:rinks(name_ko)")
+        .eq("id", matchId)
+        .single();
+        
+      if (currentMatch) {
+         // @ts-ignore
+        const rinkName = currentMatch.rink?.name_ko || "경기";
+        const startTime = new Date(currentMatch.start_time).toLocaleString("ko-KR", {
+          month: "short", day: "numeric", hour: "2-digit", minute: "2-digit",
+          timeZone: "Asia/Seoul"
+        });
 
-      await Promise.allSettled(
-        participants.map((p) =>
-          sendPushNotification(
-            p.user_id,
-            "경기 취소 알림 🚫",
-            `신청하신 ${matchDate} 경기가 취소되었습니다. 환불 규정에 따라 처리될 예정입니다.`,
-            `/mypage`
-          )
-        )
-      );
+        await Promise.allSettled(
+          participants.map(async (p) => {
+            // A. Refund Logic (Only for confirmed users)
+            if (p.status === "confirmed" && currentMatch.entry_points > 0) {
+               const { data: userProfile } = await supabase
+                .from("profiles")
+                .select("points")
+                .eq("id", p.user_id)
+                .single();
+              
+              if (userProfile) {
+                const newBalance = (userProfile.points || 0) + currentMatch.entry_points;
+                
+                // Update Balance
+                await supabase
+                  .from("profiles")
+                  .update({ points: newBalance })
+                  .eq("id", p.user_id);
+
+                // Log Transaction
+                await supabase.from("point_transactions").insert({
+                  user_id: p.user_id,
+                  type: "refund",
+                  amount: currentMatch.entry_points,
+                  balance_after: newBalance,
+                  description: "관리자 취소 환불 (100%)",
+                  reference_id: matchId,
+                });
+              }
+            }
+
+            // B. Send Notification
+            return sendPushNotification(
+              p.user_id,
+              "경기 취소 알림 🚫",
+              `관리자 사정으로 ${rinkName} (${startTime}) 경기가 취소되었습니다. (확정자는 전액 환불)`,
+              `/mypage`
+            );
+          })
+        );
+      }
     }
   }
 
@@ -194,6 +234,111 @@ export async function updateMatch(matchId: string, formData: FormData) {
 
 // Toggle participant payment status
 
+
+// Cancel a match by admin (Safe cancellation with refunds)
+export async function cancelMatchByAdmin(matchId: string) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "Not authenticated" };
+  }
+
+  // Verify admin or superuser role
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  if (profile?.role !== "admin" && profile?.role !== "superuser") {
+    return { error: "Unauthorized" };
+  }
+
+  // 1. Get Match Info & Participants
+  const { data: match } = await supabase
+    .from("matches")
+    .select("start_time, entry_points, rink:rinks(name_ko)")
+    .eq("id", matchId)
+    .single();
+
+  if (!match) {
+    return { error: "Match not found" };
+  }
+
+  const { data: participants } = await supabase
+    .from("participants")
+    .select("user_id, status, entry_points") // entry_points might not be on participant, check schema. Usually match has entry_points.
+    .eq("match_id", matchId);
+
+  if (!participants) return { success: true };
+
+  // 2. Process Refunds & Notifications
+  const refundPromises = participants.map(async (p) => {
+    // Refund only confirmed participants with payment
+    // We treat admin cancellation as 100% refund regardless of time
+    if (p.status === "confirmed" && match.entry_points > 0) {
+      const { data: userProfile } = await supabase
+        .from("profiles")
+        .select("points")
+        .eq("id", p.user_id)
+        .single();
+      
+      if (userProfile) {
+        const newBalance = (userProfile.points || 0) + match.entry_points;
+        
+        // Update Balance
+        await supabase
+          .from("profiles")
+          .update({ points: newBalance })
+          .eq("id", p.user_id);
+
+        // Log Transaction
+        await supabase.from("point_transactions").insert({
+          user_id: p.user_id,
+          type: "refund",
+          amount: match.entry_points,
+          balance_after: newBalance,
+          description: "관리자 취소 환불 (100%)",
+          reference_id: matchId,
+        });
+      }
+    }
+
+    // Send Notification to ALL participants
+    // @ts-ignore
+    const rinkName = match.rink?.name_ko || "경기";
+    const startTime = new Date(match.start_time).toLocaleString("ko-KR", {
+      month: "short", day: "numeric", hour: "2-digit", minute: "2-digit",
+      timeZone: "Asia/Seoul"
+    });
+
+    return sendPushNotification(
+      p.user_id,
+      "경기 취소 알림 📢",
+      `관리자 사정으로 ${rinkName} (${startTime}) 경기가 취소되었습니다. (확정자는 전액 환불)`,
+      "/mypage" // Redirect to mypage or points history
+    );
+  });
+
+  await Promise.all(refundPromises);
+
+  // 3. Update Match Status
+  const { error } = await supabase
+    .from("matches")
+    .update({ status: "canceled" })
+    .eq("id", matchId);
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  revalidatePath("/admin/matches");
+  return { success: true };
+}
 
 // Delete a match
 export async function deleteMatch(matchId: string) {
@@ -216,6 +361,16 @@ export async function deleteMatch(matchId: string) {
 
   if (profile?.role !== "admin" && profile?.role !== "superuser") {
     return { error: "Unauthorized" };
+  }
+
+  // SAFETY GUARD: Check for participants
+  const { count } = await supabase
+    .from("participants")
+    .select("*", { count: "exact", head: true })
+    .eq("match_id", matchId);
+
+  if (count && count > 0) {
+    return { error: "참가자가 있는 경기는 삭제할 수 없습니다. 대신 '경기 취소'를 이용해주세요." };
   }
 
   const { error } = await supabase.from("matches").delete().eq("id", matchId);

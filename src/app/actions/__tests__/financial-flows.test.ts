@@ -4,6 +4,7 @@ import { mockSupabase, resetSupabaseMock, createChainableMock } from '../../../.
 import { joinMatch, cancelJoin } from '../match';
 import { confirmPointCharge } from '../superuser';
 import { requestPointCharge } from '../points';
+import { deleteMatch, cancelMatchByAdmin } from '../admin';
 
 // Mock External Dependencies
 vi.mock('@/lib/supabase/server', () => ({
@@ -303,6 +304,62 @@ describe('Financial Flows', () => {
         payment_status: true
       }));
       expect(participantsMock.eq).toHaveBeenCalledWith('id', mockWaiter.id);
+    });
+  });
+
+  describe('Admin Cancellation Flow', () => {
+    it('Guard: deleteMatch fails if participants exist', async () => {
+      // Mock Admin Role
+      profilesMock.single.mockResolvedValue({ data: { role: 'admin' } });
+
+      // Setup: Participants exist
+      participantsMock.select.mockReturnThis();
+      participantsMock.eq.mockResolvedValue({ count: 5 }); // 5 participants
+
+      const result = await deleteMatch(mockMatchId);
+
+      expect(result.error).toBeDefined();
+      expect(result.error).toContain('참가자가 있는 경기');
+      
+      // Verify NO delete
+      expect(matchesMock.delete).not.toHaveBeenCalled();
+    });
+
+    it('Refund: cancelMatchByAdmin refunds confirmed users', async () => {
+      // 1. Setup: Confirmed user exists
+      matchesMock.single.mockResolvedValue({
+        data: { entry_points: 10000, start_time: new Date().toISOString(), rink: { name_ko: 'Rink' } }
+      });
+
+      const mockParticipant = { user_id: 'p-user', status: 'confirmed', entry_points: 0 };
+      participantsMock.select.mockReturnThis();
+      participantsMock.eq.mockResolvedValue({ data: [mockParticipant] }); 
+
+      // Mock Profile Calls:
+      // 1. Check Admin Role (cancelMatchByAdmin)
+      // 2. Fetch User Points (for refund)
+      profilesMock.single
+        .mockResolvedValueOnce({ data: { role: 'admin' } })
+        .mockResolvedValueOnce({ data: { points: 5000 } });
+
+      // 2. Action
+      const result = await cancelMatchByAdmin(mockMatchId);
+
+      // 3. Verify
+      expect(result.success).toBe(true);
+      
+      // Refund processed (5000 + 10000)
+      expect(profilesMock.update).toHaveBeenCalledWith({ points: 15000 });
+      
+      // Transaction logged
+      expect(transactionsMock.insert).toHaveBeenCalledWith(expect.objectContaining({
+        type: 'refund',
+        amount: 10000,
+        description: expect.stringContaining('관리자 취소')
+      }));
+
+      // Match status updated
+      expect(matchesMock.update).toHaveBeenCalledWith({ status: 'canceled' });
     });
   });
 });
