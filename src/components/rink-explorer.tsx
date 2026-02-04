@@ -24,7 +24,7 @@ export function RinkExplorer({ rinks, matches, clubs }: RinkExplorerProps) {
   );
 
   return (
-    <div className="flex flex-col h-[calc(100vh-200px)] min-h-[600px] gap-4">
+    <div className="flex flex-col gap-4">
       {/* Search & Toggle Bar */}
       {/* Search & Toggle Bar */}
       <div className="flex flex-col gap-3 sticky top-0 z-10 bg-white dark:bg-zinc-950 pb-2">
@@ -72,11 +72,11 @@ export function RinkExplorer({ rinks, matches, clubs }: RinkExplorerProps) {
       </div>
 
       {/* Content Area */}
-      <div className={`flex-1 relative rounded-xl overflow-hidden ${viewMode === 'map' ? 'border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900' : ''}`}>
+      <div className={`flex-1 relative rounded-xl overflow-hidden ${viewMode === 'map' ? 'h-[calc(100vh-200px)] min-h-[600px] border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900' : ''}`}>
         {viewMode === "map" ? (
           <DynamicRinkMap rinks={rinks} matches={matches} clubs={clubs} />
         ) : (
-          <div className="h-full overflow-y-auto pb-4 no-scrollbar">
+          <div className="pb-4">
             {filteredRinks.length === 0 ? (
                 <div className="h-full flex items-center justify-center text-zinc-500">
                     검색 결과가 없습니다.
