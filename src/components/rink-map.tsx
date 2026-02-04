@@ -16,6 +16,7 @@ interface RinkMapProps {
 function RinkDetailCard({ rink, matches, clubs = [], onClose }: { rink: Rink; matches: Match[]; clubs?: Club[]; onClose: () => void }) {
   const rinkMatches = matches
     .filter((m) => m.rink?.id === rink.id)
+    .filter((m) => m.status !== "canceled") // Hide canceled matches
     .filter((m) => new Date(m.start_time) >= new Date()) // Future matches only
     .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime())
     .slice(0, 3); // Top 3

@@ -77,6 +77,7 @@ export async function getMatches(): Promise<Match[]> {
       club:club_id(id, name, kakao_open_chat_url, logo_url)
     `
     )
+    .neq("status", "canceled")
     .order("start_time", { ascending: true });
 
   if (error) {

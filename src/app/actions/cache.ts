@@ -85,6 +85,7 @@ export async function getCachedMatches(): Promise<Match[]> {
       rink:rink_id(id, name_ko, name_en, address, lat, lng, rink_type),
       club:club_id(id, name, kakao_open_chat_url, logo_url)
     `)
+    .neq("status", "canceled")
     .order("start_time", { ascending: true });
 
   if (error) {
