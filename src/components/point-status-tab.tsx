@@ -19,9 +19,10 @@ interface PointStatusTabProps {
 export function PointStatusTab({ initialUsers = [] }: PointStatusTabProps) {
   const t = useTranslations("admin.pointManagement");
   const locale = useLocale();
-  const [users, setUsers] = useState<UserPointStatus[]>(initialUsers);
+  
+  // Maintain all users in state to handle updates (like editing points)
+  const [allUsers, setAllUsers] = useState<UserPointStatus[]>(initialUsers);
   const [searchTerm, setSearchTerm] = useState("");
-  const [isSearching, startSearch] = useTransition();
   const [selectedUser, setSelectedUser] = useState<UserPointStatus | null>(null);
   const [isHistoryLoading, setIsHistoryLoading] = useState(false);
   const [history, setHistory] = useState<PointTransaction[]>([]);
@@ -32,13 +33,11 @@ export function PointStatusTab({ initialUsers = [] }: PointStatusTabProps) {
   const [editReason, setEditReason] = useState("");
   const [isSaving, startSave] = useTransition();
 
-  const handleSearch = (term: string) => {
-    setSearchTerm(term);
-    startSearch(async () => {
-      const results = await getAllUserPoints(term);
-      setUsers(results);
-    });
-  };
+  // Client-side filtering
+  const filteredUsers = allUsers.filter(user => 
+    (user.email?.toLowerCase() || "").includes(searchTerm.toLowerCase()) || 
+    (user.full_name?.toLowerCase() || "").includes(searchTerm.toLowerCase())
+  );
 
   const handleUserClick = async (user: UserPointStatus) => {
     setSelectedUser(user);
@@ -63,8 +62,9 @@ export function PointStatusTab({ initialUsers = [] }: PointStatusTabProps) {
       const result = await updateUserPoints(selectedUser.id, editAmount, editReason);
       if (result.success) {
         // Refresh local state
-        setUsers(users.map(u => u.id === selectedUser.id ? { ...u, points: editAmount } : u));
-        setSelectedUser({ ...selectedUser, points: editAmount });
+        const updatedUser = { ...selectedUser, points: editAmount };
+        setAllUsers(allUsers.map(u => u.id === selectedUser.id ? updatedUser : u));
+        setSelectedUser(updatedUser);
         
         // Refresh history
         const txs = await getUserTransactionHistory(selectedUser.id);
@@ -99,24 +99,20 @@ export function PointStatusTab({ initialUsers = [] }: PointStatusTabProps) {
               type="text"
               placeholder={t("searchPlaceholder")}
               value={searchTerm}
-              onChange={(e) => handleSearch(e.target.value)}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full bg-zinc-800 border-zinc-700 rounded-lg pl-9 pr-4 py-2 text-sm text-white focus:ring-2 focus:ring-blue-500 outline-none"
             />
           </div>
         </div>
         
         <div className="flex-1 overflow-y-auto">
-          {isSearching ? (
-            <div className="p-8 flex justify-center">
-              <Loader2 className="w-6 h-6 animate-spin text-zinc-500" />
-            </div>
-          ) : users.length === 0 ? (
+          {filteredUsers.length === 0 ? (
             <div className="p-8 text-center text-zinc-500 text-sm">
               No users found.
             </div>
           ) : (
             <div className="divide-y divide-zinc-800">
-              {users.map((user) => (
+              {filteredUsers.map((user) => (
                 <div
                   key={user.id}
                   onClick={() => handleUserClick(user)}

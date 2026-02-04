@@ -883,9 +883,12 @@ export async function getAllUserPoints(search?: string): Promise<UserPointStatus
 
   if (search) {
      query = query.or(`email.ilike.%${search}%,full_name.ilike.%${search}%`);
-  } else {
-     query = query.limit(50);
   }
+  
+  // User requested to fetch ALL users without limit.
+  // else {
+  //    query = query.limit(50);
+  // }
 
   const { data, error } = await query;
   if (error) {
