@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { updateProfile } from "@/app/actions/auth";
-import { Check, Loader2 } from "lucide-react";
+import { Check, Loader2, X } from "lucide-react";
 import { BirthDatePicker } from "@/components/birth-date-picker";
 
 interface Profile {
@@ -190,7 +190,7 @@ export function OnboardingForm({ profile, locale }: OnboardingFormProps) {
                 onClick={() => setShowTermsModal(false)}
                 className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full"
               >
-                <Check className="w-5 h-5" />
+                <X className="w-5 h-5" />
               </button>
             </div>
             
@@ -212,13 +212,10 @@ export function OnboardingForm({ profile, locale }: OnboardingFormProps) {
 
             <div className="p-4 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50 rounded-b-2xl sticky bottom-0 z-10">
               <button
-                onClick={() => {
-                  setFormData(prev => ({ ...prev, termsAgreed: true }));
-                  setShowTermsModal(false);
-                }}
+                onClick={() => setShowTermsModal(false)}
                 className="w-full py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition active:scale-[0.98]"
               >
-                동의하고 닫기
+                확인
               </button>
             </div>
           </div>
