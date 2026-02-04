@@ -60,6 +60,7 @@ export function MatchEditForm({
   };
 
   const isCanceled = match.status === "canceled";
+  const hasGoalies = (match.participants_count?.g || 0) > 0;
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -338,22 +339,25 @@ export function MatchEditForm({
       </div>
 
       {/* Goalie Free Option */}
-      <div className="flex items-center gap-3 p-4 bg-zinc-900/50 rounded-lg border border-zinc-700">
+      <div className={`flex items-center gap-3 p-4 rounded-lg border ${hasGoalies ? 'bg-zinc-800 border-zinc-700 opacity-60' : 'bg-zinc-900/50 border-zinc-700'}`}>
         <input
           type="checkbox"
           name="goalie_free"
           id="goalie_free_edit"
           value="true"
-          disabled={isCanceled}
+          disabled={isCanceled || hasGoalies}
           defaultChecked={match.goalie_free === true}
-          className="w-5 h-5 rounded border-zinc-600 bg-zinc-800 text-blue-600 focus:ring-blue-500 disabled:opacity-50"
+          className="w-5 h-5 rounded border-zinc-600 bg-zinc-800 text-blue-600 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
         />
-        <label htmlFor="goalie_free_edit" className="flex flex-col">
+        <label htmlFor="goalie_free_edit" className="flex flex-col flex-1">
           <span className="text-sm font-medium text-zinc-200">
             🧤 {t("match.goalieFreeLabel")}
           </span>
           <span className="text-xs text-zinc-400">
-            {t("match.goalieFreeDesc")}
+            {hasGoalies 
+              ? (locale === "ko" ? "이미 신청한 골리가 있어 설정을 변경할 수 없습니다." : "Cannot change setting because goalies have already applied.")
+              : t("match.goalieFreeDesc")
+            }
           </span>
         </label>
       </div>

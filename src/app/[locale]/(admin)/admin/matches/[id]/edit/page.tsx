@@ -21,7 +21,25 @@ export default async function EditMatchPage({
     notFound();
   }
 
-  // Transform rink for form
+  // Transform participants for list
+  const participantsForList =
+    match.participants?.filter((p) => p.status !== "canceled") || [];
+
+  // Calculate counts for validation (Consolidated logic)
+  const fwCount = participantsForList.filter(
+    (p) =>
+      p.position === "FW" && ["applied", "confirmed", "pending_payment"].includes(p.status)
+  ).length;
+  const dfCount = participantsForList.filter(
+    (p) =>
+      p.position === "DF" && ["applied", "confirmed", "pending_payment"].includes(p.status)
+  ).length;
+  const gCount = participantsForList.filter(
+    (p) =>
+      p.position === "G" && ["applied", "confirmed", "pending_payment"].includes(p.status)
+  ).length;
+
+  // Transform rink for form and inject accurate counts
   const matchForForm = {
     ...match,
     rink: match.rink
@@ -31,11 +49,12 @@ export default async function EditMatchPage({
           name_en: match.rink.name_en,
         }
       : null,
+    participants_count: {
+      fw: fwCount,
+      df: dfCount,
+      g: gCount,
+    },
   };
-
-  // Transform participants for list
-  const participantsForList =
-    match.participants?.filter((p) => p.status !== "canceled") || [];
 
   return (
     <div>
