@@ -214,6 +214,7 @@
             "noClubs": "등록된 동호회가 없습니다",
             "createFirst": "첫 번째 동호회 등록하기",
             "members": "멤버 {count}명",
+            "membersTitle": "멤버 목록 ({count}명)",
             "openChat": "오픈채팅",
             "edit": "수정"
         },

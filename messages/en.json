@@ -212,6 +212,7 @@
             "noClubs": "No clubs registered",
             "createFirst": "Register First Club",
             "members": "{count} Members",
+            "membersTitle": "Member List ({count})",
             "openChat": "Open Chat",
             "edit": "Edit"
         },

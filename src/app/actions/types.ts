@@ -22,6 +22,7 @@ export interface Club {
   created_at?: string;
   member_count?: number;
   rinks?: Rink[];
+  members?: { full_name: string | null; email: string; }[];
 }
 
 export interface ClubMembership {

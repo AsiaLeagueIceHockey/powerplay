@@ -65,14 +65,27 @@ export async function getClubs(): Promise<Club[]> {
         .select("*", { count: "exact", head: true })
         .eq("club_id", club.id);
 
+      // Fetch detailed member info
+      const { data: membersData } = await supabase
+        .from("club_memberships")
+        .select("user:profiles(full_name, email)")
+        .eq("club_id", club.id);
+
       // Transform club_rinks to rinks
       // @ts-ignore
       const rinks = club.club_rinks?.map((cr) => cr.rink).filter(Boolean) || [];
+
+      // Transform members data
+      const members = membersData?.map((m: any) => ({
+        full_name: m.user?.full_name || null,
+        email: m.user?.email || "",
+      })) || [];
 
       return {
         ...club,
         member_count: count || 0,
         rinks,
+        members,
       } as Club;
     })
   );
@@ -123,14 +136,27 @@ export async function getAdminClubs(): Promise<Club[]> {
         .select("*", { count: "exact", head: true })
         .eq("club_id", club.id);
 
+      // Fetch detailed member info
+      const { data: membersData } = await supabase
+        .from("club_memberships")
+        .select("user:profiles(full_name, email)")
+        .eq("club_id", club.id);
+
       // Transform club_rinks to rinks
       // @ts-ignore
       const rinks = club.club_rinks?.map((cr) => cr.rink).filter(Boolean) || [];
+
+      // Transform members data
+      const members = membersData?.map((m) => ({
+        full_name: (m.user as any)?.full_name || null,
+        email: (m.user as any)?.email || "",
+      })) || [];
 
       return {
         ...club,
         member_count: count || 0,
         rinks,
+        members,
       } as Club;
     })
   );

@@ -1,7 +1,7 @@
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { getAdminClubs } from "@/app/actions/clubs";
 import Link from "next/link";
-import { Users, MessageCircle } from "lucide-react";
+import { AdminClubCard } from "@/components/admin-club-card";
 
 export default async function AdminClubsPage({
   params,
@@ -38,37 +38,7 @@ export default async function AdminClubsPage({
       ) : (
         <div className="space-y-3">
           {clubs.map((club) => (
-            <div
-              key={club.id}
-              className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 bg-zinc-800 rounded-lg"
-            >
-              <div className="flex-1">
-                <div className="font-medium text-lg">{club.name}</div>
-                <div className="flex items-center gap-4 text-sm text-zinc-400 mt-1">
-                  <span className="flex items-center gap-1">
-                    <Users className="w-4 h-4" />
-                    {t("admin.clubs.members", { count: club.member_count || 0 })}
-                  </span>
-                  {club.kakao_open_chat_url && (
-                    <a
-                      href={club.kakao_open_chat_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-1 text-yellow-400 hover:underline"
-                    >
-                      <MessageCircle className="w-4 h-4" />
-                      {t("admin.clubs.openChat")}
-                    </a>
-                  )}
-                </div>
-              </div>
-              <Link
-                href={`/${locale}/admin/clubs/${club.id}/edit`}
-                className="text-sm text-blue-400 hover:underline"
-              >
-                {t("admin.clubs.edit")}
-              </Link>
-            </div>
+            <AdminClubCard key={club.id} club={club} />
           ))}
         </div>
       )}
