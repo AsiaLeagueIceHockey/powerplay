@@ -514,13 +514,21 @@ export async function cancelJoin(matchId: string) {
 async function promoteWaitlistUser(matchId: string, position: string) {
   const supabase = await createClient();
 
-  // 1. Find oldest waiting user for this position
-  const { data: waiter } = await supabase
+  // 1. Find oldest waiting user for this position (or skater pool)
+  let query = supabase
     .from("participants")
-    .select("id, user_id")
+    .select("id, user_id, position")
     .eq("match_id", matchId)
-    .eq("status", "waiting")
-    .eq("position", position)
+    .eq("status", "waiting");
+
+  if (position === "G") {
+    query = query.eq("position", "G");
+  } else {
+    // Treat FW and DF as unified 'Skaters'
+    query = query.in("position", ["FW", "DF"]);
+  }
+
+  const { data: waiter } = await query
     .order("created_at", { ascending: true })
     .limit(1)
     .single();
