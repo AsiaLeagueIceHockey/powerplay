@@ -150,34 +150,18 @@ function RinkMapContent({ rinks, matches = [], clubs = [] }: RinkMapProps) {
           map.setZoom(13); // Zoom in closer for user location
         },
         (error) => {
-          console.error("Geolocation error:", error);
-          // Optional: Don't alert on auto-load error to avoid annoyance, only on manual click
+          // Permission denied (code 1) is expected if user declines - no need to log
+          if (error.code !== 1) {
+            console.warn("Geolocation error:", error);
+          }
         }
       );
     }
   };
 
-  // Auto-Geolocation on mount (only for Explorer View)
-  useState(() => {
-     // Check if we are in Explorer mode (>1 rink)
-     if (rinks.length > 1) {
-        // We use a small timeout to ensure map is ready or just rely on 'map' state effect?
-        // Actually, we can use an effect dependent on 'map'.
-     }
-  });
-
-  // Effect to trigger geolocation once map is loaded
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const [autoLocateDone, setAutoLocateDone] = useState(false);
-  
-  if (map && !autoLocateDone && rinks.length > 1) {
-    handleMyLocation();
-    setAutoLocateDone(true);
-  }
-
   return (
     <div ref={containerRef} className="relative w-full h-full min-h-[500px] rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-900">
-      <MapContainer className="w-full h-full">
+      <MapContainer className="w-full h-[600px]">
         <NaverMap
             defaultCenter={initialCenter}
             defaultZoom={rinks.length === 1 ? 15 : 11}

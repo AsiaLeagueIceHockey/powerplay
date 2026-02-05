@@ -580,3 +580,16 @@ UPDATE profiles SET role = 'superuser' WHERE email = 'your-email@example.com';
   - **Filtering**: Filtered out past matches from map detail and list views.
   - **iOS Guide**: Added "Open in Safari" step to the PWA install instructions.
 - **Next Steps**: Gather user feedback on the new Rink Tab experience.
+### [2026-02-05] Security Audit, Match Life-cycle Hardening & UI Polish
+- **Summary**: Conducted a security audit on hard deletes, fixed a critical match cancellation bug, and refined match management constraints and UI.
+- **Changes**:
+  - **Security Audit**: Performed hard delete audit on `profiles`, `clubs`, and `matches`. Verified RLS policies for `admin` and `superuser` roles.
+  - **Match Management**:
+    - **Visibility**: Excluded 'canceled' matches from the public match list (`getCachedMatches`) and Rink Map details.
+    - **Constraints**: Locked 'canceled' matches from editing. Disabled Edit/Cancel/Delete actions for completed matches in Admin UI.
+    - **Goalie Free Setting**: Disabled the 'Goalie Free' toggle in the match edit form if goalies have already joined to prevent unfair changes.
+  - **Critical Fixes**: 
+    - Resolved a silent failure in `cancelMatchByAdmin` caused by an invalid SQL query (non-existent `entry_points` column in `participants`).
+    - Added `v22_admin_superuser_matches_fix.sql` to explicitly grant both `admin` and `superuser` roles permission to update matches.
+  - **UI/UX Enhancement**: Removed the nested scrollbar in the Rink Explorer list view, allowing it to use the full page scroll while keeping the map fixed at a proper viewport height.
+- **Next Steps**: Monitor the points system for any edge cases during match cancellation and ensure notifications are delivered correctly.
