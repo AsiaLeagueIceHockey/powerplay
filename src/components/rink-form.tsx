@@ -71,6 +71,13 @@ export function RinkForm({ locale, rink }: RinkFormProps) {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    
+    // For new rinks, require lat/lng to be fetched
+    if (!isEdit && (!formData.lat || !formData.lng)) {
+      setError("먼저 '정보 가져오기' 버튼을 클릭하여 좌표를 가져와주세요.");
+      return;
+    }
+    
     setLoading(true);
     setError(null);
 
@@ -112,20 +119,20 @@ export function RinkForm({ locale, rink }: RinkFormProps) {
             <br />
             예: https://naver.me/Fx9u4qot
           </p>
-          <div className="flex gap-2">
+          <div className="flex flex-col gap-2">
             <input
               type="url"
               value={formData.map_url}
               onChange={(e) => setFormData({ ...formData, map_url: e.target.value })}
               required={!isEdit}
               placeholder="https://naver.me/..."
-              className="flex-1 px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-white placeholder-zinc-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-white placeholder-zinc-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
             />
             <button
               type="button"
               onClick={handleParseUrl}
               disabled={parsing || !formData.map_url}
-              className="px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium flex items-center gap-2 whitespace-nowrap"
+              className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium flex items-center justify-center gap-2"
             >
               {parsing ? (
                 <>
@@ -217,8 +224,8 @@ export function RinkForm({ locale, rink }: RinkFormProps) {
       {/* Submit */}
       <button
         type="submit"
-        disabled={loading}
-        className="w-full py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 transition-colors font-medium"
+        disabled={loading || (!isEdit && (!formData.lat || !formData.lng))}
+        className="w-full py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
       >
         {loading
           ? isEdit
