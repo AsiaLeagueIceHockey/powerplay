@@ -1,18 +1,25 @@
-import { checkIsAdmin } from "@/app/actions/admin-check";
+import { getAdminInfo } from "@/app/actions/admin-check";
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
 
 export async function AdminControls({
   matchId,
   locale,
+  createdBy,
 }: {
   matchId: string;
   locale: string;
+  createdBy?: string;
 }) {
-  const isAdmin = await checkIsAdmin();
-  const t = await getTranslations(); // Assuming 'common' or similar, but simplified
+  const { isAdmin, isSuperuser, userId } = await getAdminInfo();
 
+  // Not an admin at all - hide controls
   if (!isAdmin) return null;
+
+  // superuser can edit all matches
+  // admin can only edit their own matches
+  const canEdit = isSuperuser || (createdBy && createdBy === userId);
+
+  if (!canEdit) return null;
 
   return (
     <div className="bg-zinc-100 dark:bg-zinc-800/50 rounded-lg p-3 flex justify-between items-center border border-dashed border-zinc-300 dark:border-zinc-700 mb-6">

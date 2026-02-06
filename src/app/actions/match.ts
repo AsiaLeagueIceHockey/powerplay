@@ -48,6 +48,7 @@ export interface Match {
   description: string | null;
   bank_account?: string | null;
   goalie_free?: boolean;
+  created_by?: string;
   rink: MatchRink | null;
   club?: MatchClub | null;
   participants_count?: {
@@ -102,7 +103,7 @@ export async function getMatches(): Promise<Match[]> {
 
       // Handle rink which might be an array or object
       const rink = Array.isArray(match.rink) ? match.rink[0] : match.rink;
-      
+
       // Handle club
       const club = Array.isArray(match.club) ? match.club[0] : match.club;
 
@@ -135,6 +136,7 @@ export async function getMatch(id: string): Promise<Match | null> {
       description,
       bank_account,
       goalie_free,
+      created_by,
       rink:rink_id(id, name_ko, name_en, map_url, address, lat, lng),
       club:club_id(id, name, kakao_open_chat_url, logo_url)
     `
@@ -165,7 +167,7 @@ export async function getMatch(id: string): Promise<Match | null> {
 
   // Handle rink which might be an array or object
   const rink = Array.isArray(match.rink) ? match.rink[0] : match.rink;
-  
+
   // Handle club which might be an array or object
   const club = Array.isArray(match.club) ? match.club[0] : match.club;
 
@@ -186,9 +188,9 @@ export async function getMatch(id: string): Promise<Match | null> {
   } as Match;
 }
 
-export async function joinMatch(matchId: string, position: string): Promise<{ 
-  success?: boolean; 
-  error?: string; 
+export async function joinMatch(matchId: string, position: string): Promise<{
+  success?: boolean;
+  error?: string;
   code?: string;
   status?: 'confirmed' | 'pending_payment';
 }> {
@@ -251,7 +253,7 @@ export async function joinMatch(matchId: string, position: string): Promise<{
   // Deduct points only if confirmed and entry_points > 0
   if (hasEnoughPoints && entryPoints > 0) {
     const newBalance = userPoints - entryPoints;
-    
+
     const { error: pointsError } = await supabase
       .from("profiles")
       .update({ points: newBalance })
@@ -315,7 +317,7 @@ export async function joinMatch(matchId: string, position: string): Promise<{
     .select("full_name")
     .eq("id", user.id)
     .single();
-  
+
   const participantName = participantProfile?.full_name || user.email?.split("@")[0] || "참가자";
 
   if (participantStatus === "confirmed") {
@@ -434,8 +436,8 @@ export async function cancelJoin(matchId: string) {
 
     // Record transaction
     // Use activeEntryPoints specifically for the description percentage calculation
-    const refundPercentage = activeEntryPoints > 0 
-      ? Math.floor(refundAmount / activeEntryPoints * 100) 
+    const refundPercentage = activeEntryPoints > 0
+      ? Math.floor(refundAmount / activeEntryPoints * 100)
       : 0;
 
     await supabase.from("point_transactions").insert({
@@ -542,7 +544,7 @@ async function promoteWaitlistUser(matchId: string, position: string) {
     .select("entry_points, start_time, goalie_free, rink:rinks(name_ko)")
     .eq("id", matchId)
     .single();
-    
+
   if (!match) return;
 
   const { data: profile } = await supabase
@@ -552,7 +554,7 @@ async function promoteWaitlistUser(matchId: string, position: string) {
     .single();
 
   const userPoints = profile?.points || 0;
-  
+
   // Logic: Check Cost
   const isGoalieAndFree = position === "G" && match.goalie_free === true;
   const entryPoints = isGoalieAndFree ? 0 : (match.entry_points || 0);
@@ -562,20 +564,20 @@ async function promoteWaitlistUser(matchId: string, position: string) {
   if (hasEnoughPoints) {
     // A. Direct Confirm
     if (entryPoints > 0) {
-       // Deduct Points
-       const newBalance = userPoints - entryPoints;
-       const { error: pointError } = await supabase
+      // Deduct Points
+      const newBalance = userPoints - entryPoints;
+      const { error: pointError } = await supabase
         .from("profiles")
         .update({ points: newBalance })
         .eq("id", waiter.user_id);
-      
-       if (pointError) {
-         console.error("Waitlist promo point deduction failed", pointError);
-         return; 
-       }
 
-       // Transaction
-       await supabase.from("point_transactions").insert({
+      if (pointError) {
+        console.error("Waitlist promo point deduction failed", pointError);
+        return;
+      }
+
+      // Transaction
+      await supabase.from("point_transactions").insert({
         user_id: waiter.user_id,
         type: "use",
         amount: -entryPoints,
@@ -598,7 +600,7 @@ async function promoteWaitlistUser(matchId: string, position: string) {
       month: "short", day: "numeric", hour: "2-digit", minute: "2-digit",
       timeZone: "Asia/Seoul"
     });
-    
+
     await sendPushNotification(
       waiter.user_id,
       "대기 전환 및 참가 확정 🎉",
@@ -630,9 +632,9 @@ async function promoteWaitlistUser(matchId: string, position: string) {
   }
 }
 
-export async function joinWaitlist(matchId: string, position: string): Promise<{ 
-  success?: boolean; 
-  error?: string; 
+export async function joinWaitlist(matchId: string, position: string): Promise<{
+  success?: boolean;
+  error?: string;
 }> {
   const supabase = await createClient();
 

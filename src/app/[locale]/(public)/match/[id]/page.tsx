@@ -15,9 +15,9 @@ export default async function MatchPage({
 }) {
   const { locale, id } = await params;
   setRequestLocale(locale);
-  
+
   const supabase = await createClient();
-  
+
   // Fully parallel fetch - translations, user, and match all at once
   const [t, { data: { user } }, match] = await Promise.all([
     getTranslations(),
@@ -28,7 +28,7 @@ export default async function MatchPage({
   if (!match) {
     notFound();
   }
-  
+
   // Get user profile for onboarding status and points (only if user exists)
   let onboardingCompleted = true;
   let userPoints = 0;
@@ -47,19 +47,19 @@ export default async function MatchPage({
   const dateStr =
     locale === "ko"
       ? date.toLocaleDateString("ko-KR", {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-          weekday: "long",
-          timeZone: "Asia/Seoul",
-        })
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        weekday: "long",
+        timeZone: "Asia/Seoul",
+      })
       : date.toLocaleDateString("en-US", {
-          weekday: "long",
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-          timeZone: "Asia/Seoul",
-        });
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        timeZone: "Asia/Seoul",
+      });
 
   const timeStr = date.toLocaleTimeString(locale === "ko" ? "ko-KR" : "en-US", {
     hour: "numeric",
@@ -100,18 +100,17 @@ export default async function MatchPage({
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       {/* Admin Controls - One line, Edit only */}
-      <AdminControls matchId={match.id} locale={locale} />
+      <AdminControls matchId={match.id} locale={locale} createdBy={match.created_by} />
 
       {/* Header Section */}
       <div>
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center space-x-2">
             <span
-              className={`px-3 py-1 rounded-full text-sm font-bold ${
-                match.status === "open"
+              className={`px-3 py-1 rounded-full text-sm font-bold ${match.status === "open"
                   ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
                   : "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"
-              }`}
+                }`}
             >
               {t(`match.status.${match.status}`)}
             </span>
@@ -121,7 +120,7 @@ export default async function MatchPage({
               </span>
             )}
           </div>
-          
+
           <MatchShareButton match={match} />
         </div>
 
@@ -138,7 +137,7 @@ export default async function MatchPage({
       {/* Match Details Card */}
       <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-sm">
         <h2 className="text-lg font-bold mb-4">{t("match.details")}</h2>
-        
+
         <div className="space-y-3">
           <div className="flex justify-between items-center text-sm">
             <span className="text-zinc-500">{t("match.fee")}</span>
@@ -146,16 +145,16 @@ export default async function MatchPage({
               {(match.entry_points || match.fee).toLocaleString()}{locale === "ko" ? "원" : "KRW"}
             </span>
           </div>
-          
 
-          
+
+
           <div className="border-t border-zinc-100 dark:border-zinc-800 my-2"></div>
 
           <div className="flex justify-between items-center text-sm">
             <span className="text-zinc-500">{t("match.skater")}</span>
             <span className={`font-semibold ${remaining.skaters === 0 ? 'text-red-500' : 'text-green-600 dark:text-green-400'}`}>
-              {remaining.skaters <= 0 
-                ? (locale === 'ko' ? '마감' : 'Full') 
+              {remaining.skaters <= 0
+                ? (locale === 'ko' ? '마감' : 'Full')
                 : (locale === 'ko' ? `${remaining.skaters}자리 남음` : `${remaining.skaters} spots left`)}
             </span>
           </div>
@@ -168,8 +167,8 @@ export default async function MatchPage({
                 </span>
               )}
               <span className={`font-semibold ${remaining.g === 0 ? 'text-red-500' : 'text-green-600 dark:text-green-400'}`}>
-                {remaining.g <= 0 
-                  ? (locale === 'ko' ? '마감' : 'Full') 
+                {remaining.g <= 0
+                  ? (locale === 'ko' ? '마감' : 'Full')
                   : (locale === 'ko' ? `${remaining.g}자리 남음` : `${remaining.g} spots left`)}
               </span>
             </div>
@@ -184,19 +183,19 @@ export default async function MatchPage({
             >
               📍 {t("match.viewMap")}
             </a>
-            
+
             {/* Embedded Map */}
             {match.rink && match.rink.lat && match.rink.lng && (
-                <div className="w-full h-48 rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-800">
-                    <DynamicRinkMap rinks={[match.rink]} /> 
-                </div>
+              <div className="w-full h-48 rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-800">
+                <DynamicRinkMap rinks={[match.rink]} />
+              </div>
             )}
 
             {/* Address */}
             {match.rink?.address && (
-                <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">
-                  {match.rink.address}
-                </p>
+              <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">
+                {match.rink.address}
+              </p>
             )}
           </div>
         </div>
@@ -205,10 +204,10 @@ export default async function MatchPage({
       {/* Notice */}
       {match.description && (
         <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-sm">
-           <h2 className="text-lg font-bold mb-2">{t("admin.form.description")}</h2>
-           <p className="text-zinc-600 dark:text-zinc-300 whitespace-pre-wrap">
-             {match.description}
-           </p>
+          <h2 className="text-lg font-bold mb-2">{t("admin.form.description")}</h2>
+          <p className="text-zinc-600 dark:text-zinc-300 whitespace-pre-wrap">
+            {match.description}
+          </p>
         </div>
       )}
 
@@ -219,16 +218,16 @@ export default async function MatchPage({
           <div className="flex items-start gap-2">
             <span className="text-green-600 dark:text-green-400 font-bold mt-0.5">✓</span>
             <p>
-              {locale === "ko" 
-                ? "경기 전일 23:59까지 취소 시: 100% 환불" 
+              {locale === "ko"
+                ? "경기 전일 23:59까지 취소 시: 100% 환불"
                 : "Cancellation by 23:59 the day before the match: 100% Refund"}
             </p>
           </div>
           <div className="flex items-start gap-2">
             <span className="text-red-500 font-bold mt-0.5">!</span>
             <p>
-              {locale === "ko" 
-                ? "경기 당일 취소 시: 환불 불가 (또는 운영진 문의)" 
+              {locale === "ko"
+                ? "경기 당일 취소 시: 환불 불가 (또는 운영진 문의)"
                 : "Cancellation on the match day: No Refund (or contact admin)"}
             </p>
           </div>
@@ -236,8 +235,8 @@ export default async function MatchPage({
       </div>
 
       {/* Application - Inline status and button */}
-      <MatchApplication 
-        matchId={match.id} 
+      <MatchApplication
+        matchId={match.id}
         positions={{
           FW: remaining.skaters > 0,
           DF: remaining.skaters > 0,
@@ -265,101 +264,101 @@ export default async function MatchPage({
       <div className="space-y-4">
         {/* FW Card */}
         <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-sm">
-           <div className="flex items-center space-x-2 mb-4">
-             <span className="px-2 py-1 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 rounded text-xs font-bold">
-               {t("match.position.FW")}
-             </span>
-             <span className="text-zinc-500 text-sm">({players.fw?.length || 0})</span>
-           </div>
-           
-           {players.fw?.length === 0 ? (
-             <p className="text-sm text-zinc-400 pl-1">{t("match.noParticipants")}</p>
-           ) : (
-             <ul className="space-y-3">
-               {players.fw?.map((p, i) => (
-                 <li key={p.id} className="flex items-center space-x-3 text-sm p-3 bg-zinc-50 dark:bg-zinc-950/50 rounded-lg">
-                   <div className="w-6 h-6 bg-zinc-200 dark:bg-zinc-700 rounded-full flex items-center justify-center text-xs font-bold text-zinc-500">
-                     {i + 1}
-                   </div>
-                   <span className="font-medium">
-                     {p.user?.full_name || p.user?.email?.split('@')[0]}
-                   </span>
-                   {p.status === "pending_payment" && (
-                     <span className="text-xs bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 px-2 py-0.5 rounded">{t("participant.status.pending_payment")}</span>
-                   )}
-                   {p.id === userParticipant?.id && (
-                     <span className="ml-auto text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">Me</span>
-                   )}
-                 </li>
-               ))}
-             </ul>
-           )}
+          <div className="flex items-center space-x-2 mb-4">
+            <span className="px-2 py-1 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 rounded text-xs font-bold">
+              {t("match.position.FW")}
+            </span>
+            <span className="text-zinc-500 text-sm">({players.fw?.length || 0})</span>
+          </div>
+
+          {players.fw?.length === 0 ? (
+            <p className="text-sm text-zinc-400 pl-1">{t("match.noParticipants")}</p>
+          ) : (
+            <ul className="space-y-3">
+              {players.fw?.map((p, i) => (
+                <li key={p.id} className="flex items-center space-x-3 text-sm p-3 bg-zinc-50 dark:bg-zinc-950/50 rounded-lg">
+                  <div className="w-6 h-6 bg-zinc-200 dark:bg-zinc-700 rounded-full flex items-center justify-center text-xs font-bold text-zinc-500">
+                    {i + 1}
+                  </div>
+                  <span className="font-medium">
+                    {p.user?.full_name || p.user?.email?.split('@')[0]}
+                  </span>
+                  {p.status === "pending_payment" && (
+                    <span className="text-xs bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 px-2 py-0.5 rounded">{t("participant.status.pending_payment")}</span>
+                  )}
+                  {p.id === userParticipant?.id && (
+                    <span className="ml-auto text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">Me</span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
         {/* DF Card */}
         <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-sm">
-           <div className="flex items-center space-x-2 mb-4">
-             <span className="px-2 py-1 bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300 rounded text-xs font-bold">
-               {t("match.position.DF")}
-             </span>
-             <span className="text-zinc-500 text-sm">({players.df?.length || 0})</span>
-           </div>
-           
-           {players.df?.length === 0 ? (
-             <p className="text-sm text-zinc-400 pl-1">{t("match.noParticipants")}</p>
-           ) : (
-             <ul className="space-y-3">
-               {players.df?.map((p, i) => (
-                 <li key={p.id} className="flex items-center space-x-3 text-sm p-3 bg-zinc-50 dark:bg-zinc-950/50 rounded-lg">
-                   <div className="w-6 h-6 bg-zinc-200 dark:bg-zinc-700 rounded-full flex items-center justify-center text-xs font-bold text-zinc-500">
-                     {i + 1}
-                   </div>
-                   <span className="font-medium">
-                     {p.user?.full_name || p.user?.email?.split('@')[0]}
-                   </span>
-                   {p.status === "pending_payment" && (
-                     <span className="text-xs bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 px-2 py-0.5 rounded">{t("participant.status.pending_payment")}</span>
-                   )}
-                   {p.id === userParticipant?.id && (
-                     <span className="ml-auto text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">Me</span>
-                   )}
-                 </li>
-               ))}
-             </ul>
-           )}
+          <div className="flex items-center space-x-2 mb-4">
+            <span className="px-2 py-1 bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300 rounded text-xs font-bold">
+              {t("match.position.DF")}
+            </span>
+            <span className="text-zinc-500 text-sm">({players.df?.length || 0})</span>
+          </div>
+
+          {players.df?.length === 0 ? (
+            <p className="text-sm text-zinc-400 pl-1">{t("match.noParticipants")}</p>
+          ) : (
+            <ul className="space-y-3">
+              {players.df?.map((p, i) => (
+                <li key={p.id} className="flex items-center space-x-3 text-sm p-3 bg-zinc-50 dark:bg-zinc-950/50 rounded-lg">
+                  <div className="w-6 h-6 bg-zinc-200 dark:bg-zinc-700 rounded-full flex items-center justify-center text-xs font-bold text-zinc-500">
+                    {i + 1}
+                  </div>
+                  <span className="font-medium">
+                    {p.user?.full_name || p.user?.email?.split('@')[0]}
+                  </span>
+                  {p.status === "pending_payment" && (
+                    <span className="text-xs bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 px-2 py-0.5 rounded">{t("participant.status.pending_payment")}</span>
+                  )}
+                  {p.id === userParticipant?.id && (
+                    <span className="ml-auto text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">Me</span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
         {/* G Card */}
         <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-sm">
-           <div className="flex items-center space-x-2 mb-4">
-             <span className="px-2 py-1 bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 rounded text-xs font-bold">
-               {t("match.position.G")}
-             </span>
-             <span className="text-zinc-500 text-sm">({players.g?.length || 0})</span>
-           </div>
-           
-           {players.g?.length === 0 ? (
-             <p className="text-sm text-zinc-400 pl-1">{t("match.noParticipants")}</p>
-           ) : (
-             <ul className="space-y-3">
-               {players.g?.map((p, i) => (
-                 <li key={p.id} className="flex items-center space-x-3 text-sm p-3 bg-zinc-50 dark:bg-zinc-950/50 rounded-lg">
-                   <div className="w-6 h-6 bg-zinc-200 dark:bg-zinc-700 rounded-full flex items-center justify-center text-xs font-bold text-zinc-500">
-                     {i + 1}
-                   </div>
-                   <span className="font-medium">
-                     {p.user?.full_name || p.user?.email?.split('@')[0]}
-                   </span>
-                   {p.status === "pending_payment" && (
-                     <span className="text-xs bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 px-2 py-0.5 rounded">{t("participant.status.pending_payment")}</span>
-                   )}
-                   {p.id === userParticipant?.id && (
-                     <span className="ml-auto text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">Me</span>
-                   )}
-                 </li>
-               ))}
-             </ul>
-           )}
+          <div className="flex items-center space-x-2 mb-4">
+            <span className="px-2 py-1 bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 rounded text-xs font-bold">
+              {t("match.position.G")}
+            </span>
+            <span className="text-zinc-500 text-sm">({players.g?.length || 0})</span>
+          </div>
+
+          {players.g?.length === 0 ? (
+            <p className="text-sm text-zinc-400 pl-1">{t("match.noParticipants")}</p>
+          ) : (
+            <ul className="space-y-3">
+              {players.g?.map((p, i) => (
+                <li key={p.id} className="flex items-center space-x-3 text-sm p-3 bg-zinc-50 dark:bg-zinc-950/50 rounded-lg">
+                  <div className="w-6 h-6 bg-zinc-200 dark:bg-zinc-700 rounded-full flex items-center justify-center text-xs font-bold text-zinc-500">
+                    {i + 1}
+                  </div>
+                  <span className="font-medium">
+                    {p.user?.full_name || p.user?.email?.split('@')[0]}
+                  </span>
+                  {p.status === "pending_payment" && (
+                    <span className="text-xs bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 px-2 py-0.5 rounded">{t("participant.status.pending_payment")}</span>
+                  )}
+                  {p.id === userParticipant?.id && (
+                    <span className="ml-auto text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">Me</span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
         {/* Waitlist Section */}
@@ -371,7 +370,7 @@ export default async function MatchPage({
               </span>
               <span className="text-zinc-500 text-sm">({waitlist.length})</span>
             </div>
-            
+
             <ul className="space-y-3">
               {waitlist.map((p, i) => (
                 <li key={p.id} className="flex items-center space-x-3 text-sm p-3 bg-blue-50 dark:bg-blue-950/50 rounded-lg">
