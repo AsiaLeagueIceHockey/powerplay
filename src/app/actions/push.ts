@@ -68,7 +68,10 @@ async function sendWithRetry(
   
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
-      await webpush.sendNotification(subscription, payload);
+      await webpush.sendNotification(subscription, payload, {
+        urgency: 'high',  // Android: 실시간 전달 (배치 대기 없이 즉시 알림)
+        TTL: 60 * 60 * 24, // 24시간 내 전달 시도
+      });
       return; // Success
     } catch (err: any) {
       lastError = err;

@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
+import { logAndNotify } from "@/lib/audit";
 
 export async function signUp(formData: FormData) {
   const supabase = await createClient();
@@ -167,6 +168,21 @@ export async function updateProfile(formData: FormData) {
 
   revalidatePath("/profile", "page");
   revalidatePath("/onboarding", "page");
+
+  // 새 사용자 온보딩 완료 시 SuperUser에게 알림 발송
+  if (updateData.onboarding_completed === true) {
+    const { data: { user: currentUser } } = await supabase.auth.getUser();
+    const userEmail = currentUser?.email || "unknown";
+    const userName = updateData.full_name || userEmail;
+
+    await logAndNotify({
+      userId: user.id,
+      action: "USER_SIGNUP",
+      description: `새 사용자 가입: ${userName} (${userEmail})`,
+      metadata: { email: userEmail, name: userName },
+    });
+  }
+
   return { success: true };
 }
 

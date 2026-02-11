@@ -506,7 +506,7 @@ export async function cancelJoin(matchId: string) {
   await logAndNotify({
     userId: user.id,
     action: "MATCH_CANCEL",
-    description: `사용자가 경기 참가를 취소했습니다. (환불: ${refundAmount.toLocaleString()}원)`,
+    description: `${user.email}님이 경기 참가를 취소했습니다. (환불: ${refundAmount.toLocaleString()}원)`,
     metadata: { matchId, refundAmount },
   });
 
@@ -712,7 +712,7 @@ export async function joinWaitlist(matchId: string, position: string): Promise<{
     await logAndNotify({
       userId: user.id,
       action: "MATCH_JOIN",
-      description: `사용자가 ${rinkName} 경기 대기명단에 등록했습니다.`,
+      description: `${user.email}님이 ${rinkName} 경기 대기명단에 등록했습니다.`,
       metadata: { matchId, rinkName, status: "waiting" },
     });
   }
