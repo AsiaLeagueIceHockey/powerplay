@@ -2,7 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
-import { sendPushNotification } from "@/app/actions/push";
+import { sendPushNotification, sendPushToClubMembers } from "@/app/actions/push";
 
 // Get all rinks for dropdown
 export async function getRinks() {
@@ -61,6 +61,9 @@ export async function createMatch(formData: FormData) {
   const description = formData.get("description") as string;
   const bankAccount = formData.get("bank_account") as string;
   const goalieFree = formData.get("goalie_free") === "true";
+  const matchType = (formData.get("match_type") as string) || "open_hockey";
+  const guestOpenHoursStr = formData.get("guest_open_hours_before") as string;
+  const guestOpenHoursBefore = guestOpenHoursStr ? parseInt(guestOpenHoursStr) : 24;
 
   // datetime-local 입력은 KST로 가정, UTC로 변환하여 저장
   // 입력: "2026-01-11T00:00" (KST) → 저장: "2026-01-10T15:00:00.000Z" (UTC)
@@ -81,6 +84,8 @@ export async function createMatch(formData: FormData) {
       created_by: user.id,
       bank_account: bankAccount || null,
       goalie_free: goalieFree,
+      match_type: matchType,
+      guest_open_hours_before: guestOpenHoursBefore,
     })
     .select()
     .single();
@@ -91,6 +96,33 @@ export async function createMatch(formData: FormData) {
   }
 
   revalidatePath("/admin/matches");
+
+  // Send push to club members for regular matches
+  if (matchType === "regular" && clubId) {
+    try {
+      const startDate = new Date(startTimeUTC);
+      const dateStr = startDate.toLocaleDateString("ko-KR", {
+        timeZone: "Asia/Seoul",
+        month: "long",
+        day: "numeric",
+        weekday: "short",
+      });
+      const timeStr = startDate.toLocaleTimeString("ko-KR", {
+        timeZone: "Asia/Seoul",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+      await sendPushToClubMembers(
+        clubId,
+        `🏒 새 정규 대관이 등록되었습니다`,
+        `${dateStr} ${timeStr} 경기가 등록되었습니다. 참/불참을 응답해주세요!`,
+        `/match/${data.id}`
+      );
+    } catch (e) {
+      console.error("Failed to send push to club members:", e);
+    }
+  }
+
   return { success: true, matchId: data.id };
 }
 

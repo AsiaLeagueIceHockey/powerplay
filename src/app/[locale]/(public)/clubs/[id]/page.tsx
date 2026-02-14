@@ -1,4 +1,4 @@
-import { getClub, getClubNotices, isClubMember, joinClub } from "@/app/actions/clubs";
+import { getClub, getClubNotices, getClubMembershipStatus } from "@/app/actions/clubs";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { MessageCircle, Users, Calendar, Building2 } from "lucide-react";
@@ -14,10 +14,10 @@ export default async function ClubDetailPage({
   setRequestLocale(locale);
   const t = await getTranslations("club");
 
-  const [club, notices, isMember] = await Promise.all([
+  const [club, notices, membershipStatus] = await Promise.all([
     getClub(id),
     getClubNotices(id),
-    isClubMember(id),
+    getClubMembershipStatus(id),
   ]);
 
   if (!club) {
@@ -83,7 +83,7 @@ export default async function ClubDetailPage({
 
           {/* Bottom Row: Actions */}
           <div className="flex flex-col gap-3 mt-2">
-             <JoinClubButton club={club} initialIsMember={isMember} className="w-full justify-center" />
+             <JoinClubButton club={club} initialStatus={membershipStatus} className="w-full justify-center" />
              
              {club.kakao_open_chat_url && (
                <a

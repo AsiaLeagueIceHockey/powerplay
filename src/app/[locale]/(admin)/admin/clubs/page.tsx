@@ -1,5 +1,5 @@
 import { setRequestLocale, getTranslations } from "next-intl/server";
-import { getAdminClubs } from "@/app/actions/clubs";
+import { getAdminClubs, getPendingMembers } from "@/app/actions/clubs";
 import Link from "next/link";
 import { AdminClubCard } from "@/components/admin-club-card";
 
@@ -12,6 +12,14 @@ export default async function AdminClubsPage({
   setRequestLocale(locale);
   const t = await getTranslations();
   const clubs = await getAdminClubs();
+
+  // Fetch pending members for each club
+  const clubsWithPending = await Promise.all(
+    clubs.map(async (club) => {
+      const pendingMembers = await getPendingMembers(club.id);
+      return { club, pendingMembers };
+    })
+  );
 
   return (
     <div>
@@ -37,8 +45,8 @@ export default async function AdminClubsPage({
         </div>
       ) : (
         <div className="space-y-3">
-          {clubs.map((club) => (
-            <AdminClubCard key={club.id} club={club} />
+          {clubsWithPending.map(({ club, pendingMembers }) => (
+            <AdminClubCard key={club.id} club={club} pendingMembers={pendingMembers} />
           ))}
         </div>
       )}

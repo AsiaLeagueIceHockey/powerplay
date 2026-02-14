@@ -30,8 +30,25 @@ export interface ClubMembership {
   club_id: string;
   user_id: string;
   role: "admin" | "member";
+  status: "pending" | "approved" | "rejected";
+  intro_message?: string;
   created_at?: string;
   club?: Club;
+}
+
+export interface RegularMatchResponse {
+  id: string;
+  match_id: string;
+  user_id: string;
+  response: "attending" | "not_attending";
+  position?: "FW" | "DF" | "G";
+  created_at?: string;
+  updated_at?: string;
+  user?: {
+    id: string;
+    full_name: string | null;
+    email: string;
+  };
 }
 
 export interface ClubPost {

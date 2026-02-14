@@ -48,6 +48,8 @@ export interface Match {
   description: string | null;
   bank_account?: string | null;
   goalie_free?: boolean;
+  match_type?: "open_hockey" | "regular";
+  guest_open_hours_before?: number;
   created_by?: string;
   rink: MatchRink | null;
   club?: MatchClub | null;
@@ -74,6 +76,8 @@ export async function getMatches(): Promise<Match[]> {
       max_goalies,
       status,
       description,
+      match_type,
+      guest_open_hours_before,
       rink:rink_id(id, name_ko, name_en, address, lat, lng, rink_type),
       club:club_id(id, name, kakao_open_chat_url, logo_url)
     `
@@ -136,6 +140,8 @@ export async function getMatch(id: string): Promise<Match | null> {
       description,
       bank_account,
       goalie_free,
+      match_type,
+      guest_open_hours_before,
       created_by,
       rink:rink_id(id, name_ko, name_en, map_url, address, lat, lng),
       club:club_id(id, name, kakao_open_chat_url, logo_url)
@@ -219,7 +225,7 @@ export async function joinMatch(matchId: string, position: string): Promise<{
   // Get match entry_points and goalie_free setting
   const { data: match } = await supabase
     .from("matches")
-    .select("entry_points, status, goalie_free")
+    .select("entry_points, status, goalie_free, match_type, guest_open_hours_before, start_time, club_id")
     .eq("id", matchId)
     .single();
 
@@ -229,6 +235,30 @@ export async function joinMatch(matchId: string, position: string): Promise<{
 
   if (match.status !== "open") {
     return { error: "Match is not open for registration" };
+  }
+
+  // Guest time restriction for regular matches
+  if (match.match_type === "regular" && match.club_id) {
+    // Check if user is a club member
+    const { data: membership } = await supabase
+      .from("club_memberships")
+      .select("status")
+      .eq("club_id", match.club_id)
+      .eq("user_id", user.id)
+      .eq("status", "approved")
+      .single();
+
+    if (!membership) {
+      // User is a guest - check time restriction
+      const guestOpenHours = match.guest_open_hours_before || 24;
+      const matchStart = new Date(match.start_time);
+      const guestOpenTime = new Date(matchStart.getTime() - guestOpenHours * 60 * 60 * 1000);
+      const now = new Date();
+
+      if (now < guestOpenTime) {
+        return { error: "guest_not_yet_open", code: "GUEST_NOT_YET_OPEN" };
+      }
+    }
   }
 
   // 골리이고 goalie_free가 true면 무료
@@ -718,4 +748,115 @@ export async function joinWaitlist(matchId: string, position: string): Promise<{
   }
 
   return { success: true };
+}
+
+// ============================================
+// Regular Match Response (참/불참)
+// ============================================
+
+export async function respondToRegularMatch(
+  matchId: string,
+  response: "attending" | "not_attending",
+  position?: "FW" | "DF" | "G"
+): Promise<{ success?: boolean; error?: string }> {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "Not authenticated" };
+  }
+
+  // Verify this is a regular match
+  const { data: match } = await supabase
+    .from("matches")
+    .select("match_type, club_id")
+    .eq("id", matchId)
+    .single();
+
+  if (!match || match.match_type !== "regular") {
+    return { error: "Not a regular match" };
+  }
+
+  // Verify user is a club member
+  const { data: membership } = await supabase
+    .from("club_memberships")
+    .select("status")
+    .eq("club_id", match.club_id)
+    .eq("user_id", user.id)
+    .eq("status", "approved")
+    .single();
+
+  if (!membership) {
+    return { error: "Not a club member" };
+  }
+
+  // Upsert response
+  const { error } = await supabase
+    .from("regular_match_responses")
+    .upsert(
+      {
+        match_id: matchId,
+        user_id: user.id,
+        response,
+        position: response === "attending" ? position : null,
+      },
+      { onConflict: "match_id,user_id" }
+    );
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  return { success: true };
+}
+
+export async function getRegularMatchResponses(matchId: string) {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("regular_match_responses")
+    .select(`
+      id,
+      match_id,
+      user_id,
+      response,
+      position,
+      created_at,
+      updated_at,
+      user:profiles(id, full_name, email)
+    `)
+    .eq("match_id", matchId)
+    .order("created_at", { ascending: true });
+
+  if (error) {
+    console.error("Error fetching regular match responses:", error);
+    return [];
+  }
+
+  return (data || []).map((r: any) => ({
+    ...r,
+    user: Array.isArray(r.user) ? r.user[0] : r.user,
+  }));
+}
+
+export async function getMyRegularMatchResponse(matchId: string) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return null;
+
+  const { data } = await supabase
+    .from("regular_match_responses")
+    .select("response, position")
+    .eq("match_id", matchId)
+    .eq("user_id", user.id)
+    .single();
+
+  return data;
 }

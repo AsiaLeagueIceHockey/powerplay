@@ -1,8 +1,10 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { revalidatePath } from "next/cache";
 import { Club, ClubMembership, ClubPost } from "./types";
 import { logAndNotify } from "@/lib/audit";
+import { sendPushToClubAdmin, sendPushNotification } from "@/app/actions/push";
 
 // ============================================
 // Club Logo Upload
@@ -44,6 +46,30 @@ export async function uploadClubLogo(formData: FormData): Promise<{ url?: string
 // Club CRUD Operations
 // ============================================
 
+export async function getMyClubMembershipStatuses(): Promise<Record<string, "approved" | "pending" | "rejected">> {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return {};
+  }
+
+  const { data: memberships } = await supabase
+    .from("club_memberships")
+    .select("club_id, status")
+    .eq("user_id", user.id);
+
+  const statusMap: Record<string, "approved" | "pending" | "rejected"> = {};
+  memberships?.forEach((m) => {
+    statusMap[m.club_id] = m.status;
+  });
+
+  return statusMap;
+}
+
 export async function getClubs(): Promise<Club[]> {
   const supabase = await createClient();
 
@@ -63,13 +89,15 @@ export async function getClubs(): Promise<Club[]> {
       const { count } = await supabase
         .from("club_memberships")
         .select("*", { count: "exact", head: true })
-        .eq("club_id", club.id);
+        .eq("club_id", club.id)
+        .eq("status", "approved");
 
       // Fetch detailed member info
       const { data: membersData } = await supabase
         .from("club_memberships")
         .select("user:profiles(full_name, email)")
-        .eq("club_id", club.id);
+        .eq("club_id", club.id)
+        .eq("status", "approved");
 
       // Transform club_rinks to rinks
       // @ts-ignore
@@ -134,13 +162,15 @@ export async function getAdminClubs(): Promise<Club[]> {
       const { count } = await supabase
         .from("club_memberships")
         .select("*", { count: "exact", head: true })
-        .eq("club_id", club.id);
+        .eq("club_id", club.id)
+        .eq("status", "approved");
 
       // Fetch detailed member info
       const { data: membersData } = await supabase
         .from("club_memberships")
         .select("user:profiles(full_name, email)")
-        .eq("club_id", club.id);
+        .eq("club_id", club.id)
+        .eq("status", "approved");
 
       // Transform club_rinks to rinks
       // @ts-ignore
@@ -341,10 +371,12 @@ export async function getMyClubs(): Promise<ClubMembership[]> {
       club_id,
       user_id,
       role,
+      status,
       created_at,
       club:club_id(id, name, kakao_open_chat_url)
     `)
-    .eq("user_id", user.id);
+    .eq("user_id", user.id)
+    .eq("status", "approved");
 
   if (error) {
     console.error("Error fetching my clubs:", error);
@@ -358,7 +390,7 @@ export async function getMyClubs(): Promise<ClubMembership[]> {
   })) as ClubMembership[];
 }
 
-export async function joinClub(clubId: string) {
+export async function joinClub(clubId: string, introMessage?: string) {
   const supabase = await createClient();
 
   const {
@@ -369,29 +401,223 @@ export async function joinClub(clubId: string) {
     return { error: "Not authenticated" };
   }
 
-  // Check if already a member
+  // Check if already a member or pending
   const { data: existing } = await supabase
     .from("club_memberships")
-    .select("id")
+    .select("id, status")
     .eq("club_id", clubId)
     .eq("user_id", user.id)
     .single();
 
   if (existing) {
-    return { error: "Already a member of this club" };
+    if (existing.status === "pending") {
+      return { error: "already_pending" };
+    }
+    if (existing.status === "approved") {
+      return { error: "already_member" };
+    }
+    // If rejected, allow re-apply by updating
+    const { error: updateError } = await supabase
+      .from("club_memberships")
+      .update({ status: "pending", intro_message: introMessage?.trim() || null })
+      .eq("id", existing.id);
+    if (updateError) return { error: updateError.message };
+  } else {
+    const { error } = await supabase.from("club_memberships").insert({
+      club_id: clubId,
+      user_id: user.id,
+      role: "member",
+      status: "pending",
+      intro_message: introMessage?.trim() || null,
+    });
+
+    if (error) {
+      return { error: error.message };
+    }
   }
 
-  const { error } = await supabase.from("club_memberships").insert({
-    club_id: clubId,
-    user_id: user.id,
-    role: "member",
-  });
+  // Get user profile for notification
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("full_name, email")
+    .eq("id", user.id)
+    .single();
 
-  if (error) {
-    return { error: error.message };
+  const userName = profile?.full_name || profile?.email || "새 사용자";
+
+  // Get club name for notification
+  const { data: club } = await supabase
+    .from("clubs")
+    .select("name")
+    .eq("id", clubId)
+    .single();
+
+  // Send push notification to club admin
+  try {
+    await sendPushToClubAdmin(
+      clubId,
+      `📋 동호회 가입 신청`,
+      `${userName}님이 '${club?.name || "동호회"}'에 가입을 신청했습니다.`,
+      `/admin/clubs`
+    );
+  } catch (e) {
+    console.error("Failed to send push to club admin:", e);
+  }
+
+  return { success: true, status: "pending" };
+}
+
+// ============================================
+// Club Membership Approval
+// ============================================
+
+export async function approveClubMember(membershipId: string) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return { error: "Not authenticated" };
+
+  // Check if current user is club admin or system admin
+  const { data: membership } = await supabase
+    .from("club_memberships")
+    .select("club_id, user_id, status, club:club_id(created_by, name)")
+    .eq("id", membershipId)
+    .single();
+
+  if (!membership) return { error: "Membership not found" };
+
+  const club = Array.isArray(membership.club) ? membership.club[0] : membership.club;
+
+  // Check permission
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  const isSystemAdmin = profile?.role === "admin" || profile?.role === "superuser";
+  const isClubCreator = (club as any)?.created_by === user.id;
+
+  if (!isSystemAdmin && !isClubCreator) {
+    return { error: "Unauthorized" };
+  }
+
+  const { error } = await supabase
+    .from("club_memberships")
+    .update({ status: "approved" })
+    .eq("id", membershipId);
+
+  if (error) return { error: error.message };
+
+  // Send push notification to the user
+  try {
+    const clubName = (club as any)?.name || "동호회";
+    await sendPushNotification(
+      membership.user_id,
+      "동호회 가입 승인 🎉",
+      `'${clubName}' 가입이 승인되었습니다. 이제 동호회 활동을 시작해보세요!`,
+      `/clubs/${membership.club_id}`
+    );
+  } catch (e) {
+    console.error("Failed to send push to user:", e);
   }
 
   return { success: true };
+}
+
+export async function rejectClubMember(membershipId: string) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return { error: "Not authenticated" };
+
+  // Check if current user is club admin or system admin
+  const { data: membership } = await supabase
+    .from("club_memberships")
+    .select("club_id, user_id, status, club:club_id(created_by)")
+    .eq("id", membershipId)
+    .single();
+
+  if (!membership) return { error: "Membership not found" };
+
+  const club = Array.isArray(membership.club) ? membership.club[0] : membership.club;
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  const isSystemAdmin = profile?.role === "admin" || profile?.role === "superuser";
+  const isClubCreator = (club as any)?.created_by === user.id;
+
+  if (!isSystemAdmin && !isClubCreator) {
+    return { error: "Unauthorized" };
+  }
+
+  const { error } = await supabase
+    .from("club_memberships")
+    .update({ status: "rejected" })
+    .eq("id", membershipId);
+
+  if (error) return { error: error.message };
+
+  return { success: true };
+}
+
+export async function getPendingMembers(clubId: string) {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("club_memberships")
+    .select(`
+      id,
+      club_id,
+      user_id,
+      role,
+      status,
+      intro_message,
+      created_at,
+      user:profiles(id, full_name, email, position)
+    `)
+    .eq("club_id", clubId)
+    .eq("status", "pending")
+    .order("created_at", { ascending: true });
+
+  if (error) {
+    console.error("Error fetching pending members:", error);
+    return [];
+  }
+
+  return (data || []).map((m: any) => ({
+    ...m,
+    user: Array.isArray(m.user) ? m.user[0] : m.user,
+  }));
+}
+
+export async function getClubMembershipStatus(clubId: string): Promise<"approved" | "pending" | "rejected" | null> {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return null;
+
+  const { data } = await supabase
+    .from("club_memberships")
+    .select("status")
+    .eq("club_id", clubId)
+    .eq("user_id", user.id)
+    .single();
+
+  return data?.status || null;
 }
 
 export async function leaveClub(clubId: string) {

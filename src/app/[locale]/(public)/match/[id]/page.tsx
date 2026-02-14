@@ -1,12 +1,13 @@
 import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
-import { getMatch } from "@/app/actions/match";
+import { getMatch, getRegularMatchResponses, getMyRegularMatchResponse } from "@/app/actions/match";
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { MatchApplication } from "@/components/match-application";
 import { AdminControls } from "@/components/admin-controls";
 import { MatchShareButton } from "@/components/match-share-button";
 import { DynamicRinkMap } from "@/components/dynamic-rink-map";
+import { RegularMatchResponseSection } from "@/components/regular-match-response";
 
 export default async function MatchPage({
   params,
@@ -117,6 +118,11 @@ export default async function MatchPage({
             {match.club && (
               <span className="px-3 py-1 rounded-full text-sm font-bold bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 flex items-center gap-1">
                 👥 {match.club.name}
+              </span>
+            )}
+            {match.match_type === "regular" && (
+              <span className="px-3 py-1 rounded-full text-sm font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
+                {locale === "ko" ? "정규" : "Regular"}
               </span>
             )}
           </div>
@@ -233,6 +239,44 @@ export default async function MatchPage({
           </div>
         </div>
       </div>
+
+      {/* Guest Restriction Info for Regular Matches */}
+      {match.match_type === "regular" && match.guest_open_hours_before && (() => {
+        const matchStart = new Date(match.start_time);
+        const guestOpenTime = new Date(matchStart.getTime() - (match.guest_open_hours_before || 24) * 60 * 60 * 1000);
+        const now = new Date();
+        const isGuestOpen = now >= guestOpenTime;
+        return (
+          <div className={`border rounded-2xl p-4 shadow-sm ${
+            isGuestOpen
+              ? "bg-green-50 dark:bg-green-900/10 border-green-200 dark:border-green-700/30"
+              : "bg-amber-50 dark:bg-amber-900/10 border-amber-200 dark:border-amber-700/30"
+          }`}>
+            <div className="flex items-center gap-2 text-sm">
+              <span>{isGuestOpen ? "🟢" : "🔒"}</span>
+              <span className={`font-medium ${
+                isGuestOpen
+                  ? "text-green-700 dark:text-green-400"
+                  : "text-amber-700 dark:text-amber-400"
+              }`}>
+                {isGuestOpen
+                  ? (locale === "ko" ? "게스트 모집 중" : "Open to Guests")
+                  : (locale === "ko"
+                    ? `게스트 모집: ${guestOpenTime.toLocaleString("ko-KR", { timeZone: "Asia/Seoul", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })} 부터`
+                    : `Guest registration opens: ${guestOpenTime.toLocaleString("en-US", { timeZone: "Asia/Seoul", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}`)}
+              </span>
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* Regular Match Response Section */}
+      {match.match_type === "regular" && user && (
+        <RegularMatchResponseSection
+          matchId={match.id}
+          matchClubId={match.club?.id}
+        />
+      )}
 
       {/* Application - Inline status and button */}
       <MatchApplication

@@ -101,3 +101,78 @@ export async function getMyMatches(): Promise<MyMatch[]> {
 
   return validMatches;
 }
+
+export interface PendingRegularMatch {
+  id: string;
+  start_time: string;
+  match_type: string;
+  club: {
+    id: string;
+    name: string;
+  } | null;
+  rink: {
+    name_ko: string;
+    name_en: string;
+  } | null;
+}
+
+export async function getMyPendingRegularMatches(): Promise<PendingRegularMatch[]> {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return [];
+
+  // Get user's approved club IDs
+  const { data: memberships } = await supabase
+    .from("club_memberships")
+    .select("club_id")
+    .eq("user_id", user.id)
+    .eq("status", "approved");
+
+  if (!memberships || memberships.length === 0) return [];
+
+  const clubIds = memberships.map((m) => m.club_id);
+
+  // Get upcoming regular matches from those clubs
+  const now = new Date().toISOString();
+  const { data: matches, error } = await supabase
+    .from("matches")
+    .select(`
+      id,
+      start_time,
+      match_type,
+      club:club_id(id, name),
+      rink:rink_id(name_ko, name_en)
+    `)
+    .eq("match_type", "regular")
+    .in("club_id", clubIds)
+    .gte("start_time", now)
+    .neq("status", "canceled")
+    .order("start_time", { ascending: true });
+
+  if (error || !matches) return [];
+
+  // Get user's existing responses
+  const matchIds = matches.map((m) => m.id);
+  const { data: responses } = await supabase
+    .from("regular_match_responses")
+    .select("match_id")
+    .eq("user_id", user.id)
+    .in("match_id", matchIds);
+
+  const respondedMatchIds = new Set((responses || []).map((r) => r.match_id));
+
+  // Filter to only unreplied matches
+  return matches
+    .filter((m) => !respondedMatchIds.has(m.id))
+    .map((m) => ({
+      id: m.id,
+      start_time: m.start_time,
+      match_type: m.match_type,
+      club: Array.isArray(m.club) ? m.club[0] : m.club,
+      rink: Array.isArray(m.rink) ? m.rink[0] : m.rink,
+    })) as PendingRegularMatch[];
+}

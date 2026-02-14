@@ -23,6 +23,8 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedClubId, setSelectedClubId] = useState<string>("");
+  const [matchType, setMatchType] = useState<"open_hockey" | "regular">("open_hockey");
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -56,13 +58,18 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
       {clubs.length > 0 && (
         <div>
           <label className="block text-sm font-medium mb-2 text-zinc-300">
-            👥 주최 동호회 (선택)
+            👥 {locale === "ko" ? "주최 동호회 (선택)" : "Host Club (Optional)"}
           </label>
           <select
             name="club_id"
+            value={selectedClubId}
+            onChange={(e) => {
+              setSelectedClubId(e.target.value);
+              if (!e.target.value) setMatchType("open_hockey");
+            }}
             className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
           >
-            <option value="">동호회 없음 (개인 주최)</option>
+            <option value="">{locale === "ko" ? "동호회 없음 (개인 주최)" : "No Club (Personal)"}</option>
             {clubs.map((club) => (
               <option key={club.id} value={club.id}>
                 {club.name}
@@ -70,8 +77,80 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
             ))}
           </select>
           <p className="text-xs text-zinc-500 mt-1">
-            동호회를 선택하면 해당 동호회 경기로 등록됩니다.
+            {locale === "ko"
+              ? "동호회를 선택하면 해당 동호회 경기로 등록됩니다."
+              : "Select a club to register this as a club match."}
           </p>
+        </div>
+      )}
+
+      {/* Match Type (only when club is selected) */}
+      {selectedClubId && (
+        <div className="p-4 bg-zinc-900/50 rounded-lg border border-zinc-700 space-y-3">
+          <label className="block text-sm font-medium text-zinc-300">
+            🏒 {locale === "ko" ? "경기 타입" : "Match Type"}
+          </label>
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              type="button"
+              onClick={() => setMatchType("open_hockey")}
+              className={`p-3 rounded-lg border text-sm text-left transition-all ${
+                matchType === "open_hockey"
+                  ? "border-blue-500 bg-blue-500/10 text-blue-300"
+                  : "border-zinc-700 text-zinc-400 hover:border-zinc-600"
+              }`}
+            >
+              <div className="font-medium">{locale === "ko" ? "오픈 하키" : "Open Hockey"}</div>
+              <div className="text-xs mt-1 opacity-75">
+                {locale === "ko" ? "누구나 참가 가능" : "Anyone can join"}
+              </div>
+            </button>
+            <button
+              type="button"
+              onClick={() => setMatchType("regular")}
+              className={`p-3 rounded-lg border text-sm text-left transition-all ${
+                matchType === "regular"
+                  ? "border-emerald-500 bg-emerald-500/10 text-emerald-300"
+                  : "border-zinc-700 text-zinc-400 hover:border-zinc-600"
+              }`}
+            >
+              <div className="font-medium">{locale === "ko" ? "정규 대관" : "Regular"}</div>
+              <div className="text-xs mt-1 opacity-75">
+                {locale === "ko" ? "동호회 멤버 우선" : "Members first"}
+              </div>
+            </button>
+          </div>
+          <input type="hidden" name="match_type" value={matchType} />
+
+          {/* Guest Open Hours (only for regular) */}
+          {matchType === "regular" && (
+            <div className="mt-3 p-3 bg-emerald-900/20 rounded-lg border border-emerald-800/30">
+              <label className="block text-sm font-medium mb-2 text-emerald-300">
+                ⏰ {locale === "ko" ? "게스트 모집 허용 시간" : "Guest Open Time"}
+              </label>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-zinc-400">
+                  {locale === "ko" ? "경기 시작" : "Start"}{" "}
+                </span>
+                <input
+                  type="number"
+                  name="guest_open_hours_before"
+                  defaultValue={24}
+                  min={0}
+                  max={168}
+                  className="w-20 px-3 py-2 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 text-center focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                />
+                <span className="text-sm text-zinc-400">
+                  {locale === "ko" ? "시간 전부터" : "hours before"}
+                </span>
+              </div>
+              <p className="text-xs text-zinc-500 mt-2">
+                {locale === "ko"
+                  ? "설정한 시간 이전에는 동호회 멤버만 참가할 수 있습니다."
+                  : "Only club members can join before this time window."}
+              </p>
+            </div>
+          )}
         </div>
       )}
 
@@ -283,17 +362,19 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
       {/* 정산 계좌번호 */}
       <div>
         <label className="block text-sm font-medium mb-2 text-zinc-300">
-          정산 받을 계좌번호
+          {locale === "ko" ? "정산 받을 계좌번호" : "Bank Account for Settlement"}
         </label>
         <input
           type="text"
           name="bank_account"
           className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-          placeholder="예: 카카오뱅크 3333-00-0000000 홍길동"
-          required
+          placeholder={locale === "ko" ? "예: 카카오뱅크 3333-00-0000000 홍길동" : "e.g., Bank 1234-5678 Name"}
+          required={matchType !== "regular"}
         />
         <p className="text-xs text-zinc-500 mt-1">
-          경기 참가비를 정산 받을 계좌를 입력해주세요. (은행명, 계좌번호, 예금주)
+          {matchType === "regular"
+            ? (locale === "ko" ? "정규 대관은 별도 회비로 운영 시 선택 사항입니다." : "Optional for regular matches with separate dues.")
+            : (locale === "ko" ? "경기 참가비를 정산 받을 계좌를 입력해주세요. (은행명, 계좌번호, 예금주)" : "Enter bank details for collecting entry fees.")}
         </p>
       </div>
 

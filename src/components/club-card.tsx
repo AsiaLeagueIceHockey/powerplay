@@ -11,11 +11,11 @@ import { MessageCircle, Users, Building2, ChevronDown, ChevronUp } from "lucide-
 
 interface ClubCardProps {
   club: Club;
-  initialIsMember: boolean;
+  initialMemberStatus: "approved" | "pending" | "rejected" | null;
 }
 
-export function ClubCard({ club, initialIsMember }: ClubCardProps) {
-  const [isMember, setIsMember] = useState(initialIsMember);
+export function ClubCard({ club, initialMemberStatus }: ClubCardProps) {
+  const [memberStatus, setMemberStatus] = useState(initialMemberStatus);
   const [loading, setLoading] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const locale = useLocale();
@@ -25,7 +25,7 @@ export function ClubCard({ club, initialIsMember }: ClubCardProps) {
     e.preventDefault();
     e.stopPropagation();
 
-    if (isMember) return;
+    if (memberStatus === "approved" || memberStatus === "pending") return;
     
     if (!confirm(locale === "ko" ? "이 동호회에 가입하시겠습니까?" : "Do you want to join this club?")) {
       return;
@@ -37,12 +37,16 @@ export function ClubCard({ club, initialIsMember }: ClubCardProps) {
     if (res.error) {
       if (res.error === "Not authenticated") {
          alert(locale === "ko" ? "로그인이 필요합니다." : "Please login first.");
+      } else if (res.error === "already_pending") {
+         alert(locale === "ko" ? "이미 가입 신청 중입니다." : "Application already pending.");
       } else {
          alert(locale === "ko" ? "가입 실패: " + res.error : "Failed to join: " + res.error);
       }
     } else {
-      setIsMember(true);
-      alert(locale === "ko" ? "가입되었습니다!" : "Successfully joined!");
+      setMemberStatus("pending");
+      alert(locale === "ko" 
+        ? "가입 신청이 완료되었습니다! 관리자 승인을 기다려주세요." 
+        : "Application submitted! Please wait for admin approval.");
     }
     setLoading(false);
   };
@@ -139,22 +143,24 @@ export function ClubCard({ club, initialIsMember }: ClubCardProps) {
         {/* Join Button */}
         <button
           onClick={handleJoin}
-          disabled={isMember || loading}
+          disabled={memberStatus === "approved" || memberStatus === "pending" || loading}
           className={`flex-1 py-2.5 rounded-lg text-sm font-bold transition-colors ${
-            isMember
+            memberStatus === "approved"
               ? "bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 cursor-default"
+              : memberStatus === "pending"
+              ? "bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 cursor-default border border-orange-200 dark:border-orange-800/50"
               : "bg-blue-600 text-white hover:bg-blue-700 shadow-sm"
           }`}
         >
           {loading
             ? "..."
-            : isMember
-            ? locale === "ko"
-              ? "가입됨"
-              : "Joined"
-            : locale === "ko"
-            ? "참여하기"
-            : "Join"}
+            : memberStatus === "approved"
+            ? locale === "ko" ? "가입됨" : "Joined"
+            : memberStatus === "pending"
+            ? locale === "ko" ? "승인 대기 중" : "Pending"
+            : memberStatus === "rejected"
+            ? locale === "ko" ? "다시 신청하기" : "Re-apply"
+            : locale === "ko" ? "참여하기" : "Join"}
         </button>
 
         {/* Kakao Link */}

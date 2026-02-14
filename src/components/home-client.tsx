@@ -20,11 +20,12 @@ interface HomeClientProps {
   clubs: Club[];
   allMatches?: Match[]; // Optional, for backward compatibility if needed, but we'll use 'matches' as source
   myClubIds?: string[];
+  myClubStatuses?: Record<string, "approved" | "pending" | "rejected">;
   initialDate?: string;
   userRole?: string | null;
 }
 
-export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds = [], initialDate, userRole }: HomeClientProps) {
+export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds = [], myClubStatuses = {}, initialDate, userRole }: HomeClientProps) {
   const locale = useLocale();
   const t = useTranslations("home");
   const router = useRouter();
@@ -383,7 +384,7 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
                   <ClubCard
                     key={club.id}
                     club={club}
-                    initialIsMember={myClubIds.includes(club.id)}
+                    initialMemberStatus={myClubStatuses[club.id] || null}
                   />
                 ))}
               </div>

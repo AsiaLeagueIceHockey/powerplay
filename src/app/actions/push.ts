@@ -216,6 +216,104 @@ export async function sendPushToSuperUsers(
 }
 
 // ============================================
+// Send Push to Club Members (approved only)
+// ============================================
+export async function sendPushToClubMembers(
+  clubId: string,
+  title: string,
+  body: string,
+  url: string = "/"
+) {
+  try {
+    validateVapidConfig();
+  } catch {
+    return { success: false, error: "VAPID not configured" };
+  }
+
+  const supabase = await createClient();
+
+  // Use Secure RPC to get all club member push tokens
+  const { data: subscriptions, error } = await supabase
+    .rpc("get_club_member_push_tokens", { target_club_id: clubId });
+
+  if (error || !subscriptions || subscriptions.length === 0) {
+    console.log("[PUSH] No subscriptions found for club members:", clubId);
+    return { success: false, error: "No subscriptions" };
+  }
+
+  const payload = JSON.stringify({ title, body, url });
+  let successCount = 0;
+
+  await Promise.allSettled(
+    subscriptions.map(async (sub: any) => {
+      try {
+        await sendWithRetry(
+          { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
+          payload
+        );
+        successCount++;
+      } catch (err: any) {
+        if (err.statusCode === 410 || err.statusCode === 404) {
+          await supabase.from("push_subscriptions").delete().eq("endpoint", sub.endpoint);
+        }
+      }
+    })
+  );
+
+  console.log(`[PUSH] Club members push: ${successCount}/${subscriptions.length} for club ${clubId}`);
+  return { success: successCount > 0, sent: successCount };
+}
+
+// ============================================
+// Send Push to Club Admin (creator)
+// ============================================
+export async function sendPushToClubAdmin(
+  clubId: string,
+  title: string,
+  body: string,
+  url: string = "/admin/clubs"
+) {
+  try {
+    validateVapidConfig();
+  } catch {
+    return { success: false, error: "VAPID not configured" };
+  }
+
+  const supabase = await createClient();
+
+  // Use Secure RPC to get club admin push tokens
+  const { data: subscriptions, error } = await supabase
+    .rpc("get_club_admin_push_tokens", { target_club_id: clubId });
+
+  if (error || !subscriptions || subscriptions.length === 0) {
+    console.log("[PUSH] No subscriptions found for club admin:", clubId);
+    return { success: false, error: "No subscriptions" };
+  }
+
+  const payload = JSON.stringify({ title, body, url });
+  let successCount = 0;
+
+  await Promise.allSettled(
+    subscriptions.map(async (sub: any) => {
+      try {
+        await sendWithRetry(
+          { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
+          payload
+        );
+        successCount++;
+      } catch (err: any) {
+        if (err.statusCode === 410 || err.statusCode === 404) {
+          await supabase.from("push_subscriptions").delete().eq("endpoint", sub.endpoint);
+        }
+      }
+    })
+  );
+
+  console.log(`[PUSH] Club admin push: ${successCount}/${subscriptions.length} for club ${clubId}`);
+  return { success: successCount > 0, sent: successCount };
+}
+
+// ============================================
 // Main Send Push Notification
 // ============================================
 export async function sendPushNotification(
