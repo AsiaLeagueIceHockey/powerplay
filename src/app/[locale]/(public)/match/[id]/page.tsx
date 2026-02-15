@@ -1,6 +1,7 @@
 import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { getMatch, getRegularMatchResponses, getMyRegularMatchResponse } from "@/app/actions/match";
+import { isClubMember } from "@/app/actions/clubs";
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { MatchApplication } from "@/components/match-application";
@@ -22,12 +23,19 @@ export default async function MatchPage({
   // Fully parallel fetch - translations, user, and match all at once
   const [t, { data: { user } }, match] = await Promise.all([
     getTranslations(),
+
     supabase.auth.getUser(),
     getMatch(id),
   ]);
 
   if (!match) {
     notFound();
+  }
+
+  // Check if user is a member of the club (for Regular Matches)
+  let isMember = false;
+  if (user && match.club?.id) {
+    isMember = await isClubMember(match.club.id);
   }
 
   // Get user profile for onboarding status and points (only if user exists)
@@ -120,9 +128,13 @@ export default async function MatchPage({
                 👥 {match.club.name}
               </span>
             )}
-            {match.match_type === "regular" && (
-              <span className="px-3 py-1 rounded-full text-sm font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
-                {locale === "ko" ? "정규" : "Regular"}
+            {match.match_type === "regular" ? (
+              <span className="px-3 py-1 rounded-full text-sm font-bold bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800">
+                {locale === "ko" ? "정규대관" : "Regular Match"}
+              </span>
+            ) : (
+              <span className="px-3 py-1 rounded-full text-sm font-bold bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400 border border-sky-200 dark:border-sky-700">
+                {locale === "ko" ? "오픈하키" : "Open Hockey"}
               </span>
             )}
           </div>
@@ -240,37 +252,32 @@ export default async function MatchPage({
         </div>
       </div>
 
-      {/* Guest Restriction Info for Regular Matches */}
-      {match.match_type === "regular" && match.guest_open_hours_before && (() => {
-        const matchStart = new Date(match.start_time);
-        const guestOpenTime = new Date(matchStart.getTime() - (match.guest_open_hours_before || 24) * 60 * 60 * 1000);
-        const now = new Date();
-        const isGuestOpen = now >= guestOpenTime;
-        return (
-          <div className={`border rounded-2xl p-4 shadow-sm ${
-            isGuestOpen
-              ? "bg-green-50 dark:bg-green-900/10 border-green-200 dark:border-green-700/30"
-              : "bg-amber-50 dark:bg-amber-900/10 border-amber-200 dark:border-amber-700/30"
-          }`}>
-            <div className="flex items-center gap-2 text-sm">
-              <span>{isGuestOpen ? "🟢" : "🔒"}</span>
-              <span className={`font-medium ${
-                isGuestOpen
-                  ? "text-green-700 dark:text-green-400"
-                  : "text-amber-700 dark:text-amber-400"
-              }`}>
-                {isGuestOpen
-                  ? (locale === "ko" ? "게스트 모집 중" : "Open to Guests")
-                  : (locale === "ko"
-                    ? `게스트 모집: ${guestOpenTime.toLocaleString("ko-KR", { timeZone: "Asia/Seoul", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })} 부터`
-                    : `Guest registration opens: ${guestOpenTime.toLocaleString("en-US", { timeZone: "Asia/Seoul", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}`)}
-              </span>
-            </div>
-          </div>
-        );
-      })()}
 
-      {/* Regular Match Response Section */}
+
+
+      {/* Club Join CTA for Guests (Regular Match Only) */}
+      {match.match_type === "regular" && match.club && !isMember && (
+        <div className="bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-800 rounded-2xl p-5 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div>
+            <h3 className="font-bold text-blue-900 dark:text-blue-100 mb-1">
+              {locale === "ko" ? `'${match.club.name}' 정규 멤버가 되어보세요!` : `Join '${match.club.name}' as a Regular Member!`}
+            </h3>
+            <p className="text-sm text-blue-700 dark:text-blue-300">
+              {locale === "ko" 
+                ? "정규 멤버는 게스트 모집 전 우선 신청이 가능합니다." 
+                : "Regular members get priority registration before guest opening."}
+            </p>
+          </div>
+          <a
+            href={`/clubs/${match.club.id}`}
+            className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-lg transition-colors whitespace-nowrap shadow-sm"
+          >
+            {locale === "ko" ? "동호회 보러가기" : "View Club"}
+          </a>
+        </div>
+      )}
+
+      {/* Regular Match Response Section (For Members) */}
       {match.match_type === "regular" && user && (
         <RegularMatchResponseSection
           matchId={match.id}
@@ -278,26 +285,86 @@ export default async function MatchPage({
         />
       )}
 
-      {/* Application - Inline status and button */}
-      <MatchApplication
-        matchId={match.id}
-        positions={{
-          FW: remaining.skaters > 0,
-          DF: remaining.skaters > 0,
-          G: remaining.g > 0
-        }}
-        isJoined={isJoined}
-        currentPosition={userParticipant?.position}
-        currentStatus={userParticipant?.status}
-        matchStatus={match.status}
-        matchStartTime={match.start_time}
-        entryPoints={match.entry_points || 0}
-        userPoints={userPoints}
-        onboardingCompleted={onboardingCompleted}
-        isFull={isFull}
-        goalieFree={match.goalie_free === true}
-        isAuthenticated={!!user}
-      />
+      {/* Guest Application Section (For Regular Matches) */}
+      {match.match_type === "regular" ? (
+        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-sm">
+          <h2 className="text-lg font-bold mb-4">👋🏽 {t("match.guestApplication")}</h2>
+
+          {/* Guest Restriction Info */}
+          {match.guest_open_hours_before && (() => {
+            const matchStart = new Date(match.start_time);
+            const guestOpenTime = new Date(matchStart.getTime() - (match.guest_open_hours_before || 24) * 60 * 60 * 1000);
+            const now = new Date();
+            const isGuestOpen = now >= guestOpenTime;
+            return (
+              <div className={`border rounded-2xl p-4 mb-4 shadow-sm ${
+                isGuestOpen
+                  ? "bg-green-50 dark:bg-green-900/10 border-green-200 dark:border-green-700/30"
+                  : "bg-amber-50 dark:bg-amber-900/10 border-amber-200 dark:border-amber-700/30"
+              }`}>
+                <div className="flex items-center gap-2 text-sm">
+                  <span>{isGuestOpen ? "🟢" : "🔒"}</span>
+                  <span className={`font-medium ${
+                    isGuestOpen
+                      ? "text-green-700 dark:text-green-400"
+                      : "text-amber-700 dark:text-amber-400"
+                  }`}>
+                    {isGuestOpen
+                      ? (locale === "ko" ? "게스트 모집 중" : "Open to Guests")
+                      : (locale === "ko"
+                        ? `게스트 모집: ${guestOpenTime.toLocaleString("ko-KR", { timeZone: "Asia/Seoul", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })} 부터`
+                        : `Guest registration opens: ${guestOpenTime.toLocaleString("en-US", { timeZone: "Asia/Seoul", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}`)}
+                  </span>
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* Guest Join Button */}
+          <MatchApplication
+            matchId={match.id}
+            positions={{
+              FW: remaining.skaters > 0,
+              DF: remaining.skaters > 0,
+              G: remaining.g > 0
+            }}
+            isJoined={isMember ? false : isJoined}
+            currentPosition={userParticipant?.position}
+            currentStatus={userParticipant?.status}
+            matchStatus={match.status}
+            matchStartTime={match.start_time}
+            entryPoints={match.entry_points || 0}
+            userPoints={userPoints}
+            onboardingCompleted={onboardingCompleted}
+            isFull={isFull}
+            goalieFree={match.goalie_free === true}
+            isAuthenticated={!!user}
+            disabled={isMember}
+            customButtonText={t("match.guestJoin")}
+          />
+        </div>
+      ) : (
+        /* Standard Application for Open Hockey */
+        <MatchApplication
+          matchId={match.id}
+          positions={{
+            FW: remaining.skaters > 0,
+            DF: remaining.skaters > 0,
+            G: remaining.g > 0
+          }}
+          isJoined={isJoined}
+          currentPosition={userParticipant?.position}
+          currentStatus={userParticipant?.status}
+          matchStatus={match.status}
+          matchStartTime={match.start_time}
+          entryPoints={match.entry_points || 0}
+          userPoints={userPoints}
+          onboardingCompleted={onboardingCompleted}
+          isFull={isFull}
+          goalieFree={match.goalie_free === true}
+          isAuthenticated={!!user}
+        />
+      )}
 
       {/* Participant List Header */}
       <h2 className="text-xl font-bold pt-4">

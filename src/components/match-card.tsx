@@ -57,11 +57,22 @@ export function MatchCard({ match }: { match: Match }) {
         <div className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
           {formattedDate} · {formattedTime}
         </div>
-        <span
-          className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColors[displayStatus]}`}
-        >
-          {t(`status.${displayStatus}`)}
-        </span>
+        <div className="flex items-center gap-1">
+          {match.match_type === "regular" ? (
+            <span className="rounded px-1.5 py-0.5 text-xs font-bold bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800">
+               {locale === "ko" ? "정규대관" : "Regular Match"}
+            </span>
+          ) : (
+             <span className="rounded px-1.5 py-0.5 text-xs font-bold bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400 border border-sky-200 dark:border-sky-700">
+                {locale === "ko" ? "오픈하키" : "Open Hockey"}
+             </span>
+           )}
+          <span
+            className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColors[displayStatus]}`}
+          >
+            {t(`status.${displayStatus}`)}
+          </span>
+        </div>
       </div>
 
       {/* Rink Name & Address */}

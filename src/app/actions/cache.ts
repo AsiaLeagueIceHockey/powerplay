@@ -82,6 +82,7 @@ export async function getCachedMatches(): Promise<Match[]> {
       max_goalies,
       status,
       description,
+      match_type,
       rink:rink_id(id, name_ko, name_en, address, lat, lng, rink_type),
       club:club_id(id, name, kakao_open_chat_url, logo_url)
     `)
@@ -121,7 +122,7 @@ export async function getCachedMatches(): Promise<Match[]> {
   });
 
   // Transform matches
-  return (matches || []).map(match => {
+  return (matches as any[] || []).map(match => {
     const rink = Array.isArray(match.rink) ? match.rink[0] : match.rink;
     const club = Array.isArray(match.club) ? match.club[0] : match.club;
 

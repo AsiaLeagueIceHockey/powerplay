@@ -25,6 +25,7 @@ interface Match {
   max_skaters: number;
   max_goalies: number;
   fee: number;
+  match_type?: string;
 }
 
 export function AdminMatchCard({
@@ -162,13 +163,25 @@ export function AdminMatchCard({
             {formatDate(match.start_time)}
           </p>
         </div>
-        <span
-          className={`px-2.5 py-1 rounded-md text-xs font-semibold ${getStatusColor(
-            displayStatus
-          )}`}
-        >
-          {getStatusText(displayStatus)}
-        </span>
+        <div className="flex flex-col items-end gap-1">
+          <span
+            className={`px-2.5 py-1 rounded-md text-xs font-semibold ${getStatusColor(
+              displayStatus
+            )}`}
+          >
+            {getStatusText(displayStatus)}
+          </span>
+          {match.match_type === "regular" && (
+            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-900/50 text-blue-200 border border-blue-800">
+               {locale === "ko" ? "정규대관" : "Regular"}
+            </span>
+          )}
+           {match.match_type === "open_hockey" && (
+            <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-zinc-700 text-zinc-400 border border-zinc-600">
+               {locale === "ko" ? "오픈하키" : "Open Hockey"}
+            </span>
+          )}
+        </div>
       </div>
 
       <div className="flex justify-between items-center text-sm text-zinc-300 mb-6 bg-zinc-900/50 p-3 rounded-lg border border-zinc-700/50">

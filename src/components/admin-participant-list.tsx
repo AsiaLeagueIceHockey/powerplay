@@ -12,6 +12,7 @@ interface Participant {
     full_name: string | null;
     email: string;
   } | null;
+  is_club_member?: boolean;
 }
 
 export function AdminParticipantList({
@@ -79,6 +80,16 @@ export function AdminParticipantList({
                     >
                       {t(`participant.status.${p.status}`)}
                     </span>
+                    {p.is_club_member && (
+                      <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-indigo-100 text-indigo-700 border border-indigo-200 ml-1">
+                        Member
+                      </span>
+                    )}
+                    {!p.is_club_member && (
+                      <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-gray-100 text-gray-600 border border-gray-200 ml-1">
+                        Guest
+                      </span>
+                    )}
                   </div>
                   
                   {/* Payment status is implied by status, no toggle needed */}

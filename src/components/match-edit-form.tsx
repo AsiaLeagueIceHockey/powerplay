@@ -27,6 +27,8 @@ interface Match {
   bank_account?: string | null;
   goalie_free?: boolean;
   rink: Rink | null;
+  match_type?: "open_hockey" | "regular";
+  guest_open_hours_before?: number;
 }
 
 export function MatchEditForm({
@@ -41,6 +43,7 @@ export function MatchEditForm({
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [matchType, setMatchType] = useState<"open_hockey" | "regular">(match.match_type || "open_hockey");
 
   // Format datetime for input (KST)
   const formatDateTimeLocal = (dateString: string) => {
@@ -140,6 +143,81 @@ export function MatchEditForm({
           </p>
         )}
       </div>
+      
+      {/* Match Type */}
+      <div>
+        <label className="block text-sm font-medium mb-2 text-zinc-300">
+          {t("match.matchType")}
+        </label>
+        <div className="flex gap-4 p-1 bg-zinc-900 rounded-lg border border-zinc-700 opacity-60">
+          <label className={`flex-1 flex items-center justify-center py-2 rounded-md transition-all cursor-not-allowed ${
+            matchType === "open_hockey" 
+              ? "bg-zinc-700 text-white font-medium shadow-sm" 
+              : "text-zinc-500"
+          }`}>
+            <input
+              type="radio"
+              name="match_type"
+              value="open_hockey"
+              checked={matchType === "open_hockey"}
+              disabled={true}
+              className="sr-only"
+            />
+            🏒 {t("match.openHockey")}
+          </label>
+          <label className={`flex-1 flex items-center justify-center py-2 rounded-md transition-all cursor-not-allowed ${
+            matchType === "regular" 
+              ? "bg-blue-900/50 text-blue-200 font-medium shadow-sm border border-blue-800/50" 
+              : "text-zinc-500"
+          }`}>
+            <input
+              type="radio"
+              name="match_type"
+              value="regular"
+              checked={matchType === "regular"}
+              disabled={true}
+              className="sr-only"
+            />
+            ⭐ {t("match.regular")}
+          </label>
+        </div>
+        <input type="hidden" name="match_type" value={matchType} />
+        <p className="text-xs text-zinc-500 mt-1">
+          {locale === "ko" 
+            ? "* 경기 타입은 변경할 수 없습니다." 
+            : "* Match type cannot be changed."}
+        </p>
+      </div>
+
+      {/* Guest Open Hours (only for regular) */}
+      {matchType === "regular" && (
+        <div className="mt-3 p-3 bg-emerald-900/20 rounded-lg border border-emerald-800/30">
+          <label className="block text-sm font-medium mb-2 text-emerald-300">
+            ⏰ {locale === "ko" ? "게스트 모집 허용 시간" : "Guest Open Time"}
+          </label>
+          <p className="text-xs text-emerald-300 mb-2">
+            {t("admin.form.regularMemberFree")}
+          </p>
+          <div className="relative">
+            <input
+              type="number"
+              name="guest_open_hours_before"
+              defaultValue={match.guest_open_hours_before || 24}
+              min={0}
+              disabled={isCanceled}
+              className="w-full px-4 py-3 pr-12 bg-zinc-900 border border-emerald-800/50 rounded-lg text-emerald-100 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 disabled:opacity-50"
+            />
+            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-emerald-500 text-sm">
+              {locale === "ko" ? "시간 전부터" : "hours before"}
+            </span>
+          </div>
+          <p className="text-xs text-emerald-400/70 mt-2">
+            {locale === "ko" 
+              ? "경기 시작 N시간 전부터 게스트 신청이 가능합니다. (그 전엔 정규 멤버만 가능)"
+              : "Guests can join N hours before the match starts. (Regular members only before that)"}
+          </p>
+        </div>
+      )}
 
       {/* Rink Selection */}
       <div>

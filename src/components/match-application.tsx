@@ -24,6 +24,8 @@ interface MatchApplicationProps {
   isFull?: boolean;
   goalieFree?: boolean;
   isAuthenticated?: boolean;
+  disabled?: boolean;
+  customButtonText?: string;
 }
 
 export function MatchApplication({
@@ -40,6 +42,8 @@ export function MatchApplication({
   isFull = false,
   goalieFree = false,
   isAuthenticated = false,
+  disabled = false,
+  customButtonText,
 }: MatchApplicationProps) {
   const t = useTranslations("match");
   const tParticipant = useTranslations("participant");
@@ -410,9 +414,14 @@ export function MatchApplication({
   return (
     <button
       onClick={() => setShowSelect(true)}
-      className="w-full py-4 bg-zinc-900 text-white rounded-2xl text-lg font-bold hover:bg-zinc-800 transition shadow-sm dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
+      disabled={disabled}
+      className={`w-full py-4 rounded-2xl text-lg font-bold transition shadow-sm ${
+        disabled
+          ? "bg-zinc-200 text-zinc-400 cursor-not-allowed dark:bg-zinc-800 dark:text-zinc-600"
+          : "bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
+      }`}
     >
-      {t("join")}
+      {customButtonText || t("join")}
     </button>
   );
 }

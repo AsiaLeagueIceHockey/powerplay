@@ -9,10 +9,11 @@ import { MatchCard } from "@/components/match-card";
 import { CalendarView } from "@/components/calendar-view";
 import { RinkExplorer } from "@/components/rink-explorer";
 import { useTranslations, useLocale } from "next-intl";
-import { RinkFilterDrawer } from "@/components/rink-filter-drawer";
+import { MatchTypeFilterDrawer } from "@/components/match-type-filter-drawer";
 import { List, CalendarDays, Loader2, ChevronDown } from "lucide-react";
 import { Club } from "@/app/actions/types";
 import { ClubCard } from "@/components/club-card";
+import { RinkFilterDrawer } from "@/components/rink-filter-drawer";
 
 interface HomeClientProps {
   matches: Match[]; // This is now ALL matches passed from server
@@ -47,6 +48,7 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
   // Rink Filter State
   const [selectedRinkIds, setSelectedRinkIds] = useState<string[]>([]);
   const [isRinkFilterOpen, setIsRinkFilterOpen] = useState(false);
+  const [isMatchTypeFilterOpen, setIsMatchTypeFilterOpen] = useState(false);
 
   const setActiveTab = (tab: "match" | "rink" | "club") => {
     startTransition(() => {
@@ -113,6 +115,24 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
       if (currentGoalies >= match.max_goalies) {
         filterMatch = false;
       }
+    }
+
+    // Match Type Filter
+    const hasRegularFilter = activeFilters.has("match_type_regular");
+    const hasOpenFilter = activeFilters.has("match_type_open");
+
+    if (hasRegularFilter || hasOpenFilter) {
+        // If at least one type filter is active, check if match matches any active type
+        const isRegular = match.match_type === "regular";
+        const isOpen = match.match_type === "open_hockey" || !match.match_type; // Treat missing as open
+
+        let typeMatch = false;
+        if (hasRegularFilter && isRegular) typeMatch = true;
+        if (hasOpenFilter && isOpen) typeMatch = true;
+
+        if (!typeMatch) {
+            filterMatch = false;
+        }
     }
     
     // 3. Rink Filter (Intersection / OR within Rinks)
@@ -244,6 +264,22 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
                     {locale === "ko" ? "링크장" : "Rink"} 
                     {selectedRinkIds.length > 0 && ` (${selectedRinkIds.length})`}
                     <ChevronDown className={`w-3 h-3 transition-transform ${isRinkFilterOpen ? "rotate-180" : ""}`} />
+                  </button>
+
+                  {/* Match Type Filter Button */}
+                  <button
+                    onClick={() => setIsMatchTypeFilterOpen(true)}
+                    className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium border transition-colors whitespace-nowrap ${
+                      activeFilters.has("match_type_regular") || activeFilters.has("match_type_open")
+                        ? "bg-blue-600 text-white border-blue-600 shadow-sm"
+                        : "bg-white text-zinc-600 border-zinc-200 hover:bg-zinc-50 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700 dark:hover:bg-zinc-700"
+                    }`}
+                  >
+                    {locale === "ko" ? "경기 타입" : "Match Type"}
+                    {(activeFilters.has("match_type_regular") || activeFilters.has("match_type_open")) && (
+                        ` (${(activeFilters.has("match_type_regular") ? 1 : 0) + (activeFilters.has("match_type_open") ? 1 : 0)})`
+                    )}
+                    <ChevronDown className={`w-3 h-3 transition-transform ${isMatchTypeFilterOpen ? "rotate-180" : ""}`} />
                   </button>
 
                   <button
@@ -406,7 +442,14 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
         selectedRinkIds={selectedRinkIds}
         onSelectRinkIds={setSelectedRinkIds}
       />
+
+      {/* Match Type Filter Drawer */}
+      <MatchTypeFilterDrawer
+        isOpen={isMatchTypeFilterOpen}
+        onClose={() => setIsMatchTypeFilterOpen(false)}
+        activeFilters={activeFilters}
+        onUpdateFilters={setActiveFilters}
+      />
     </div>
   );
 }
-

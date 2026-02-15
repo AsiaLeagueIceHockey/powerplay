@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { calculateRefundPercent } from "./points";
 import { sendPushNotification } from "@/app/actions/push";
 import { logAndNotify } from "@/lib/audit";
+import { revalidatePath } from "next/cache";
 
 // Type definitions for match data
 export interface MatchRink {
@@ -802,6 +803,7 @@ export async function respondToRegularMatch(
         user_id: user.id,
         response,
         position: response === "attending" ? position : null,
+        updated_at: new Date().toISOString(),
       },
       { onConflict: "match_id,user_id" }
     );
@@ -810,6 +812,62 @@ export async function respondToRegularMatch(
     return { error: error.message };
   }
 
+  // Sync with participants table
+  if (response === "attending") {
+    // 1. Check if already a participant
+    const { data: participant } = await supabase
+      .from("participants")
+      .select("id")
+      .eq("match_id", matchId)
+      .eq("user_id", user.id)
+      .single();
+
+    if (!participant) {
+      // Insert as confirmed participant (Regular members skip payment)
+      const { error: joinError } = await supabase.from("participants").insert({
+        match_id: matchId,
+        user_id: user.id,
+        position: position || "FW", // Default to FW if missing
+        status: "confirmed",
+        payment_status: true, // Free for regular members
+        team_color: null
+      });
+
+      if (joinError) {
+        console.error("Failed to sync regular member to participants:", joinError);
+        // We don't fail the whole request, but log it. 
+        // Ideally we should probably transaction this, but Supabase HTTP API doesn't support transactions easily without RPC.
+      } else {
+        // Audit Log for auto-join
+        await logAndNotify({
+          userId: user.id,
+          action: "MATCH_JOIN",
+          description: `${user.email}님이 정규 대관(${matchId})에 정규 멤버로 참가했습니다.`,
+          metadata: { matchId, status: "confirmed", type: "regular_member" },
+        });
+      }
+    } else {
+        // Update position if changed
+        await supabase
+            .from("participants")
+            .update({ position: position || "FW" })
+            .eq("id", participant.id);
+    }
+  } else {
+    // response === "not_attending"
+    // Remove from participants if exists
+    const { error: leaveError } = await supabase
+      .from("participants")
+      .delete()
+      .eq("match_id", matchId)
+      .eq("user_id", user.id);
+      
+    if (leaveError) {
+        console.error("Failed to remove regular member from participants:", leaveError);
+    }
+  }
+
+  revalidatePath(`/match/${matchId}`);
   return { success: true };
 }
 

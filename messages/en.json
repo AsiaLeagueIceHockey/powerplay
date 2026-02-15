@@ -113,7 +113,12 @@
         "refundPolicy": "Refund Policy",
         "goalieFree": "FREE",
         "goalieFreeLabel": "Free Goalie Entry",
-        "goalieFreeDesc": "Goalies can join for free without entry fee"
+        "goalieFreeDesc": "Goalies can join for free without entry fee",
+        "guestApplication": "Guest Application",
+        "guestJoin": "Guest Join",
+        "matchType": "Match Type",
+        "openHockey": "Open Hockey",
+        "regular": "Regular Match"
     },
     "participant": {
         "status": {
@@ -238,6 +243,8 @@
             "dateTime": "Date & Time",
             "fee": "Entry Fee",
             "entryPoints": "Entry Fee",
+            "guestFee": "Guest Entry Fee",
+            "regularMemberFree": "(Regular members can join for free)",
             "maxSkaters": "Max Skaters",
             "maxGoalies": "Max Goalies",
             "description": "Description",

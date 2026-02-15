@@ -593,3 +593,40 @@ UPDATE profiles SET role = 'superuser' WHERE email = 'your-email@example.com';
     - Added `v22_admin_superuser_matches_fix.sql` to explicitly grant both `admin` and `superuser` roles permission to update matches.
   - **UI/UX Enhancement**: Removed the nested scrollbar in the Rink Explorer list view, allowing it to use the full page scroll while keeping the map fixed at a proper viewport height.
 - **Next Steps**: Monitor the points system for any edge cases during match cancellation and ensure notifications are delivered correctly.
+### [2026-02-14] Regular Member Management (동호회 정규 대관)
+- **Context**: Implemented approval-based club membership and regular match management for exclusive club games.
+- **Database Schema**:
+  - `club_memberships`: Added `status` ('pending'|'approved'|'rejected') and `intro_message`.
+  - `matches`: Added `match_type` ('open_hockey'|'regular') and `guest_open_hours_before` for guest restrictions.
+  - `regular_match_responses`: New table for regular members to RSVP (attending/not_attending) with position.
+  - **RLS**: Updated policies to allow club creators/admins to approve members (`v24_fix_club_membership_update_rls.sql`).
+- **Backend Logic**:
+  - **Membership**: `joinClub` (with intro), `approveClubMember` (push notification), `rejectClubMember`.
+  - **Match Creation**: `createMatch` sends push notifications to ALL approved club members for regular matches.
+  - **Participation**: `joinMatch` enforces guest time restrictions (guests cannot join until `guest_open_hours_before`).
+  - **Response**: `respondToRegularMatch` allows members to RSVP without payment flow.
+- **Frontend Features**:
+  - **Club Join**: Enhanced UI with status badges (Pending/Joined) and Intro Message form.
+  - **Admin Approval**: `AdminClubCard` allows admins to view intro messages and approve/reject requests.
+  - **Match Detail**: 
+    - Regular members see an RSVP section ("참석/불참").
+    - **Guest Application**: Separate card for guests with "Guest Open Time" info and "Guest Join" button.
+    - **Regular Members**: "Guest Join" button is disabled for members to prevent confusion.
+  - **Admin Form**: "Entry Fee" label changes to "Guest Entry Fee" for Regular Matches with a note about free regular member participation.
+  - **My Page**: Sections for "My Clubs" and "Pending Regular Match Responses".
+  - **Match Edit**: `MatchEditForm` enhanced to support `match_type` and `guest_open_hours_before` modification.
+  - **Regular Match Sync**: `respondToRegularMatch` automatically adds/updates members in the `participants` table upon "Attending" response, ensuring they appear in the main participant list.
+  - **UI Refinements**:
+    - **Guest Application**: Disabled Guest Join button for Regular Members in the guest section to prevent confusion.
+    - **Admin Match List**: Added [Open Hockey] / [Regular Match] badges.
+    - **Admin Participants**: Added [Member] / [Guest] badges to distinguish participant types.
+    - **Admin Guide**: Added Match Management Guide text in Admin Matches page.
+  - **Bug Fixes**:
+    - **Admin Query**: Fixed duplicate join on `rink` table causing "specified more than once" error.
+    - **Regular Member Guest View**: Fixed `MatchApplication` showing "Confirmed" state for Regular Members; now correctly shows disabled "Guest Join" button.
+    - **Public Match List**: Added [Regular]/[Open] badges to `MatchCard` for better visibility in the main list.
+    - **Admin Refund Logic**: Updated `cancelMatchByAdmin` to selectively refund only paid participants (Guests). Regular Club Members (who pay 0) are excluded from refunds.
+- **Verification**:
+  - **Unit Tests**: `club-membership.test.ts` (26 tests) and `regular-match.test.ts` (21 tests) cover core logic.
+  - **Manual Checks**: Verified push notifications for approval and new match creation.
+- **Next Steps**: Monitor usage of Regular Matches and gather feedback on the "Guest Open Time" flexibility.

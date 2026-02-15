@@ -54,6 +54,56 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
         </div>
       )}
 
+      {/* Match Management Guide */}
+      <div className="p-4 bg-blue-900/20 border border-blue-800/30 rounded-lg">
+        <h3 className="text-sm font-bold text-blue-200 mb-2 flex items-center gap-2">
+          ℹ️ {locale === "ko" ? "경기 유형 안내" : "Match Type Guide"}
+        </h3>
+        <div className="text-sm text-blue-300/80 leading-relaxed">
+          {locale === "ko" ? (
+            <div className="flex flex-col gap-4">
+              <div>
+                <strong className="text-blue-100 block mb-1">[오픈 하키]</strong>
+                <p>
+                  누구나 참여할 수 있는 게임입니다.
+                  <br />
+                  참여자당 수수료 1,000원을 차감하여 정산됩니다.
+                </p>
+              </div>
+              <div>
+                <strong className="text-blue-100 block mb-1">[정규 대관]</strong>
+                <p>
+                  동호회 멤버는 무료로 참여가 가능합니다.
+                  <br />
+                  게임 생성 시, 멤버들은 참/불참을 선택할 수 있습니다.
+                  <br />
+                  공석이 발생하면 게스트 신청이 가능합니다.
+                  <br />
+                  게스트는 수수료 1,000원을 차감하여 정산됩니다.
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-4">
+              <div>
+                <strong className="text-blue-100 block mb-1">[Open Hockey]</strong>
+                <p>Open to everyone. A 1,000 KRW fee applies per participant.</p>
+              </div>
+              <div>
+                <strong className="text-blue-100 block mb-1">[Regular Match]</strong>
+                <p>
+                  Exclusive to club members.
+                  <br />
+                  Members participate for free. Guests can join if vacancies exist.
+                  <br />
+                  (A 1,000 KRW fee applies to guests.)
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Club Selection (Optional) */}
       {clubs.length > 0 && (
         <div>
@@ -128,6 +178,9 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
               <label className="block text-sm font-medium mb-2 text-emerald-300">
                 ⏰ {locale === "ko" ? "게스트 모집 허용 시간" : "Guest Open Time"}
               </label>
+              <p className="text-xs text-emerald-300 mb-2">
+                {t("admin.form.regularMemberFree")}
+              </p>
               <div className="flex items-center gap-2">
                 <span className="text-sm text-zinc-400">
                   {locale === "ko" ? "경기 시작" : "Start"}{" "}
@@ -281,7 +334,7 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
       {/* Entry Points (참가 금액) */}
       <div>
         <label className="block text-sm font-medium mb-2 text-zinc-300">
-          {t("admin.form.entryPoints")}
+          {matchType === "regular" ? t("admin.form.guestFee") : t("admin.form.entryPoints")}
         </label>
         <div className="relative">
           <input

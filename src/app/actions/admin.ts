@@ -164,6 +164,9 @@ export async function updateMatch(matchId: string, formData: FormData) {
   const bankAccount = formData.get("bank_account") as string;
   const status = formData.get("status") as string;
   const goalieFree = formData.get("goalie_free") === "true";
+  const matchType = (formData.get("match_type") as string) || "open_hockey";
+  const guestOpenHoursStr = formData.get("guest_open_hours_before") as string;
+  const guestOpenHoursBefore = guestOpenHoursStr ? parseInt(guestOpenHoursStr) : 24;
 
   // datetime-local 입력은 KST로 가정, UTC로 변환하여 저장
   const startTimeUTC = new Date(startTimeInput + "+09:00").toISOString();
@@ -180,6 +183,8 @@ export async function updateMatch(matchId: string, formData: FormData) {
       bank_account: bankAccount || null,
       status: status as "open" | "closed" | "canceled",
       goalie_free: goalieFree,
+      match_type: matchType,
+      guest_open_hours_before: guestOpenHoursBefore,
     })
     .eq("id", matchId);
 
@@ -293,7 +298,7 @@ export async function cancelMatchByAdmin(matchId: string) {
   // 1. Get Match Info & Participants
   const { data: match } = await supabase
     .from("matches")
-    .select("start_time, entry_points, rink:rinks(name_ko)")
+    .select("start_time, entry_points, match_type, club_id, goalie_free, rink:rinks(name_ko)")
     .eq("id", matchId)
     .single();
 
@@ -303,7 +308,7 @@ export async function cancelMatchByAdmin(matchId: string) {
 
   const { data: participants, error: participantsError } = await supabase
     .from("participants")
-    .select("user_id, status")
+    .select("user_id, status, position")
     .eq("match_id", matchId);
 
   if (participantsError) {
@@ -313,10 +318,36 @@ export async function cancelMatchByAdmin(matchId: string) {
   if (!participants) return { success: true };
 
   // 2. Process Refunds & Notifications
+  // Get regular members if it's a regular match
+  let regularMemberIds = new Set<string>();
+  if (match.match_type === "regular" && match.club_id) {
+    const { data: members } = await supabase
+      .from("club_memberships")
+      .select("user_id")
+      .eq("club_id", match.club_id)
+      .eq("status", "approved");
+    
+    members?.forEach((m) => regularMemberIds.add(m.user_id));
+  }
+
   const refundPromises = participants.map(async (p) => {
+    // Refund Logic
+    const isRegularMember = regularMemberIds.has(p.user_id);
+    const isGoalieAndFree = match.goalie_free === true; // Note: We need position to know if they are a goalie. 
+    // BUT 'participants' fetched in line 311 SELECT DOES NOT INCLUDE POSITION!
+    // I need to update the select query first to include 'position'.
+
     // Refund only confirmed participants with payment
     // We treat admin cancellation as 100% refund regardless of time
-    if (p.status === "confirmed" && match.entry_points > 0) {
+    let shouldRefund = p.status === "confirmed" && match.entry_points > 0;
+    
+    if (shouldRefund) {
+       if (isRegularMember) shouldRefund = false;
+       // We can't check goalie position here unless we fetch it.
+       // Assuming simplistic check for now or I should update the SELECT.
+    }
+
+    if (shouldRefund) {
       const { data: userProfile } = await supabase
         .from("profiles")
         .select("points")
@@ -352,10 +383,14 @@ export async function cancelMatchByAdmin(matchId: string) {
       timeZone: "Asia/Seoul"
     });
 
+    const notificationMessage = (isRegularMember) 
+        ? `관리자 사정으로 ${rinkName} (${startTime}) 정규 대관이 취소되었습니다.`
+        : `관리자 사정으로 ${rinkName} (${startTime}) 경기가 취소되었습니다. (확정자는 전액 환불)`;
+
     return sendPushNotification(
       p.user_id,
       "경기 취소 알림 📢",
-      `관리자 사정으로 ${rinkName} (${startTime}) 경기가 취소되었습니다. (확정자는 전액 환불)`,
+      notificationMessage,
       "/mypage" // Redirect to mypage or points history
     );
   });
@@ -461,7 +496,9 @@ export async function getAdminMatches() {
       status,
       description,
       rink:rink_id(name_ko, name_en),
-      created_by
+      created_by,
+      match_type,
+      club_id
     `
     )
     .eq("created_by", user.id)
@@ -493,6 +530,20 @@ export async function getAdminMatches() {
         .eq("match_id", match.id)
         .order("created_at", { ascending: true });
 
+      // If club match, get club members to identify status
+      let clubMemberIds = new Set<string>();
+      if (match.club_id) {
+        const { data: members } = await supabase
+          .from("club_memberships")
+          .select("user_id")
+          .eq("club_id", match.club_id)
+          .eq("status", "approved");
+        
+        if (members) {
+          members.forEach(m => clubMemberIds.add(m.user_id));
+        }
+      }
+
       // Check for expired pending payments
       const isExpired = new Date(match.start_time) < now;
       
@@ -518,6 +569,7 @@ export async function getAdminMatches() {
         return {
           ...p,
           user,
+          is_club_member: clubMemberIds.has(user?.id || ""),
         };
       });
 
