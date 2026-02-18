@@ -137,7 +137,18 @@
         "title": "마이페이지",
         "subtitle": "내가 신청한 경기 목록",
         "noMatches": "신청한 경기가 없습니다",
-        "browseMatches": "경기 둘러보기"
+        "browseMatches": "경기 둘러보기",
+        "myChat": "내 채팅"
+    },
+    "chat": {
+        "title": "채팅",
+        "empty": "아직 대화가 없습니다",
+        "sendMessage": "메시지 보내기",
+        "placeholder": "메시지를 입력하세요...",
+        "send": "전송",
+        "unread": "읽지 않음",
+        "noMessages": "대화를 시작해보세요!",
+        "matchContext": "경기 관련 대화"
     },
     "points": {
         "title": "충전 금액",

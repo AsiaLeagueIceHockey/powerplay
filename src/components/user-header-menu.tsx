@@ -8,7 +8,7 @@ import { DeleteAccountModal } from "./delete-account-modal";
 import { useNotification } from "@/contexts/notification-context";
 import { useTranslations } from "next-intl";
 
-import { CircleDollarSign, User as UserIcon, ChevronDown, Wrench, Bell, LogOut, Ticket } from "lucide-react";
+import { CircleDollarSign, User as UserIcon, ChevronDown, Wrench, Bell, LogOut, Ticket, MessageCircle } from "lucide-react";
 
 interface User {
   email?: string;
@@ -22,19 +22,28 @@ export function UserHeaderMenu({
   locale,
   isAdmin,
   points = 0,
+  initialUnreadCount = 0,
 }: {
   user: User | null;
   locale: string;
   isAdmin: boolean;
   points?: number;
+  initialUnreadCount?: number;
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const tPoints = useTranslations("points");
+  const tChat = useTranslations("chat");
+  const [unreadCount, setUnreadCount] = useState(initialUnreadCount);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const { openGuide } = useNotification();
   const router = useRouter();
   const pathname = usePathname();
   const menuRef = useRef<HTMLDivElement>(null);
+
+  // Update unread count when initialUnreadCount changes
+  useEffect(() => {
+    setUnreadCount(initialUnreadCount || 0);
+  }, [initialUnreadCount]);
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -93,6 +102,9 @@ export function UserHeaderMenu({
             <div className="flex items-center gap-1 text-sm font-medium text-zinc-700 dark:text-zinc-200">
               <span className="max-w-[100px] truncate">{displayName}</span>
               <span className="text-zinc-400 font-normal">{locale === "ko" ? "님" : ""}</span>
+              {unreadCount > 0 && (
+                <span className="ml-1 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+              )}
             </div>
             <ChevronDown size={14} className={`text-zinc-400 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
           </button>
@@ -120,6 +132,23 @@ export function UserHeaderMenu({
                   <UserIcon size={16} />
                 </div>
                 <span>{locale === "ko" ? "마이페이지" : "My Page"}</span>
+              </Link>
+
+              {/* 2. 채팅 (메시지) */}
+              <Link
+                href={`/${locale}/mypage/chat`}
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-3 px-4 py-2.5 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700/50 transition-colors"
+              >
+                <div className="w-8 h-8 rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 flex items-center justify-center flex-shrink-0 relative">
+                  <MessageCircle size={16} />
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                      {unreadCount > 99 ? "99+" : unreadCount}
+                    </span>
+                  )}
+                </div>
+                <span>{tChat("title")}</span>
               </Link>
 
               {/* 2. 충전 금액 (동전) */}

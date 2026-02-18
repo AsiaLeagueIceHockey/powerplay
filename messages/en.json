@@ -137,7 +137,18 @@
         "title": "My Page",
         "subtitle": "My match applications",
         "noMatches": "No matches applied yet",
-        "browseMatches": "Browse matches"
+        "browseMatches": "Browse matches",
+        "myChat": "My Chats"
+    },
+    "chat": {
+        "title": "Chats",
+        "empty": "No conversations yet",
+        "sendMessage": "Send Message",
+        "placeholder": "Type a message...",
+        "send": "Send",
+        "unread": "Unread",
+        "noMessages": "Start a conversation!",
+        "matchContext": "Match-related chat"
     },
     "points": {
         "title": "Credits",

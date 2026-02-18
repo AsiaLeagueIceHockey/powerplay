@@ -18,6 +18,7 @@ export const createChainableMock = () => {
     range: vi.fn().mockReturnThis(),
     single: vi.fn(),
     maybeSingle: vi.fn(),
+    or: vi.fn().mockReturnThis(),
   };
   return mock;
 };

@@ -4,9 +4,13 @@ import { getMatch, getRegularMatchResponses, getMyRegularMatchResponse } from "@
 import { isClubMember } from "@/app/actions/clubs";
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
+import { Suspense } from "react";
 import { MatchApplication } from "@/components/match-application";
 import { AdminControls } from "@/components/admin-controls";
 import { MatchShareButton } from "@/components/match-share-button";
+import { UserHeaderLoader } from "@/components/user-header-loader";
+import { UserHeaderSkeleton } from "@/components/user-header-skeleton";
+import { ChatButton } from "@/components/chat-button";
 import { DynamicRinkMap } from "@/components/dynamic-rink-map";
 import { RegularMatchResponseSection } from "@/components/regular-match-response";
 
@@ -394,6 +398,14 @@ export default async function MatchPage({
                   <span className="font-medium">
                     {p.user?.full_name || p.user?.email?.split('@')[0]}
                   </span>
+                  {user && p.user && (
+                    <ChatButton 
+                      otherUserId={p.user.id} 
+                      matchId={match.id} 
+                      currentUserId={user.id} 
+                      locale={locale} 
+                    />
+                  )}
                   {p.status === "pending_payment" && (
                     <span className="text-xs bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 px-2 py-0.5 rounded">{t("participant.status.pending_payment")}</span>
                   )}
@@ -427,6 +439,14 @@ export default async function MatchPage({
                   <span className="font-medium">
                     {p.user?.full_name || p.user?.email?.split('@')[0]}
                   </span>
+                  {user && p.user && (
+                    <ChatButton 
+                      otherUserId={p.user.id} 
+                      matchId={match.id} 
+                      currentUserId={user.id} 
+                      locale={locale} 
+                    />
+                  )}
                   {p.status === "pending_payment" && (
                     <span className="text-xs bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 px-2 py-0.5 rounded">{t("participant.status.pending_payment")}</span>
                   )}
@@ -460,6 +480,16 @@ export default async function MatchPage({
                   <span className="font-medium">
                     {p.user?.full_name || p.user?.email?.split('@')[0]}
                   </span>
+                  {user && p.user && (
+                    <div className="ml-2">
+                      <ChatButton 
+                        otherUserId={p.user.id} 
+                        matchId={match.id} 
+                        currentUserId={user.id} 
+                        locale={locale} 
+                      />
+                    </div>
+                  )}
                   {p.status === "pending_payment" && (
                     <span className="text-xs bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 px-2 py-0.5 rounded">{t("participant.status.pending_payment")}</span>
                   )}

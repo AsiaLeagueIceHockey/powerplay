@@ -9,6 +9,7 @@ import { LanguageSwitcher } from "@/components/language-switcher";
 import { NotificationStatus } from "@/components/notification-status";
 import { ProfileEditor } from "@/components/profile-editor";
 import Link from "next/link";
+import { MessageCircle, ChevronRight } from "lucide-react";
 
 export default async function MyPage() {
   const profile = await getProfile();
@@ -39,6 +40,26 @@ export default async function MyPage() {
         <p className="text-zinc-600 dark:text-zinc-400">
           {t("mypage.subtitle")}
         </p>
+      </div>
+
+      {/* My Chats Link */}
+      <div className="mb-8">
+        <Link
+          href={`/${locale}/mypage/chat`}
+          className="flex items-center justify-between p-4 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 hover:border-blue-500 transition-colors group"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform">
+              <MessageCircle className="w-5 h-5" />
+            </div>
+            <div>
+              <h2 className="font-semibold text-zinc-900 dark:text-white">
+                {t("myChat")}
+              </h2>
+            </div>
+          </div>
+          <ChevronRight className="w-5 h-5 text-zinc-400 group-hover:text-blue-500 transition-colors" />
+        </Link>
       </div>
 
       {/* Profile Editor (Bio) */}
