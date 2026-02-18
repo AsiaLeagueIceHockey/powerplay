@@ -84,6 +84,11 @@
         "saved": "저장되었습니다"
     },
     "match": {
+        "type": "대관 구분",
+        "types": {
+            "training": "훈련 대관",
+            "game": "게임 대관"
+        },
         "status": {
             "open": "모집중",
             "closed": "마감",

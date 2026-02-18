@@ -84,6 +84,11 @@
         "saved": "Saved successfully"
     },
     "match": {
+        "type": "Match Type",
+        "types": {
+            "training": "Training",
+            "game": "Game"
+        },
         "status": {
             "open": "Open",
             "closed": "Closed",

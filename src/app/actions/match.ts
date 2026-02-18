@@ -42,6 +42,7 @@ export interface Match {
   start_time: string;
   fee: number;  // deprecated, use entry_points
   entry_points: number;
+  match_type: "training" | "game";
   max_skaters: number;
   max_goalies: number;
   status: "open" | "closed" | "canceled";
@@ -70,6 +71,7 @@ export async function getMatches(): Promise<Match[]> {
       start_time,
       fee,
       entry_points,
+      match_type,
       max_skaters,
       max_goalies,
       status,
@@ -130,6 +132,7 @@ export async function getMatch(id: string): Promise<Match | null> {
       start_time,
       fee,
       entry_points,
+      match_type,
       max_skaters,
       max_goalies,
       status,

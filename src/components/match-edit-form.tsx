@@ -27,6 +27,7 @@ interface Match {
   bank_account?: string | null;
   goalie_free?: boolean;
   rink: Rink | null;
+  match_type: "training" | "game"; // added
 }
 
 export function MatchEditForm({
@@ -70,6 +71,7 @@ export function MatchEditForm({
     const formData = new FormData(e.currentTarget);
     const maxSkaters = Number(formData.get("max_skaters"));
     const maxGoalies = Number(formData.get("max_goalies"));
+    // match_type is handled by radio input automatically in formData
 
     // Validation: Current > Max Check
     const currentSkaters = (match.participants_count?.fw || 0) + (match.participants_count?.df || 0);
@@ -275,6 +277,37 @@ export function MatchEditForm({
               </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Match Type */}
+      <div>
+        <label className="block text-sm font-medium mb-2 text-zinc-300">
+          {t("match.type")}
+        </label>
+        <div className="grid grid-cols-2 gap-3">
+          <label className="relative flex cursor-pointer items-center justify-center rounded-lg border border-zinc-700 bg-zinc-900 p-4 hover:bg-zinc-800 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-900/20 has-[:checked]:text-blue-200">
+            <input
+              type="radio"
+              name="match_type"
+              value="training"
+              defaultChecked={match.match_type === "training" || !match.match_type}
+              disabled={isCanceled}
+              className="sr-only"
+            />
+            <span className="font-medium">{t("match.types.training")}</span>
+          </label>
+          <label className="relative flex cursor-pointer items-center justify-center rounded-lg border border-zinc-700 bg-zinc-900 p-4 hover:bg-zinc-800 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-900/20 has-[:checked]:text-blue-200">
+            <input
+              type="radio"
+              name="match_type"
+              value="game"
+              defaultChecked={match.match_type === "game"}
+              disabled={isCanceled}
+              className="sr-only"
+            />
+            <span className="font-medium">{t("match.types.game")}</span>
+          </label>
         </div>
       </div>
 

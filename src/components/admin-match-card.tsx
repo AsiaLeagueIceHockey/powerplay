@@ -25,6 +25,7 @@ interface Match {
   max_skaters: number;
   max_goalies: number;
   fee: number;
+  match_type: "training" | "game"; // added
 }
 
 export function AdminMatchCard({
@@ -39,6 +40,7 @@ export function AdminMatchCard({
   const [badgeKey, setBadgeKey] = useState(0);
   const router = useRouter();
   const t = useTranslations("admin");
+  const tMatch = useTranslations("match");
 
   const totalParticipants = match.participants?.length || 0;
   const hasParticipants = totalParticipants > 0;
@@ -162,13 +164,25 @@ export function AdminMatchCard({
             {formatDate(match.start_time)}
           </p>
         </div>
-        <span
-          className={`px-2.5 py-1 rounded-md text-xs font-semibold ${getStatusColor(
-            displayStatus
-          )}`}
-        >
-          {getStatusText(displayStatus)}
-        </span>
+        
+        <div className="flex flex-col items-end gap-2">
+          <span
+            className={`px-2.5 py-1 rounded-md text-xs font-semibold ${getStatusColor(
+              displayStatus
+            )}`}
+          >
+            {getStatusText(displayStatus)}
+          </span>
+          <span
+            className={`px-2.5 py-1 rounded-md text-xs font-semibold ${
+              match.match_type === "game"
+                ? "bg-purple-900/50 text-purple-300 border border-purple-800"
+                : "bg-zinc-700 text-zinc-300 border border-zinc-600"
+            }`}
+          >
+            {tMatch(`types.${match.match_type || 'training'}`)}
+          </span>
+        </div>
       </div>
 
       <div className="flex justify-between items-center text-sm text-zinc-300 mb-6 bg-zinc-900/50 p-3 rounded-lg border border-zinc-700/50">

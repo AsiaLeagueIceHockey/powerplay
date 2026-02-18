@@ -196,7 +196,35 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
             </div>
           </div>
         </div>
-        <input type="hidden" name="start_time" />
+      <input type="hidden" name="start_time" />
+      </div>
+
+      {/* Match Type */}
+      <div>
+        <label className="block text-sm font-medium mb-2 text-zinc-300">
+          {t("match.type")}
+        </label>
+        <div className="grid grid-cols-2 gap-3">
+          <label className="relative flex cursor-pointer items-center justify-center rounded-lg border border-zinc-700 bg-zinc-900 p-4 hover:bg-zinc-800 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-900/20 has-[:checked]:text-blue-200">
+            <input
+              type="radio"
+              name="match_type"
+              value="training"
+              defaultChecked
+              className="sr-only"
+            />
+            <span className="font-medium">{t("match.types.training")}</span>
+          </label>
+          <label className="relative flex cursor-pointer items-center justify-center rounded-lg border border-zinc-700 bg-zinc-900 p-4 hover:bg-zinc-800 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-900/20 has-[:checked]:text-blue-200">
+            <input
+              type="radio"
+              name="match_type"
+              value="game"
+              className="sr-only"
+            />
+            <span className="font-medium">{t("match.types.game")}</span>
+          </label>
+        </div>
       </div>
 
       {/* Entry Points (참가 금액) */}

@@ -81,6 +81,8 @@ export async function getCachedMatches(): Promise<Match[]> {
       max_skaters,
       max_goalies,
       status,
+      entry_points,
+      match_type,
       description,
       rink:rink_id(id, name_ko, name_en, address, lat, lng, rink_type),
       club:club_id(id, name, kakao_open_chat_url, logo_url)

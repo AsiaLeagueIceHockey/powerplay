@@ -57,11 +57,22 @@ export function MatchCard({ match }: { match: Match }) {
         <div className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
           {formattedDate} · {formattedTime}
         </div>
-        <span
-          className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColors[displayStatus]}`}
-        >
-          {t(`status.${displayStatus}`)}
-        </span>
+        <div className="flex items-center gap-2">
+          <span
+            className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColors[displayStatus]}`}
+          >
+            {t(`status.${displayStatus}`)}
+          </span>
+          <span
+            className={`inline-block rounded px-2 py-0.5 text-xs font-semibold ${
+              match.match_type === "game"
+                ? "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300"
+                : "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"
+            }`}
+          >
+            {t(`types.${match.match_type || 'training'}`)}
+          </span>
+        </div>
       </div>
 
       {/* Rink Name & Address */}

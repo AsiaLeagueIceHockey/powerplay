@@ -62,6 +62,7 @@ export async function createMatch(formData: FormData) {
   const description = formData.get("description") as string;
   const bankAccount = formData.get("bank_account") as string;
   const goalieFree = formData.get("goalie_free") === "true";
+  const matchType = (formData.get("match_type") as "training" | "game") || "training";
 
   // datetime-local 입력은 KST로 가정, UTC로 변환하여 저장
   // 입력: "2026-01-11T00:00" (KST) → 저장: "2026-01-10T15:00:00.000Z" (UTC)
@@ -82,6 +83,7 @@ export async function createMatch(formData: FormData) {
       created_by: user.id,
       bank_account: bankAccount || null,
       goalie_free: goalieFree,
+      match_type: matchType,
     })
     .select()
     .single();
@@ -159,6 +161,7 @@ export async function updateMatch(matchId: string, formData: FormData) {
   const bankAccount = formData.get("bank_account") as string;
   const status = formData.get("status") as string;
   const goalieFree = formData.get("goalie_free") === "true";
+  const matchType = (formData.get("match_type") as "training" | "game") || "training";
 
   // datetime-local 입력은 KST로 가정, UTC로 변환하여 저장
   const startTimeUTC = new Date(startTimeInput + "+09:00").toISOString();
@@ -175,6 +178,7 @@ export async function updateMatch(matchId: string, formData: FormData) {
       bank_account: bankAccount || null,
       status: status as "open" | "closed" | "canceled",
       goalie_free: goalieFree,
+      match_type: matchType,
     })
     .eq("id", matchId);
 
@@ -481,6 +485,8 @@ export async function getAdminMatches() {
       id,
       start_time,
       fee,
+      entry_points,
+      match_type,
       max_skaters,
       max_goalies,
       status,

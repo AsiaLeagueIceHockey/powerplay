@@ -114,6 +114,14 @@ export default async function MatchPage({
             >
               {t(`match.status.${match.status}`)}
             </span>
+            <span
+              className={`px-3 py-1 rounded-full text-sm font-bold ${match.match_type === "game"
+                  ? "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300"
+                  : "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"
+                }`}
+            >
+              {t(`match.types.${match.match_type || 'training'}`)}
+            </span>
             {match.club && (
               <span className="px-3 py-1 rounded-full text-sm font-bold bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 flex items-center gap-1">
                 👥 {match.club.name}
