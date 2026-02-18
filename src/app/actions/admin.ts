@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { sendPushNotification } from "@/app/actions/push";
+import { logAndNotify } from "@/lib/audit";
 
 // Get all rinks for dropdown
 export async function getRinks() {
@@ -36,7 +37,7 @@ export async function createMatch(formData: FormData) {
   // Verify admin or superuser role
   const { data: profile } = await supabase
     .from("profiles")
-    .select("role")
+    .select("role, full_name")
     .eq("id", user.id)
     .single();
 
@@ -91,6 +92,32 @@ export async function createMatch(formData: FormData) {
   }
 
   revalidatePath("/admin/matches");
+
+  revalidatePath("/admin/matches");
+
+  // Fetch Club Name (if clubId exists)
+  let clubName = "";
+  if (clubId) {
+    const { data: clubData } = await supabase
+      .from("clubs")
+      .select("name")
+      .eq("id", clubId)
+      .single();
+    if (clubData) clubName = clubData.name;
+  }
+
+  // Fetch User Name
+  const creatorName = profile?.full_name || user.email?.split("@")[0] || "관리자";
+  const teamInfo = clubName ? `[${clubName}] ` : "";
+
+  // Audit Log & SuperUser Notification
+  await logAndNotify({
+    userId: user.id,
+    action: "MATCH_CREATE",
+    description: `${teamInfo}${creatorName}님이 새 매치를 생성했습니다. (일시: ${startTimeInput})`,
+    metadata: { matchId: data.id, rinkId, startTime: startTimeInput, clubId, creatorName },
+  });
+
   return { success: true, matchId: data.id };
 }
 
@@ -365,7 +392,7 @@ export async function deleteMatch(matchId: string) {
   // Verify admin or superuser role
   const { data: profile } = await supabase
     .from("profiles")
-    .select("role")
+    .select("role, full_name")
     .eq("id", user.id)
     .single();
 
@@ -383,6 +410,13 @@ export async function deleteMatch(matchId: string) {
     return { error: "참가자가 있는 경기는 삭제할 수 없습니다. 대신 '경기 취소'를 이용해주세요." };
   }
 
+  // Pre-fetch match info for notification
+  const { data: matchToDelete } = await supabase
+    .from("matches")
+    .select("start_time, rink:rinks(name_ko), club:clubs(name)")
+    .eq("id", matchId)
+    .single();
+
   const { error } = await supabase.from("matches").delete().eq("id", matchId);
 
   if (error) {
@@ -391,6 +425,29 @@ export async function deleteMatch(matchId: string) {
   }
 
   revalidatePath("/admin/matches");
+
+  if (matchToDelete) {
+    // @ts-ignore
+    const rinkName = matchToDelete.rink?.name_ko || "경기장 미정";
+    // @ts-ignore
+    const clubName = matchToDelete.club?.name || "";
+    const teamInfo = clubName ? `[${clubName}] ` : "";
+    const startTime = new Date(matchToDelete.start_time).toLocaleString("ko-KR", {
+      month: "short", day: "numeric", hour: "2-digit", minute: "2-digit",
+      timeZone: "Asia/Seoul"
+    });
+
+    const creatorName = profile?.full_name || user.email?.split("@")[0] || "관리자";
+
+    // Audit Log & SuperUser Notification
+    await logAndNotify({
+      userId: user.id,
+      action: "MATCH_DELETE",
+      description: `${teamInfo}${creatorName}님이 ${rinkName} (${startTime}) 매치를 삭제했습니다.`,
+      metadata: { matchId, rinkName, startTime, creatorName },
+    });
+  }
+
   return { success: true };
 }
 

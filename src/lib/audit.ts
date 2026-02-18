@@ -8,6 +8,7 @@ type AuditAction =
   | "MATCH_CREATE"
   | "MATCH_JOIN"
   | "MATCH_CANCEL"
+  | "MATCH_DELETE"
   | "POINT_CHARGE_REQUEST"
   | "PUSH_SUBSCRIBE"
   | "OTHER";
