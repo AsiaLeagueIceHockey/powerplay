@@ -104,10 +104,10 @@ export default async function MatchPage({
 
       {/* Header Section */}
       <div>
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center space-x-2">
+        <div className="flex items-start justify-between mb-2 gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <span
-              className={`px-3 py-1 rounded-full text-sm font-bold ${match.status === "open"
+              className={`px-2.5 py-1 rounded-md text-xs font-bold whitespace-nowrap ${match.status === "open"
                   ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
                   : "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"
                 }`}
@@ -115,7 +115,7 @@ export default async function MatchPage({
               {t(`match.status.${match.status}`)}
             </span>
             <span
-              className={`px-3 py-1 rounded-full text-sm font-bold ${match.match_type === "game"
+              className={`px-2.5 py-1 rounded-md text-xs font-bold whitespace-nowrap ${match.match_type === "game"
                   ? "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300"
                   : "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"
                 }`}
@@ -123,7 +123,7 @@ export default async function MatchPage({
               {t(`match.types.${match.match_type || 'training'}`)}
             </span>
             {match.club && (
-              <span className="px-3 py-1 rounded-full text-sm font-bold bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 flex items-center gap-1">
+              <span className="px-2.5 py-1 rounded-md text-xs font-bold bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 flex items-center gap-1 whitespace-nowrap">
                 👥 {match.club.name}
               </span>
             )}

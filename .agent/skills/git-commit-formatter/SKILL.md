@@ -25,6 +25,7 @@ When writing a git commit message, you MUST follow the Conventional Commits spec
 2. Identify the `scope` if applicable (e.g., specific component or file).
 3. Write a concise `description` in imperative mood (e.g., "add feature" not "added feature").
 4. If there are breaking changes, add a footer starting with `BREAKING CHANGE:`.
+5. **Push**: After committing, immediately push the changes to the remote repository.
 
 ## Example
 `feat(auth): implement login with google`
