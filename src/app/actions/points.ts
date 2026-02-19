@@ -126,7 +126,7 @@ export async function getUserPendingMatches(): Promise<UserPendingMatch[]> {
       position,
       status,
       rental_opt_in,
-      match:match_id(entry_points, rental_fee, start_time, rink:rink_id(name_ko, name_en))
+      match:match_id(status, entry_points, rental_fee, start_time, rink:rink_id(name_ko, name_en))
     `)
     .eq("user_id", user.id)
     .eq("status", "pending_payment")
@@ -143,8 +143,8 @@ export async function getUserPendingMatches(): Promise<UserPendingMatch[]> {
 
   (participants || []).forEach((p) => {
     const match = Array.isArray(p.match) ? p.match[0] : p.match;
-    // Check expiration
-    if (match?.start_time && new Date(match.start_time) < now) {
+    // Check expiration OR match cancellation
+    if ((match?.start_time && new Date(match.start_time) < now) || match?.status === "canceled") {
       expiredParticipantIds.push(p.id);
     } else {
       const rink = match?.rink ? (Array.isArray(match.rink) ? match.rink[0] : match.rink) : null;
@@ -153,15 +153,15 @@ export async function getUserPendingMatches(): Promise<UserPendingMatch[]> {
         match_id: p.match_id,
         position: p.position,
         entry_points: match?.entry_points || 0,
-        rental_fee: match?.rental_fee || 0, // Added
-        rental_opt_in: p.rental_opt_in || false, // Added
+        rental_fee: match?.rental_fee || 0,
+        rental_opt_in: p.rental_opt_in || false,
         start_time: match?.start_time || "",
         rink_name: rink?.name_ko || "Unknown",
       });
     }
   });
 
-  // Lazy Expiration: Cancel expired pending matches
+  // Lazy Expiration/Cleanup: Cancel expired or match-canceled pending applications
   if (expiredParticipantIds.length > 0) {
     // Fire and forget update (or await if strict consistency needed, but assume eventually consistent for UI speed)
     await supabase
