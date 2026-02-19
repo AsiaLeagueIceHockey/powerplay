@@ -152,7 +152,7 @@ export function MyMatchList({ matches }: MyMatchListProps) {
                   </span>
 
                   {/* Payment Badge */}
-                  {(match.participation.status === "confirmed" || match.participation.status === "applied") && (
+                  {match.status !== "canceled" && (match.participation.status === "confirmed" || match.participation.status === "applied") && (
                     <span
                       className={`px-2.5 py-1 rounded-lg text-xs font-semibold ${getPaymentColor(
                         match.participation.payment_status
@@ -167,10 +167,12 @@ export function MyMatchList({ matches }: MyMatchListProps) {
                   {/* Status Badge */}
                   <span
                     className={`px-2.5 py-1 rounded-lg text-xs font-semibold ${getStatusColor(
-                      match.participation.status
+                      match.status === "canceled" ? "canceled" : match.participation.status
                     )}`}
                   >
-                    {t(`participant.status.${match.participation.status}`)}
+                    {match.status === "canceled" 
+                      ? t("match.status.canceled") 
+                      : t(`participant.status.${match.participation.status}`)}
                   </span>
                 </div>
               </div>

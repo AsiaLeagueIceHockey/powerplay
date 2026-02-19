@@ -54,6 +54,7 @@ export default async function EditMatchPage({
       df: dfCount,
       g: gCount,
     },
+    description: match.description || null,
   };
 
   return (
