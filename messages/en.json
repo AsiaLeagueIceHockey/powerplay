@@ -85,7 +85,9 @@
         "saved": "Saved successfully"
     },
     "match": {
-        "rentalFee": "Equipment Rental",
+        "rentalFee": "Equipment Rental Fee",
+        "rentalFeeLabel": "Equipment Rental Fee",
+        "rentalToggleLabel": "Check if you want to provide equipment rental",
         "totalCost": "Total Cost",
         "type": "Match Type",
         "types": {

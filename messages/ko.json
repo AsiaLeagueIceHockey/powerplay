@@ -85,7 +85,9 @@
         "saved": "저장되었습니다"
     },
     "match": {
-        "rentalFee": "장비 대여",
+        "rentalFee": "장비 대여비",
+        "rentalFeeLabel": "장비 대여비",
+        "rentalToggleLabel": "신청자에게 장비를 대여해주신다면 체크해주세요",
         "totalCost": "총 참가비",
         "type": "대관 구분",
         "types": {

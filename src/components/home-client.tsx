@@ -237,6 +237,19 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
                 {/* Filter Chips */}
                 <div className="flex overflow-x-auto gap-2 px-1 pb-2 no-scrollbar">
                   <button
+                    onClick={() => setIsRinkFilterOpen(true)}
+                    className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium border transition-colors whitespace-nowrap ${
+                      selectedRinkIds.length > 0
+                        ? "bg-blue-600 text-white border-blue-600 shadow-sm"
+                        : "bg-white text-zinc-600 border-zinc-200 hover:bg-zinc-50 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700 dark:hover:bg-zinc-700"
+                    }`}
+                  >
+                    {locale === "ko" ? "링크장" : "Rink"} 
+                    {selectedRinkIds.length > 0 && ` (${selectedRinkIds.length})`}
+                    <ChevronDown className={`w-3 h-3 transition-transform ${isRinkFilterOpen ? "rotate-180" : ""}`} />
+                  </button>
+
+                  <button
                     onClick={() => {
                       const newFilters = new Set(activeFilters);
                       if (newFilters.has("rental_available")) {
@@ -253,19 +266,6 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
                     }`}
                   >
                     {t("filter.rentalAvailable")}
-                  </button>
-
-                  <button
-                    onClick={() => setIsRinkFilterOpen(true)}
-                    className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium border transition-colors whitespace-nowrap ${
-                      selectedRinkIds.length > 0
-                        ? "bg-blue-600 text-white border-blue-600 shadow-sm"
-                        : "bg-white text-zinc-600 border-zinc-200 hover:bg-zinc-50 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700 dark:hover:bg-zinc-700"
-                    }`}
-                  >
-                    {locale === "ko" ? "링크장" : "Rink"} 
-                    {selectedRinkIds.length > 0 && ` (${selectedRinkIds.length})`}
-                    <ChevronDown className={`w-3 h-3 transition-transform ${isRinkFilterOpen ? "rotate-180" : ""}`} />
                   </button>
 
                   <button
