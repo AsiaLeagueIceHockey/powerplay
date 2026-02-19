@@ -31,6 +31,8 @@ export interface UserPendingMatch {
   match_id: string;
   position: string;
   entry_points: number;
+  rental_fee: number; // Added
+  rental_opt_in: boolean; // Added
   start_time: string;
   rink_name: string;
 }
@@ -123,7 +125,8 @@ export async function getUserPendingMatches(): Promise<UserPendingMatch[]> {
       match_id,
       position,
       status,
-      match:match_id(entry_points, start_time, rink:rink_id(name_ko, name_en))
+      rental_opt_in,
+      match:match_id(entry_points, rental_fee, start_time, rink:rink_id(name_ko, name_en))
     `)
     .eq("user_id", user.id)
     .eq("status", "pending_payment")
@@ -150,6 +153,8 @@ export async function getUserPendingMatches(): Promise<UserPendingMatch[]> {
         match_id: p.match_id,
         position: p.position,
         entry_points: match?.entry_points || 0,
+        rental_fee: match?.rental_fee || 0, // Added
+        rental_opt_in: p.rental_opt_in || false, // Added
         start_time: match?.start_time || "",
         rink_name: rink?.name_ko || "Unknown",
       });

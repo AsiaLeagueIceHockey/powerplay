@@ -181,7 +181,8 @@ export function MatchApplication({
 
   // 2b. If User Joined with pending_payment => Yellow box
   if (isJoined && currentStatus === "pending_payment") {
-    const shortageAmount = Math.max(0, entryPoints - userPoints);
+    const totalRequired = entryPoints + (rentalOptIn ? rentalFee : 0);
+    const shortageAmount = Math.max(0, totalRequired - userPoints);
     const currencyUnit = locale === "ko" ? "원" : "KRW";
     
     return (
@@ -192,11 +193,6 @@ export function MatchApplication({
             <span className="font-bold text-amber-700 dark:text-amber-300 text-lg">
               {t(`position.${currentPosition}`)} {locale === "ko" ? "입금 대기" : "Pending Payment"}
             </span>
-            {rentalOptIn && (
-              <span className="ml-2 px-1.5 py-0.5 text-[10px] bg-indigo-50 text-indigo-600 rounded border border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-300 dark:border-indigo-800 font-medium">
-                {t("rentalFee")}
-              </span>
-            )}
           </div>
           
           <button
@@ -218,18 +214,40 @@ export function MatchApplication({
               {entryPoints.toLocaleString()}{currencyUnit}
             </span>
           </div>
+
+          {rentalOptIn && rentalFee > 0 && (
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-sm text-zinc-600 dark:text-zinc-400">
+                {t("rentalFee")}
+              </span>
+              <span className="font-semibold">
+                +{rentalFee.toLocaleString()}{currencyUnit}
+              </span>
+            </div>
+          )}
+
+          <div className="flex justify-between items-center mb-2 pt-2 border-t border-zinc-100 dark:border-zinc-700">
+             <span className="text-sm font-bold text-zinc-700 dark:text-zinc-300">
+              {t("totalCost")}
+            </span>
+            <span className="font-bold">
+              {totalRequired.toLocaleString()}{currencyUnit}
+            </span>
+          </div>
+
           <div className="flex justify-between items-center mb-2">
             <span className="text-sm text-zinc-600 dark:text-zinc-400">
               {locale === "ko" ? "현재 잔액" : "Current Balance"}
             </span>
-            <span className="font-semibold">
-              {userPoints.toLocaleString()}{currencyUnit}
+            <span className="font-semibold text-zinc-500">
+              - {userPoints.toLocaleString()}{currencyUnit}
             </span>
           </div>
-          <div className="border-t border-amber-200 dark:border-amber-700 pt-2">
+
+          <div className="border-t border-amber-200 dark:border-amber-700 pt-2 mt-2">
             <div className="flex justify-between items-center">
               <span className="text-sm font-medium text-amber-700 dark:text-amber-300">
-                {locale === "ko" ? "💰 필요 충전 금액" : "💰 Amount Needed"}
+                {locale === "ko" ? "💰 부족한 금액" : "💰 Shortage"}
               </span>
               <span className="font-bold text-lg text-amber-600 dark:text-amber-400">
                 {shortageAmount.toLocaleString()}{currencyUnit}

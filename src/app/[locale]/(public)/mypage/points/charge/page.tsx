@@ -31,7 +31,11 @@ export default async function ChargePointsPage({
   ]);
 
   // Calculate required amount for all pending matches
-  const totalRequiredForMatches = pendingMatches.reduce((sum, m) => sum + m.entry_points, 0);
+  const totalRequiredForMatches = pendingMatches.reduce((sum, m) => {
+    const rentalFee = m.rental_opt_in ? (m.rental_fee || 0) : 0;
+    return sum + m.entry_points + rentalFee;
+  }, 0);
+  
   const shortageAmount = Math.max(0, totalRequiredForMatches - currentBalance);
 
   // Use shortage amount if there are pending matches, otherwise use query param or default
@@ -74,23 +78,37 @@ export default async function ChargePointsPage({
             {pendingMatches.map((match) => (
               <div 
                 key={match.id} 
-                className="flex justify-between items-start text-sm bg-white dark:bg-zinc-800 p-3 rounded-lg gap-3"
+                className="flex flex-col text-sm bg-white dark:bg-zinc-800 p-3 rounded-lg gap-1"
               >
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium">{match.rink_name}</p>
-                  <p className="text-zinc-500 text-xs">
-                    {new Date(match.start_time).toLocaleDateString(locale === "ko" ? "ko-KR" : "en-US", {
-                      month: "short",
-                      day: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                      timeZone: "Asia/Seoul",
-                    })}
-                  </p>
+                <div className="flex justify-between items-start w-full">
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium">{match.rink_name}</p>
+                    <p className="text-zinc-500 text-xs">
+                      {new Date(match.start_time).toLocaleDateString(locale === "ko" ? "ko-KR" : "en-US", {
+                        month: "short",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        timeZone: "Asia/Seoul",
+                      })}
+                    </p>
+                  </div>
+                  <span className="font-semibold text-zinc-700 dark:text-zinc-300 whitespace-nowrap">
+                    {match.entry_points.toLocaleString()}{locale === "ko" ? "원" : "KRW"}
+                  </span>
                 </div>
-                <span className="font-semibold text-amber-600 dark:text-amber-400 whitespace-nowrap">
-                  {match.entry_points.toLocaleString()}{locale === "ko" ? "원" : "KRW"}
-                </span>
+                
+                {match.rental_opt_in && match.rental_fee > 0 && (
+                  <div className="flex justify-between items-center w-full mt-1 pt-1 border-t border-dashed border-zinc-200 dark:border-zinc-700">
+                     <span className="text-xs text-zinc-500 flex items-center gap-1">
+                       <span className="inline-block w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
+                       {locale === "ko" ? "체험 장비 대여" : "Experience Equipment"}
+                     </span>
+                     <span className="text-xs font-semibold text-indigo-600 dark:text-indigo-400">
+                       +{match.rental_fee.toLocaleString()}{locale === "ko" ? "원" : "KRW"}
+                     </span>
+                  </div>
+                )}
               </div>
             ))}
           </div>
