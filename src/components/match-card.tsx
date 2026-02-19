@@ -140,7 +140,7 @@ export function MatchCard({ match }: { match: Match }) {
         </span>
         {match.rental_available && (
           <span className="text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-1.5 py-0.5 rounded">
-            (+ {t("rentalFee")} {match.rental_fee > 0 ? match.rental_fee.toLocaleString() : t("goalieFree")})
+            (+ {t("rentalFee")} {match.rental_fee >= 0 ? `${match.rental_fee.toLocaleString()} ${locale === "ko" ? "원" : "KRW"}` : t("goalieFree")})
           </span>
         )}
       </div>
