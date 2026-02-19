@@ -24,6 +24,44 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // 필수 입력 필드 상태
+  const [rinkId, setRinkId] = useState("");
+  const [date, setDate] = useState("");
+  const [hour, setHour] = useState("");
+  const [minute, setMinute] = useState("");
+  const [entryPoints, setEntryPoints] = useState("");
+  const [maxSkaters, setMaxSkaters] = useState("");
+  const [maxGoalies, setMaxGoalies] = useState("");
+  const [bankAccount, setBankAccount] = useState("");
+
+  // 모든 필수 필드가 채워졌는지 확인
+  const isFormValid =
+    rinkId !== "" &&
+    date !== "" &&
+    hour !== "" &&
+    minute !== "" &&
+    entryPoints.trim() !== "" &&
+    maxSkaters.trim() !== "" &&
+    maxGoalies.trim() !== "" &&
+    bankAccount.trim() !== "";
+
+  // start_time hidden input 업데이트 헬퍼
+  const updateStartTime = (
+    d: string,
+    h: string,
+    m: string,
+    form: HTMLFormElement
+  ) => {
+    const startTimeInput = form.querySelector(
+      'input[name="start_time"]'
+    ) as HTMLInputElement;
+    if (d && h && m) {
+      startTimeInput.value = `${d}T${h}:${m}`;
+    } else {
+      startTimeInput.value = "";
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
@@ -82,6 +120,8 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
         </label>
         <select
           name="rink_id"
+          value={rinkId}
+          onChange={(e) => setRinkId(e.target.value)}
           className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
         >
           <option value="">{t("admin.form.selectRink")}</option>
@@ -106,18 +146,10 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
               required
               className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 appearance-none [-webkit-appearance:none]"
               onChange={(e) => {
-                const date = e.target.value;
-                const form = e.target.closest('form');
-                if (form) {
-                  const hour = (form.querySelector('select[name="_hour"]') as HTMLSelectElement).value;
-                  const minute = (form.querySelector('select[name="_minute"]') as HTMLSelectElement).value;
-                  const startTimeInput = form.querySelector('input[name="start_time"]') as HTMLInputElement;
-                  if (date && hour && minute) {
-                    startTimeInput.value = `${date}T${hour}:${minute}`;
-                  } else {
-                    startTimeInput.value = "";
-                  }
-                }
+                const d = e.target.value;
+                setDate(d);
+                const form = e.target.closest("form") as HTMLFormElement;
+                if (form) updateStartTime(d, hour, minute, form);
               }}
             />
           </div>
@@ -129,26 +161,18 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
                 <select
                   name="_hour"
                   required
-                  defaultValue=""
+                  value={hour}
                   className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 appearance-none"
                   onChange={(e) => {
-                    const hour = e.target.value;
-                    const form = e.target.closest('form');
-                    if (form) {
-                      const date = (form.querySelector('input[type="date"]') as HTMLInputElement).value;
-                      const minute = (form.querySelector('select[name="_minute"]') as HTMLSelectElement).value;
-                      const startTimeInput = form.querySelector('input[name="start_time"]') as HTMLInputElement;
-                      if (date && hour && minute) {
-                        startTimeInput.value = `${date}T${hour}:${minute}`;
-                      } else {
-                        startTimeInput.value = "";
-                      }
-                    }
+                    const h = e.target.value;
+                    setHour(h);
+                    const form = e.target.closest("form") as HTMLFormElement;
+                    if (form) updateStartTime(date, h, minute, form);
                   }}
                 >
                   <option value="" disabled>시</option>
-                  {Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, '0')).map(hour => (
-                    <option key={hour} value={hour}>{hour}시</option>
+                  {Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, "0")).map((h) => (
+                    <option key={h} value={h}>{h}시</option>
                   ))}
                 </select>
                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-zinc-400">
@@ -165,26 +189,18 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
                 <select
                   name="_minute"
                   required
-                  defaultValue=""
+                  value={minute}
                   className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 appearance-none"
                   onChange={(e) => {
-                    const minute = e.target.value;
-                    const form = e.target.closest('form');
-                    if (form) {
-                      const date = (form.querySelector('input[type="date"]') as HTMLInputElement).value;
-                      const hour = (form.querySelector('select[name="_hour"]') as HTMLSelectElement).value;
-                      const startTimeInput = form.querySelector('input[name="start_time"]') as HTMLInputElement;
-                      if (date && hour && minute) {
-                        startTimeInput.value = `${date}T${hour}:${minute}`;
-                      } else {
-                        startTimeInput.value = "";
-                      }
-                    }
+                    const m = e.target.value;
+                    setMinute(m);
+                    const form = e.target.closest("form") as HTMLFormElement;
+                    if (form) updateStartTime(date, hour, m, form);
                   }}
                 >
                   <option value="" disabled>분</option>
-                  {['00', '10', '20', '30', '40', '50'].map(min => (
-                    <option key={min} value={min}>{min}분</option>
+                  {["00", "10", "20", "30", "40", "50"].map((m) => (
+                    <option key={m} value={m}>{m}분</option>
                   ))}
                 </select>
                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-zinc-400">
@@ -236,13 +252,15 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
           <input
             type="text"
             name="entry_points"
-            defaultValue="30,000"
+            value={entryPoints}
             onChange={(e) => {
-              const value = e.target.value.replace(/[^0-9]/g, "");
-              e.target.value = value ? Number(value).toLocaleString() : "";
+              const raw = e.target.value.replace(/[^0-9]/g, "");
+              const formatted = raw ? Number(raw).toLocaleString() : "";
+              setEntryPoints(formatted);
+              e.target.value = formatted;
             }}
             className="w-full px-4 py-3 pr-8 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-            placeholder="0"
+            placeholder="ex. 25,000"
           />
           <span className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500">
             {locale === "ko" ? "원" : "KRW"}
@@ -265,7 +283,9 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
             <input
               type="number"
               name="max_skaters"
-              defaultValue={20}
+              value={maxSkaters}
+              onChange={(e) => setMaxSkaters(e.target.value)}
+              placeholder="20"
               min={0}
               className="w-full px-4 py-3 pr-8 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
             />
@@ -280,7 +300,9 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
             <input
               type="number"
               name="max_goalies"
-              defaultValue={2}
+              value={maxGoalies}
+              onChange={(e) => setMaxGoalies(e.target.value)}
+              placeholder="2"
               min={0}
               className="w-full px-4 py-3 pr-8 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
             />
@@ -316,6 +338,8 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
         <input
           type="text"
           name="bank_account"
+          value={bankAccount}
+          onChange={(e) => setBankAccount(e.target.value)}
           className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
           placeholder="예: 카카오뱅크 3333-00-0000000 홍길동"
           required
@@ -341,8 +365,8 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
       {/* Submit */}
       <button
         type="submit"
-        disabled={loading}
-        className="w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors font-medium border border-blue-500"
+        disabled={loading || !isFormValid}
+        className="w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors font-medium border border-blue-500"
       >
         {loading ? t("admin.form.creating") : t("admin.form.create")}
       </button>
