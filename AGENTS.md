@@ -593,3 +593,25 @@ UPDATE profiles SET role = 'superuser' WHERE email = 'your-email@example.com';
     - Added `v22_admin_superuser_matches_fix.sql` to explicitly grant both `admin` and `superuser` roles permission to update matches.
   - **UI/UX Enhancement**: Removed the nested scrollbar in the Rink Explorer list view, allowing it to use the full page scroll while keeping the map fixed at a proper viewport height.
 - **Next Steps**: Monitor the points system for any edge cases during match cancellation and ensure notifications are delivered correctly.
+
+### [2026-02-25] Equipment Rental Feature (체험 장비 대여) Implementation
+- **Summary**: Implemented the end-to-end "Equipment Rental" feature (renamed to "Experience Equipment") to allow users to rent gear for matches.
+- **Changes**:
+  - **Schema**: Added `rental_available` and `rental_fee` to `matches` table. (`sql/v24_add_rental_options.sql`, `v25_add_rental_available.sql`)
+  - **Admin UI**:
+    - Added `Rental Available` toggle in `MatchForm` / `MatchEditForm`.
+    - Made `Rental Fee` input conditional on the toggle.
+    - Reordered form fields for better UX.
+  - **User UI**:
+    - Updated `MatchApplication` to support `rental_available` flag.
+    - Implemented conditional rental option checkbox and fee display.
+    - Added "Experience Equipment" badge to Match List and Details.
+    - Added rental options to Waitlist application flow.
+  - **Backend**:
+    - Updated `joinMatch` and `joinWaitlist` actions to validate `rental_available` and calculate total cost (`Entry + Rental`).
+    - Updated `promoteWaitlistUser` to handle rental fees during automatic promotion.
+    - Fixed `pending_payment` logic to include rental fees in shortage calculation.
+  - **Testing**:
+    - Created `tests/unit/rental-logic.test.ts` (18 tests) verifying cost calculation, status logic, refund logic, and availability validation.
+    - Created `tests/unit/waitlist-rental.test.ts` (8 tests) verifying waitlist promotion logic.
+- **Next Steps**: Monitor the "Experience Equipment" usage and gather feedback on the rental fee pricing model.
