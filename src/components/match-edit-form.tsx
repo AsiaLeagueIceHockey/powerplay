@@ -25,7 +25,7 @@ interface Match {
     g: number;
   };
   max_goalies: number;
-  status: "open" | "closed" | "canceled";
+  status: "open" | "closed" | "canceled" | "finished";
   description: string | null;
   bank_account?: string | null;
   goalie_free?: boolean;
@@ -138,6 +138,7 @@ export function MatchEditForm({
         >
           <option value="open">{t("match.status.open")}</option>
           <option value="closed">{t("match.status.closed")}</option>
+          <option value="finished">{t("match.status.finished")}</option>
           {isCanceled && <option value="canceled">{t("match.status.canceled")}</option>}
         </select>
         {!isCanceled && (

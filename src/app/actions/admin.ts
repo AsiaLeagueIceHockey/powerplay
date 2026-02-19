@@ -184,7 +184,7 @@ export async function updateMatch(matchId: string, formData: FormData) {
       max_goalies: maxGoalies,
       description: description || null,
       bank_account: bankAccount || null,
-      status: status as "open" | "closed" | "canceled",
+      status: status as "open" | "closed" | "canceled" | "finished",
       goalie_free: goalieFree,
       match_type: matchType,
     })
