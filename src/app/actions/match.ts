@@ -22,6 +22,7 @@ export interface MatchParticipant {
   position: "FW" | "DF" | "G";
   status: "applied" | "confirmed" | "pending_payment" | "waiting" | "canceled";
   payment_status: boolean;
+  rental_opt_in: boolean; // Added for Equipment Rental
   team_color: "Black" | "White" | null;
   user: {
     id: string;
@@ -42,6 +43,7 @@ export interface Match {
   start_time: string;
   fee: number;  // deprecated, use entry_points
   entry_points: number;
+  rental_fee: number; // Added for Equipment Rental
   match_type: "training" | "game";
   max_skaters: number;
   max_goalies: number;
@@ -71,6 +73,7 @@ export async function getMatches(): Promise<Match[]> {
       start_time,
       fee,
       entry_points,
+      rental_fee,
       match_type,
       max_skaters,
       max_goalies,
@@ -132,6 +135,7 @@ export async function getMatch(id: string): Promise<Match | null> {
       start_time,
       fee,
       entry_points,
+      rental_fee,
       match_type,
       max_skaters,
       max_goalies,
@@ -161,6 +165,7 @@ export async function getMatch(id: string): Promise<Match | null> {
       position,
       status,
       payment_status,
+      rental_opt_in,
       team_color,
       user:user_id(id, full_name, email)
     `
@@ -191,7 +196,11 @@ export async function getMatch(id: string): Promise<Match | null> {
   } as Match;
 }
 
-export async function joinMatch(matchId: string, position: string): Promise<{
+export async function joinMatch(
+  matchId: string,
+  position: string,
+  options?: { rental?: boolean }
+): Promise<{
   success?: boolean;
   error?: string;
   code?: string;
@@ -219,10 +228,10 @@ export async function joinMatch(matchId: string, position: string): Promise<{
     return { error: "Already joined this match" };
   }
 
-  // Get match entry_points and goalie_free setting
+  // Get match entry_points, rental_fee, and goalie_free setting
   const { data: match } = await supabase
     .from("matches")
-    .select("entry_points, status, goalie_free")
+    .select("entry_points, rental_fee, status, goalie_free")
     .eq("id", matchId)
     .single();
 
@@ -236,7 +245,14 @@ export async function joinMatch(matchId: string, position: string): Promise<{
 
   // 골리이고 goalie_free가 true면 무료
   const isGoalieAndFree = position === "G" && match.goalie_free === true;
-  const entryPoints = isGoalieAndFree ? 0 : (match.entry_points || 0);
+  const baseEntryPoints = isGoalieAndFree ? 0 : (match.entry_points || 0);
+  
+  // Calculate Rental Fee
+  const isRentalOptIn = options?.rental === true;
+  const rentalFee = isRentalOptIn ? (match.rental_fee || 0) : 0;
+  
+  // Total Points Needed
+  const totalPoints = baseEntryPoints + rentalFee;
 
   // Get user's current points
   const { data: profile } = await supabase
@@ -246,16 +262,16 @@ export async function joinMatch(matchId: string, position: string): Promise<{
     .single();
 
   const userPoints = profile?.points || 0;
-  const hasEnoughPoints = entryPoints === 0 || userPoints >= entryPoints;
+  const hasEnoughPoints = totalPoints === 0 || userPoints >= totalPoints;
 
   // Determine status based on points
   // confirmed: 포인트 충분하면 즉시 확정 + 차감
   // pending_payment: 포인트 부족하면 입금 대기 상태
   const participantStatus = hasEnoughPoints ? "confirmed" : "pending_payment";
 
-  // Deduct points only if confirmed and entry_points > 0
-  if (hasEnoughPoints && entryPoints > 0) {
-    const newBalance = userPoints - entryPoints;
+  // Deduct points only if confirmed and totalPoints > 0
+  if (hasEnoughPoints && totalPoints > 0) {
+    const newBalance = userPoints - totalPoints;
 
     const { error: pointsError } = await supabase
       .from("profiles")
@@ -267,12 +283,15 @@ export async function joinMatch(matchId: string, position: string): Promise<{
     }
 
     // Record transaction
+    // Description: "경기 참가" or "경기 참가 (장비 대여 포함)"
+    const desc = isRentalOptIn ? "경기 참가 (장비 대여 포함)" : "경기 참가";
+    
     await supabase.from("point_transactions").insert({
       user_id: user.id,
       type: "use",
-      amount: -entryPoints,
+      amount: -totalPoints,
       balance_after: newBalance,
-      description: "경기 참가",
+      description: desc,
       reference_id: matchId,
     });
   }
@@ -283,11 +302,12 @@ export async function joinMatch(matchId: string, position: string): Promise<{
     position: position,
     status: participantStatus,
     payment_status: hasEnoughPoints,
+    rental_opt_in: isRentalOptIn,
   });
 
   if (error) {
     // Rollback points if participant insert failed and we deducted
-    if (hasEnoughPoints && entryPoints > 0) {
+    if (hasEnoughPoints && totalPoints > 0) {
       await supabase
         .from("profiles")
         .update({ points: userPoints })
@@ -324,8 +344,8 @@ export async function joinMatch(matchId: string, position: string): Promise<{
   const participantName = participantProfile?.full_name || user.email?.split("@")[0] || "참가자";
 
   if (participantStatus === "confirmed") {
-    const notificationBody = entryPoints > 0
-      ? `${rinkName} (${startTime}) 참가가 확정되었습니다. (${entryPoints.toLocaleString()}원 차감)`
+    const notificationBody = totalPoints > 0
+      ? `${rinkName} (${startTime}) 참가가 확정되었습니다. (${totalPoints.toLocaleString()}원 차감)`
       : `${rinkName} (${startTime}) 참가 신청이 완료되었습니다.`;
 
     await sendPushNotification(
@@ -338,10 +358,14 @@ export async function joinMatch(matchId: string, position: string): Promise<{
 
   // 알림 발송: 경기 생성자(어드민)에게 새 참가자 알림
   if (matchDetails?.created_by && matchDetails.created_by !== user.id) {
+    const adminMsg = isRentalOptIn 
+      ? `${participantName}님이 ${rinkName} (${startTime}) 경기에 신청했습니다. (장비대여)`
+      : `${participantName}님이 ${rinkName} (${startTime}) 경기에 신청했습니다.`;
+
     await sendPushNotification(
       matchDetails.created_by,
       "새 참가자 🏒",
-      `${participantName}님이 ${rinkName} (${startTime}) 경기에 신청했습니다.`,
+      adminMsg,
       `/admin/matches`
     );
   }
@@ -350,8 +374,8 @@ export async function joinMatch(matchId: string, position: string): Promise<{
   await logAndNotify({
     userId: user.id,
     action: "MATCH_JOIN",
-    description: `${participantName}님이 ${rinkName} 경기에 ${participantStatus === "confirmed" ? "참가 확정" : "참가 신청(입금대기)"}했습니다.`,
-    metadata: { matchId, rinkName, status: participantStatus, amount: entryPoints },
+    description: `${participantName}님이 ${rinkName} 경기에 ${participantStatus === "confirmed" ? "참가 확정" : "참가 신청(입금대기)"}했습니다. ${isRentalOptIn ? "(장비대여)" : ""}`,
+    metadata: { matchId, rinkName, status: participantStatus, amount: totalPoints, rental: isRentalOptIn },
   });
 
   return { success: true, status: participantStatus };
@@ -368,10 +392,10 @@ export async function cancelJoin(matchId: string) {
     return { error: "Not authenticated" };
   }
 
-  // Check if user is a participant and get status AND position
+  // Check if user is a participant and get status AND position AND rental_opt_in
   const { data: participant } = await supabase
     .from("participants")
-    .select("id, status, position")
+    .select("id, status, position, rental_opt_in")
     .eq("match_id", matchId)
     .eq("user_id", user.id)
     .single();
@@ -382,11 +406,12 @@ export async function cancelJoin(matchId: string) {
 
   const isPendingPayment = participant.status === "pending_payment";
   const isWaiting = participant.status === "waiting";
+  const isRentalOptIn = participant.rental_opt_in === true;
 
-  // Get match info for refund calculation including goalie_free
+  // Get match info for refund calculation including goalie_free and rental_fee
   const { data: match } = await supabase
     .from("matches")
-    .select("entry_points, start_time, goalie_free")
+    .select("entry_points, rental_fee, start_time, goalie_free")
     .eq("id", matchId)
     .single();
 
@@ -396,7 +421,11 @@ export async function cancelJoin(matchId: string) {
 
   // 골리이고 goalie_free가 true면 참가비는 0원 처리
   const isGoalieAndFree = participant.position === "G" && match.goalie_free === true;
-  const activeEntryPoints = isGoalieAndFree ? 0 : (match.entry_points || 0);
+  const baseEntryPoints = isGoalieAndFree ? 0 : (match.entry_points || 0);
+  
+  // Calculate Total Paid
+  const rentalFee = isRentalOptIn ? (match.rental_fee || 0) : 0;
+  const totalPaid = baseEntryPoints + rentalFee;
 
   let refundAmount = 0;
 
@@ -404,10 +433,10 @@ export async function cancelJoin(matchId: string) {
   // Refund only if:
   // 1. Not pending payment (haven't paid yet)
   // 2. Not waiting (waitlist doesn't pay upfront)
-  // 3. Entry fee > 0
-  if (!isPendingPayment && !isWaiting && activeEntryPoints > 0) {
+  // 3. User paid something (totalPaid > 0)
+  if (!isPendingPayment && !isWaiting && totalPaid > 0) {
     const refundPercent = await calculateRefundPercent(match.start_time);
-    refundAmount = Math.floor(activeEntryPoints * refundPercent / 100);
+    refundAmount = Math.floor(totalPaid * refundPercent / 100);
   }
 
   // Delete participation
@@ -438,9 +467,9 @@ export async function cancelJoin(matchId: string) {
       .eq("id", user.id);
 
     // Record transaction
-    // Use activeEntryPoints specifically for the description percentage calculation
-    const refundPercentage = activeEntryPoints > 0
-      ? Math.floor(refundAmount / activeEntryPoints * 100)
+    // Use totalPaid specifically for the description percentage calculation
+    const refundPercentage = totalPaid > 0
+      ? Math.floor(refundAmount / totalPaid * 100)
       : 0;
 
     await supabase.from("point_transactions").insert({
@@ -496,9 +525,7 @@ export async function cancelJoin(matchId: string) {
 
   // ... (previous notifications)
 
-  // Trigger Waitlist Promotion (Fire and forget-ish, but usually safest to await in serverless. 
-  // To speed up for user, we could potentially not await, but Vercel might kill it. 
-  // Let's await it as it's fast enough.)
+  // Trigger Waitlist Promotion
   try {
     await promoteWaitlistUser(matchId, participant.position);
   } catch (error) {
@@ -523,7 +550,7 @@ async function promoteWaitlistUser(matchId: string, position: string) {
   // 1. Find oldest waiting user for this position (or skater pool)
   let query = supabase
     .from("participants")
-    .select("id, user_id, position")
+    .select("id, user_id, position, rental_opt_in")
     .eq("match_id", matchId)
     .eq("status", "waiting");
 
@@ -544,7 +571,7 @@ async function promoteWaitlistUser(matchId: string, position: string) {
   // 2. Get Match Info & User Points
   const { data: match } = await supabase
     .from("matches")
-    .select("entry_points, start_time, goalie_free, rink:rinks(name_ko)")
+    .select("entry_points, rental_fee, start_time, goalie_free, rink:rinks(name_ko)")
     .eq("id", matchId)
     .single();
 
@@ -560,15 +587,22 @@ async function promoteWaitlistUser(matchId: string, position: string) {
 
   // Logic: Check Cost
   const isGoalieAndFree = position === "G" && match.goalie_free === true;
-  const entryPoints = isGoalieAndFree ? 0 : (match.entry_points || 0);
-  const hasEnoughPoints = entryPoints === 0 || userPoints >= entryPoints;
+  const baseEntryPoints = isGoalieAndFree ? 0 : (match.entry_points || 0);
+
+  // Calculate Rental Fee
+  // @ts-ignore
+  const isRentalOptIn = waiter.rental_opt_in === true;
+  const rentalFee = isRentalOptIn ? (match.rental_fee || 0) : 0;
+  
+  const totalCost = baseEntryPoints + rentalFee;
+  const hasEnoughPoints = totalCost === 0 || userPoints >= totalCost;
 
   // 3. Process Promotion
   if (hasEnoughPoints) {
     // A. Direct Confirm
-    if (entryPoints > 0) {
+    if (totalCost > 0) {
       // Deduct Points
-      const newBalance = userPoints - entryPoints;
+      const newBalance = userPoints - totalCost;
       const { error: pointError } = await supabase
         .from("profiles")
         .update({ points: newBalance })
@@ -580,12 +614,13 @@ async function promoteWaitlistUser(matchId: string, position: string) {
       }
 
       // Transaction
+      const desc = isRentalOptIn ? "대기 승격 및 참가비 결제 (장비 대여 포함)" : "대기 승격 및 참가비 결제";
       await supabase.from("point_transactions").insert({
         user_id: waiter.user_id,
         type: "use",
-        amount: -entryPoints,
+        amount: -totalCost,
         balance_after: newBalance,
-        description: "대기 승격 및 참가비 결제",
+        description: desc,
         reference_id: matchId,
       });
     }
@@ -607,7 +642,7 @@ async function promoteWaitlistUser(matchId: string, position: string) {
     await sendPushNotification(
       waiter.user_id,
       "대기 전환 및 참가 확정 🎉",
-      `${rinkName} (${startTime}) 빈자리가 생겨 대기에서 참가로 전환되었습니다! (${entryPoints > 0 ? entryPoints.toLocaleString() + "원 차감" : "무료"})`,
+      `${rinkName} (${startTime}) 빈자리가 생겨 대기에서 참가로 전환되었습니다! (${totalCost > 0 ? totalCost.toLocaleString() + "원 차감" : "무료"})`,
       `/match/${matchId}`
     );
 
@@ -635,7 +670,11 @@ async function promoteWaitlistUser(matchId: string, position: string) {
   }
 }
 
-export async function joinWaitlist(matchId: string, position: string): Promise<{
+export async function joinWaitlist(
+  matchId: string, 
+  position: string,
+  options?: { rental?: boolean }
+): Promise<{
   success?: boolean;
   error?: string;
 }> {
@@ -676,6 +715,8 @@ export async function joinWaitlist(matchId: string, position: string): Promise<{
     return { error: "Match is not open for registration" };
   }
 
+  const isRentalOptIn = options?.rental === true;
+
   // Insert as waiting - no points deducted for waitlist
   const { error } = await supabase.from("participants").insert({
     match_id: matchId,
@@ -683,6 +724,7 @@ export async function joinWaitlist(matchId: string, position: string): Promise<{
     position: position,
     status: "waiting",
     payment_status: false,
+    rental_opt_in: isRentalOptIn,
   });
 
   if (error) {
@@ -692,7 +734,7 @@ export async function joinWaitlist(matchId: string, position: string): Promise<{
   // 알림 발송: 대기명단 등록 완료
   const { data: matchInfo } = await supabase
     .from("matches")
-    .select("start_time, rink:rinks(name_ko)")
+    .select("start_time, created_by, rink:rinks(name_ko)")
     .eq("id", matchId)
     .single();
 
@@ -715,9 +757,34 @@ export async function joinWaitlist(matchId: string, position: string): Promise<{
     await logAndNotify({
       userId: user.id,
       action: "MATCH_JOIN",
-      description: `${user.email}님이 ${rinkName} 경기 대기명단에 등록했습니다.`,
-      metadata: { matchId, rinkName, status: "waiting" },
+      description: `${user.email}님이 ${rinkName} 경기 대기명단에 등록했습니다. ${isRentalOptIn ? "(장비대여)" : ""}`,
+      metadata: { matchId, rinkName, status: "waiting", rental: isRentalOptIn },
     });
+
+    // 알림 발송: 경기 생성자(어드민)에게 대기 등록 알림
+    // @ts-ignore
+    const creatorId = matchInfo.created_by;
+    if (creatorId && creatorId !== user.id) {
+       // Get participant's name
+      const { data: participantProfile } = await supabase
+        .from("profiles")
+        .select("full_name")
+        .eq("id", user.id)
+        .single();
+
+      const participantName = participantProfile?.full_name || user.email?.split("@")[0] || "대기자";
+      
+      const adminMsg = isRentalOptIn
+        ? `${participantName}님이 ${rinkName} (${startTime}) 경기에 대기 신청했습니다. (장비대여)`
+        : `${participantName}님이 ${rinkName} (${startTime}) 경기에 대기 신청했습니다.`;
+
+      await sendPushNotification(
+        creatorId,
+        "새 대기자 ⏳",
+        adminMsg,
+        `/admin/matches`
+      );
+    }
   }
 
   return { success: true };

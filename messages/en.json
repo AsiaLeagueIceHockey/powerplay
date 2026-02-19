@@ -17,7 +17,7 @@
     "home": {
         "title": "Matches",
         "subtitle": "Join upcoming ice hockey games",
-        "noMatches": "No matches scheduled",
+        "noMatches": "No matches scheduled.",
         "viewList": "List",
         "viewMap": "Map",
         "viewCalendar": "Calendar",
@@ -34,7 +34,8 @@
         "noClubs": "No clubs registered",
         "filter": {
             "skaterSpots": "🏒 Player Spots",
-            "goalieSpots": "🥅 Goalie Spots"
+            "goalieSpots": "🥅 Goalie Spots",
+            "rentalAvailable": "Rental Available"
         }
     },
     "auth": {
@@ -84,6 +85,8 @@
         "saved": "Saved successfully"
     },
     "match": {
+        "rentalFee": "Equipment Rental",
+        "totalCost": "Total Cost",
         "type": "Match Type",
         "types": {
             "training": "Training",
@@ -121,6 +124,7 @@
         "goalieFreeDesc": "Goalies can join for free without entry fee"
     },
     "participant": {
+        "rentalOption": "Rental",
         "status": {
             "applied": "Applied",
             "confirmed": "Confirmed",

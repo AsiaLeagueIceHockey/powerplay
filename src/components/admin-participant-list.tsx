@@ -7,6 +7,7 @@ interface Participant {
   position: "FW" | "DF" | "G";
   status: "applied" | "confirmed" | "pending_payment" | "waiting" | "canceled";
   payment_status: boolean;
+  rental_opt_in?: boolean; // Added
   user: {
     id: string;
     full_name: string | null;
@@ -81,6 +82,11 @@ export function AdminParticipantList({
                       >
                         {t(`participant.status.${p.status}`)}
                       </span>
+                      {p.rental_opt_in && (
+                        <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-indigo-100 text-indigo-700 border border-indigo-200">
+                          {t("match.rentalFee")}
+                        </span>
+                      )}
                     </div>
                     {p.user?.phone && (
                       <a

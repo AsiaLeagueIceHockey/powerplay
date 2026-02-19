@@ -158,6 +158,23 @@ export default async function MatchPage({
 
           <div className="border-t border-zinc-100 dark:border-zinc-800 my-2"></div>
 
+          {match.rental_fee > 0 && (
+            <>
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-zinc-500">{t("match.rentalFee")}</span>
+                <div className="text-right">
+                  <span className="font-semibold text-lg text-blue-600 dark:text-blue-400">
+                    +{match.rental_fee.toLocaleString()}{locale === "ko" ? "원" : "KRW"}
+                  </span>
+                  <p className="text-xs text-zinc-400">
+                    {locale === "ko" ? "선택 가능" : "Optional"}
+                  </p>
+                </div>
+              </div>
+              <div className="border-t border-zinc-100 dark:border-zinc-800 my-2"></div>
+            </>
+          )}
+
           <div className="flex justify-between items-center text-sm">
             <span className="text-zinc-500">{t("match.skater")}</span>
             <span className={`font-semibold ${remaining.skaters === 0 ? 'text-red-500' : 'text-green-600 dark:text-green-400'}`}>
@@ -261,6 +278,8 @@ export default async function MatchPage({
         isFull={isFull}
         goalieFree={match.goalie_free === true}
         isAuthenticated={!!user}
+        rentalFee={match.rental_fee || 0}
+        rentalOptIn={userParticipant?.rental_opt_in}
       />
 
       {/* Participant List Header */}

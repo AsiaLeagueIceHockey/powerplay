@@ -113,6 +113,11 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
         filterMatch = false;
       }
     }
+    if (activeFilters.has("rental_available")) {
+      if (!match.rental_fee || match.rental_fee <= 0) {
+        filterMatch = false;
+      }
+    }
     
     // 3. Rink Filter (Intersection / OR within Rinks)
     if (selectedRinkIds.length > 0) {
@@ -231,7 +236,25 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
 
                 {/* Filter Chips */}
                 <div className="flex overflow-x-auto gap-2 px-1 pb-2 no-scrollbar">
-                  {/* Rink Filter Button */}
+                  <button
+                    onClick={() => {
+                      const newFilters = new Set(activeFilters);
+                      if (newFilters.has("rental_available")) {
+                        newFilters.delete("rental_available");
+                      } else {
+                        newFilters.add("rental_available");
+                      }
+                      setActiveFilters(newFilters);
+                    }}
+                    className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors whitespace-nowrap ${
+                      activeFilters.has("rental_available")
+                        ? "bg-blue-600 text-white border-blue-600 shadow-sm"
+                        : "bg-white text-zinc-600 border-zinc-200 hover:bg-zinc-50 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700 dark:hover:bg-zinc-700"
+                    }`}
+                  >
+                    {t("filter.rentalAvailable")}
+                  </button>
+
                   <button
                     onClick={() => setIsRinkFilterOpen(true)}
                     className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium border transition-colors whitespace-nowrap ${

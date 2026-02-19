@@ -30,6 +30,7 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
   const [hour, setHour] = useState("");
   const [minute, setMinute] = useState("");
   const [entryPoints, setEntryPoints] = useState("");
+  const [rentalFee, setRentalFee] = useState("");
   const [maxSkaters, setMaxSkaters] = useState("");
   const [maxGoalies, setMaxGoalies] = useState("");
   const [bankAccount, setBankAccount] = useState("");
@@ -270,6 +271,36 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
           {locale === "ko"
             ? "참가비 (0 = 무료)"
             : "Entry fee (0 = free)"}
+        </p>
+      </div>
+
+      {/* Rental Fee (장비 대여비) */}
+      <div>
+        <label className="block text-sm font-medium mb-2 text-zinc-300">
+          {t("match.rentalFee")}
+        </label>
+        <div className="relative">
+          <input
+            type="text"
+            name="rental_fee"
+            value={rentalFee}
+            onChange={(e) => {
+              const raw = e.target.value.replace(/[^0-9]/g, "");
+              const formatted = raw ? Number(raw).toLocaleString() : "";
+              setRentalFee(formatted);
+              e.target.value = formatted;
+            }}
+            className="w-full px-4 py-3 pr-8 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+            placeholder="ex. 10,000"
+          />
+          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500">
+            {locale === "ko" ? "원" : "KRW"}
+          </span>
+        </div>
+        <p className="text-xs text-zinc-500 mt-1">
+          {locale === "ko"
+            ? "장비 대여비 (선택 사항, 0 = 없음)"
+            : "Equipment rental fee (Optional, 0 = none)"}
         </p>
       </div>
 

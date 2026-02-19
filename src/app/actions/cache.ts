@@ -82,6 +82,7 @@ export async function getCachedMatches(): Promise<Match[]> {
       max_goalies,
       status,
       entry_points,
+      rental_fee,
       match_type,
       description,
       rink:rink_id(id, name_ko, name_en, address, lat, lng, rink_type),

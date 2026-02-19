@@ -59,6 +59,8 @@ description: Comprehensive developer guide for PowerPlay agents. Use this skill 
 
 ## 🎨 Code Style & Conventions
 
+> **💡 UI Pattern Guide**: For detailed UI/UX rules (P7 Polish, Dark Mode, etc.), please refer to the `ui-component-pattern` skill.
+
 ### 1. Naming
 - **Components**: `PascalCase` (e.g., `MatchCard`)
 - **Files & Folders**: `kebab-case` (e.g., `match-card.tsx`)

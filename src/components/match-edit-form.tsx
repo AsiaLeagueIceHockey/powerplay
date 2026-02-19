@@ -15,6 +15,8 @@ interface Match {
   id: string;
   start_time: string;
   fee: number;
+  entry_points: number;
+  rental_fee: number; // added
   max_skaters: number;
   participants_count?: {
     fw: number;
@@ -333,6 +335,35 @@ export function MatchEditForm({
             {locale === "ko" ? "원" : "KRW"}
           </span>
         </div>
+      </div>
+
+      {/* Rental Fee */}
+      <div>
+        <label className="block text-sm font-medium mb-2 text-zinc-300">
+          {t("match.rentalFee")}
+        </label>
+        <div className="relative">
+          <input
+            type="text"
+            name="rental_fee"
+            disabled={isCanceled}
+            defaultValue={match.rental_fee?.toLocaleString()}
+            onChange={(e) => {
+              const value = e.target.value.replace(/[^0-9]/g, "");
+              e.target.value = value ? Number(value).toLocaleString() : "";
+            }}
+            className="w-full px-4 py-3 pr-8 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
+            placeholder="0"
+          />
+          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500">
+            {locale === "ko" ? "원" : "KRW"}
+          </span>
+        </div>
+        <p className="text-xs text-zinc-500 mt-1">
+          {locale === "ko"
+            ? "장비 대여비 (선택 사항, 0 = 없음)"
+            : "Equipment rental fee (Optional, 0 = none)"}
+        </p>
       </div>
 
       {/* Position Limits (Consolidated) */}

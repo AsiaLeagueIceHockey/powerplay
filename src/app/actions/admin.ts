@@ -48,9 +48,11 @@ export async function createMatch(formData: FormData) {
   const rinkId = formData.get("rink_id") as string;
   const clubId = formData.get("club_id") as string;
   const startTimeInput = formData.get("start_time") as string;
-  // Remove commas from entry_points before parsing
   const entryPointsStr = (formData.get("entry_points") as string)?.replace(/,/g, "");
   const entryPoints = entryPointsStr ? parseInt(entryPointsStr) : 0;
+
+  const rentalFeeStr = (formData.get("rental_fee") as string)?.replace(/,/g, "");
+  const rentalFee = rentalFeeStr ? parseInt(rentalFeeStr) : 0;
 
   const skatersInput = formData.get("max_skaters") as string;
   const skatersParsed = parseInt(skatersInput);
@@ -76,6 +78,7 @@ export async function createMatch(formData: FormData) {
       start_time: startTimeUTC,
       fee: entryPoints, // Keep fee for backward compatibility
       entry_points: entryPoints,
+      rental_fee: rentalFee,
       max_skaters: maxSkaters,
       max_goalies: maxGoalies,
       description: description || null,
@@ -149,6 +152,7 @@ export async function updateMatch(matchId: string, formData: FormData) {
   const rinkId = formData.get("rink_id") as string;
   const startTimeInput = formData.get("start_time") as string;
   const fee = parseInt((formData.get("fee") as string)?.replace(/,/g, "")) || 0;
+  const rentalFee = parseInt((formData.get("rental_fee") as string)?.replace(/,/g, "")) || 0;
 
   const skatersInput = formData.get("max_skaters") as string;
   const skatersParsed = parseInt(skatersInput);
@@ -172,6 +176,8 @@ export async function updateMatch(matchId: string, formData: FormData) {
       rink_id: rinkId || null,
       start_time: startTimeUTC,
       fee,
+      entry_points: fee, // Ensure entry_points is synced with fee
+      rental_fee: rentalFee,
       max_skaters: maxSkaters,
       max_goalies: maxGoalies,
       description: description || null,
@@ -194,7 +200,7 @@ export async function updateMatch(matchId: string, formData: FormData) {
     // 1. Get all participants with status
     const { data: participants } = await supabase
       .from("participants")
-      .select("user_id, status")
+      .select("user_id, status, rental_opt_in")
       .eq("match_id", matchId)
       .in("status", ["applied", "confirmed", "pending_payment"]);
 
@@ -202,7 +208,7 @@ export async function updateMatch(matchId: string, formData: FormData) {
       // 2. Fetch match info for refund amount
       const { data: currentMatch } = await supabase
         .from("matches")
-        .select("entry_points, start_time, rink:rinks(name_ko)")
+        .select("entry_points, rental_fee, start_time, rink:rinks(name_ko)")
         .eq("id", matchId)
         .single();
         
@@ -225,7 +231,12 @@ export async function updateMatch(matchId: string, formData: FormData) {
                 .single();
               
               if (userProfile) {
-                const newBalance = (userProfile.points || 0) + currentMatch.entry_points;
+                // Determine refund amount: entry_points + rental_fee if opted in
+                const isRentalOptIn = p.rental_opt_in === true;
+                const rentalFee = isRentalOptIn ? (currentMatch.rental_fee || 0) : 0;
+                const refundAmount = currentMatch.entry_points + rentalFee;
+
+                const newBalance = (userProfile.points || 0) + refundAmount;
                 
                 // Update Balance
                 await supabase
@@ -237,7 +248,7 @@ export async function updateMatch(matchId: string, formData: FormData) {
                 await supabase.from("point_transactions").insert({
                   user_id: p.user_id,
                   type: "refund",
-                  amount: currentMatch.entry_points,
+                  amount: refundAmount,
                   balance_after: newBalance,
                   description: "관리자 취소 환불 (100%)",
                   reference_id: matchId,
@@ -292,7 +303,7 @@ export async function cancelMatchByAdmin(matchId: string) {
   // 1. Get Match Info & Participants
   const { data: match } = await supabase
     .from("matches")
-    .select("start_time, entry_points, rink:rinks(name_ko)")
+    .select("start_time, entry_points, rental_fee, rink:rinks(name_ko)")
     .eq("id", matchId)
     .single();
 
@@ -302,7 +313,7 @@ export async function cancelMatchByAdmin(matchId: string) {
 
   const { data: participants, error: participantsError } = await supabase
     .from("participants")
-    .select("user_id, status")
+    .select("user_id, status, rental_opt_in")
     .eq("match_id", matchId);
 
   if (participantsError) {
@@ -323,7 +334,12 @@ export async function cancelMatchByAdmin(matchId: string) {
         .single();
       
       if (userProfile) {
-        const newBalance = (userProfile.points || 0) + match.entry_points;
+        // Determine refund amount: entry_points + rental_fee if opted in
+        const isRentalOptIn = p.rental_opt_in === true;
+        const rentalFee = isRentalOptIn ? (match.rental_fee || 0) : 0;
+        const refundAmount = match.entry_points + rentalFee;
+
+        const newBalance = (userProfile.points || 0) + refundAmount;
         
         // Update Balance
         await supabase
@@ -335,7 +351,7 @@ export async function cancelMatchByAdmin(matchId: string) {
         await supabase.from("point_transactions").insert({
           user_id: p.user_id,
           type: "refund",
-          amount: match.entry_points,
+          amount: refundAmount,
           balance_after: newBalance,
           description: "관리자 취소 환불 (100%)",
           reference_id: matchId,
@@ -517,6 +533,7 @@ export async function getAdminMatches() {
           position,
           status,
           payment_status,
+          rental_opt_in,
           team_color,
           user:user_id(id, full_name, email, phone)
         `

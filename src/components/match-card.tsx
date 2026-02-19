@@ -134,8 +134,15 @@ export function MatchCard({ match }: { match: Match }) {
       </div>
 
       {/* Fee */}
-      <div className="text-sm text-zinc-600 dark:text-zinc-400">
-        {t("fee")}: {(match.entry_points || match.fee).toLocaleString()} {locale === "ko" ? "원" : "KRW"}
+      <div className="flex items-center gap-2 text-sm">
+        <span className="font-semibold text-zinc-900 dark:text-zinc-200">
+          {(match.entry_points || match.fee).toLocaleString()} {locale === "ko" ? "원" : "KRW"}
+        </span>
+        {match.rental_fee > 0 && (
+          <span className="text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-1.5 py-0.5 rounded">
+            (+ {t("rentalFee")} {match.rental_fee.toLocaleString()})
+          </span>
+        )}
       </div>
     </Link>
   );

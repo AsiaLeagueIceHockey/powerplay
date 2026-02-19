@@ -19,11 +19,13 @@ interface MatchApplicationProps {
   matchStatus: string;
   matchStartTime: string;
   entryPoints?: number;
+  rentalFee?: number; // Added
   userPoints?: number;
   onboardingCompleted?: boolean;
   isFull?: boolean;
   goalieFree?: boolean;
   isAuthenticated?: boolean;
+  rentalOptIn?: boolean; // Added
 }
 
 export function MatchApplication({
@@ -35,11 +37,13 @@ export function MatchApplication({
   matchStatus,
   matchStartTime,
   entryPoints = 0,
+  rentalFee = 0, // Added
   userPoints = 0,
   onboardingCompleted = true,
   isFull = false,
   goalieFree = false,
   isAuthenticated = false,
+  rentalOptIn = false, // Added
 }: MatchApplicationProps) {
   const t = useTranslations("match");
   const tParticipant = useTranslations("participant");
@@ -51,11 +55,13 @@ export function MatchApplication({
   const [showSelect, setShowSelect] = useState(false);
   const [showWaitlistSelect, setShowWaitlistSelect] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [rentalChecked, setRentalChecked] = useState(false); // Added state
+  const currentRentalFee = rentalChecked ? rentalFee : 0; // Moved up
 
   const handleJoin = async (pos: string) => {
     setLoading(true);
     setError(null);
-    const res = await joinMatch(matchId, pos);
+    const res = await joinMatch(matchId, pos, { rental: rentalChecked }); // Pass rental option
     if (res.error) {
       setError(res.error);
     } else {
@@ -68,7 +74,7 @@ export function MatchApplication({
   const handleWaitlist = async (pos: string) => {
     setLoading(true);
     setError(null);
-    const res = await joinWaitlist(matchId, pos);
+    const res = await joinWaitlist(matchId, pos, { rental: rentalChecked });
     if (res.error) {
       setError(res.error);
     } else {
@@ -149,6 +155,12 @@ export function MatchApplication({
             <span className="font-bold text-blue-700 dark:text-blue-300 text-lg">
               {t(`position.${currentPosition}`)}로 대기 중
             </span>
+            {rentalOptIn && (
+              <span className="ml-2 px-1.5 py-0.5 text-[10px] bg-indigo-50 text-indigo-600 rounded border border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-300 dark:border-indigo-800 font-medium">
+                {t("rentalFee")}
+              </span>
+            )}
+            {/* We don't track rental opt-in for waitlist explicitly in UI yet, but could add if needed */}
           </div>
           
           <button
@@ -180,6 +192,11 @@ export function MatchApplication({
             <span className="font-bold text-amber-700 dark:text-amber-300 text-lg">
               {t(`position.${currentPosition}`)} {locale === "ko" ? "입금 대기" : "Pending Payment"}
             </span>
+            {rentalOptIn && (
+              <span className="ml-2 px-1.5 py-0.5 text-[10px] bg-indigo-50 text-indigo-600 rounded border border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-300 dark:border-indigo-800 font-medium">
+                {t("rentalFee")}
+              </span>
+            )}
           </div>
           
           <button
@@ -243,11 +260,20 @@ export function MatchApplication({
     return (
       <div className="rounded-2xl border border-green-200 bg-green-50 p-6 dark:border-green-900/50 dark:bg-green-900/10">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-green-600 dark:text-green-400 font-bold">✓</span>
-            <span className="font-bold text-green-700 dark:text-green-300 text-lg">
-              {t(`position.${currentPosition}`)}로 참가 확정
-            </span>
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-2">
+              <span className="text-green-600 dark:text-green-400 font-bold">✓</span>
+              <span className="font-bold text-green-700 dark:text-green-300 text-lg">
+                {t(`position.${currentPosition}`)}로 참가 확정
+              </span>
+            </div>
+            {rentalOptIn && (
+              <div className="ml-6">
+                <span className="px-1.5 py-0.5 text-[10px] bg-indigo-50 text-indigo-600 rounded border border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-300 dark:border-indigo-800 font-medium">
+                  {t("rentalFee")}
+                </span>
+              </div>
+            )}
           </div>
           
           <button
@@ -270,6 +296,48 @@ export function MatchApplication({
         <h3 className="mb-4 font-bold text-lg text-blue-800 dark:text-blue-200">대기 포지션 선택</h3>
         
         {error && <p className="mb-4 text-sm text-red-500">{error}</p>}
+        
+        {/* Rental Option & Total Cost Calculation (Waitlist) */}
+        {rentalFee > 0 && (
+          <div className="mb-6 space-y-4">
+             <div className="p-4 rounded-xl border-2 transition-all cursor-pointer bg-white border-zinc-200 hover:border-blue-300 dark:bg-zinc-800 dark:border-zinc-700 dark:hover:border-blue-700"
+                  onClick={() => setRentalChecked(!rentalChecked)}>
+                <div className="flex items-center gap-3">
+                  <div className={`w-6 h-6 rounded-md flex items-center justify-center border transition-colors ${
+                    rentalChecked 
+                      ? "bg-blue-600 border-blue-600 text-white" 
+                      : "bg-white border-zinc-300 dark:bg-zinc-700 dark:border-zinc-600"
+                  }`}>
+                    {rentalChecked && <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
+                  </div>
+                  
+                  <div className="flex-1">
+                    <div className="flex justify-between items-center">
+                      <span className="font-bold text-zinc-900 dark:text-zinc-100">
+                        {t("rentalFee")}
+                      </span>
+                      <span className="font-bold text-blue-600 dark:text-blue-400">
+                        +{rentalFee.toLocaleString()}{locale === "ko" ? "원" : "KRW"}
+                      </span>
+                    </div>
+                    <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
+                      {locale === "ko" ? "장비 대여가 필요하면 체크해주세요" : "Check this if you need equipment rental"}
+                    </p>
+                  </div>
+                </div>
+             </div>
+
+             {/* Total Cost Display */}
+             <div className="flex justify-between items-center px-2 py-3 bg-blue-100/50 dark:bg-blue-900/30 rounded-xl border border-blue-200 dark:border-blue-800">
+                <span className="text-zinc-600 dark:text-zinc-400 font-medium">
+                  {t("totalCost")} ({locale === "ko" ? "승격 시 자동결제" : "Auto-pay on promotion"})
+                </span>
+                <span className="text-xl font-bold text-blue-700 dark:text-blue-300">
+                  {(entryPoints + currentRentalFee).toLocaleString()}{locale === "ko" ? "원" : "KRW"}
+                </span>
+             </div>
+          </div>
+        )}
         
         <div className="flex gap-3 mb-4">
           <button
@@ -305,6 +373,12 @@ export function MatchApplication({
     );
   }
 
+  // Calculate total cost for UI
+  // Note: we don't know selected position here until button click, 
+  // but for "Show Select" mode, we can show dynamic cost if we had position selector first.
+  // Current UI flows: Click Join -> Show Position Buttons.
+  // We can add Rental Checkbox insdie `showSelect` view.
+
   // 3b. Position Select Mode (Regular Join)
   if (showSelect) {
     // Check if the error is about insufficient points
@@ -335,6 +409,48 @@ export function MatchApplication({
         {/* Other errors */}
         {error && !isInsufficientPoints && <p className="mb-4 text-sm text-red-500">{error}</p>}
         
+        {/* Rental Option & Total Cost Calculation */}
+        {rentalFee > 0 && (
+          <div className="mb-6 space-y-4">
+             <div className="p-4 rounded-xl border-2 transition-all cursor-pointer bg-white border-zinc-200 hover:border-blue-300 dark:bg-zinc-800 dark:border-zinc-700 dark:hover:border-blue-700"
+                  onClick={() => setRentalChecked(!rentalChecked)}>
+                <div className="flex items-center gap-3">
+                  <div className={`w-6 h-6 rounded-md flex items-center justify-center border transition-colors ${
+                    rentalChecked 
+                      ? "bg-blue-600 border-blue-600 text-white" 
+                      : "bg-white border-zinc-300 dark:bg-zinc-700 dark:border-zinc-600"
+                  }`}>
+                    {rentalChecked && <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
+                  </div>
+                  
+                  <div className="flex-1">
+                    <div className="flex justify-between items-center">
+                      <span className="font-bold text-zinc-900 dark:text-zinc-100">
+                        {t("rentalFee")}
+                      </span>
+                      <span className="font-bold text-blue-600 dark:text-blue-400">
+                        +{rentalFee.toLocaleString()}{locale === "ko" ? "원" : "KRW"}
+                      </span>
+                    </div>
+                    <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
+                      {locale === "ko" ? "장비 대여가 필요하면 체크해주세요" : "Check this if you need equipment rental"}
+                    </p>
+                  </div>
+                </div>
+             </div>
+
+             {/* Total Cost Display */}
+             <div className="flex justify-between items-center px-2 py-3 bg-zinc-50 dark:bg-zinc-900/50 rounded-xl border border-zinc-100 dark:border-zinc-800">
+                <span className="text-zinc-600 dark:text-zinc-400 font-medium">
+                  {t("totalCost")}
+                </span>
+                <span className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
+                  {(entryPoints + currentRentalFee).toLocaleString()}{locale === "ko" ? "원" : "KRW"}
+                </span>
+             </div>
+          </div>
+        )}
+
         <div className="flex gap-3 mb-4">
           {/* FW Button */}
           <button
