@@ -35,7 +35,7 @@
         "filter": {
             "skaterSpots": "🏒 Player Spots",
             "goalieSpots": "🥅 Goalie Spots",
-            "rentalAvailable": "Rental Available"
+            "rentalAvailable": "Experience Equipment"
         }
     },
     "auth": {
@@ -85,9 +85,10 @@
         "saved": "Saved successfully"
     },
     "match": {
-        "rentalFee": "Equipment Rental Fee",
-        "rentalFeeLabel": "Equipment Rental Fee",
-        "rentalToggleLabel": "Check if you want to provide equipment rental",
+        "rentalFee": "Experience Equipment",
+        "rentalFeeLabel": "Experience Equipment Fee",
+        "rentalToggleLabel": "Check this to offer experience equipment rental",
+        "rentalCheckboxDesc": "Check this if you need experience equipment",
         "totalCost": "Total Cost",
         "type": "Match Type",
         "types": {

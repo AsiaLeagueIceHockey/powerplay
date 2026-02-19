@@ -321,7 +321,7 @@ export function MatchApplication({
                       </span>
                     </div>
                     <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
-                      {locale === "ko" ? "장비 대여가 필요하면 체크해주세요" : "Check this if you need equipment rental"}
+                      {t("rentalCheckboxDesc")}
                     </p>
                   </div>
                 </div>
@@ -433,7 +433,7 @@ export function MatchApplication({
                       </span>
                     </div>
                     <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
-                      {locale === "ko" ? "장비 대여가 필요하면 체크해주세요" : "Check this if you need equipment rental"}
+                      {t("rentalCheckboxDesc")}
                     </p>
                   </div>
                 </div>

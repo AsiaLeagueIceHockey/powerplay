@@ -35,7 +35,7 @@
         "filter": {
             "skaterSpots": "🏒 플레이어 모집",
             "goalieSpots": "🥅 골리 모집",
-            "rentalAvailable": "장비 대여 가능"
+            "rentalAvailable": "체험 장비 대여"
         }
     },
     "auth": {
@@ -85,9 +85,10 @@
         "saved": "저장되었습니다"
     },
     "match": {
-        "rentalFee": "장비 대여비",
-        "rentalFeeLabel": "장비 대여비",
-        "rentalToggleLabel": "신청자에게 장비를 대여해주신다면 체크해주세요",
+        "rentalFee": "체험 장비 대여",
+        "rentalFeeLabel": "체험 장비 대여비",
+        "rentalToggleLabel": "체험용 장비 대여 옵션을 제공하려면 체크해주세요",
+        "rentalCheckboxDesc": "체험용 장비가 필요하면 체크해주세요",
         "totalCost": "총 참가비",
         "type": "대관 구분",
         "types": {
