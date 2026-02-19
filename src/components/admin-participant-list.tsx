@@ -11,6 +11,7 @@ interface Participant {
     id: string;
     full_name: string | null;
     email: string;
+    phone: string | null;
   } | null;
 }
 
@@ -68,20 +69,28 @@ export function AdminParticipantList({
                   key={p.id}
                   className="flex items-center justify-between p-3 bg-white rounded-lg border border-zinc-200"
                 >
-                  <div className="flex items-center gap-3">
-                    <span className="font-semibold text-zinc-900">
-                      {p.user?.full_name || p.user?.email || "Unknown"}
-                    </span>
-                    <span
-                      className={`px-2 py-0.5 rounded text-xs font-medium ${getStatusColor(
-                        p.status
-                      )}`}
-                    >
-                      {t(`participant.status.${p.status}`)}
-                    </span>
+                  <div className="flex flex-col gap-0.5">
+                    <div className="flex items-center gap-3">
+                      <span className="font-semibold text-zinc-900">
+                        {p.user?.full_name || p.user?.email || "Unknown"}
+                      </span>
+                      <span
+                        className={`px-2 py-0.5 rounded text-xs font-medium ${getStatusColor(
+                          p.status
+                        )}`}
+                      >
+                        {t(`participant.status.${p.status}`)}
+                      </span>
+                    </div>
+                    {p.user?.phone && (
+                      <a
+                        href={`tel:${p.user.phone}`}
+                        className="text-xs text-zinc-500 hover:text-blue-600 transition-colors"
+                      >
+                        📞 {p.user.phone}
+                      </a>
+                    )}
                   </div>
-                  
-                  {/* Payment status is implied by status, no toggle needed */}
                 </div>
               ))}
             </div>

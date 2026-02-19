@@ -518,7 +518,7 @@ export async function getAdminMatches() {
           status,
           payment_status,
           team_color,
-          user:user_id(id, full_name, email)
+          user:user_id(id, full_name, email, phone)
         `
         )
         .eq("match_id", match.id)
