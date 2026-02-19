@@ -57,6 +57,11 @@ export default async function EditMatchPage({
     description: match.description || null,
   };
 
+  // Check if any participant (active) has opted in for rental
+  const hasRentalParticipants = participantsForList.some(
+    (p) => p.rental_opt_in === true
+  );
+
   return (
     <div>
       <div className="mb-6">
@@ -72,7 +77,11 @@ export default async function EditMatchPage({
         {/* Edit Form */}
         <div>
           <h1 className="text-2xl font-bold mb-6">{t("admin.matches.edit")}</h1>
-          <MatchEditForm match={matchForForm} rinks={rinks} />
+          <MatchEditForm 
+            match={matchForForm} 
+            rinks={rinks} 
+            hasRentalParticipants={hasRentalParticipants}
+          />
         </div>
       </div>
     </div>

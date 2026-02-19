@@ -114,7 +114,7 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
       }
     }
     if (activeFilters.has("rental_available")) {
-      if (!match.rental_fee || match.rental_fee <= 0) {
+      if (!match.rental_available) {
         filterMatch = false;
       }
     }

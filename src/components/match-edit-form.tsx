@@ -36,9 +36,11 @@ interface Match {
 export function MatchEditForm({
   match,
   rinks,
+  hasRentalParticipants = false, // Added prop with default
 }: {
   match: Match;
   rinks: Rink[];
+  hasRentalParticipants?: boolean;
 }) {
   const t = useTranslations();
   const locale = useLocale();
@@ -406,21 +408,24 @@ export function MatchEditForm({
           {t("match.rentalFeeLabel")}
         </label>
 
-        <div className="space-y-4">
-            <input type="hidden" name="rental_available" value={String(isRentalAvailable)} />
+        <div className={`space-y-4 ${hasRentalParticipants ? 'opacity-70' : ''}`}>
+            {/* Note: In disabled state, we should still submit existing values if not changing */}
+            {hasRentalParticipants && (
+                <>
+                <input type="hidden" name="rental_available" value={String(match.rental_available)} />
+                <input type="hidden" name="rental_fee" value={match.rental_fee} />
+                </>
+            )}
+            {!hasRentalParticipants && 
+                <input type="hidden" name="rental_available" value={String(isRentalAvailable)} />
+            }
+            
              {/* Toggle Switch */}
              <div 
                 onClick={() => {
-                    if (isCanceled) return;
+                    if (isCanceled || hasRentalParticipants) return;
                     const next = !isRentalAvailable;
                     setIsRentalAvailable(next);
-                    // In edit mode, we don't clear the value immediately to avoid data loss if toggled by accident,
-                    // but the hidden input or form submission logic might need to handle it. 
-                    // However, for UX consistency with Create form, let's keep the value in the input but hide it.
-                    // If the user submits with isRentalAvailable=false, we should ideally send 0.
-                    // But standard form submission will send the input value even if hidden.
-                    // So we must clear the specific input value if unchecked, OR handle it in the action.
-                    // For simplicity, let's clear the visual input if unchecked.
                     if (!next) {
                         const input = document.querySelector('input[name="rental_fee"]') as HTMLInputElement;
                         if (input) input.value = "";
@@ -430,7 +435,7 @@ export function MatchEditForm({
                     isRentalAvailable 
                         ? "bg-blue-900/20 border-blue-500/50" 
                         : "bg-zinc-900 border-zinc-700"
-                } ${!isCanceled ? "cursor-pointer hover:bg-zinc-800" : "opacity-50 cursor-not-allowed"}`}
+                } ${!isCanceled && !hasRentalParticipants ? "cursor-pointer hover:bg-zinc-800" : "opacity-50 cursor-not-allowed"}`}
             >
                 <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${
                     isRentalAvailable
@@ -439,9 +444,18 @@ export function MatchEditForm({
                 }`}>
                     {isRentalAvailable && <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
                 </div>
-                <span className={`text-sm font-medium ${isRentalAvailable ? "text-blue-200" : "text-zinc-400"}`}>
-                    {t("match.rentalToggleLabel")}
-                </span>
+                <div className="flex flex-col">
+                    <span className={`text-sm font-medium ${isRentalAvailable ? "text-blue-200" : "text-zinc-400"}`}>
+                        {t("match.rentalToggleLabel")}
+                    </span>
+                    {hasRentalParticipants && (
+                        <span className="text-xs text-orange-400 mt-1">
+                            {locale === "ko" 
+                                ? "이미 장비 대여 신청자가 있어 설정을 변경할 수 없습니다." 
+                                : "Cannot change setting because participants have already opted for rental."}
+                        </span>
+                    )}
+                </div>
             </div>
 
             {/* Input Field (Conditional) */}
@@ -450,7 +464,7 @@ export function MatchEditForm({
                 <input
                     type="text"
                     name="rental_fee"
-                    disabled={isCanceled}
+                    disabled={isCanceled || hasRentalParticipants}
                     defaultValue={match.rental_fee?.toLocaleString()}
                     onChange={(e) => {
                         const value = e.target.value.replace(/[^0-9]/g, "");
