@@ -37,6 +37,17 @@ export const calculateRefund = (
   return Math.floor((totalPaid * refundPercent) / 100);
 };
 
+// Logic from joinMatch for validating rental availability
+export const validateRentalAvailability = (
+  isRentalOptIn: boolean,
+  isRentalAvailable: boolean
+): string | null => {
+  if (isRentalOptIn && !isRentalAvailable) {
+    return "Equipment rental is not available for this match";
+  }
+  return null;
+};
+
 
 // ==========================================
 // 2. Test Suites
@@ -122,6 +133,28 @@ describe("Rental Payment Logic Defense", () => {
         // Entry 0, Rental 10k
         const refund = calculateRefund(0, 10000, 100);
         expect(refund).toBe(10000);
+    });
+  });
+
+  describe("4. Rental Availability Validation", () => {
+    it("Allowed: Optimization IN + Rental Available", () => {
+        const error = validateRentalAvailability(true, true);
+        expect(error).toBeNull();
+    });
+
+    it("Allowed: Optimization OUT + Rental Available", () => {
+        const error = validateRentalAvailability(false, true);
+        expect(error).toBeNull();
+    });
+
+    it("Allowed: Optimization OUT + Rental NOT Available", () => {
+        const error = validateRentalAvailability(false, false);
+        expect(error).toBeNull();
+    });
+
+    it("Blocked: Optimization IN + Rental NOT Available", () => {
+        const error = validateRentalAvailability(true, false);
+        expect(error).toBe("Equipment rental is not available for this match");
     });
   });
 });

@@ -44,24 +44,20 @@ export interface Match {
   fee: number;  // deprecated, use entry_points
   entry_points: number;
   rental_fee: number; // Added for Equipment Rental
+  rental_available: boolean; // Added for Equipment Rental
   match_type: "training" | "game";
   max_skaters: number;
   max_goalies: number;
-  status: "open" | "closed" | "canceled";
-  description: string | null;
-  bank_account?: string | null;
+  status: "open" | "closed" | "canceled" | "finished";
+  description?: string;
+  bank_account?: string;
   goalie_free?: boolean;
   created_by?: string;
   rink: MatchRink | null;
-  club?: MatchClub | null;
-  participants_count?: {
-    fw: number;
-    df: number;
-    g: number;
-  };
+  club: MatchClub | null;
   participants?: MatchParticipant[];
+  participants_count?: { fw: number; df: number; g: number };
 }
-
 export async function getMatches(): Promise<Match[]> {
   const supabase = await createClient();
 
@@ -74,6 +70,7 @@ export async function getMatches(): Promise<Match[]> {
       fee,
       entry_points,
       rental_fee,
+      rental_available,
       match_type,
       max_skaters,
       max_goalies,
@@ -136,6 +133,7 @@ export async function getMatch(id: string): Promise<Match | null> {
       fee,
       entry_points,
       rental_fee,
+      rental_available,
       match_type,
       max_skaters,
       max_goalies,
@@ -231,7 +229,7 @@ export async function joinMatch(
   // Get match entry_points, rental_fee, and goalie_free setting
   const { data: match } = await supabase
     .from("matches")
-    .select("entry_points, rental_fee, status, goalie_free")
+    .select("entry_points, rental_fee, status, goalie_free, rental_available")
     .eq("id", matchId)
     .single();
 
@@ -249,6 +247,12 @@ export async function joinMatch(
   
   // Calculate Rental Fee
   const isRentalOptIn = options?.rental === true;
+  
+  // Validate Rental Availability
+  if (isRentalOptIn && !match.rental_available) {
+    return { error: "Equipment rental is not available for this match" };
+  }
+
   const rentalFee = isRentalOptIn ? (match.rental_fee || 0) : 0;
   
   // Total Points Needed

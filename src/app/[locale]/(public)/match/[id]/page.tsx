@@ -158,7 +158,7 @@ export default async function MatchPage({
 
           <div className="border-t border-zinc-100 dark:border-zinc-800 my-2"></div>
 
-          {match.rental_fee > 0 && (
+          {match.rental_available && (
             <>
               <div className="flex justify-between items-center text-sm">
                 <span className="text-zinc-500">{t("match.rentalFee")}</span>
@@ -279,6 +279,7 @@ export default async function MatchPage({
         goalieFree={match.goalie_free === true}
         isAuthenticated={!!user}
         rentalFee={match.rental_fee || 0}
+        rentalAvailable={match.rental_available} // Added
         rentalOptIn={userParticipant?.rental_opt_in}
       />
 

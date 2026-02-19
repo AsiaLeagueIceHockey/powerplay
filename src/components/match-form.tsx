@@ -275,63 +275,6 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
         </p>
       </div>
 
-      {/* Rental Fee (장비 대여비) */}
-      <div>
-        <label className="block text-sm font-medium mb-2 text-zinc-300">
-          {t("match.rentalFeeLabel")}
-        </label>
-        
-        <div className="space-y-4">
-            {/* Toggle Switch */}
-            <div 
-                onClick={() => {
-                    const next = !isRentalAvailable;
-                    setIsRentalAvailable(next);
-                    if (!next) setRentalFee("");
-                }}
-                className={`flex items-center gap-3 p-4 rounded-lg border cursor-pointer transition-all ${
-                    isRentalAvailable 
-                        ? "bg-blue-900/20 border-blue-500/50" 
-                        : "bg-zinc-900 border-zinc-700 hover:bg-zinc-800"
-                }`}
-            >
-                <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${
-                    isRentalAvailable
-                        ? "bg-blue-600 border-blue-600"
-                        : "bg-zinc-800 border-zinc-600"
-                }`}>
-                    {isRentalAvailable && <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
-                </div>
-                <span className={`text-sm font-medium ${isRentalAvailable ? "text-blue-200" : "text-zinc-400"}`}>
-                    {t("match.rentalToggleLabel")}
-                </span>
-            </div>
-
-            {/* Input Field (Conditional) */}
-            {isRentalAvailable && (
-                <div className="relative animate-in fade-in slide-in-from-top-2 duration-200">
-                <input
-                    type="text"
-                    name="rental_fee"
-                    value={rentalFee}
-                    onChange={(e) => {
-                    const raw = e.target.value.replace(/[^0-9]/g, "");
-                    const formatted = raw ? Number(raw).toLocaleString() : "";
-                    setRentalFee(formatted);
-                    e.target.value = formatted;
-                    }}
-                    className="w-full px-4 py-3 pr-8 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                    placeholder="ex. 10,000"
-                    autoFocus
-                />
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500">
-                    {locale === "ko" ? "원" : "KRW"}
-                </span>
-                </div>
-            )}
-        </div>
-      </div>
-
       {/* Position Limits (Consolidated) */}
       <div className="grid grid-cols-2 gap-4">
         <div>
@@ -387,6 +330,64 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
             {t("match.goalieFreeDesc")}
           </span>
         </label>
+      </div>
+
+      {/* Rental Fee (장비 대여비) */}
+      <div>
+        <label className="block text-sm font-medium mb-2 text-zinc-300">
+          {t("match.rentalFeeLabel")}
+        </label>
+        
+        <div className="space-y-4">
+            <input type="hidden" name="rental_available" value={String(isRentalAvailable)} />
+            {/* Toggle Switch */}
+            <div 
+                onClick={() => {
+                    const next = !isRentalAvailable;
+                    setIsRentalAvailable(next);
+                    if (!next) setRentalFee("");
+                }}
+                className={`flex items-center gap-3 p-4 rounded-lg border cursor-pointer transition-all ${
+                    isRentalAvailable 
+                        ? "bg-blue-900/20 border-blue-500/50" 
+                        : "bg-zinc-900 border-zinc-700 hover:bg-zinc-800"
+                }`}
+            >
+                <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${
+                    isRentalAvailable
+                        ? "bg-blue-600 border-blue-600"
+                        : "bg-zinc-800 border-zinc-600"
+                }`}>
+                    {isRentalAvailable && <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
+                </div>
+                <span className={`text-sm font-medium ${isRentalAvailable ? "text-blue-200" : "text-zinc-400"}`}>
+                    {t("match.rentalToggleLabel")}
+                </span>
+            </div>
+
+            {/* Input Field (Conditional) */}
+            {isRentalAvailable && (
+                <div className="relative animate-in fade-in slide-in-from-top-2 duration-200">
+                <input
+                    type="text"
+                    name="rental_fee"
+                    value={rentalFee}
+                    onChange={(e) => {
+                    const raw = e.target.value.replace(/[^0-9]/g, "");
+                    const formatted = raw ? Number(raw).toLocaleString() : "";
+                    setRentalFee(formatted);
+                    e.target.value = formatted;
+                    }}
+                    className="w-full px-4 py-3 pr-8 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    placeholder="ex. 10,000"
+                    autoFocus
+                />
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500">
+                    {locale === "ko" ? "원" : "KRW"}
+                </span>
+                </div>
+            )}
+        </div>
       </div>
 
       {/* 정산 계좌번호 */}

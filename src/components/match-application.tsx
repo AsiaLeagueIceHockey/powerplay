@@ -19,13 +19,14 @@ interface MatchApplicationProps {
   matchStatus: string;
   matchStartTime: string;
   entryPoints?: number;
-  rentalFee?: number; // Added
+  rentalFee?: number;
   userPoints?: number;
   onboardingCompleted?: boolean;
   isFull?: boolean;
   goalieFree?: boolean;
   isAuthenticated?: boolean;
-  rentalOptIn?: boolean; // Added
+  rentalOptIn?: boolean;
+  rentalAvailable?: boolean; // Added
 }
 
 export function MatchApplication({
@@ -37,13 +38,14 @@ export function MatchApplication({
   matchStatus,
   matchStartTime,
   entryPoints = 0,
-  rentalFee = 0, // Added
+  rentalFee = 0,
   userPoints = 0,
   onboardingCompleted = true,
   isFull = false,
   goalieFree = false,
   isAuthenticated = false,
-  rentalOptIn = false, // Added
+  rentalOptIn = false,
+  rentalAvailable = false, // Added
 }: MatchApplicationProps) {
   const t = useTranslations("match");
   const tParticipant = useTranslations("participant");
@@ -55,13 +57,13 @@ export function MatchApplication({
   const [showSelect, setShowSelect] = useState(false);
   const [showWaitlistSelect, setShowWaitlistSelect] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [rentalChecked, setRentalChecked] = useState(false); // Added state
-  const currentRentalFee = rentalChecked ? rentalFee : 0; // Moved up
+  const [rentalChecked, setRentalChecked] = useState(false);
+  const currentRentalFee = rentalChecked ? rentalFee : 0;
 
   const handleJoin = async (pos: string) => {
     setLoading(true);
     setError(null);
-    const res = await joinMatch(matchId, pos, { rental: rentalChecked }); // Pass rental option
+    const res = await joinMatch(matchId, pos, { rental: rentalChecked });
     if (res.error) {
       setError(res.error);
     } else {
@@ -215,7 +217,7 @@ export function MatchApplication({
             </span>
           </div>
 
-          {rentalOptIn && rentalFee > 0 && (
+          {rentalOptIn && rentalAvailable && ( // Changed check
             <div className="flex justify-between items-center mb-2">
               <span className="text-sm text-zinc-600 dark:text-zinc-400">
                 {t("rentalFee")}
@@ -316,7 +318,7 @@ export function MatchApplication({
         {error && <p className="mb-4 text-sm text-red-500">{error}</p>}
         
         {/* Rental Option & Total Cost Calculation (Waitlist) */}
-        {rentalFee > 0 && (
+        {rentalAvailable && ( // Changed check
           <div className="mb-6 space-y-4">
              <div className="p-4 rounded-xl border-2 transition-all cursor-pointer bg-white border-zinc-200 hover:border-blue-300 dark:bg-zinc-800 dark:border-zinc-700 dark:hover:border-blue-700"
                   onClick={() => setRentalChecked(!rentalChecked)}>
@@ -428,7 +430,7 @@ export function MatchApplication({
         {error && !isInsufficientPoints && <p className="mb-4 text-sm text-red-500">{error}</p>}
         
         {/* Rental Option & Total Cost Calculation */}
-        {rentalFee > 0 && (
+        {rentalAvailable && ( // Changed check
           <div className="mb-6 space-y-4">
              <div className="p-4 rounded-xl border-2 transition-all cursor-pointer bg-white border-zinc-200 hover:border-blue-300 dark:bg-zinc-800 dark:border-zinc-700 dark:hover:border-blue-700"
                   onClick={() => setRentalChecked(!rentalChecked)}>

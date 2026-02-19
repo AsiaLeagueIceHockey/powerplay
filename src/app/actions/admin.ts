@@ -64,6 +64,7 @@ export async function createMatch(formData: FormData) {
   const description = formData.get("description") as string;
   const bankAccount = formData.get("bank_account") as string;
   const goalieFree = formData.get("goalie_free") === "true";
+  const rentalAvailable = formData.get("rental_available") === "true";
   const matchType = (formData.get("match_type") as "training" | "game") || "training";
 
   // datetime-local 입력은 KST로 가정, UTC로 변환하여 저장
@@ -79,6 +80,7 @@ export async function createMatch(formData: FormData) {
       fee: entryPoints, // Keep fee for backward compatibility
       entry_points: entryPoints,
       rental_fee: rentalFee,
+      rental_available: rentalAvailable,
       max_skaters: maxSkaters,
       max_goalies: maxGoalies,
       description: description || null,
@@ -95,8 +97,6 @@ export async function createMatch(formData: FormData) {
     console.error("Error creating match:", error);
     return { error: error.message };
   }
-
-  revalidatePath("/admin/matches");
 
   revalidatePath("/admin/matches");
 
@@ -165,6 +165,7 @@ export async function updateMatch(matchId: string, formData: FormData) {
   const bankAccount = formData.get("bank_account") as string;
   const status = formData.get("status") as string;
   const goalieFree = formData.get("goalie_free") === "true";
+  const rentalAvailable = formData.get("rental_available") === "true";
   const matchType = (formData.get("match_type") as "training" | "game") || "training";
 
   // datetime-local 입력은 KST로 가정, UTC로 변환하여 저장
@@ -178,6 +179,7 @@ export async function updateMatch(matchId: string, formData: FormData) {
       fee,
       entry_points: fee, // Ensure entry_points is synced with fee
       rental_fee: rentalFee,
+      rental_available: rentalAvailable,
       max_skaters: maxSkaters,
       max_goalies: maxGoalies,
       description: description || null,
