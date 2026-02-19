@@ -190,6 +190,8 @@
             "rinksShort": "Rinks",
             "admins": "Admins",
             "adminsShort": "Admins",
+            "userManagement": "User Management",
+            "userManagementShort": "Users",
             "chargeRequests": "Charge Requests",
             "chargeRequestsShort": "Requests",
             "pointManagement": "Point Management",

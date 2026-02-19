@@ -74,7 +74,7 @@ export default async function AdminLayout({
                   href={`/${locale}/admin/admins`}
                   className="block rounded-lg px-4 py-2.5 text-sm font-medium text-zinc-300 hover:bg-zinc-800 hover:text-white"
                 >
-                  🛡️ {t("menu.admins")}
+                  👥 {t("menu.userManagement")}
                 </Link>
                 <Link
                   href={`/${locale}/admin/points`}
@@ -145,8 +145,8 @@ export default async function AdminLayout({
               href={`/${locale}/admin/admins`}
               className="flex flex-col items-center gap-1 px-3 py-2 text-amber-400 hover:text-amber-300"
             >
-              <span className="text-xl">🛡️</span>
-              <span className="text-xs">{t("menu.adminsShort")}</span>
+              <span className="text-xl">👥</span>
+              <span className="text-xs">{t("menu.userManagementShort")}</span>
             </Link>
             <Link
               href={`/${locale}/admin/points`}

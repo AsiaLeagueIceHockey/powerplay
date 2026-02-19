@@ -898,6 +898,51 @@ export async function getAllUserPoints(search?: string): Promise<UserPointStatus
   return data as UserPointStatus[];
 }
 
+// ==================== ALL USERS MANAGEMENT (SuperUser Only) ====================
+
+export interface UserProfile {
+  id: string;
+  email: string;
+  full_name: string | null;
+  phone: string | null;
+  bio: string | null;
+  birth_date: string | null;
+  role: string;
+  position: string | null;
+  points: number;
+  preferred_lang: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+/**
+ * 모든 유저 프로필 조회 (SuperUser 전용)
+ * Supabase profiles 테이블의 모든 유저 정보를 반환
+ */
+export async function getAllUsers(search?: string): Promise<UserProfile[]> {
+  const supabase = await createClient();
+  const isSuperUser = await checkIsSuperUser();
+  if (!isSuperUser) return [];
+
+  let query = supabase
+    .from("profiles")
+    .select(
+      "id, email, full_name, phone, bio, birth_date, role, position, points, preferred_lang, created_at, updated_at"
+    )
+    .order("created_at", { ascending: false });
+
+  if (search) {
+    query = query.or(`email.ilike.%${search}%,full_name.ilike.%${search}%,phone.ilike.%${search}%`);
+  }
+
+  const { data, error } = await query;
+  if (error) {
+    console.error("Error fetching all users:", error);
+    return [];
+  }
+  return (data || []) as UserProfile[];
+}
+
 export async function getUserTransactionHistory(userId: string): Promise<PointTransaction[]> {
   const supabase = await createClient();
   const isSuperUser = await checkIsSuperUser();

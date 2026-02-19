@@ -190,6 +190,8 @@
             "rinksShort": "링크장",
             "admins": "관리자 관리",
             "adminsShort": "관리자",
+            "userManagement": "유저 관리",
+            "userManagementShort": "유저",
             "chargeRequests": "충전 요청 관리",
             "chargeRequestsShort": "충전 요청",
             "pointManagement": "충전 관리",
