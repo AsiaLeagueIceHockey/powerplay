@@ -750,7 +750,7 @@ export async function getAllMatchesForSuperuser() {
           status,
           payment_status,
           team_color,
-          user:user_id(id, full_name, email)
+          user:user_id(id, full_name, email, phone)
         `)
         .eq("match_id", match.id)
         .order("created_at", { ascending: true }); // Keep order
