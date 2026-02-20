@@ -11,6 +11,11 @@ interface Rink {
   name_en: string;
 }
 
+interface Club {
+  id: string;
+  name: string;
+}
+
 interface Match {
   id: string;
   start_time: string;
@@ -30,16 +35,19 @@ interface Match {
   bank_account?: string | null;
   goalie_free?: boolean;
   rink: Rink | null;
+  club?: { id: string; name: string } | null;
   match_type: "training" | "game"; // added
 }
 
 export function MatchEditForm({
   match,
   rinks,
+  clubs = [],
   hasRentalParticipants = false, // Added prop with default
 }: {
   match: Match;
   rinks: Rink[];
+  clubs?: Club[];
   hasRentalParticipants?: boolean;
 }) {
   const t = useTranslations();
@@ -84,11 +92,11 @@ export function MatchEditForm({
     const currentGoalies = match.participants_count?.g || 0;
 
     if (maxSkaters < currentSkaters || maxGoalies < currentGoalies) {
-        setError(t("admin.form.minParticipantsError"));
-        setLoading(false);
-        // Scroll to top to see error
-        window.scrollTo({ top: 0, behavior: "smooth" });
-        return;
+      setError(t("admin.form.minParticipantsError"));
+      setLoading(false);
+      // Scroll to top to see error
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
     }
 
     const result = await updateMatch(match.id, formData);
@@ -144,11 +152,36 @@ export function MatchEditForm({
           {isCanceled && <option value="canceled">{t("match.status.canceled")}</option>}
         </select>
         {!isCanceled && (
-             <p className="text-xs text-zinc-500 mt-1">
+          <p className="text-xs text-zinc-500 mt-1">
             {locale === "ko" ? "* 취소는 목록 페이지에서 가능합니다." : "* Cancellation is available in the list view."}
           </p>
         )}
       </div>
+
+      {/* Club Selection */}
+      {clubs.length > 0 && (
+        <div>
+          <label className="block text-sm font-medium mb-2 text-zinc-300">
+            👥 주최 동호회
+          </label>
+          <select
+            name="club_id"
+            defaultValue={match.club?.id || ""}
+            disabled={isCanceled}
+            className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
+          >
+            <option value="">동호회 없음 (개인 주최)</option>
+            {clubs.map((club) => (
+              <option key={club.id} value={club.id}>
+                {club.name}
+              </option>
+            ))}
+          </select>
+          <p className="text-xs text-zinc-500 mt-1">
+            동호회를 선택하면 해당 동호회 경기로 등록됩니다.
+          </p>
+        </div>
+      )}
 
       {/* Rink Selection */}
       <div>
@@ -175,12 +208,12 @@ export function MatchEditForm({
         <label className="block text-sm font-medium mb-2 text-zinc-300">
           {t("admin.form.dateTime")}
         </label>
-        
+
         {/* Hidden Input for Form Submission */}
-        <input 
-          type="hidden" 
-          name="start_time" 
-          defaultValue={formatDateTimeLocal(match.start_time)} 
+        <input
+          type="hidden"
+          name="start_time"
+          defaultValue={formatDateTimeLocal(match.start_time)}
         />
 
         <div className="space-y-2">
@@ -394,7 +427,7 @@ export function MatchEditForm({
             🧤 {t("match.goalieFreeLabel")}
           </span>
           <span className="text-xs text-zinc-400">
-            {hasGoalies 
+            {hasGoalies
               ? (locale === "ko" ? "이미 신청한 골리가 있어 설정을 변경할 수 없습니다." : "Cannot change setting because goalies have already applied.")
               : t("match.goalieFreeDesc")
             }
@@ -409,75 +442,73 @@ export function MatchEditForm({
         </label>
 
         <div className={`space-y-4 ${hasRentalParticipants ? 'opacity-70' : ''}`}>
-            {/* Note: In disabled state, we should still submit existing values if not changing */}
-            {hasRentalParticipants && (
-                <>
-                <input type="hidden" name="rental_available" value={String(match.rental_available)} />
-                <input type="hidden" name="rental_fee" value={match.rental_fee} />
-                </>
-            )}
-            {!hasRentalParticipants && 
-                <input type="hidden" name="rental_available" value={String(isRentalAvailable)} />
-            }
-            
-             {/* Toggle Switch */}
-             <div 
-                onClick={() => {
-                    if (isCanceled || hasRentalParticipants) return;
-                    const next = !isRentalAvailable;
-                    setIsRentalAvailable(next);
-                    if (!next) {
-                        const input = document.querySelector('input[name="rental_fee"]') as HTMLInputElement;
-                        if (input) input.value = "";
-                    }
-                }}
-                className={`flex items-center gap-3 p-4 rounded-lg border transition-all ${
-                    isRentalAvailable 
-                        ? "bg-blue-900/20 border-blue-500/50" 
-                        : "bg-zinc-900 border-zinc-700"
-                } ${!isCanceled && !hasRentalParticipants ? "cursor-pointer hover:bg-zinc-800" : "opacity-50 cursor-not-allowed"}`}
-            >
-                <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${
-                    isRentalAvailable
-                        ? "bg-blue-600 border-blue-600"
-                        : "bg-zinc-800 border-zinc-600"
-                }`}>
-                    {isRentalAvailable && <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
-                </div>
-                <div className="flex flex-col">
-                    <span className={`text-sm font-medium ${isRentalAvailable ? "text-blue-200" : "text-zinc-400"}`}>
-                        {t("match.rentalToggleLabel")}
-                    </span>
-                    {hasRentalParticipants && (
-                        <span className="text-xs text-orange-400 mt-1">
-                            {locale === "ko" 
-                                ? "이미 장비 대여 신청자가 있어 설정을 변경할 수 없습니다." 
-                                : "Cannot change setting because participants have already opted for rental."}
-                        </span>
-                    )}
-                </div>
-            </div>
+          {/* Note: In disabled state, we should still submit existing values if not changing */}
+          {hasRentalParticipants && (
+            <>
+              <input type="hidden" name="rental_available" value={String(match.rental_available)} />
+              <input type="hidden" name="rental_fee" value={match.rental_fee} />
+            </>
+          )}
+          {!hasRentalParticipants &&
+            <input type="hidden" name="rental_available" value={String(isRentalAvailable)} />
+          }
 
-            {/* Input Field (Conditional) */}
-            {isRentalAvailable && (
-                <div className="relative animate-in fade-in slide-in-from-top-2 duration-200">
-                <input
-                    type="text"
-                    name="rental_fee"
-                    disabled={isCanceled || hasRentalParticipants}
-                    defaultValue={match.rental_fee?.toLocaleString()}
-                    onChange={(e) => {
-                        const value = e.target.value.replace(/[^0-9]/g, "");
-                        e.target.value = value ? Number(value).toLocaleString() : "";
-                    }}
-                    className="w-full px-4 py-3 pr-8 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
-                    placeholder="ex. 10,000"
-                />
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500">
-                    {locale === "ko" ? "원" : "KRW"}
+          {/* Toggle Switch */}
+          <div
+            onClick={() => {
+              if (isCanceled || hasRentalParticipants) return;
+              const next = !isRentalAvailable;
+              setIsRentalAvailable(next);
+              if (!next) {
+                const input = document.querySelector('input[name="rental_fee"]') as HTMLInputElement;
+                if (input) input.value = "";
+              }
+            }}
+            className={`flex items-center gap-3 p-4 rounded-lg border transition-all ${isRentalAvailable
+                ? "bg-blue-900/20 border-blue-500/50"
+                : "bg-zinc-900 border-zinc-700"
+              } ${!isCanceled && !hasRentalParticipants ? "cursor-pointer hover:bg-zinc-800" : "opacity-50 cursor-not-allowed"}`}
+          >
+            <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${isRentalAvailable
+                ? "bg-blue-600 border-blue-600"
+                : "bg-zinc-800 border-zinc-600"
+              }`}>
+              {isRentalAvailable && <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
+            </div>
+            <div className="flex flex-col">
+              <span className={`text-sm font-medium ${isRentalAvailable ? "text-blue-200" : "text-zinc-400"}`}>
+                {t("match.rentalToggleLabel")}
+              </span>
+              {hasRentalParticipants && (
+                <span className="text-xs text-orange-400 mt-1">
+                  {locale === "ko"
+                    ? "이미 장비 대여 신청자가 있어 설정을 변경할 수 없습니다."
+                    : "Cannot change setting because participants have already opted for rental."}
                 </span>
-                </div>
-            )}
+              )}
+            </div>
+          </div>
+
+          {/* Input Field (Conditional) */}
+          {isRentalAvailable && (
+            <div className="relative animate-in fade-in slide-in-from-top-2 duration-200">
+              <input
+                type="text"
+                name="rental_fee"
+                disabled={isCanceled || hasRentalParticipants}
+                defaultValue={match.rental_fee?.toLocaleString()}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/[^0-9]/g, "");
+                  e.target.value = value ? Number(value).toLocaleString() : "";
+                }}
+                className="w-full px-4 py-3 pr-8 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
+                placeholder="ex. 10,000"
+              />
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500">
+                {locale === "ko" ? "원" : "KRW"}
+              </span>
+            </div>
+          )}
         </div>
       </div>
 

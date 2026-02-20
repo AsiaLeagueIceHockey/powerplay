@@ -150,6 +150,7 @@ export async function updateMatch(matchId: string, formData: FormData) {
   }
 
   const rinkId = formData.get("rink_id") as string;
+  const clubId = formData.get("club_id") as string;
   const startTimeInput = formData.get("start_time") as string;
   const fee = parseInt((formData.get("fee") as string)?.replace(/,/g, "")) || 0;
   const rentalFee = parseInt((formData.get("rental_fee") as string)?.replace(/,/g, "")) || 0;
@@ -175,6 +176,7 @@ export async function updateMatch(matchId: string, formData: FormData) {
     .from("matches")
     .update({
       rink_id: rinkId || null,
+      club_id: clubId || null,
       start_time: startTimeUTC,
       fee,
       entry_points: fee, // Ensure entry_points is synced with fee
@@ -213,9 +215,9 @@ export async function updateMatch(matchId: string, formData: FormData) {
         .select("entry_points, rental_fee, start_time, rink:rinks(name_ko)")
         .eq("id", matchId)
         .single();
-        
+
       if (currentMatch) {
-         // @ts-ignore
+        // @ts-ignore
         const rinkName = currentMatch.rink?.name_ko || "경기";
         const startTime = new Date(currentMatch.start_time).toLocaleString("ko-KR", {
           month: "short", day: "numeric", hour: "2-digit", minute: "2-digit",
@@ -226,12 +228,12 @@ export async function updateMatch(matchId: string, formData: FormData) {
           participants.map(async (p) => {
             // A. Refund Logic (Only for confirmed users)
             if (p.status === "confirmed" && currentMatch.entry_points > 0) {
-               const { data: userProfile } = await supabase
+              const { data: userProfile } = await supabase
                 .from("profiles")
                 .select("points")
                 .eq("id", p.user_id)
                 .single();
-              
+
               if (userProfile) {
                 // Determine refund amount: entry_points + rental_fee if opted in
                 const isRentalOptIn = p.rental_opt_in === true;
@@ -239,7 +241,7 @@ export async function updateMatch(matchId: string, formData: FormData) {
                 const refundAmount = currentMatch.entry_points + rentalFee;
 
                 const newBalance = (userProfile.points || 0) + refundAmount;
-                
+
                 // Update Balance
                 await supabase
                   .from("profiles")
@@ -334,7 +336,7 @@ export async function cancelMatchByAdmin(matchId: string) {
         .select("points")
         .eq("id", p.user_id)
         .single();
-      
+
       if (userProfile) {
         // Determine refund amount: entry_points + rental_fee if opted in
         const isRentalOptIn = p.rental_opt_in === true;
@@ -342,7 +344,7 @@ export async function cancelMatchByAdmin(matchId: string) {
         const refundAmount = match.entry_points + rentalFee;
 
         const newBalance = (userProfile.points || 0) + refundAmount;
-        
+
         // Update Balance
         await supabase
           .from("profiles")
@@ -545,12 +547,12 @@ export async function getAdminMatches() {
 
       // Check for expired pending payments
       const isExpired = new Date(match.start_time) < now;
-      
+
       const processedParticipants = (participants || []).map((p) => {
         if (isExpired && p.status === "pending_payment") {
-            expiredParticipantIds.push(p.id);
-            // Return as canceled for UI
-            return { ...p, status: "canceled" };
+          expiredParticipantIds.push(p.id);
+          // Return as canceled for UI
+          return { ...p, status: "canceled" };
         }
         return p;
       });
@@ -586,7 +588,7 @@ export async function getAdminMatches() {
       .from("participants")
       .update({ status: "canceled" })
       .in("id", expiredParticipantIds);
-      
+
     console.log(`[LazyExpiration:Admin] Canceled ${expiredParticipantIds.length} expired pending applications.`);
   }
 

@@ -2,7 +2,10 @@ import { setRequestLocale, getTranslations } from "next-intl/server";
 import { redirect, notFound } from "next/navigation";
 import { getMatch } from "@/app/actions/match";
 import { getRinks } from "@/app/actions/admin";
+import { getAdminInfo } from "@/app/actions/admin-check";
+import { getClubs, getMyClubs } from "@/app/actions/clubs";
 import { MatchEditForm } from "@/components/match-edit-form";
+import type { Club } from "@/app/actions/types";
 import Link from "next/link";
 
 export default async function EditMatchPage({
@@ -12,13 +15,27 @@ export default async function EditMatchPage({
 }) {
   const { locale, id } = await params;
   setRequestLocale(locale);
-  const t = await getTranslations();
 
-  const match = await getMatch(id);
-  const rinks = await getRinks();
+  const [t, match, rinks, adminInfo] = await Promise.all([
+    getTranslations(),
+    getMatch(id),
+    getRinks(),
+    getAdminInfo(),
+  ]);
 
   if (!match) {
     notFound();
+  }
+
+  // Fetch clubs based on role (same pattern as new match page)
+  let clubs: Club[] = [];
+  if (adminInfo.isSuperuser) {
+    clubs = await getClubs();
+  } else {
+    const myClubs = await getMyClubs();
+    clubs = myClubs
+      .filter((m) => m.club != null)
+      .map((m) => ({ id: m.club!.id, name: m.club!.name }) as Club);
   }
 
   // Transform participants for list
@@ -44,10 +61,10 @@ export default async function EditMatchPage({
     ...match,
     rink: match.rink
       ? {
-          id: match.rink.id || "",
-          name_ko: match.rink.name_ko,
-          name_en: match.rink.name_en,
-        }
+        id: match.rink.id || "",
+        name_ko: match.rink.name_ko,
+        name_en: match.rink.name_en,
+      }
       : null,
     participants_count: {
       fw: fwCount,
@@ -77,9 +94,10 @@ export default async function EditMatchPage({
         {/* Edit Form */}
         <div>
           <h1 className="text-2xl font-bold mb-6">{t("admin.matches.edit")}</h1>
-          <MatchEditForm 
-            match={matchForForm} 
-            rinks={rinks} 
+          <MatchEditForm
+            match={matchForForm}
+            rinks={rinks}
+            clubs={clubs}
             hasRentalParticipants={hasRentalParticipants}
           />
         </div>
