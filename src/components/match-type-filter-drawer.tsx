@@ -122,7 +122,7 @@ export function MatchTypeFilterDrawer({
                     : "bg-white border-zinc-200 text-zinc-700 hover:bg-zinc-50 dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-800"
                 }`}
               >
-                <span className="font-semibold text-left">
+                <span className="font-semibold text-left whitespace-nowrap">
                   {tMatch(`types.${type}`)}
                 </span>
                 {isSelected && (
