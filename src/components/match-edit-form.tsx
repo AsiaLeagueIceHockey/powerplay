@@ -336,7 +336,7 @@ export function MatchEditForm({
               disabled={isCanceled}
               className="sr-only"
             />
-            <span className="font-medium text-sm">{t("match.types.training")}</span>
+            <span className="font-medium text-sm whitespace-nowrap">{t("match.types.training")}</span>
           </label>
           <label className="relative flex cursor-pointer items-center justify-center rounded-lg border border-zinc-700 bg-zinc-900 p-4 hover:bg-zinc-800 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-900/20 has-[:checked]:text-blue-200">
             <input
@@ -347,7 +347,7 @@ export function MatchEditForm({
               disabled={isCanceled}
               className="sr-only"
             />
-            <span className="font-medium text-sm">{t("match.types.game")}</span>
+            <span className="font-medium text-sm whitespace-nowrap">{t("match.types.game")}</span>
           </label>
           <label className="relative flex cursor-pointer items-center justify-center rounded-lg border border-zinc-700 bg-zinc-900 p-4 hover:bg-zinc-800 has-[:checked]:border-teal-500 has-[:checked]:bg-teal-900/20 has-[:checked]:text-teal-200">
             <input
@@ -358,7 +358,7 @@ export function MatchEditForm({
               disabled={isCanceled}
               className="sr-only"
             />
-            <span className="font-medium text-sm">{t("match.types.team_match")}</span>
+            <span className="font-medium text-sm whitespace-nowrap">{t("match.types.team_match")}</span>
           </label>
         </div>
       </div>
