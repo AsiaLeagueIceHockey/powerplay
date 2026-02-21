@@ -45,7 +45,7 @@ export interface Match {
   entry_points: number;
   rental_fee: number; // Added for Equipment Rental
   rental_available: boolean; // Added for Equipment Rental
-  match_type: "training" | "game";
+  match_type: "training" | "game" | "team_match";
   max_skaters: number;
   max_goalies: number;
   status: "open" | "closed" | "canceled" | "finished";
@@ -347,14 +347,25 @@ export async function joinMatch(
 
   const participantName = participantProfile?.full_name || user.email?.split("@")[0] || "참가자";
 
+  // Get match type for notification context
+  const { data: matchForType } = await supabase
+    .from("matches")
+    .select("match_type")
+    .eq("id", matchId)
+    .single();
+  const isTeamMatchNotif = matchForType?.match_type === "team_match";
+
   if (participantStatus === "confirmed") {
-    const notificationBody = totalPoints > 0
-      ? `${rinkName} (${startTime}) 참가가 확정되었습니다. (${totalPoints.toLocaleString()}원 차감)`
-      : `${rinkName} (${startTime}) 참가 신청이 완료되었습니다.`;
+    const notificationTitle = isTeamMatchNotif ? "팀 매칭 확정 🤝" : "경기 참가 확정 🏒";
+    const notificationBody = isTeamMatchNotif
+      ? `${rinkName} (${startTime}) 팀 매칭이 확정되었습니다.`
+      : totalPoints > 0
+        ? `${rinkName} (${startTime}) 참가가 확정되었습니다. (${totalPoints.toLocaleString()}원 차감)`
+        : `${rinkName} (${startTime}) 참가 신청이 완료되었습니다.`;
 
     await sendPushNotification(
       user.id,
-      "경기 참가 확정 🏒",
+      notificationTitle,
       notificationBody,
       `/match/${matchId}`
     );
@@ -362,13 +373,16 @@ export async function joinMatch(
 
   // 알림 발송: 경기 생성자(어드민)에게 새 참가자 알림
   if (matchDetails?.created_by && matchDetails.created_by !== user.id) {
-    const adminMsg = isRentalOptIn 
-      ? `${participantName}님이 ${rinkName} (${startTime}) 경기에 신청했습니다. (장비대여)`
-      : `${participantName}님이 ${rinkName} (${startTime}) 경기에 신청했습니다.`;
+    const adminMsg = isTeamMatchNotif
+      ? `${participantName}님이 ${rinkName} (${startTime}) 팀 매칭에 상대팀으로 신청했습니다.`
+      : isRentalOptIn 
+        ? `${participantName}님이 ${rinkName} (${startTime}) 경기에 신청했습니다. (장비대여)`
+        : `${participantName}님이 ${rinkName} (${startTime}) 경기에 신청했습니다.`;
+    const adminTitle = isTeamMatchNotif ? "상대팀 매칭 신청 🤝" : "새 참가자 🏒";
 
     await sendPushNotification(
       matchDetails.created_by,
-      "새 참가자 🏒",
+      adminTitle,
       adminMsg,
       `/admin/matches`
     );
@@ -486,8 +500,24 @@ export async function cancelJoin(matchId: string) {
     });
   }
 
+  // Get match type for notification context
+  const { data: matchTypeData } = await supabase
+    .from("matches")
+    .select("match_type")
+    .eq("id", matchId)
+    .single();
+  const isTeamMatchCancel = matchTypeData?.match_type === "team_match";
+
   // 알림 발송 (Trigger 4: 참가 취소 및 포인트 반환)
-  if (refundAmount > 0) {
+  if (isTeamMatchCancel) {
+    // 팀 매치: 간단한 취소 알림 (환불 없음)
+    await sendPushNotification(
+      user.id,
+      "팀 매칭 취소 ↩️",
+      `팀 매칭 신청이 취소되었습니다.`,
+      `/mypage`
+    );
+  } else if (refundAmount > 0) {
     await sendPushNotification(
       user.id,
       "환불 완료 💰",

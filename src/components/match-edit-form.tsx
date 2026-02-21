@@ -36,7 +36,7 @@ interface Match {
   goalie_free?: boolean;
   rink: Rink | null;
   club?: { id: string; name: string } | null;
-  match_type: "training" | "game"; // added
+  match_type: "training" | "game" | "team_match"; // added
 }
 
 export function MatchEditForm({
@@ -56,6 +56,7 @@ export function MatchEditForm({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isRentalAvailable, setIsRentalAvailable] = useState(match.rental_available ?? (match.rental_fee || 0) > 0);
+  const isTeamMatch = match.match_type === "team_match";
 
   // Format datetime for input (KST)
   const formatDateTimeLocal = (dateString: string) => {
@@ -325,7 +326,7 @@ export function MatchEditForm({
         <label className="block text-sm font-medium mb-2 text-zinc-300">
           {t("match.type")}
         </label>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-3 gap-3">
           <label className="relative flex cursor-pointer items-center justify-center rounded-lg border border-zinc-700 bg-zinc-900 p-4 hover:bg-zinc-800 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-900/20 has-[:checked]:text-blue-200">
             <input
               type="radio"
@@ -335,7 +336,7 @@ export function MatchEditForm({
               disabled={isCanceled}
               className="sr-only"
             />
-            <span className="font-medium">{t("match.types.training")}</span>
+            <span className="font-medium text-sm">{t("match.types.training")}</span>
           </label>
           <label className="relative flex cursor-pointer items-center justify-center rounded-lg border border-zinc-700 bg-zinc-900 p-4 hover:bg-zinc-800 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-900/20 has-[:checked]:text-blue-200">
             <input
@@ -346,11 +347,25 @@ export function MatchEditForm({
               disabled={isCanceled}
               className="sr-only"
             />
-            <span className="font-medium">{t("match.types.game")}</span>
+            <span className="font-medium text-sm">{t("match.types.game")}</span>
+          </label>
+          <label className="relative flex cursor-pointer items-center justify-center rounded-lg border border-zinc-700 bg-zinc-900 p-4 hover:bg-zinc-800 has-[:checked]:border-teal-500 has-[:checked]:bg-teal-900/20 has-[:checked]:text-teal-200">
+            <input
+              type="radio"
+              name="match_type"
+              value="team_match"
+              defaultChecked={match.match_type === "team_match"}
+              disabled={isCanceled}
+              className="sr-only"
+            />
+            <span className="font-medium text-sm">{t("match.types.team_match")}</span>
           </label>
         </div>
       </div>
 
+      {/* === 팀 매치가 아닌 경우에만 표시 === */}
+      {!isTeamMatch && (
+        <>
       {/* Fee */}
       <div>
         <label className="block text-sm font-medium mb-2 text-zinc-300">
@@ -529,6 +544,8 @@ export function MatchEditForm({
           경기 참가비를 정산 받을 계좌를 입력해주세요. (은행명, 계좌번호, 예금주)
         </p>
       </div>
+        </>
+      )}
 
       {/* Description */}
       <div>

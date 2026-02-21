@@ -96,6 +96,18 @@ export default async function MatchPage({
   // User Status
   const userParticipant = match.participants?.find((p) => p.user?.id === user?.id);
   const isJoined = !!userParticipant;
+  const isTeamMatch = match.match_type === "team_match";
+
+  // Team Match: 주최자 이름 조회 (개인 주최 시 이름 표시용)
+  let creatorName = "";
+  if (isTeamMatch && !match.club && match.created_by) {
+    const { data: creatorProfile } = await supabase
+      .from("profiles")
+      .select("full_name")
+      .eq("id", match.created_by)
+      .single();
+    creatorName = creatorProfile?.full_name || "";
+  }
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
@@ -117,6 +129,8 @@ export default async function MatchPage({
             <span
               className={`px-2.5 py-1 rounded-md text-xs font-bold whitespace-nowrap ${match.match_type === "game"
                   ? "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300"
+                  : match.match_type === "team_match"
+                  ? "bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-300"
                   : "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"
                 }`}
             >
@@ -149,16 +163,20 @@ export default async function MatchPage({
         <div className="space-y-3">
           <div className="flex justify-between items-center text-sm">
             <span className="text-zinc-500">{t("match.fee")}</span>
-            <span className="font-semibold text-lg">
-              {(match.entry_points || match.fee).toLocaleString()}{locale === "ko" ? "원" : "KRW"}
-            </span>
+            {isTeamMatch ? (
+              <span className="font-semibold text-lg text-teal-600 dark:text-teal-400">
+                {t("match.feeDescriptionRef")}
+              </span>
+            ) : (
+              <span className="font-semibold text-lg">
+                {(match.entry_points || match.fee).toLocaleString()}{locale === "ko" ? "원" : "KRW"}
+              </span>
+            )}
           </div>
-
-
 
           <div className="border-t border-zinc-100 dark:border-zinc-800 my-2"></div>
 
-          {match.rental_available && (
+          {!isTeamMatch && match.rental_available && (
             <>
               <div className="flex justify-between items-center text-sm">
                 <span className="text-zinc-500">{t("match.rentalFee")}</span>
@@ -175,29 +193,44 @@ export default async function MatchPage({
             </>
           )}
 
-          <div className="flex justify-between items-center text-sm">
-            <span className="text-zinc-500">{t("match.skater")}</span>
-            <span className={`font-semibold ${remaining.skaters === 0 ? 'text-red-500' : 'text-green-600 dark:text-green-400'}`}>
-              {remaining.skaters <= 0
-                ? (locale === 'ko' ? '마감' : 'Full')
-                : (locale === 'ko' ? `${remaining.skaters}자리 남음` : `${remaining.skaters} spots left`)}
-            </span>
-          </div>
-          <div className="flex justify-between items-center text-sm">
-            <span className="text-zinc-500">{t("match.position.G")}</span>
-            <div className="flex items-center gap-2">
-              {match.goalie_free && (
-                <span className="px-2 py-0.5 text-xs font-bold bg-green-100 text-green-700 rounded-full dark:bg-green-900/30 dark:text-green-400">
-                  {t("match.goalieFree")}
-                </span>
-              )}
-              <span className={`font-semibold ${remaining.g === 0 ? 'text-red-500' : 'text-green-600 dark:text-green-400'}`}>
-                {remaining.g <= 0
-                  ? (locale === 'ko' ? '마감' : 'Full')
-                  : (locale === 'ko' ? `${remaining.g}자리 남음` : `${remaining.g} spots left`)}
+          {isTeamMatch ? (
+            <div className="flex justify-between items-center text-sm">
+              <span className="text-zinc-500">{t("match.teamParticipants")}</span>
+              <span className={`font-semibold ${
+                isFull
+                  ? "text-teal-600 dark:text-teal-400"
+                  : "text-amber-600 dark:text-amber-400"
+              }`}>
+                {isFull ? t("match.teamJoined") : t("match.teamMatchWaiting")}
               </span>
             </div>
-          </div>
+          ) : (
+            <>
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-zinc-500">{t("match.skater")}</span>
+                <span className={`font-semibold ${remaining.skaters === 0 ? 'text-red-500' : 'text-green-600 dark:text-green-400'}`}>
+                  {remaining.skaters <= 0
+                    ? (locale === 'ko' ? '마감' : 'Full')
+                    : (locale === 'ko' ? `${remaining.skaters}자리 남음` : `${remaining.skaters} spots left`)}
+                </span>
+              </div>
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-zinc-500">{t("match.position.G")}</span>
+                <div className="flex items-center gap-2">
+                  {match.goalie_free && (
+                    <span className="px-2 py-0.5 text-xs font-bold bg-green-100 text-green-700 rounded-full dark:bg-green-900/30 dark:text-green-400">
+                      {t("match.goalieFree")}
+                    </span>
+                  )}
+                  <span className={`font-semibold ${remaining.g === 0 ? 'text-red-500' : 'text-green-600 dark:text-green-400'}`}>
+                    {remaining.g <= 0
+                      ? (locale === 'ko' ? '마감' : 'Full')
+                      : (locale === 'ko' ? `${remaining.g}자리 남음` : `${remaining.g} spots left`)}
+                  </span>
+                </div>
+              </div>
+            </>
+          )}
 
           <div className="pt-2">
             <a
@@ -236,7 +269,8 @@ export default async function MatchPage({
         </div>
       )}
 
-      {/* Refund Policy Section */}
+      {/* Refund Policy Section - hide for team match */}
+      {!isTeamMatch && (
       <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-sm">
         <h2 className="text-lg font-bold mb-3">{locale === "ko" ? "취소 및 환불 규정" : "Cancellation & Refund Policy"}</h2>
         <div className="space-y-2 text-sm text-zinc-600 dark:text-zinc-300">
@@ -258,6 +292,7 @@ export default async function MatchPage({
           </div>
         </div>
       </div>
+      )}
 
       {/* Application - Inline status and button */}
       <MatchApplication
@@ -279,16 +314,68 @@ export default async function MatchPage({
         goalieFree={match.goalie_free === true}
         isAuthenticated={!!user}
         rentalFee={match.rental_fee || 0}
-        rentalAvailable={match.rental_available} // Added
+        rentalAvailable={match.rental_available}
         rentalOptIn={userParticipant?.rental_opt_in}
+        matchType={match.match_type}
       />
 
-      {/* Participant List Header */}
+      {/* Participant List */}
+      {isTeamMatch ? (
+        /* Team Match: Host Team + Opponent Team display */
+        <>
+          <h2 className="text-xl font-bold pt-4">
+            {t("match.teamParticipants")}
+          </h2>
+          <div className="space-y-4">
+            {/* Host Team Card */}
+            <div className="bg-white dark:bg-zinc-900 border border-teal-200 dark:border-teal-800 rounded-2xl p-5 shadow-sm">
+              <div className="flex items-center space-x-2 mb-3">
+                <span className="px-2 py-1 bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-300 rounded text-xs font-bold">
+                  {t("match.teamHost")}
+                </span>
+              </div>
+              <div className="flex items-center space-x-3 text-sm p-3 bg-teal-50 dark:bg-teal-950/30 rounded-lg">
+                <div className="w-6 h-6 bg-teal-200 dark:bg-teal-700 rounded-full flex items-center justify-center text-xs font-bold text-teal-700 dark:text-teal-200">
+                  1
+                </div>
+                <span className="font-medium">
+                  {match.club?.name || (creatorName ? (locale === "ko" ? `개인 주최 (${creatorName})` : `Personal (${creatorName})`) : (locale === "ko" ? "주최자" : "Host"))}
+                </span>
+              </div>
+            </div>
+
+            {/* Opponent Team Card */}
+            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-sm">
+              <div className="flex items-center space-x-2 mb-3">
+                <span className="px-2 py-1 bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300 rounded text-xs font-bold">
+                  {t("match.teamOpponent")}
+                </span>
+              </div>
+              {players.fw.length === 0 ? (
+                <p className="text-sm text-zinc-400 pl-1">{t("match.teamMatchWaiting")}</p>
+              ) : (
+                <div className="flex items-center space-x-3 text-sm p-3 bg-zinc-50 dark:bg-zinc-950/50 rounded-lg">
+                  <div className="w-6 h-6 bg-zinc-200 dark:bg-zinc-700 rounded-full flex items-center justify-center text-xs font-bold text-zinc-500">
+                    2
+                  </div>
+                  <span className="font-medium">
+                    {players.fw[0]?.user?.full_name || players.fw[0]?.user?.email?.split('@')[0]}
+                  </span>
+                  {players.fw[0]?.id === userParticipant?.id && (
+                    <span className="ml-auto text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">Me</span>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        </>
+      ) : (
+        /* Regular match: FW/DF/G participant lists */
+        <>
       <h2 className="text-xl font-bold pt-4">
         {locale === "ko" ? "참가자 현황" : "Participants"}
       </h2>
 
-      {/* Participant Cards */}
       <div className="space-y-4">
         {/* FW Card */}
         <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-sm">
@@ -420,6 +507,8 @@ export default async function MatchPage({
           </div>
         )}
       </div>
+        </>
+      )}
     </div>
   );
 }

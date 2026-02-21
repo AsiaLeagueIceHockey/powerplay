@@ -25,7 +25,7 @@ interface Match {
   max_skaters: number;
   max_goalies: number;
   fee: number;
-  match_type: "training" | "game"; // added
+  match_type: "training" | "game" | "team_match"; // added
 }
 
 export function AdminMatchCard({
@@ -177,6 +177,8 @@ export function AdminMatchCard({
             className={`px-2.5 py-1 rounded-md text-xs font-semibold ${
               match.match_type === "game"
                 ? "bg-purple-900/50 text-purple-300 border border-purple-800"
+                : match.match_type === "team_match"
+                ? "bg-teal-900/50 text-teal-300 border border-teal-800"
                 : "bg-zinc-700 text-zinc-300 border border-zinc-600"
             }`}
           >
@@ -185,6 +187,16 @@ export function AdminMatchCard({
         </div>
       </div>
 
+      {match.match_type === "team_match" ? (
+        <div className="flex justify-center items-center text-sm text-zinc-300 mb-6 bg-zinc-900/50 p-3 rounded-lg border border-zinc-700/50">
+          <span className="font-medium">
+            {(match.participants_count.fw + match.participants_count.df + match.participants_count.g) >= match.max_skaters
+              ? (locale === "ko" ? "매칭 완료" : "Matched")
+              : (locale === "ko" ? "매칭 대기" : "Waiting for Opponent")
+            }
+          </span>
+        </div>
+      ) : (
       <div className="flex justify-between items-center text-sm text-zinc-300 mb-6 bg-zinc-900/50 p-3 rounded-lg border border-zinc-700/50">
         <span className="flex flex-col items-center">
           <span className="text-xs text-zinc-500 mb-1">Skater</span>
@@ -200,6 +212,7 @@ export function AdminMatchCard({
           </span>
         </span>
       </div>
+      )}
 
       <div className="space-y-3">
         <div className="grid grid-cols-2 gap-3">

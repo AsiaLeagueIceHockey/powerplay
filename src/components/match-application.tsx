@@ -26,7 +26,8 @@ interface MatchApplicationProps {
   goalieFree?: boolean;
   isAuthenticated?: boolean;
   rentalOptIn?: boolean;
-  rentalAvailable?: boolean; // Added
+  rentalAvailable?: boolean;
+  matchType?: "training" | "game" | "team_match";
 }
 
 export function MatchApplication({
@@ -45,7 +46,8 @@ export function MatchApplication({
   goalieFree = false,
   isAuthenticated = false,
   rentalOptIn = false,
-  rentalAvailable = false, // Added
+  rentalAvailable = false,
+  matchType = "training",
 }: MatchApplicationProps) {
   const t = useTranslations("match");
   const tParticipant = useTranslations("participant");
@@ -59,6 +61,7 @@ export function MatchApplication({
   const [error, setError] = useState<string | null>(null);
   const [rentalChecked, setRentalChecked] = useState(false);
   const currentRentalFee = rentalChecked ? rentalFee : 0;
+  const isTeamMatch = matchType === "team_match";
 
   const handleJoin = async (pos: string) => {
     setLoading(true);
@@ -96,10 +99,9 @@ export function MatchApplication({
   };
 
   const handleCancel = async () => {
-    const refundable = isRefundAvailable();
-    const confirmMessage = refundable 
-      ? t("confirmCancel") 
-      : t("confirmCancelNoRefund");
+    const confirmMessage = isTeamMatch
+      ? (locale === "ko" ? "팀 매칭 신청을 취소하시겠습니까?" : "Cancel team match application?")
+      : isRefundAvailable() ? t("confirmCancel") : t("confirmCancelNoRefund");
     
     if (!confirm(confirmMessage)) return;
     setLoading(true);
@@ -114,9 +116,75 @@ export function MatchApplication({
 
   // 1. If Match Closed/Canceled => Show nothing or status?
   // User didn't specify, but typically we disable join.
-  if (matchStatus !== "open" && !isJoined) {
+   if (matchStatus !== "open" && !isJoined) {
     return null; 
   }
+
+  // === Team Match: Simplified flow ===
+  if (isTeamMatch) {
+    // Already joined
+    if (isJoined) {
+      return (
+        <div className="rounded-2xl border border-teal-200 bg-teal-50 p-6 dark:border-teal-900/50 dark:bg-teal-900/10">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-teal-600 dark:text-teal-400 font-bold">✓</span>
+              <span className="font-bold text-teal-700 dark:text-teal-300 text-lg">
+                {t("teamJoined")}
+              </span>
+            </div>
+            <button
+              onClick={handleCancel}
+              disabled={loading}
+              className="px-4 py-2 bg-white text-red-500 border border-red-200 rounded-lg text-sm font-semibold hover:bg-red-50 hover:border-red-300 transition-colors disabled:opacity-50 dark:bg-zinc-800 dark:border-red-900/50 dark:text-red-400 dark:hover:bg-red-900/20"
+            >
+              {loading ? "..." : (locale === "ko" ? "신청 취소" : "Cancel")}
+            </button>
+          </div>
+          {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
+        </div>
+      );
+    }
+
+    // Not authenticated
+    if (!isAuthenticated) {
+      return (
+        <button
+          onClick={() => router.push(`/${locale}/login`)}
+          className="w-full py-4 bg-zinc-900 text-white rounded-2xl text-lg font-bold hover:bg-zinc-800 transition shadow-sm dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
+        >
+          {locale === "ko" ? "로그인하고 참가하기" : "Login to Join"}
+        </button>
+      );
+    }
+
+    // Full (someone already applied)
+    if (isFull) {
+      return (
+        <div className="rounded-2xl border border-teal-200 bg-teal-50 p-4 text-center dark:border-teal-900/50 dark:bg-teal-900/10">
+          <span className="font-bold text-teal-700 dark:text-teal-300">
+            {t("teamMatchFull")}
+          </span>
+        </div>
+      );
+    }
+
+    // Available to apply
+    return (
+      <div>
+        <button
+          onClick={() => handleJoin("FW")}
+          disabled={loading}
+          className="w-full py-4 bg-teal-600 text-white rounded-2xl text-lg font-bold hover:bg-teal-700 transition shadow-sm disabled:opacity-50"
+        >
+          {loading ? "..." : t("teamJoin")}
+        </button>
+        {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
+      </div>
+    );
+  }
+
+  // === Regular match flow below ===
 
   // 0. If Not Authenticated => Show Login Button
   if (!isAuthenticated) {

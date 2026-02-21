@@ -10,6 +10,7 @@ import { CalendarView } from "@/components/calendar-view";
 import { RinkExplorer } from "@/components/rink-explorer";
 import { useTranslations, useLocale } from "next-intl";
 import { RinkFilterDrawer } from "@/components/rink-filter-drawer";
+import { MatchTypeFilterDrawer } from "@/components/match-type-filter-drawer";
 import { List, CalendarDays, Loader2, ChevronDown } from "lucide-react";
 import { Club } from "@/app/actions/types";
 import { ClubCard } from "@/components/club-card";
@@ -46,6 +47,10 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
   // Rink Filter State
   const [selectedRinkIds, setSelectedRinkIds] = useState<string[]>([]);
   const [isRinkFilterOpen, setIsRinkFilterOpen] = useState(false);
+
+  // Match Type Filter State
+  const [selectedMatchTypes, setSelectedMatchTypes] = useState<string[]>([]);
+  const [isMatchTypeFilterOpen, setIsMatchTypeFilterOpen] = useState(false);
 
   const setActiveTab = (tab: "match" | "rink" | "club") => {
     startTransition(() => {
@@ -121,11 +126,15 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
     
     // 3. Rink Filter (Intersection / OR within Rinks)
     if (selectedRinkIds.length > 0) {
-        // If match has no rink or rink ID is not in selected list, exclude it
-        // Note: match.rink might be null, though unlikely for valid matches
-        // Also ensure we handle the type safely
         const rinkId = match.rink?.id;
         if (!rinkId || !selectedRinkIds.includes(rinkId)) {
+            filterMatch = false;
+        }
+    }
+
+    // 4. Match Type Filter (OR within selected types)
+    if (selectedMatchTypes.length > 0) {
+        if (!selectedMatchTypes.includes(match.match_type || 'training')) {
             filterMatch = false;
         }
     }
@@ -247,6 +256,20 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
                     {locale === "ko" ? "링크장" : "Rink"} 
                     {selectedRinkIds.length > 0 && ` (${selectedRinkIds.length})`}
                     <ChevronDown className={`w-3 h-3 transition-transform ${isRinkFilterOpen ? "rotate-180" : ""}`} />
+                  </button>
+
+                  {/* Match Type Filter Button */}
+                  <button
+                    onClick={() => setIsMatchTypeFilterOpen(!isMatchTypeFilterOpen)}
+                    className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium border transition-colors whitespace-nowrap ${
+                      selectedMatchTypes.length > 0
+                        ? "bg-blue-600 text-white border-blue-600 shadow-sm"
+                        : "bg-white text-zinc-600 border-zinc-200 hover:bg-zinc-50 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700 dark:hover:bg-zinc-700"
+                    }`}
+                  >
+                    {t("filter.matchType")}
+                    {selectedMatchTypes.length > 0 && ` (${selectedMatchTypes.length})`}
+                    <ChevronDown className={`w-3 h-3 transition-transform ${isMatchTypeFilterOpen ? "rotate-180" : ""}`} />
                   </button>
 
                   <button
@@ -427,6 +450,14 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
         }
         selectedRinkIds={selectedRinkIds}
         onSelectRinkIds={setSelectedRinkIds}
+      />
+
+      {/* Match Type Filter Drawer */}
+      <MatchTypeFilterDrawer
+        isOpen={isMatchTypeFilterOpen}
+        onClose={() => setIsMatchTypeFilterOpen(false)}
+        selectedTypes={selectedMatchTypes}
+        onSelectTypes={setSelectedMatchTypes}
       />
     </div>
   );

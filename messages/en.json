@@ -35,7 +35,8 @@
         "filter": {
             "skaterSpots": "🏒 Player Spots",
             "goalieSpots": "🥅 Goalie Spots",
-            "rentalAvailable": "Experience Equipment"
+            "rentalAvailable": "Experience Equipment",
+            "matchType": "Match Type"
         }
     },
     "auth": {
@@ -93,8 +94,17 @@
         "type": "Match Type",
         "types": {
             "training": "Training",
-            "game": "Game"
+            "game": "Game",
+            "team_match": "Team Match"
         },
+        "feeDescriptionRef": "See Description",
+        "teamParticipants": "Participating Teams",
+        "teamJoin": "Apply as Opponent",
+        "teamJoined": "Matched",
+        "teamHost": "Host Team",
+        "teamOpponent": "Opponent Rep.",
+        "teamMatchFull": "Match Complete",
+        "teamMatchWaiting": "Waiting for Opponent",
         "status": {
             "open": "Open",
             "closed": "Closed",

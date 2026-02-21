@@ -35,7 +35,8 @@
         "filter": {
             "skaterSpots": "🏒 플레이어 모집",
             "goalieSpots": "🥅 골리 모집",
-            "rentalAvailable": "체험 장비 대여"
+            "rentalAvailable": "체험 장비 대여",
+            "matchType": "대관 구분"
         }
     },
     "auth": {
@@ -93,8 +94,17 @@
         "type": "대관 구분",
         "types": {
             "training": "훈련 대관",
-            "game": "게임 대관"
+            "game": "게임 대관",
+            "team_match": "팀 매치"
         },
+        "feeDescriptionRef": "설명 참조",
+        "teamParticipants": "참가 팀",
+        "teamJoin": "상대팀 매칭 신청",
+        "teamJoined": "매칭 완료",
+        "teamHost": "주최 팀",
+        "teamOpponent": "상대 팀 대표자",
+        "teamMatchFull": "매칭 완료 (상대팀 확정)",
+        "teamMatchWaiting": "매칭 대기",
         "status": {
             "open": "모집중",
             "closed": "마감",

@@ -67,6 +67,8 @@ export function MatchCard({ match }: { match: Match }) {
             className={`inline-block rounded px-2 py-0.5 text-xs font-semibold ${
               match.match_type === "game"
                 ? "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300"
+                : match.match_type === "team_match"
+                ? "bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-300"
                 : "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"
             }`}
           >
@@ -106,6 +108,17 @@ export function MatchCard({ match }: { match: Match }) {
       )}
 
       {/* Position Availability */}
+      {match.match_type === "team_match" ? (
+        <div className="mb-3 text-sm">
+          <span className={`rounded px-2 py-1 font-medium ${
+            currentSkaters >= match.max_skaters
+              ? "bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400"
+              : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+          }`}>
+            {currentSkaters >= match.max_skaters ? t("teamJoined") : t("teamMatchWaiting")}
+          </span>
+        </div>
+      ) : (
       <div className="mb-3 flex gap-3 text-sm">
         <div className="flex items-center gap-1">
           <span className="font-medium">{t("skater")}</span>
@@ -132,16 +145,25 @@ export function MatchCard({ match }: { match: Match }) {
           </span>
         </div>
       </div>
+      )}
 
       {/* Fee */}
       <div className="flex items-center gap-2 text-sm">
-        <span className="font-semibold text-zinc-900 dark:text-zinc-200">
-          {(match.entry_points || match.fee).toLocaleString()} {locale === "ko" ? "원" : "KRW"}
-        </span>
-        {match.rental_available && (
-          <span className="text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-1.5 py-0.5 rounded">
-            (+ {t("rentalFee")} {match.rental_fee >= 0 ? `${match.rental_fee.toLocaleString()} ${locale === "ko" ? "원" : "KRW"}` : t("goalieFree")})
+        {match.match_type === "team_match" ? (
+          <span className="font-semibold text-teal-600 dark:text-teal-400">
+            {t("feeDescriptionRef")}
           </span>
+        ) : (
+          <>
+            <span className="font-semibold text-zinc-900 dark:text-zinc-200">
+              {(match.entry_points || match.fee).toLocaleString()} {locale === "ko" ? "원" : "KRW"}
+            </span>
+            {match.rental_available && (
+              <span className="text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-1.5 py-0.5 rounded">
+                (+ {t("rentalFee")} {match.rental_fee >= 0 ? `${match.rental_fee.toLocaleString()} ${locale === "ko" ? "원" : "KRW"}` : t("goalieFree")})
+              </span>
+            )}
+          </>
         )}
       </div>
     </Link>

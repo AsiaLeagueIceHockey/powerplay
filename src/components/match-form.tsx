@@ -34,18 +34,23 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
   const [maxSkaters, setMaxSkaters] = useState("");
   const [maxGoalies, setMaxGoalies] = useState("");
   const [bankAccount, setBankAccount] = useState("");
-  const [isRentalAvailable, setIsRentalAvailable] = useState(false); // Added state
+  const [isRentalAvailable, setIsRentalAvailable] = useState(false);
+  const [matchType, setMatchType] = useState<"training" | "game" | "team_match">("training");
+
+  const isTeamMatch = matchType === "team_match";
 
   // 모든 필수 필드가 채워졌는지 확인
-  const isFormValid =
-    rinkId !== "" &&
-    date !== "" &&
-    hour !== "" &&
-    minute !== "" &&
-    entryPoints.trim() !== "" &&
-    maxSkaters.trim() !== "" &&
-    maxGoalies.trim() !== "" &&
-    bankAccount.trim() !== "";
+  // 팀 매치: rink + date/time만 필수
+  const isFormValid = isTeamMatch
+    ? rinkId !== "" && date !== "" && hour !== "" && minute !== ""
+    : rinkId !== "" &&
+      date !== "" &&
+      hour !== "" &&
+      minute !== "" &&
+      entryPoints.trim() !== "" &&
+      maxSkaters.trim() !== "" &&
+      maxGoalies.trim() !== "" &&
+      bankAccount.trim() !== "";
 
   // start_time hidden input 업데이트 헬퍼
   const updateStartTime = (
@@ -222,192 +227,211 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
         <label className="block text-sm font-medium mb-2 text-zinc-300">
           {t("match.type")}
         </label>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-3 gap-3">
           <label className="relative flex cursor-pointer items-center justify-center rounded-lg border border-zinc-700 bg-zinc-900 p-4 hover:bg-zinc-800 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-900/20 has-[:checked]:text-blue-200">
             <input
               type="radio"
               name="match_type"
               value="training"
-              defaultChecked
+              checked={matchType === "training"}
+              onChange={() => setMatchType("training")}
               className="sr-only"
             />
-            <span className="font-medium">{t("match.types.training")}</span>
+            <span className="font-medium text-sm">{t("match.types.training")}</span>
           </label>
           <label className="relative flex cursor-pointer items-center justify-center rounded-lg border border-zinc-700 bg-zinc-900 p-4 hover:bg-zinc-800 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-900/20 has-[:checked]:text-blue-200">
             <input
               type="radio"
               name="match_type"
               value="game"
+              checked={matchType === "game"}
+              onChange={() => setMatchType("game")}
               className="sr-only"
             />
-            <span className="font-medium">{t("match.types.game")}</span>
+            <span className="font-medium text-sm">{t("match.types.game")}</span>
           </label>
-        </div>
-      </div>
-
-      {/* Entry Points (참가 금액) */}
-      <div>
-        <label className="block text-sm font-medium mb-2 text-zinc-300">
-          {t("admin.form.entryPoints")}
-        </label>
-        <div className="relative">
-          <input
-            type="text"
-            name="entry_points"
-            value={entryPoints}
-            onChange={(e) => {
-              const raw = e.target.value.replace(/[^0-9]/g, "");
-              const formatted = raw ? Number(raw).toLocaleString() : "";
-              setEntryPoints(formatted);
-              e.target.value = formatted;
-            }}
-            className="w-full px-4 py-3 pr-8 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-            placeholder="ex. 25,000"
-          />
-          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500">
-            {locale === "ko" ? "원" : "KRW"}
-          </span>
-        </div>
-        <p className="text-xs text-zinc-500 mt-1">
-          {locale === "ko"
-            ? "참가비 (0 = 무료)"
-            : "Entry fee (0 = free)"}
-        </p>
-      </div>
-
-      {/* Position Limits (Consolidated) */}
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium mb-2 text-zinc-300">
-            {t("admin.form.maxSkaters")}
-          </label>
-          <div className="relative">
+          <label className="relative flex cursor-pointer items-center justify-center rounded-lg border border-zinc-700 bg-zinc-900 p-4 hover:bg-zinc-800 has-[:checked]:border-teal-500 has-[:checked]:bg-teal-900/20 has-[:checked]:text-teal-200">
             <input
-              type="number"
-              name="max_skaters"
-              value={maxSkaters}
-              onChange={(e) => setMaxSkaters(e.target.value)}
-              placeholder="20"
-              min={0}
-              className="w-full px-4 py-3 pr-8 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              type="radio"
+              name="match_type"
+              value="team_match"
+              checked={matchType === "team_match"}
+              onChange={() => setMatchType("team_match")}
+              className="sr-only"
             />
-            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 text-sm">명</span>
-          </div>
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-2 text-zinc-300">
-            {t("admin.form.maxGoalies")}
+            <span className="font-medium text-sm">{t("match.types.team_match")}</span>
           </label>
-          <div className="relative">
-            <input
-              type="number"
-              name="max_goalies"
-              value={maxGoalies}
-              onChange={(e) => setMaxGoalies(e.target.value)}
-              placeholder="2"
-              min={0}
-              className="w-full px-4 py-3 pr-8 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-            />
-            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 text-sm">명</span>
-          </div>
         </div>
       </div>
 
-      {/* Goalie Free Option */}
-      <div className="flex items-center gap-3 p-4 bg-zinc-900/50 rounded-lg border border-zinc-700">
-        <input
-          type="checkbox"
-          name="goalie_free"
-          id="goalie_free"
-          value="true"
-          className="w-5 h-5 rounded border-zinc-600 bg-zinc-800 text-blue-600 focus:ring-blue-500"
-        />
-        <label htmlFor="goalie_free" className="flex flex-col">
-          <span className="text-sm font-medium text-zinc-200">
-            🧤 {t("match.goalieFreeLabel")}
-          </span>
-          <span className="text-xs text-zinc-400">
-            {t("match.goalieFreeDesc")}
-          </span>
-        </label>
-      </div>
-
-      {/* Rental Fee (장비 대여비) */}
-      <div>
-        <label className="block text-sm font-medium mb-2 text-zinc-300">
-          {t("match.rentalFeeLabel")}
-        </label>
-        
-        <div className="space-y-4">
-            <input type="hidden" name="rental_available" value={String(isRentalAvailable)} />
-            {/* Toggle Switch */}
-            <div 
-                onClick={() => {
-                    const next = !isRentalAvailable;
-                    setIsRentalAvailable(next);
-                    if (!next) setRentalFee("");
+      {/* === 팀 매치가 아닌 경우에만 표시되는 필드들 === */}
+      {!isTeamMatch && (
+        <>
+          {/* Entry Points (참가 금액) */}
+          <div>
+            <label className="block text-sm font-medium mb-2 text-zinc-300">
+              {t("admin.form.entryPoints")}
+            </label>
+            <div className="relative">
+              <input
+                type="text"
+                name="entry_points"
+                value={entryPoints}
+                onChange={(e) => {
+                  const raw = e.target.value.replace(/[^0-9]/g, "");
+                  const formatted = raw ? Number(raw).toLocaleString() : "";
+                  setEntryPoints(formatted);
+                  e.target.value = formatted;
                 }}
-                className={`flex items-center gap-3 p-4 rounded-lg border cursor-pointer transition-all ${
-                    isRentalAvailable 
-                        ? "bg-blue-900/20 border-blue-500/50" 
-                        : "bg-zinc-900 border-zinc-700 hover:bg-zinc-800"
-                }`}
-            >
-                <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${
-                    isRentalAvailable
-                        ? "bg-blue-600 border-blue-600"
-                        : "bg-zinc-800 border-zinc-600"
-                }`}>
-                    {isRentalAvailable && <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
-                </div>
-                <span className={`text-sm font-medium ${isRentalAvailable ? "text-blue-200" : "text-zinc-400"}`}>
-                    {t("match.rentalToggleLabel")}
-                </span>
+                className="w-full px-4 py-3 pr-8 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                placeholder="ex. 25,000"
+              />
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500">
+                {locale === "ko" ? "원" : "KRW"}
+              </span>
             </div>
+            <p className="text-xs text-zinc-500 mt-1">
+              {locale === "ko"
+                ? "참가비 (0 = 무료)"
+                : "Entry fee (0 = free)"}
+            </p>
+          </div>
 
-            {/* Input Field (Conditional) */}
-            {isRentalAvailable && (
-                <div className="relative animate-in fade-in slide-in-from-top-2 duration-200">
+          {/* Position Limits (Consolidated) */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium mb-2 text-zinc-300">
+                {t("admin.form.maxSkaters")}
+              </label>
+              <div className="relative">
                 <input
-                    type="text"
-                    name="rental_fee"
-                    value={rentalFee}
-                    onChange={(e) => {
-                    const raw = e.target.value.replace(/[^0-9]/g, "");
-                    const formatted = raw ? Number(raw).toLocaleString() : "";
-                    setRentalFee(formatted);
-                    e.target.value = formatted;
-                    }}
-                    className="w-full px-4 py-3 pr-8 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                    placeholder="ex. 10,000"
-                    autoFocus
+                  type="number"
+                  name="max_skaters"
+                  value={maxSkaters}
+                  onChange={(e) => setMaxSkaters(e.target.value)}
+                  placeholder="20"
+                  min={0}
+                  className="w-full px-4 py-3 pr-8 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                 />
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500">
-                    {locale === "ko" ? "원" : "KRW"}
-                </span>
-                </div>
-            )}
-        </div>
-      </div>
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 text-sm">명</span>
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2 text-zinc-300">
+                {t("admin.form.maxGoalies")}
+              </label>
+              <div className="relative">
+                <input
+                  type="number"
+                  name="max_goalies"
+                  value={maxGoalies}
+                  onChange={(e) => setMaxGoalies(e.target.value)}
+                  placeholder="2"
+                  min={0}
+                  className="w-full px-4 py-3 pr-8 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                />
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 text-sm">명</span>
+              </div>
+            </div>
+          </div>
 
-      {/* 정산 계좌번호 */}
-      <div>
-        <label className="block text-sm font-medium mb-2 text-zinc-300">
-          정산 받을 계좌번호
-        </label>
-        <input
-          type="text"
-          name="bank_account"
-          value={bankAccount}
-          onChange={(e) => setBankAccount(e.target.value)}
-          className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-          placeholder="예: 카카오뱅크 3333-00-0000000 홍길동"
-          required
-        />
-        <p className="text-xs text-zinc-500 mt-1">
-          경기 참가비를 정산 받을 계좌를 입력해주세요. (은행명, 계좌번호, 예금주)
-        </p>
-      </div>
+          {/* Goalie Free Option */}
+          <div className="flex items-center gap-3 p-4 bg-zinc-900/50 rounded-lg border border-zinc-700">
+            <input
+              type="checkbox"
+              name="goalie_free"
+              id="goalie_free"
+              value="true"
+              className="w-5 h-5 rounded border-zinc-600 bg-zinc-800 text-blue-600 focus:ring-blue-500"
+            />
+            <label htmlFor="goalie_free" className="flex flex-col">
+              <span className="text-sm font-medium text-zinc-200">
+                🧤 {t("match.goalieFreeLabel")}
+              </span>
+              <span className="text-xs text-zinc-400">
+                {t("match.goalieFreeDesc")}
+              </span>
+            </label>
+          </div>
+
+          {/* Rental Fee (장비 대여비) */}
+          <div>
+            <label className="block text-sm font-medium mb-2 text-zinc-300">
+              {t("match.rentalFeeLabel")}
+            </label>
+            
+            <div className="space-y-4">
+                <input type="hidden" name="rental_available" value={String(isRentalAvailable)} />
+                {/* Toggle Switch */}
+                <div 
+                    onClick={() => {
+                        const next = !isRentalAvailable;
+                        setIsRentalAvailable(next);
+                        if (!next) setRentalFee("");
+                    }}
+                    className={`flex items-center gap-3 p-4 rounded-lg border cursor-pointer transition-all ${
+                        isRentalAvailable 
+                            ? "bg-blue-900/20 border-blue-500/50" 
+                            : "bg-zinc-900 border-zinc-700 hover:bg-zinc-800"
+                    }`}
+                >
+                    <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${
+                        isRentalAvailable
+                            ? "bg-blue-600 border-blue-600"
+                            : "bg-zinc-800 border-zinc-600"
+                    }`}>
+                        {isRentalAvailable && <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
+                    </div>
+                    <span className={`text-sm font-medium ${isRentalAvailable ? "text-blue-200" : "text-zinc-400"}`}>
+                        {t("match.rentalToggleLabel")}
+                    </span>
+                </div>
+
+                {/* Input Field (Conditional) */}
+                {isRentalAvailable && (
+                    <div className="relative animate-in fade-in slide-in-from-top-2 duration-200">
+                    <input
+                        type="text"
+                        name="rental_fee"
+                        value={rentalFee}
+                        onChange={(e) => {
+                        const raw = e.target.value.replace(/[^0-9]/g, "");
+                        const formatted = raw ? Number(raw).toLocaleString() : "";
+                        setRentalFee(formatted);
+                        e.target.value = formatted;
+                        }}
+                        className="w-full px-4 py-3 pr-8 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                        placeholder="ex. 10,000"
+                        autoFocus
+                    />
+                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500">
+                        {locale === "ko" ? "원" : "KRW"}
+                    </span>
+                    </div>
+                )}
+            </div>
+          </div>
+
+          {/* 정산 계좌번호 */}
+          <div>
+            <label className="block text-sm font-medium mb-2 text-zinc-300">
+              정산 받을 계좌번호
+            </label>
+            <input
+              type="text"
+              name="bank_account"
+              value={bankAccount}
+              onChange={(e) => setBankAccount(e.target.value)}
+              className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              placeholder="예: 카카오뱅크 3333-00-0000000 홍길동"
+              required
+            />
+            <p className="text-xs text-zinc-500 mt-1">
+              경기 참가비를 정산 받을 계좌를 입력해주세요. (은행명, 계좌번호, 예금주)
+            </p>
+          </div>
+        </>
+      )}
 
       {/* Description */}
       <div>
