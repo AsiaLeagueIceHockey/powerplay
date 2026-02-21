@@ -155,7 +155,7 @@ export function AdminMatchCard({
 
       <div className="flex justify-between items-start mb-4">
         <div>
-          <h3 className="font-bold text-lg text-zinc-100">
+          <h3 className="font-bold text-lg text-zinc-100 break-keep">
             {locale === "ko"
               ? match.rink?.name_ko
               : match.rink?.name_en || match.rink?.name_ko}
@@ -165,16 +165,16 @@ export function AdminMatchCard({
           </p>
         </div>
         
-        <div className="flex flex-col items-end gap-2">
+        <div className="flex flex-col flex-none items-end gap-2 ml-2">
           <span
-            className={`px-2.5 py-1 rounded-md text-xs font-semibold ${getStatusColor(
+            className={`px-2.5 py-1 rounded-md text-xs font-semibold whitespace-nowrap ${getStatusColor(
               displayStatus
             )}`}
           >
             {getStatusText(displayStatus)}
           </span>
           <span
-            className={`px-2.5 py-1 rounded-md text-xs font-semibold ${
+            className={`px-2.5 py-1 rounded-md text-xs font-semibold whitespace-nowrap ${
               match.match_type === "game"
                 ? "bg-purple-900/50 text-purple-300 border border-purple-800"
                 : match.match_type === "team_match"
@@ -276,7 +276,7 @@ export function AdminMatchCard({
 
       {showParticipants && (
         <div className="mt-4 pt-4 border-t border-zinc-700">
-          <AdminParticipantList participants={match.participants} />
+          <AdminParticipantList participants={match.participants} matchType={match.match_type} />
         </div>
       )}
     </div>

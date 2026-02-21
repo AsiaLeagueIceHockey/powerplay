@@ -510,6 +510,7 @@ export async function getAllMatchesForSuperuser() {
       id,
       start_time,
       fee,
+      entry_points,
       max_skaters,
       max_goalies,
       status,
