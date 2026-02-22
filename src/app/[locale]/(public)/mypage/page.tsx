@@ -43,6 +43,7 @@ export default async function MyPage() {
           detailedPositions={profile?.detailed_positions || null}
           stickDirection={profile?.stick_direction || null}
           phone={profile?.phone || null}
+          fullName={profile?.full_name || null}
           clubs={clubs}
         />
       </div>

@@ -12,6 +12,7 @@ interface ProfileEditorProps {
   detailedPositions: string[] | null;
   stickDirection: string | null;
   phone: string | null;
+  fullName: string | null;
   clubs: { id: string; name: string }[];
 }
 
@@ -22,6 +23,7 @@ export function ProfileEditor({
   detailedPositions, 
   stickDirection,
   phone,
+  fullName,
   clubs 
 }: ProfileEditorProps) {
   const t = useTranslations();
@@ -36,6 +38,7 @@ export function ProfileEditor({
   const [positions, setPositions] = useState<string[]>(detailedPositions || []);
   const [stick, setStick] = useState(stickDirection || "");
   const [phoneState, setPhoneState] = useState(phone || "");
+  const [nameState, setNameState] = useState(fullName || "");
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -52,9 +55,10 @@ export function ProfileEditor({
     
     const isStickChanged = stick !== (stickDirection || "");
     const isPhoneChanged = phoneState !== (phone || "");
+    const isNameChanged = nameState !== (fullName || "");
     
-    return isBioChanged || isYearChanged || isMonthChanged || isClubChanged || isPosChanged || isStickChanged || isPhoneChanged;
-  }, [bio, initialBio, startYear, initialYear, startMonth, initialMonth, primaryClubIdState, primaryClubId, positions, detailedPositions, stick, stickDirection, phoneState, phone]);
+    return isBioChanged || isYearChanged || isMonthChanged || isClubChanged || isPosChanged || isStickChanged || isPhoneChanged || isNameChanged;
+  }, [bio, initialBio, startYear, initialYear, startMonth, initialMonth, primaryClubIdState, primaryClubId, positions, detailedPositions, stick, stickDirection, phoneState, phone, nameState, fullName]);
 
   const handleSave = async () => {
     setLoading(true);
@@ -71,6 +75,7 @@ export function ProfileEditor({
     fd.set("detailedPositions", JSON.stringify(positions));
     fd.set("stickDirection", stick);
     fd.set("phone", phoneState);
+    fd.set("fullName", nameState);
     
     await updateProfile(fd);
     
@@ -137,6 +142,19 @@ export function ProfileEditor({
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Full Name */}
+        <div className="space-y-3">
+          <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            {t("profile.fullName")}
+          </label>
+          <input
+            type="text"
+            value={nameState}
+            onChange={(e) => setNameState(e.target.value)}
+            className="w-full px-3 py-2 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-transparent text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
         {/* Phone Number */}
         <div className="space-y-3">
           <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
