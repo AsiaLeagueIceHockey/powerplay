@@ -83,6 +83,39 @@
             "title": "자기소개",
             "placeholder": "자유롭게 본인 소개 부탁드려요. (ex. 속한 팀, 주 포지션, 팀 디비전 정보 등)"
         },
+        "experience": {
+            "title": "하키 시작 시점 (구력)",
+            "year": "년",
+            "month": "월",
+            "monthDuration": "개월",
+            "calculated": "{years}년 {months}개월",
+            "lessThanMonth": "1개월 미만",
+            "placeholderYear": "연도",
+            "placeholderMonth": "월"
+        },
+        "team": {
+            "title": "소속팀",
+            "placeholder": "소속팀 선택",
+            "none": "소속팀 없음"
+        },
+        "positions": {
+            "title": "주포지션 (다중 선택 가능)",
+            "options": {
+                "LW": "레프트윙 (LW)",
+                "C": "센터 (C)",
+                "RW": "라이트윙 (RW)",
+                "LD": "레프트 디펜스 (LD)",
+                "RD": "라이트 디펜스 (RD)",
+                "G": "골리 (G)",
+                "UNDECIDED": "미정"
+            }
+        },
+        "stick": {
+            "title": "스틱 방향",
+            "left": "레프트",
+            "right": "라이트",
+            "none": "선택 안함"
+        },
         "saved": "저장되었습니다"
     },
     "match": {

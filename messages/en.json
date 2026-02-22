@@ -83,6 +83,39 @@
             "title": "Self Introduction",
             "placeholder": "Tell us about yourself. (ex. Your team, main position, division info, etc.)"
         },
+        "experience": {
+            "title": "Hockey Start Date (Experience)",
+            "year": "Year",
+            "month": "Month",
+            "monthDuration": "Months",
+            "calculated": "{years} years {months} months",
+            "lessThanMonth": "Less than 1 month",
+            "placeholderYear": "Year",
+            "placeholderMonth": "Month"
+        },
+        "team": {
+            "title": "Team",
+            "placeholder": "Select Team",
+            "none": "No team"
+        },
+        "positions": {
+            "title": "Primary Positions (Multi-select)",
+            "options": {
+                "LW": "Left Wing (LW)",
+                "C": "Center (C)",
+                "RW": "Right Wing (RW)",
+                "LD": "Left Defense (LD)",
+                "RD": "Right Defense (RD)",
+                "G": "Goalie (G)",
+                "UNDECIDED": "Undecided"
+            }
+        },
+        "stick": {
+            "title": "Stick Direction",
+            "left": "Left",
+            "right": "Right",
+            "none": "None"
+        },
         "saved": "Saved successfully"
     },
     "match": {

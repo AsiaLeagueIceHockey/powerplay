@@ -151,6 +151,19 @@ export async function updateProfile(formData: FormData) {
   if (formData.has("birthDate")) updateData.birth_date = formData.get("birthDate") || null;
   if (formData.has("termsAgreed")) updateData.terms_agreed = formData.get("termsAgreed") === "true";
   if (formData.has("bio")) updateData.bio = formData.get("bio") || null;
+  if (formData.has("hockeyStartDate")) updateData.hockey_start_date = formData.get("hockeyStartDate") || null;
+  if (formData.has("primaryClubId")) updateData.primary_club_id = formData.get("primaryClubId") || null;
+  if (formData.has("stickDirection")) updateData.stick_direction = formData.get("stickDirection") || null;
+  if (formData.has("detailedPositions")) {
+    const rawPositions = formData.get("detailedPositions");
+    if (typeof rawPositions === "string") {
+      try {
+        updateData.detailed_positions = JSON.parse(rawPositions);
+      } catch {
+        updateData.detailed_positions = null;
+      }
+    }
+  }
 
   // Only set onboarding_completed if explicitly provided
   if (formData.has("onboarding_completed")) {

@@ -2,18 +2,14 @@ import { redirect } from "next/navigation";
 import { getTranslations, getLocale } from "next-intl/server";
 import { getUser, getProfile } from "@/app/actions/auth";
 import { getMyMatches } from "@/app/actions/mypage";
+import { getClubs } from "@/app/actions/clubs";
 import { MyMatchList } from "@/components/my-match-list";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { NotificationStatus } from "@/components/notification-status";
 import { ProfileEditor } from "@/components/profile-editor";
 
 export default async function MyPage() {
-  // ... (existing code, ensure getUser/getProfile calls are optimized if needed, but here we reuse getUser from auth)
-  // Wait, getUser returns User object, we need Profile object specifically for 'bio'.
-  // MyPage currently calls getUser, let's see if we need getProfile.
-  // The existing code calls getUser() at top.
-  // We need to fetch the full profile to get the bio.
-  const profile = await getProfile(); // Import this!
+  const profile = await getProfile();
   const user = await getUser();
   const locale = await getLocale();
 
@@ -23,6 +19,8 @@ export default async function MyPage() {
 
   const t = await getTranslations();
   const myMatches = await getMyMatches();
+  const clubsData = await getClubs();
+  const clubs = clubsData.map((c) => ({ id: c.id, name: c.name }));
 
   return (
     <div className="container mx-auto px-4 max-w-4xl">
@@ -39,9 +37,16 @@ export default async function MyPage() {
         </p>
       </div>
 
-      {/* Profile Editor (Bio) */}
+      {/* Profile Editor */}
       <div className="mb-8">
-        <ProfileEditor initialBio={profile?.bio || null} />
+        <ProfileEditor 
+          initialBio={profile?.bio || null} 
+          hockeyStartDate={profile?.hockey_start_date || null}
+          primaryClubId={profile?.primary_club_id || null}
+          detailedPositions={profile?.detailed_positions || null}
+          stickDirection={profile?.stick_direction || null}
+          clubs={clubs}
+        />
       </div>
 
       {/* My Matches */}
