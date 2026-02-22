@@ -630,3 +630,10 @@ UPDATE profiles SET role = 'superuser' WHERE email = 'your-email@example.com';
   - **Server Action Updates**: Modified the `getAllUsers` SELECT query in `src/app/actions/superuser.ts` to fetch `hockey_start_date`, `stick_direction`, `detailed_positions`, and a JOIN on `clubs`.
   - **Type Definition**: Updated the `UserProfile` interface to accurately type the newly fetched columns.
   - **Modal Refinements**: Added new `InfoItem` visual grid blocks to `user-management-tab.tsx` converting timestamps to relative experience periods ("X년 Y개월") and mapping database enum values to user-friendly Korean strings ("레프트", "FW" etc.).
+
+### [2026-02-23] Onboarding Full-View Revamp
+- **Summary**: Transformed the onboarding page to run as a full-screen view without headers or bottom navigation, while incorporating all new detailed profiling fields.
+- **Changes**:
+  - **Layout Isolation**: Moved the `onboarding` page routing directory natively outside of the `(public)` group to naturally shed any inherited Layout bindings.
+  - **Form Updates**: Supercharged `OnboardingForm` to require `hockeyStartDate`, `stickDirection`, and `detailedPositions` in its validation logic before form submission is enabled. 
+- **Next Steps**: Monitor sign-up completion rates.

@@ -18,12 +18,21 @@ interface Profile {
   phone?: string | null;
   birth_date?: string | null;
   terms_agreed?: boolean;
+  hockey_start_date?: string | null;
+  stick_direction?: "LEFT" | "RIGHT" | null;
+  detailed_positions?: string[] | null;
 }
 
 interface OnboardingFormProps {
   profile: Profile | null;
   locale: string;
 }
+
+const DETAILED_POSITIONS: Record<string, string[]> = {
+  FW: ["LW", "C", "RW"],
+  DF: ["LD", "RD"],
+  G: ["G"],
+};
 
 export function OnboardingForm({ profile, locale }: OnboardingFormProps) {
   const router = useRouter();
@@ -40,6 +49,9 @@ export function OnboardingForm({ profile, locale }: OnboardingFormProps) {
     phone: string;
     birthDate: string;
     termsAgreed: boolean;
+    hockeyStartDate: string;
+    stickDirection: "LEFT" | "RIGHT" | null;
+    detailedPositions: string[];
   }>({
     fullName: profile?.full_name || "",
     position: profile?.position || null,
@@ -47,10 +59,30 @@ export function OnboardingForm({ profile, locale }: OnboardingFormProps) {
     phone: profile?.phone || "",
     birthDate: profile?.birth_date || "",
     termsAgreed: profile?.terms_agreed || false,
+    hockeyStartDate: profile?.hockey_start_date || "",
+    stickDirection: profile?.stick_direction || null,
+    detailedPositions: profile?.detailed_positions || [],
   });
 
   // Terms Modal State
   const [showTermsModal, setShowTermsModal] = useState(false);
+
+  // Generate Year/Month options for experience
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: currentYear - 1980 + 1 }, (_, i) => String(currentYear - i));
+  const months = Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, "0"));
+
+  const handleDetailedPositionToggle = (pos: string) => {
+    setFormData((prev) => {
+      const current = prev.detailedPositions;
+      return {
+        ...prev,
+        detailedPositions: current.includes(pos)
+          ? current.filter((p) => p !== pos)
+          : [...current, pos],
+      };
+    });
+  };
 
   const handleSubmit = async () => {
     if (!formData.termsAgreed) {
@@ -68,11 +100,31 @@ export function OnboardingForm({ profile, locale }: OnboardingFormProps) {
     fd.set("termsAgreed", formData.termsAgreed.toString());
     fd.set("onboarding_completed", "true"); // Complete onboarding immediately
     
+    if (formData.hockeyStartDate) {
+      fd.set("hockeyStartDate", formData.hockeyStartDate);
+    }
+    if (formData.stickDirection) {
+      fd.set("stickDirection", formData.stickDirection);
+    }
+    if (formData.detailedPositions.length > 0) {
+      // Must append as a string for FormData, server action should parse it
+      fd.set("detailedPositions", JSON.stringify(formData.detailedPositions));
+    }
+    
     await updateProfile(fd);
     
     router.push(`/${locale}`);
     router.refresh();
   };
+
+  // Form Validation Logic
+  const isFormValid = 
+    formData.fullName && 
+    formData.phone && 
+    formData.birthDate && 
+    formData.termsAgreed && 
+    formData.hockeyStartDate && 
+    formData.stickDirection;
 
   return (
     <>
@@ -119,7 +171,13 @@ export function OnboardingForm({ profile, locale }: OnboardingFormProps) {
               <label className="block text-sm font-medium mb-2">{t("position")}</label>
               <select
                 value={formData.position || ""}
-                onChange={(e) => setFormData({ ...formData, position: (e.target.value as "FW" | "DF" | "G" | "") || null })}
+                onChange={(e) => {
+                  setFormData({ 
+                    ...formData, 
+                    position: (e.target.value as "FW" | "DF" | "G" | "") || null,
+                    detailedPositions: [] // Reset detailed positions when base position changes
+                  })
+                }}
                 className="w-full px-4 py-3 rounded-lg border border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800"
               >
                 <option value="">{tMatch("position.NONE")}</option>
@@ -140,6 +198,102 @@ export function OnboardingForm({ profile, locale }: OnboardingFormProps) {
                 <option value="en">English</option>
               </select>
             </div>
+
+            {/* Hockey Start Date (Experience) */}
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                아이스하키 시작 <span className="text-red-500">*</span>
+              </label>
+              <p className="text-xs text-zinc-500 mb-2">구력 계산을 위해 처음 하키를 시작한 시기를 선택해주세요.</p>
+              <div className="flex gap-2">
+                <select
+                  value={formData.hockeyStartDate ? formData.hockeyStartDate.split("-")[0] : ""}
+                  onChange={(e) => {
+                    const year = e.target.value;
+                    const month = formData.hockeyStartDate ? formData.hockeyStartDate.split("-")[1] : "01";
+                    setFormData({ ...formData, hockeyStartDate: year ? `${year}-${month}-01` : "" });
+                  }}
+                  className="w-full px-4 py-3 rounded-lg border border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800 focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">년도 선택</option>
+                  {years.map((y) => (
+                    <option key={y} value={y}>{y}년</option>
+                  ))}
+                </select>
+                <select
+                  value={formData.hockeyStartDate ? formData.hockeyStartDate.split("-")[1] : ""}
+                  onChange={(e) => {
+                    const month = e.target.value;
+                    const year = formData.hockeyStartDate ? formData.hockeyStartDate.split("-")[0] : currentYear.toString();
+                    setFormData({ ...formData, hockeyStartDate: month ? `${year}-${month}-01` : "" });
+                  }}
+                  className="w-full px-4 py-3 rounded-lg border border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800 focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">월 선택</option>
+                  {months.map((m) => (
+                    <option key={m} value={m}>{m}월</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Stick Direction */}
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                스틱 방향 <span className="text-red-500">*</span>
+              </label>
+              <div className="flex gap-4">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="stickDirection"
+                    value="LEFT"
+                    checked={formData.stickDirection === "LEFT"}
+                    onChange={() => setFormData({ ...formData, stickDirection: "LEFT" })}
+                    className="w-4 h-4 text-blue-600 focus:ring-blue-500"
+                  />
+                  <span>레프트 (Left)</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="stickDirection"
+                    value="RIGHT"
+                    checked={formData.stickDirection === "RIGHT"}
+                    onChange={() => setFormData({ ...formData, stickDirection: "RIGHT" })}
+                    className="w-4 h-4 text-blue-600 focus:ring-blue-500"
+                  />
+                  <span>라이트 (Right)</span>
+                </label>
+              </div>
+            </div>
+
+            {/* Detailed Positions (Conditionally rendered) */}
+            {formData.position && DETAILED_POSITIONS[formData.position] && (
+              <div className="animate-in fade-in slide-in-from-top-2 duration-200">
+                <label className="block text-sm font-medium mb-2">상세 포지션</label>
+                <div className="flex flex-wrap gap-2">
+                  {DETAILED_POSITIONS[formData.position].map((pos) => {
+                    const isSelected = formData.detailedPositions.includes(pos);
+                    return (
+                      <button
+                        key={pos}
+                        type="button"
+                        onClick={() => handleDetailedPositionToggle(pos)}
+                        className={`px-4 py-2 rounded-lg border text-sm font-medium transition-colors ${
+                          isSelected
+                            ? "bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-900/30 dark:border-blue-800 dark:text-blue-300"
+                            : "bg-white border-zinc-200 text-zinc-700 hover:bg-zinc-50 dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                        }`}
+                      >
+                        {pos}
+                        {isSelected && <Check className="w-3 h-3 inline-block ml-1" />}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             {/* Terms Agreement */}
             <div className="pt-2">
@@ -172,7 +326,7 @@ export function OnboardingForm({ profile, locale }: OnboardingFormProps) {
 
           <button
             onClick={handleSubmit}
-            disabled={loading || !formData.fullName || !formData.phone || !formData.birthDate || !formData.termsAgreed}
+            disabled={loading || !isFormValid}
             className="w-full py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "완료"}
