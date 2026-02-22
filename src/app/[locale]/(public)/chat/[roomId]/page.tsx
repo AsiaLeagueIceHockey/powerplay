@@ -52,7 +52,7 @@ export default async function ChatRoomPage({
   const { messages } = await getChatMessages(roomId);
 
   return (
-    <div className="flex flex-col h-[100dvh] bg-white dark:bg-zinc-950">
+    <div className="flex flex-col h-[100dvh] bg-white dark:bg-zinc-950 supports-[min-height:100dvh]:min-h-[100dvh] touch-none">
       <ChatRoomClient 
         roomId={roomId}
         initialMessages={messages}

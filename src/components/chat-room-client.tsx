@@ -115,6 +115,9 @@ export function ChatRoomClient({
       alert("Failed to send message: " + result.error);
       // Remove optimistic message if failed
       setMessages((prev) => prev.filter(m => m.id !== tempId));
+    } else {
+       // Remove optimistic message on success since realtime subscription will add the actual message back
+       setMessages((prev) => prev.filter(m => m.id !== tempId));
     }
 
     setIsSending(false);
@@ -125,8 +128,8 @@ export function ChatRoomClient({
   };
 
   return (
-    <>
-      <header className="px-4 py-3 flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md sticky top-0 z-10 pt-safe">
+    <div className="flex flex-col flex-1 h-full overflow-hidden">
+      <header className="px-4 py-3 flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md shrink-0 z-10 pt-safe">
         <div className="flex items-center gap-3">
           <button 
             onClick={() => router.push(`/${locale}/chat`)}
@@ -180,7 +183,7 @@ export function ChatRoomClient({
         <div ref={messagesEndRef} />
       </main>
 
-      <footer className="p-3 bg-white dark:bg-zinc-950 border-t border-zinc-200 dark:border-zinc-800 pb-[calc(env(safe-area-inset-bottom)+0.75rem)]">
+      <footer className="p-3 bg-white dark:bg-zinc-950 border-t border-zinc-200 dark:border-zinc-800 pb-safe">
         <form onSubmit={handleSend} className="max-w-3xl mx-auto flex items-end gap-2 relative">
           <textarea
             value={inputValue}
@@ -205,6 +208,6 @@ export function ChatRoomClient({
           </button>
         </form>
       </footer>
-    </>
+    </div>
   );
 }
