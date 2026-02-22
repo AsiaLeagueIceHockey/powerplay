@@ -199,6 +199,47 @@ export async function updateProfile(formData: FormData) {
   return { success: true };
 }
 
+export async function issuePlayerCard() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "Not authenticated" };
+  }
+
+  // Generate sequence using RPC since doing it inline with update is tricky without returning
+  // We'll create a simple function to get the next val, or use a workaround
+  // Wait, let's just do a direct query or create a function. A direct query via supabase-js isn't possible.
+  // We need an RPC call. Wait, I should create a function `get_next_player_card_seq`
+  // Let me just update auth.ts first and add the sql file for the function next.
+
+  const { data: seqData, error: seqError } = await supabase.rpc('get_next_player_card_seq');
+  if (seqError) {
+     return { error: "Failed to generate serial number" };
+  }
+
+  const serialNum = seqData as number;
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({ 
+      card_issued_at: new Date().toISOString(),
+      card_serial_number: serialNum
+    })
+    .eq("id", user.id);
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  revalidatePath("/mypage", "page");
+  revalidatePath("/mypage/card", "page");
+
+  return { success: true, serialNumber: serialNum };
+}
+
 // 관리자 신청
 export async function applyForAdmin() {
   const supabase = await createClient();

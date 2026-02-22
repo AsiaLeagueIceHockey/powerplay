@@ -45,6 +45,7 @@ export default async function MyPage() {
           phone={profile?.phone || null}
           fullName={profile?.full_name || null}
           clubs={clubs}
+          cardIssuedAt={profile?.card_issued_at || null}
         />
       </div>
 

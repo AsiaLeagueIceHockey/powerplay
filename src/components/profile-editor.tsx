@@ -2,8 +2,9 @@
 
 import { useState, useMemo } from "react";
 import { useTranslations } from "next-intl";
-import { updateProfile } from "@/app/actions/auth";
-import { Loader2, Save } from "lucide-react";
+import { updateProfile, issuePlayerCard } from "@/app/actions/auth";
+import { Loader2, Save, CreditCard } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface ProfileEditorProps {
   initialBio: string | null;
@@ -14,6 +15,7 @@ interface ProfileEditorProps {
   phone: string | null;
   fullName: string | null;
   clubs: { id: string; name: string }[];
+  cardIssuedAt?: string | null;
 }
 
 export function ProfileEditor({ 
@@ -24,9 +26,11 @@ export function ProfileEditor({
   stickDirection,
   phone,
   fullName,
-  clubs 
+  clubs,
+  cardIssuedAt
 }: ProfileEditorProps) {
   const t = useTranslations();
+  const router = useRouter();
   
   const initialYear = hockeyStartDate ? hockeyStartDate.split("-")[0] : "";
   const initialMonth = hockeyStartDate ? hockeyStartDate.split("-")[1] : "";
@@ -40,6 +44,7 @@ export function ProfileEditor({
   const [phoneState, setPhoneState] = useState(phone || "");
   const [nameState, setNameState] = useState(fullName || "");
   const [loading, setLoading] = useState(false);
+  const [cardLoading, setCardLoading] = useState(false);
   const [saved, setSaved] = useState(false);
 
   // Check if anything changed
@@ -82,6 +87,32 @@ export function ProfileEditor({
     setLoading(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
+  };
+
+  const isProfileComplete = 
+    nameState.trim() !== "" &&
+    phoneState.trim() !== "" &&
+    startYear !== "" &&
+    startMonth !== "" &&
+    primaryClubIdState !== "" &&
+    stick !== "" &&
+    positions.length > 0;
+
+  const handleIssueCard = async () => {
+    if (!isProfileComplete) return;
+    
+    setCardLoading(true);
+    const result = await issuePlayerCard();
+    if (result.success) {
+      router.push("/ko/mypage/card");
+    } else {
+      setCardLoading(false);
+      alert(t("common.error")); // Assuming common fallback
+    }
+  };
+
+  const handleViewCard = () => {
+    router.push("/ko/mypage/card");
   };
 
   const currentYear = new Date().getFullYear();
@@ -271,6 +302,43 @@ export function ProfileEditor({
                 </button>
               );
             })}
+          </div>
+        </div>
+
+        {/* Player Card Section */}
+        <div className="space-y-4 md:col-span-2 pt-4 border-t border-zinc-200 dark:border-zinc-800">
+          <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            {t("profile.card.title", { fallback: "선수 디지털 카드" })}
+          </label>
+          <div className="flex flex-col sm:flex-row items-center justify-between p-4 bg-zinc-50 dark:bg-zinc-800/50 rounded-lg border border-zinc-200 dark:border-zinc-700">
+            <div className="text-sm text-zinc-600 dark:text-zinc-400 mb-4 sm:mb-0">
+              {cardIssuedAt 
+                ? t("profile.card.issuedDesc", { fallback: "선수 카드가 발급되었습니다. 나만의 카드를 확인해보세요." })
+                : t("profile.card.unissuedDesc", { fallback: "프로필(자기소개 제외)을 모두 입력하시면 선수 디지털 카드를 발급받을 수 있습니다!" })
+              }
+            </div>
+            
+            {!cardIssuedAt ? (
+              <button
+                type="button"
+                onClick={handleIssueCard}
+                disabled={!isProfileComplete || cardLoading || isChanged}
+                className="w-full sm:w-auto flex flex-shrink-0 items-center justify-center gap-2 px-6 py-2.5 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-lg text-sm font-medium hover:bg-zinc-800 dark:hover:bg-zinc-200 disabled:opacity-50 transition-colors"
+                title={isChanged ? t("profile.card.needSave", { fallback: "변경사항을 먼저 저장해주세요." }) : undefined}
+              >
+                {cardLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <CreditCard className="w-5 h-5" />}
+                {t("profile.card.create", { fallback: "선수 카드 만들기" })}
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={handleViewCard}
+                className="w-full sm:w-auto flex flex-shrink-0 items-center justify-center gap-2 px-6 py-2.5 border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-lg text-sm font-medium hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors"
+              >
+                <CreditCard className="w-5 h-5" />
+                {t("profile.card.view", { fallback: "선수 카드 보기" })}
+              </button>
+            )}
           </div>
         </div>
 
