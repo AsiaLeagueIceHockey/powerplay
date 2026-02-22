@@ -1,6 +1,7 @@
 {
     "common": {
         "appName": "파워플레이",
+        "home": "홈",
         "login": "로그인",
         "logout": "로그아웃",
         "signup": "회원가입",

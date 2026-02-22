@@ -3,6 +3,7 @@ import { setRequestLocale } from "next-intl/server";
 import { UserHeaderSkeleton } from "@/components/skeletons";
 import { UserHeaderLoader } from "@/components/user-header-loader";
 import { createClient } from "@/lib/supabase/server";
+import { BottomNav } from "@/components/bottom-nav";
 
 export default async function PublicLayout({
   children,
@@ -41,7 +42,10 @@ export default async function PublicLayout({
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">{children}</main>
+      <main className="container mx-auto px-4 py-8 pb-24 md:pb-8">{children}</main>
+
+      {/* Bottom Navigation */}
+      <BottomNav locale={locale} />
     </div>
   );
 }

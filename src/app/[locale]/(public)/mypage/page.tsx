@@ -25,16 +25,13 @@ export default async function MyPage() {
   return (
     <div className="container mx-auto px-4 max-w-4xl">
       {/* Header */}
-      <div className="mb-8">
+      <div className="mb-6">
         <h1 className="text-2xl font-bold mb-2 text-zinc-900 dark:text-white">
           <span className="text-blue-600 dark:text-blue-400">
             {profile?.full_name || user.email?.split("@")[0]}
           </span>
           {locale === "ko" ? "님, 안녕하세요! 👋" : ", Welcome back! 👋"}
         </h1>
-        <p className="text-zinc-600 dark:text-zinc-400">
-          {t("mypage.subtitle")}
-        </p>
       </div>
 
       {/* Profile Editor */}
@@ -45,11 +42,17 @@ export default async function MyPage() {
           primaryClubId={profile?.primary_club_id || null}
           detailedPositions={profile?.detailed_positions || null}
           stickDirection={profile?.stick_direction || null}
+          phone={profile?.phone || null}
           clubs={clubs}
         />
       </div>
 
-      {/* My Matches */}
+      {/* My Matches Title and List */}
+      <div className="mb-4">
+        <h2 className="text-lg font-bold text-zinc-900 dark:text-white">
+          {t("mypage.subtitle")}
+        </h2>
+      </div>
       <MyMatchList matches={myMatches} />
       
       {/* Notification Status */}

@@ -1,6 +1,7 @@
 {
     "common": {
         "appName": "Power Play",
+        "home": "Home",
         "login": "Login",
         "logout": "Logout",
         "signup": "Sign Up",
