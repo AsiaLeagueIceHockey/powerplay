@@ -8,13 +8,15 @@ export const dynamic = "force-dynamic";
 export default async function ChatRoomPage({
   params,
 }: {
-  params: { locale: string; roomId: string };
+  params: Promise<{ locale: string; roomId: string }>;
 }) {
+  const { locale, roomId } = await params;
+  
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect(`/${params.locale}/login`);
+    redirect(`/${locale}/login`);
   }
 
   // Fetch the room definition to get participants and verify access
@@ -25,11 +27,11 @@ export default async function ChatRoomPage({
       p1:participant1_id (id, full_name, primary_club_id),
       p2:participant2_id (id, full_name, primary_club_id)
     `)
-    .eq("id", params.roomId)
+    .eq("id", roomId)
     .single();
 
   if (roomError || !room) {
-    redirect(`/${params.locale}/chat`);
+    redirect(`/${locale}/chat`);
   }
 
   const p1 = room.p1 as unknown as { id: string; full_name: string; primary_club_id: string | null };
@@ -39,20 +41,20 @@ export default async function ChatRoomPage({
   const isParticipant2 = p2.id === user.id;
 
   if (!isParticipant1 && !isParticipant2) {
-    redirect(`/${params.locale}/chat`);
+    redirect(`/${locale}/chat`);
   }
 
   const otherParticipant = isParticipant1 ? p2 : p1;
 
   // Mark all unread messages as read when opening the room
-  await markMessagesAsRead(params.roomId);
+  await markMessagesAsRead(roomId);
 
-  const { messages } = await getChatMessages(params.roomId);
+  const { messages } = await getChatMessages(roomId);
 
   return (
     <div className="flex flex-col h-[100dvh] bg-white dark:bg-zinc-950">
       <ChatRoomClient 
-        roomId={params.roomId}
+        roomId={roomId}
         initialMessages={messages}
         currentUserId={user.id}
         otherParticipant={otherParticipant}
