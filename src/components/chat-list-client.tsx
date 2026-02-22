@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useNotification } from "@/contexts/notification-context";
-import { MessageCircle, BellOff, ArrowRight, Plus } from "lucide-react";
+import { MessageCircle, BellOff, ArrowRight, Plus, Download } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -81,16 +81,22 @@ export function ChatListClient({ initialRooms }: { initialRooms: ChatRoom[] }) {
 
   // Render PWA/Push Gate
   if (!isStandalone || !hasDbSubscription) {
+    const isInstallRequired = !isStandalone;
+
     return (
       <div className="flex flex-col items-center justify-center p-6 text-center h-[70vh]">
         <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mb-6">
-          <BellOff className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+          {isInstallRequired ? (
+            <Download className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+          ) : (
+            <BellOff className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+          )}
         </div>
         <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-3">
-          {t("pwaRequiredTitle")}
+          {isInstallRequired ? t("installRequiredTitle") : t("pushRequiredTitle")}
         </h2>
         <p className="text-zinc-500 dark:text-zinc-400 mb-8 max-w-sm">
-          {t("pwaRequiredDesc")}
+          {isInstallRequired ? t("installRequiredDesc") : t("pushRequiredDesc")}
         </p>
 
         <div className="space-y-3 w-full max-w-xs">
