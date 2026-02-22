@@ -38,7 +38,9 @@ export default function PlayerCardClient({ initialData }: PlayerCardClientProps)
   // Convert external logo to base64 to avoid cross-origin canvas tainting in html-to-image
   useEffect(() => {
     if (clubLogo) {
-      fetch(clubLogo)
+      // Proxy through Next.js image optimizer to bypass CORS issues on external images
+      const proxiedUrl = `/_next/image?url=${encodeURIComponent(clubLogo)}&w=64&q=75`;
+      fetch(proxiedUrl)
         .then((res) => res.blob())
         .then((blob) => {
           const reader = new FileReader();
@@ -59,7 +61,6 @@ export default function PlayerCardClient({ initialData }: PlayerCardClientProps)
       const blob = await toBlob(cardRef.current, {
         quality: 1.0,
         pixelRatio: 2, // Reduced from 3 to improve performance
-        cacheBust: true, // Help with image loading
       });
 
       if (!blob) throw new Error("Could not generate image");
@@ -69,8 +70,8 @@ export default function PlayerCardClient({ initialData }: PlayerCardClientProps)
       if (navigator.share && navigator.canShare({ files: [file] })) {
         await navigator.share({
           files: [file],
-          title: "My PowerPlay Player Card",
-          text: "Check out my digital hockey card on PowerPlay!",
+          title: t("profile.card.shareTitle", { fallback: "My PowerPlay Player Card" }),
+          text: t("profile.card.shareText", { fallback: "Check out my digital hockey card on PowerPlay!" }),
         });
       } else {
         // Fallback to download

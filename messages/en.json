@@ -118,6 +118,19 @@
             "right": "Right",
             "none": "None"
         },
+        "card": {
+            "title": "Digital Player Card",
+            "issuedDesc": "Check out your digital player card.",
+            "unissuedDesc": "Enter your profile to get your digital player card!",
+            "create": "Create Player Card",
+            "reissue": "Reissue Card",
+            "view": "View Player Card",
+            "myCard": "My Player Card",
+            "share": "Share",
+            "shareTitle": "My PowerPlay Player Card",
+            "shareText": "Check out my digital hockey card on PowerPlay!",
+            "needSave": "Please save your changes first."
+        },
         "saved": "Saved successfully"
     },
     "match": {
