@@ -110,6 +110,18 @@ export function UserHeaderMenu({
                 </p>
               </div>
 
+              {/* 1. 마이페이지 (PC 전용) */}
+              <Link
+                href={`/${locale}/mypage`}
+                onClick={() => setIsOpen(false)}
+                className="hidden md:flex items-center gap-3 px-4 py-2.5 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700/50 transition-colors"
+              >
+                <div className="w-8 h-8 rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 flex items-center justify-center flex-shrink-0">
+                  <UserIcon size={16} />
+                </div>
+                <span>{locale === "ko" ? "마이페이지" : "My Page"}</span>
+              </Link>
+
               {/* 2. 충전 금액 (동전) */}
               <Link
                 href={`/${locale}/mypage/points`}
