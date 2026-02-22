@@ -320,12 +320,12 @@ export function ProfileEditor({
               }
             </div>
             
-            <div className="flex gap-2 w-full sm:w-auto">
+            <div className="flex flex-col gap-2 w-full sm:w-auto">
               {cardIssuedAt && (
                 <button
                   type="button"
                   onClick={handleViewCard}
-                  className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-2.5 border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-lg text-sm font-medium hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors"
+                  className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-2.5 border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-lg text-sm font-medium hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors"
                 >
                   <CreditCard className="w-5 h-5" />
                   {t("profile.card.view", { fallback: "선수 카드 보기" })}
@@ -337,7 +337,7 @@ export function ProfileEditor({
                   type="button"
                   onClick={handleIssueCard}
                   disabled={!isProfileComplete || cardLoading || isChanged}
-                  className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-2.5 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-lg text-sm font-medium hover:bg-zinc-800 dark:hover:bg-zinc-200 disabled:opacity-50 transition-colors"
+                  className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-2.5 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-lg text-sm font-medium hover:bg-zinc-800 dark:hover:bg-zinc-200 disabled:opacity-50 transition-colors"
                   title={isChanged ? t("profile.card.needSave", { fallback: "변경사항을 먼저 저장해주세요." }) : undefined}
                 >
                   {cardLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <CreditCard className="w-5 h-5" />}

@@ -42,7 +42,8 @@ export default function PlayerCardClient({ initialData }: PlayerCardClientProps)
       
       const blob = await toBlob(cardRef.current, {
         quality: 1.0,
-        pixelRatio: 3, // High quality
+        pixelRatio: 2, // Reduced from 3 to improve performance
+        cacheBust: true, // Help with image loading
       });
 
       if (!blob) throw new Error("Could not generate image");
@@ -148,7 +149,8 @@ export default function PlayerCardClient({ initialData }: PlayerCardClientProps)
             {/* Club info top-left */}
             <div className="flex items-center gap-2 bg-white/5 backdrop-blur-sm rounded-lg pr-3 pl-1.5 py-1.5 border border-white/10">
               {clubLogo ? (
-                <Image src={clubLogo} alt="Team" width={24} height={24} className="rounded object-cover bg-white" />
+                // eslint-disable-next-line @next/next/no-img-element
+                <img crossOrigin="anonymous" src={clubLogo} alt="Team" width={24} height={24} className="rounded object-cover bg-white" />
               ) : (
                  <div className="w-6 h-6 bg-zinc-800 text-white rounded flex items-center justify-center font-bold text-xs">
                    {clubName ? clubName.charAt(0) : "P"}
@@ -180,6 +182,7 @@ export default function PlayerCardClient({ initialData }: PlayerCardClientProps)
                   fill
                   className={`object-contain brightness-0 invert opacity-90 ${isLeftHanded && !isGoalie ? 'scale-x-[-1]' : ''}`}
                   priority
+                  unoptimized // Bypass Next.js image optimization for reliable export
                 />
              </div>
           </div>
