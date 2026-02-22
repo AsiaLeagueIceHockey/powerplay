@@ -32,14 +32,17 @@ export default async function ChatRoomPage({
     redirect(`/${params.locale}/chat`);
   }
 
-  const isParticipant1 = room.p1.id === user.id;
-  const isParticipant2 = room.p2.id === user.id;
+  const p1 = room.p1 as unknown as { id: string; full_name: string; primary_club_id: string | null };
+  const p2 = room.p2 as unknown as { id: string; full_name: string; primary_club_id: string | null };
+
+  const isParticipant1 = p1.id === user.id;
+  const isParticipant2 = p2.id === user.id;
 
   if (!isParticipant1 && !isParticipant2) {
     redirect(`/${params.locale}/chat`);
   }
 
-  const otherParticipant = isParticipant1 ? room.p2 : room.p1;
+  const otherParticipant = isParticipant1 ? p2 : p1;
 
   // Mark all unread messages as read when opening the room
   await markMessagesAsRead(params.roomId);

@@ -53,7 +53,7 @@ export function ChatUserSelector({ isOpen, onClose }: { isOpen: boolean; onClose
       .order("full_name");
 
     if (!error && data) {
-      setUsers(data as UserProfile[]);
+      setUsers(data as unknown as UserProfile[]);
     }
     setIsLoading(false);
   };
