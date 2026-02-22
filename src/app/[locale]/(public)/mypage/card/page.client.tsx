@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Loader2, Share2, ChevronLeft } from "lucide-react";
@@ -29,9 +29,25 @@ export default function PlayerCardClient({ initialData }: PlayerCardClientProps)
   const router = useRouter();
   const cardRef = useRef<HTMLDivElement>(null);
   const [sharing, setSharing] = useState(false);
+  const [logoDataUrl, setLogoDataUrl] = useState<string | null>(null);
+  
   const data = initialData.profile;
   const clubName = initialData.club?.name || "";
   const clubLogo = initialData.club?.logo_url || null;
+
+  // Convert external logo to base64 to avoid cross-origin canvas tainting in html-to-image
+  useEffect(() => {
+    if (clubLogo) {
+      fetch(clubLogo)
+        .then((res) => res.blob())
+        .then((blob) => {
+          const reader = new FileReader();
+          reader.onloadend = () => setLogoDataUrl(reader.result as string);
+          reader.readAsDataURL(blob);
+        })
+        .catch((err) => console.error("Failed to convert club logo to base64", err));
+    }
+  }, [clubLogo]);
 
   const handleShare = async () => {
     if (!cardRef.current) return;
@@ -150,7 +166,7 @@ export default function PlayerCardClient({ initialData }: PlayerCardClientProps)
             <div className="flex items-center gap-2 bg-white/5 backdrop-blur-sm rounded-lg pr-3 pl-1.5 py-1.5 border border-white/10">
               {clubLogo ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img crossOrigin="anonymous" src={clubLogo} alt="Team" width={24} height={24} className="rounded object-cover bg-white" />
+                <img crossOrigin="anonymous" src={logoDataUrl || clubLogo} alt="Team" width={24} height={24} className="rounded object-cover bg-white" />
               ) : (
                  <div className="w-6 h-6 bg-zinc-800 text-white rounded flex items-center justify-center font-bold text-xs">
                    {clubName ? clubName.charAt(0) : "P"}
