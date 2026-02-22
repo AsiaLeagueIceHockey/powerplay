@@ -227,8 +227,8 @@ export function AdminParticipantList({
                         {t("profile.stick.title", { fallback: "스틱 방향" })}
                       </p>
                       <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
-                        {selectedProfile.stick_direction === "left" ? t("profile.stick.left", { fallback: "레프트" }) : 
-                         selectedProfile.stick_direction === "right" ? t("profile.stick.right", { fallback: "라이트" }) : 
+                        {selectedProfile.stick_direction?.toUpperCase() === "LEFT" ? t("profile.stick.left", { fallback: "레프트" }) : 
+                         selectedProfile.stick_direction?.toUpperCase() === "RIGHT" ? t("profile.stick.right", { fallback: "라이트" }) : 
                          "-"}
                       </p>
                     </div>
