@@ -161,7 +161,7 @@ function RinkMapContent({ rinks, matches = [], clubs = [], isCompact = false }: 
   };
 
   return (
-    <div ref={containerRef} className={`relative w-full rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-900 ${isCompact ? "h-full" : "h-full min-h-[500px]"}`}>
+    <div ref={containerRef} className={`relative w-full rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-900 ${isCompact ? "h-full" : "h-[calc(100vh-200px)] min-h-[500px]"}`}>
       <MapContainer className="w-full h-full">
         <NaverMap
             defaultCenter={initialCenter}
