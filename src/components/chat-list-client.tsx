@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useNotification } from "@/contexts/notification-context";
-import { MessageCircle, BellOff, ArrowRight, Plus, Download } from "lucide-react";
+import { MessageCircle, BellOff, ArrowRight, Download, LogIn } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -22,7 +22,7 @@ interface ChatRoom {
   lastMessageAt: string;
 }
 
-export function ChatListClient({ initialRooms }: { initialRooms: ChatRoom[] }) {
+export function ChatListClient({ initialRooms, isAuthenticated = true }: { initialRooms: ChatRoom[], isAuthenticated?: boolean }) {
   const t = useTranslations("chat");
   const { hasDbSubscription, openGuide, deferredPrompt, promptInstall } = useNotification();
   const [isStandalone, setIsStandalone] = useState<boolean>(true); // Optimistic true on SSR to avoid flash
@@ -78,6 +78,33 @@ export function ChatListClient({ initialRooms }: { initialRooms: ChatRoom[] }) {
   }, [initialRooms]);
 
   if (!isMounted) return null;
+
+  // Render Login Gate
+  if (!isAuthenticated) {
+    return (
+      <div className="flex flex-col items-center justify-center p-6 text-center h-[70vh]">
+        <div className="w-16 h-16 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center mb-6">
+          <LogIn className="w-8 h-8 text-zinc-400 dark:text-zinc-500" />
+        </div>
+        <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-3">
+          {locale === "ko" ? "로그인이 필요합니다" : "Login Required"}
+        </h2>
+        <p className="text-zinc-500 dark:text-zinc-400 mb-8 max-w-sm">
+          {locale === "ko" ? "채팅 서비스를 이용하려면 로그인이 필요합니다." : "Please log in to use the chat service."}
+        </p>
+
+        <div className="w-full max-w-xs">
+            <button
+              onClick={() => router.push(`/${locale}/login`)}
+              className="w-full flex items-center justify-between px-6 py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-colors"
+            >
+              <span>{locale === "ko" ? "로그인하기" : "Log In"}</span>
+              <ArrowRight className="w-5 h-5 opacity-50" />
+            </button>
+        </div>
+      </div>
+    );
+  }
 
   // Render PWA/Push Gate
   if (!isStandalone || !hasDbSubscription) {
