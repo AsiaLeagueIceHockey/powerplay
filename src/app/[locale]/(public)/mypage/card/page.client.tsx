@@ -60,7 +60,7 @@ export default function PlayerCardClient({ initialData }: PlayerCardClientProps)
       
       const blob = await toBlob(cardRef.current, {
         quality: 1.0,
-        pixelRatio: 2, // Reduced from 3 to improve performance
+        pixelRatio: 3, // High quality for crisp rendering
       });
 
       if (!blob) throw new Error("Could not generate image");
