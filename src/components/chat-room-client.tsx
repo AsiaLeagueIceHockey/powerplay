@@ -94,30 +94,11 @@ export function ChatRoomClient({
     setInputValue("");
     setIsSending(true);
 
-    // Optimistically add message
-    const tempId = crypto.randomUUID();
-    const tempMessage: Message = {
-      id: tempId,
-      room_id: roomId,
-      sender_id: currentUserId,
-      content,
-      is_read: false,
-      created_at: new Date().toISOString(),
-    };
-    
-    setMessages((prev) => [...prev, tempMessage]);
-    scrollToBottom();
-
-    // Actual API call
+    // Actual API call. We rely purely on Realtime for UI updates to avoid duplicates.
     const result = await sendMessage(roomId, content, otherParticipant.id);
     
     if (result.error) {
       alert("Failed to send message: " + result.error);
-      // Remove optimistic message if failed
-      setMessages((prev) => prev.filter(m => m.id !== tempId));
-    } else {
-       // Remove optimistic message on success since realtime subscription will add the actual message back
-       setMessages((prev) => prev.filter(m => m.id !== tempId));
     }
 
     setIsSending(false);
@@ -128,7 +109,7 @@ export function ChatRoomClient({
   };
 
   return (
-    <div className="flex flex-col flex-1 h-full overflow-hidden">
+    <div className="flex flex-col flex-1 h-[100dvh] overflow-hidden">
       <header className="px-4 py-3 flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md shrink-0 z-10 pt-safe">
         <div className="flex items-center gap-3">
           <button 
@@ -146,10 +127,9 @@ export function ChatRoomClient({
         </div>
       </header>
 
-      <main className="flex-1 overflow-y-auto p-4 bg-zinc-50 dark:bg-zinc-900 mb-safe flex flex-col gap-1">
+      <main className="flex-1 overflow-y-auto p-4 bg-white dark:bg-zinc-900 mb-safe flex flex-col gap-1">
         {messages.map((message, index) => {
           const isMine = message.sender_id === currentUserId;
-          // Show time or date separators (simple implementation: just show time for now)
           const isLastInGroup = index === messages.length - 1 || messages[index + 1].sender_id !== message.sender_id;
 
           return (
@@ -162,20 +142,20 @@ export function ChatRoomClient({
                   className={`px-4 py-2.5 rounded-2xl break-words ${
                     isMine 
                       ? 'bg-blue-600 text-white rounded-br-sm' 
-                      : 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-700/50 rounded-bl-sm'
+                      : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-700/50 rounded-bl-sm'
                   }`}
                 >
                   {message.content}
                 </div>
                 
-                {isLastInGroup && (
-                  <div className={`flex flex-col gap-0.5 text-[10px] text-zinc-400 ${isMine ? 'items-end' : 'items-start'}`}>
-                    {isMine && !message.is_read && (
-                      <span className="text-blue-500 font-semibold px-0.5">1</span>
-                    )}
+                <div className={`flex flex-col gap-0.5 text-[10px] text-zinc-400 ${isMine ? 'items-end' : 'items-start'}`}>
+                  {isMine && !message.is_read && (
+                    <span className="text-blue-500 font-semibold px-0.5">1</span>
+                  )}
+                  {isLastInGroup && (
                     <span className="whitespace-nowrap pb-0.5">{formatMessageTime(message.created_at)}</span>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             </div>
           );
