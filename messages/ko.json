@@ -7,6 +7,7 @@
         "signup": "회원가입",
         "profile": "프로필",
         "myPage": "마이페이지",
+        "chat": "채팅",
         "admin": "관리자",
         "save": "저장",
         "feedback": {
@@ -132,6 +133,21 @@
             "needSave": "변경사항을 먼저 저장해주세요."
         },
         "saved": "저장되었습니다"
+    },
+    "chat": {
+        "title": "채팅",
+        "empty": "참여 중인 채팅방이 없습니다.",
+        "newChat": "채팅 시작",
+        "newChatTooltip": "새 채팅",
+        "pwaRequiredTitle": "알림 설정이 필요합니다",
+        "pwaRequiredDesc": "채팅 사용을 위해 파워플레이 홈 화면 추가(앱 설치) 및 푸시 알림 설정이 필요합니다.",
+        "installPwa": "앱 설치 가이드 보기",
+        "enablePush": "알림 설정 가이드 보기",
+        "startChatConfirm": "이 유저와 채팅을 시작하시겠습니까?",
+        "userSelectorTitle": "대화 상대 선택",
+        "searchUser": "유저 검색",
+        "inputPlaceholder": "메시지를 입력하세요 (텍스트만 됨)",
+        "send": "전송"
     },
     "match": {
         "rentalFee": "체험 장비 대여",

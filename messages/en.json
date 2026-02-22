@@ -7,6 +7,7 @@
         "signup": "Sign Up",
         "profile": "Profile",
         "myPage": "My Page",
+        "chat": "Chat",
         "admin": "Admin",
         "save": "Save",
         "feedback": {
@@ -132,6 +133,21 @@
             "needSave": "Please save your changes first."
         },
         "saved": "Saved successfully"
+    },
+    "chat": {
+        "title": "Chat",
+        "empty": "No active chat rooms.",
+        "newChat": "Start Chat",
+        "newChatTooltip": "New Chat",
+        "pwaRequiredTitle": "Notification Settings Required",
+        "pwaRequiredDesc": "To use the chat seamlessly, please add Power Play to your home screen (install app) and enable push notifications.",
+        "installPwa": "View App Install Guide",
+        "enablePush": "View Push Enable Guide",
+        "startChatConfirm": "Start chatting with this user?",
+        "userSelectorTitle": "Select User to Chat",
+        "searchUser": "Search User",
+        "inputPlaceholder": "Enter a message (text only)",
+        "send": "Send"
     },
     "match": {
         "rentalFee": "Experience Equipment",
