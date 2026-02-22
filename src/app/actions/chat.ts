@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { sendPushNotification } from "@/app/actions/push";
+import { logAndNotify } from "@/lib/audit";
 
 // ============================================
 // Create or Get Room
@@ -47,6 +48,19 @@ export async function createOrGetRoom(targetUserId: string) {
     console.error("Error creating chat room:", createError);
     return { error: createError.message };
   }
+
+  // Get names for logging purposes
+  const { data: p1Profile } = await supabase.from("profiles").select("full_name").eq("id", p1).single();
+  const { data: p2Profile } = await supabase.from("profiles").select("full_name").eq("id", p2).single();
+  const p1Name = p1Profile?.full_name || p1;
+  const p2Name = p2Profile?.full_name || p2;
+
+  await logAndNotify({
+    userId: user.id,
+    action: "CHAT_CREATE",
+    description: `새로운 채팅방이 개설되었습니다. (${p1Name} 님과 ${p2Name} 님)`,
+    metadata: { room_id: newRoom.id, p1, p2 },
+  });
 
   return { room: newRoom };
 }

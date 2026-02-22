@@ -194,6 +194,18 @@ export async function updateProfile(formData: FormData) {
       description: `새 사용자 가입: ${userName} (${userEmail})`,
       metadata: { email: userEmail, name: userName },
     });
+  } else {
+    // 일반 프로필 업데이트 로직
+    const { data: { user: currentUser } } = await supabase.auth.getUser();
+    const userEmail = currentUser?.email || "unknown";
+    const userName = updateData.full_name || userEmail;
+
+    await logAndNotify({
+      userId: user.id,
+      action: "PROFILE_UPDATE",
+      description: `프로필 정보 수정: ${userName} (${userEmail})`,
+      metadata: { email: userEmail, name: userName, updatedFields: Object.keys(updateData) },
+    });
   }
 
   return { success: true };
@@ -236,6 +248,24 @@ export async function issuePlayerCard() {
 
   revalidatePath("/mypage", "page");
   revalidatePath("/mypage/card", "page");
+
+  const { data: { user: currentUser } } = await supabase.auth.getUser();
+  const userEmail = currentUser?.email || "unknown";
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("full_name")
+    .eq("id", user.id)
+    .single();
+
+  const userName = profile?.full_name || userEmail;
+
+  await logAndNotify({
+    userId: user.id,
+    action: "CARD_ISSUE",
+    description: `선수 카드 발급: ${userName} (${userEmail})`,
+    metadata: { serialNum, email: userEmail, name: userName },
+  });
 
   return { success: true, serialNumber: serialNum };
 }

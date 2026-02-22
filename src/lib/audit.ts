@@ -11,6 +11,9 @@ type AuditAction =
   | "MATCH_DELETE"
   | "POINT_CHARGE_REQUEST"
   | "PUSH_SUBSCRIBE"
+  | "CHAT_CREATE"
+  | "PROFILE_UPDATE"
+  | "CARD_ISSUE"
   | "OTHER";
 
 interface AuditLogParams {
