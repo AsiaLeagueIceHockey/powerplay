@@ -235,6 +235,27 @@ export default async function MatchPage({
             </>
           )}
 
+          {/* Manager / 담당자 Contact (Moved between Goalie and Map) */}
+          {match.created_by && match.created_by !== user?.id && (
+            <div className="pt-2">
+              <div className="border-t border-zinc-100 dark:border-zinc-800 mb-4"></div>
+              <div className="flex justify-between items-center text-sm py-1">
+                <span className="text-zinc-500">{t("match.manager")}</span>
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold text-zinc-900 dark:text-zinc-100">
+                    {creatorName || (locale === "ko" ? "운영진" : "Admin")}
+                  </span>
+                  <StartChatButton
+                    targetUserId={match.created_by}
+                    className="p-1.5 text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 dark:text-blue-400 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 rounded-full"
+                    iconOnly
+                    label={t("match.contactManager")}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="pt-2">
             <a
               href={match.rink?.map_url || "#"}
@@ -260,26 +281,6 @@ export default async function MatchPage({
             )}
           </div>
 
-          {/* Manager / 담당자 Contact (Moved to bottom) */}
-          {match.created_by && match.created_by !== user?.id && (
-            <div className="pt-2">
-              <div className="border-t border-zinc-100 dark:border-zinc-800 mb-4"></div>
-              <div className="flex justify-between items-center text-sm py-1">
-                <span className="text-zinc-500">{t("match.manager")}</span>
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold text-zinc-900 dark:text-zinc-100">
-                    {creatorName || (locale === "ko" ? "운영진" : "Admin")}
-                  </span>
-                  <StartChatButton
-                    targetUserId={match.created_by}
-                    className="p-1.5 text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 dark:text-blue-400 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 rounded-full"
-                    iconOnly
-                    label={t("match.contactManager")}
-                  />
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
 
