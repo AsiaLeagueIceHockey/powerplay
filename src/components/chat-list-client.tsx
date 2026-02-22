@@ -24,8 +24,9 @@ interface ChatRoom {
 
 export function ChatListClient({ initialRooms }: { initialRooms: ChatRoom[] }) {
   const t = useTranslations("chat");
-  const { hasDbSubscription, openGuide } = useNotification();
+  const { hasDbSubscription, openGuide, deferredPrompt, promptInstall } = useNotification();
   const [isStandalone, setIsStandalone] = useState<boolean>(true); // Optimistic true on SSR to avoid flash
+  const [os, setOs] = useState<"ios" | "android" | "other">("other");
   const [isMounted, setIsMounted] = useState(false);
   const [rooms, setRooms] = useState<ChatRoom[]>(initialRooms);
   const [isUserSelectorOpen, setIsUserSelectorOpen] = useState(false);
@@ -40,6 +41,13 @@ export function ChatListClient({ initialRooms }: { initialRooms: ChatRoom[] }) {
     const checkStandalone = () => {
       const isPwa = window.matchMedia("(display-mode: standalone)").matches || (navigator as any).standalone === true;
       setIsStandalone(isPwa);
+      
+      const ua = window.navigator.userAgent.toLowerCase();
+      if (/iphone|ipad|ipod/.test(ua)) {
+        setOs("ios");
+      } else if (/android/.test(ua)) {
+        setOs("android");
+      }
     };
     checkStandalone();
     
@@ -86,7 +94,23 @@ export function ChatListClient({ initialRooms }: { initialRooms: ChatRoom[] }) {
         </p>
 
         <div className="space-y-3 w-full max-w-xs">
-          {!isStandalone && (
+          {!isStandalone && os === "android" && (
+            <button
+              onClick={async () => {
+                if (deferredPrompt) {
+                  await promptInstall();
+                } else {
+                  openGuide("install"); // fallback for Android
+                }
+              }}
+              className="w-full flex items-center justify-between px-6 py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-colors"
+            >
+              <span>{locale === "ko" ? "앱 설치하기" : "Install App"}</span>
+              <ArrowRight className="w-5 h-5 opacity-50" />
+            </button>
+          )}
+
+          {!isStandalone && os !== "android" && (
             <button
               onClick={() => openGuide("install")}
               className="w-full flex items-center justify-between px-6 py-3.5 bg-zinc-900 hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-zinc-900 rounded-xl font-medium transition-colors"
@@ -95,6 +119,7 @@ export function ChatListClient({ initialRooms }: { initialRooms: ChatRoom[] }) {
               <ArrowRight className="w-5 h-5 opacity-50" />
             </button>
           )}
+
           {isStandalone && !hasDbSubscription && (
             <button
               onClick={() => openGuide("notification")}
@@ -113,6 +138,7 @@ export function ChatListClient({ initialRooms }: { initialRooms: ChatRoom[] }) {
     <div className="flex-1 w-full max-w-2xl mx-auto flex flex-col pt-safe">
       <header className="px-4 py-4 flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 sticky top-0 z-10">
         <h1 className="text-xl font-bold dark:text-zinc-100">{t("title")}</h1>
+        {/* Temporarily disabled global chat creation
         <button 
           onClick={() => setIsUserSelectorOpen(true)}
           className="p-2 -mr-2 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 rounded-full transition-colors"
@@ -120,6 +146,7 @@ export function ChatListClient({ initialRooms }: { initialRooms: ChatRoom[] }) {
         >
           <Plus size={24} />
         </button>
+        */}
       </header>
 
       <div className="flex-1 overflow-y-auto">

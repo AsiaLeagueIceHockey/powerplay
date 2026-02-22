@@ -156,6 +156,9 @@
         "rentalCheckboxDesc": "Check this if you need experience equipment",
         "totalCost": "Total Cost",
         "type": "Match Type",
+        "manager": "Manager",
+        "contactManager": "Contact Manager",
+        "contactParticipant": "Send Message",
         "types": {
             "training": "Training",
             "game": "Game",

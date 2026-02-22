@@ -156,6 +156,9 @@
         "rentalCheckboxDesc": "체험용 장비가 필요하면 체크해주세요",
         "totalCost": "총 참가비",
         "type": "대관 구분",
+        "manager": "담당자",
+        "contactManager": "담당자 문의",
+        "contactParticipant": "메시지 보내기",
         "types": {
             "training": "훈련 대관",
             "game": "게임 대관",

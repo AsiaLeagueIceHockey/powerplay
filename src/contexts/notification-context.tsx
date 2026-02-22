@@ -14,6 +14,8 @@ interface NotificationContextType {
   markOnboardingComplete: () => void;
   hasDbSubscription: boolean;
   refreshSubscriptionStatus: () => Promise<void>;
+  deferredPrompt: any;
+  promptInstall: () => Promise<boolean>;
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
@@ -32,6 +34,29 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
   // Onboarding Logic
   const [shouldShowOnboarding, setShouldShowOnboarding] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+
+  useEffect(() => {
+    const handler = (e: any) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+    window.addEventListener("beforeinstallprompt", handler);
+    window.addEventListener("appinstalled", () => {
+      setDeferredPrompt(null);
+    });
+    return () => window.removeEventListener("beforeinstallprompt", handler);
+  }, []);
+
+  const promptInstall = async () => {
+    if (!deferredPrompt) return false;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === "accepted") {
+      setDeferredPrompt(null);
+    }
+    return outcome === "accepted";
+  };
 
   // Fetch DB subscription status
   const refreshSubscriptionStatus = async () => {
@@ -154,7 +179,9 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       shouldShowOnboarding,
       markOnboardingComplete,
       hasDbSubscription,
-      refreshSubscriptionStatus
+      refreshSubscriptionStatus,
+      deferredPrompt,
+      promptInstall
     }}>
       {children}
     </NotificationContext.Provider>

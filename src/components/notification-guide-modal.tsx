@@ -196,42 +196,81 @@ export function NotificationGuideModal() {
                     </div>
                   )}
 
-                  <div className="space-y-4">
-                    <div className="flex items-start gap-4">
-                      <div className="w-8 h-8 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center font-bold flex-shrink-0">1</div>
-                      <div>
-                        <p className="font-medium mb-1">Safari 브라우저에서 열기</p>
-                        <div className="flex items-center gap-2 text-sm text-zinc-500">
-                           <Compass className="w-4 h-4 shrink-0" />
-                           <span>인앱 브라우저(카톡, 인스타 등)라면 Safari로 접속해주세요.</span>
+                  {os === "ios" ? (
+                    <div className="space-y-4">
+                      <div className="flex items-start gap-4">
+                        <div className="w-8 h-8 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center font-bold flex-shrink-0">1</div>
+                        <div>
+                          <p className="font-medium mb-1">Safari 브라우저에서 열기</p>
+                          <div className="flex items-center gap-2 text-sm text-zinc-500">
+                             <Compass className="w-4 h-4 shrink-0" />
+                             <span>인앱 브라우저(카톡, 인스타 등)라면 Safari로 접속해주세요.</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-4">
+                        <div className="w-8 h-8 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center font-bold flex-shrink-0">2</div>
+                        <div>
+                          <p className="font-medium mb-1">브라우저 하단 공유 버튼 클릭</p>
+                          <Share className="w-6 h-6 text-blue-500" />
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-4">
+                        <div className="w-8 h-8 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center font-bold flex-shrink-0">3</div>
+                        <div>
+                          <p className="font-medium mb-1">'홈 화면에 추가' 선택</p>
+                          <div className="flex items-center gap-2 text-sm text-zinc-500">
+                             <PlusSquare className="w-4 h-4" />
+                             <span>홈 화면에 추가</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-4">
+                        <div className="w-8 h-8 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center font-bold flex-shrink-0">4</div>
+                        <div>
+                          <p className="font-medium mb-1">홈 화면의 아이콘으로 앱 실행</p>
+                          <p className="text-sm text-zinc-500">새로 설치된 앱으로 접속해주세요.</p>
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-start gap-4">
-                      <div className="w-8 h-8 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center font-bold flex-shrink-0">2</div>
-                      <div>
-                        <p className="font-medium mb-1">브라우저 하단 공유 버튼 클릭</p>
-                        <Share className="w-6 h-6 text-blue-500" />
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="flex items-start gap-4">
+                        <div className="w-8 h-8 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center font-bold flex-shrink-0">1</div>
+                        <div>
+                          <p className="font-medium mb-1">일반 브라우저에서 열기</p>
+                          <div className="flex items-center gap-2 text-sm text-zinc-500">
+                             <Compass className="w-4 h-4 shrink-0" />
+                             <span>크롬(Chrome)이나 삼성 스토어 등의 브라우저로 접속해주세요.</span>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex items-start gap-4">
-                      <div className="w-8 h-8 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center font-bold flex-shrink-0">3</div>
-                      <div>
-                        <p className="font-medium mb-1">'홈 화면에 추가' 선택</p>
-                        <div className="flex items-center gap-2 text-sm text-zinc-500">
-                           <PlusSquare className="w-4 h-4" />
-                           <span>홈 화면에 추가</span>
+                      <div className="flex items-start gap-4">
+                        <div className="w-8 h-8 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center font-bold flex-shrink-0">2</div>
+                        <div>
+                          <p className="font-medium mb-1">브라우저 설정 메뉴 클릭</p>
+                          <p className="text-sm text-zinc-500">우측 상단 또는 하단의 메뉴(⋮) 아이콘을 누르세요.</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-4">
+                        <div className="w-8 h-8 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center font-bold flex-shrink-0">3</div>
+                        <div>
+                          <p className="font-medium mb-1">'앱 설치' 또는 '홈 화면에 추가'</p>
+                          <div className="flex items-center gap-2 text-sm text-zinc-500">
+                             <Download className="w-4 h-4" />
+                             <span>앱 설치 / 홈 화면에 추가</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-4">
+                        <div className="w-8 h-8 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center font-bold flex-shrink-0">4</div>
+                        <div>
+                          <p className="font-medium mb-1">홈 화면의 아이콘으로 앱 실행</p>
+                          <p className="text-sm text-zinc-500">새로 설치된 앱으로 접속해주세요.</p>
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-start gap-4">
-                      <div className="w-8 h-8 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center font-bold flex-shrink-0">4</div>
-                      <div>
-                        <p className="font-medium mb-1">홈 화면의 아이콘으로 앱 실행</p>
-                        <p className="text-sm text-zinc-500">새로 설치된 앱으로 접속해주세요.</p>
-                      </div>
-                    </div>
-                  </div>
+                  )}
                   
                   {guideType === "install" && (
                     <button onClick={handleClose} className="w-full py-3 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 rounded-xl font-medium transition mt-4">

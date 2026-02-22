@@ -7,6 +7,7 @@ import { MatchApplication } from "@/components/match-application";
 import { AdminControls } from "@/components/admin-controls";
 import { MatchShareButton } from "@/components/match-share-button";
 import { DynamicRinkMap } from "@/components/dynamic-rink-map";
+import { StartChatButton } from "@/components/start-chat-button";
 
 export default async function MatchPage({
   params,
@@ -161,6 +162,27 @@ export default async function MatchPage({
         <h2 className="text-lg font-bold mb-4">{t("match.details")}</h2>
 
         <div className="space-y-3">
+          {/* Manager / 담당자 Contact (if match.created_by exists and is not current user) */}
+          {match.created_by && match.created_by !== user?.id && (
+            <>
+              <div className="flex justify-between items-center text-sm py-1">
+                <span className="text-zinc-500">{t("match.manager")}</span>
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold text-zinc-900 dark:text-zinc-100">
+                    {creatorName || (locale === "ko" ? "운영진" : "Admin")}
+                  </span>
+                  <StartChatButton
+                    targetUserId={match.created_by}
+                    className="p-1.5 text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 dark:text-blue-400 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 rounded-full"
+                    iconOnly
+                    label={t("match.contactManager")}
+                  />
+                </div>
+              </div>
+              <div className="border-t border-zinc-100 dark:border-zinc-800 my-2"></div>
+            </>
+          )}
+
           <div className="flex justify-between items-center text-sm">
             <span className="text-zinc-500">{t("match.fee")}</span>
             {isTeamMatch ? (
@@ -361,6 +383,16 @@ export default async function MatchPage({
                   <span className="font-medium">
                     {players.fw[0]?.user?.full_name || players.fw[0]?.user?.email?.split('@')[0]}
                   </span>
+                  {players.fw[0]?.user?.id && players.fw[0].user.id !== user?.id && (
+                    <div className="ml-auto">
+                      <StartChatButton
+                        targetUserId={players.fw[0].user.id}
+                        className="p-1.5 text-zinc-400 hover:text-blue-600 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full"
+                        iconOnly
+                        label={t("match.contactParticipant")}
+                      />
+                    </div>
+                  )}
                   {players.fw[0]?.id === userParticipant?.id && (
                     <span className="ml-auto text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">Me</span>
                   )}
@@ -401,6 +433,16 @@ export default async function MatchPage({
                   {p.status === "pending_payment" && (
                     <span className="text-xs bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 px-2 py-0.5 rounded">{t("participant.status.pending_payment")}</span>
                   )}
+                  {p.user?.id && p.user.id !== user?.id && (
+                    <div className="ml-auto">
+                      <StartChatButton
+                        targetUserId={p.user.id}
+                        className="p-1.5 text-zinc-400 hover:text-blue-600 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full"
+                        iconOnly
+                        label={t("match.contactParticipant")}
+                      />
+                    </div>
+                  )}
                   {p.id === userParticipant?.id && (
                     <span className="ml-auto text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">Me</span>
                   )}
@@ -433,6 +475,16 @@ export default async function MatchPage({
                   </span>
                   {p.status === "pending_payment" && (
                     <span className="text-xs bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 px-2 py-0.5 rounded">{t("participant.status.pending_payment")}</span>
+                  )}
+                  {p.user?.id && p.user.id !== user?.id && (
+                    <div className="ml-auto">
+                      <StartChatButton
+                        targetUserId={p.user.id}
+                        className="p-1.5 text-zinc-400 hover:text-blue-600 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full"
+                        iconOnly
+                        label={t("match.contactParticipant")}
+                      />
+                    </div>
                   )}
                   {p.id === userParticipant?.id && (
                     <span className="ml-auto text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">Me</span>
@@ -467,6 +519,16 @@ export default async function MatchPage({
                   {p.status === "pending_payment" && (
                     <span className="text-xs bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 px-2 py-0.5 rounded">{t("participant.status.pending_payment")}</span>
                   )}
+                  {p.user?.id && p.user.id !== user?.id && (
+                    <div className="ml-auto">
+                      <StartChatButton
+                        targetUserId={p.user.id}
+                        className="p-1.5 text-zinc-400 hover:text-blue-600 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full"
+                        iconOnly
+                        label={t("match.contactParticipant")}
+                      />
+                    </div>
+                  )}
                   {p.id === userParticipant?.id && (
                     <span className="ml-auto text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">Me</span>
                   )}
@@ -498,6 +560,16 @@ export default async function MatchPage({
                   <span className="text-xs bg-zinc-200 text-zinc-600 dark:bg-zinc-700 dark:text-zinc-400 px-2 py-0.5 rounded">
                     {t(`match.position.${p.position}`)}
                   </span>
+                  {p.user?.id && p.user.id !== user?.id && (
+                    <div className="ml-auto">
+                      <StartChatButton
+                        targetUserId={p.user.id}
+                        className="p-1.5 text-zinc-400 hover:text-blue-600 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full"
+                        iconOnly
+                        label={t("match.contactParticipant")}
+                      />
+                    </div>
+                  )}
                   {p.id === userParticipant?.id && (
                     <span className="ml-auto text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded">Me</span>
                   )}
