@@ -99,9 +99,9 @@ export default async function MatchPage({
   const isJoined = !!userParticipant;
   const isTeamMatch = match.match_type === "team_match";
 
-  // Team Match: 주최자 이름 조회 (개인 주최 시 이름 표시용)
+  // 주최자 이름 조회 (모든 경기에서 담당자 이름 표시용)
   let creatorName = "";
-  if (isTeamMatch && !match.club && match.created_by) {
+  if (match.created_by) {
     const { data: creatorProfile } = await supabase
       .from("profiles")
       .select("full_name")
@@ -162,26 +162,7 @@ export default async function MatchPage({
         <h2 className="text-lg font-bold mb-4">{t("match.details")}</h2>
 
         <div className="space-y-3">
-          {/* Manager / 담당자 Contact (if match.created_by exists and is not current user) */}
-          {match.created_by && match.created_by !== user?.id && (
-            <>
-              <div className="flex justify-between items-center text-sm py-1">
-                <span className="text-zinc-500">{t("match.manager")}</span>
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold text-zinc-900 dark:text-zinc-100">
-                    {creatorName || (locale === "ko" ? "운영진" : "Admin")}
-                  </span>
-                  <StartChatButton
-                    targetUserId={match.created_by}
-                    className="p-1.5 text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 dark:text-blue-400 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 rounded-full"
-                    iconOnly
-                    label={t("match.contactManager")}
-                  />
-                </div>
-              </div>
-              <div className="border-t border-zinc-100 dark:border-zinc-800 my-2"></div>
-            </>
-          )}
+
 
           <div className="flex justify-between items-center text-sm">
             <span className="text-zinc-500">{t("match.fee")}</span>
@@ -266,8 +247,8 @@ export default async function MatchPage({
 
             {/* Embedded Map */}
             {match.rink && match.rink.lat && match.rink.lng && (
-              <div className="w-full h-48 rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-800">
-                <DynamicRinkMap rinks={[match.rink]} />
+              <div className="w-full h-48 rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-800 relative z-0">
+                <DynamicRinkMap rinks={[match.rink]} isCompact={true} />
               </div>
             )}
 
@@ -278,6 +259,27 @@ export default async function MatchPage({
               </p>
             )}
           </div>
+
+          {/* Manager / 담당자 Contact (Moved to bottom) */}
+          {match.created_by && match.created_by !== user?.id && (
+            <div className="pt-2">
+              <div className="border-t border-zinc-100 dark:border-zinc-800 mb-4"></div>
+              <div className="flex justify-between items-center text-sm py-1">
+                <span className="text-zinc-500">{t("match.manager")}</span>
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold text-zinc-900 dark:text-zinc-100">
+                    {creatorName || (locale === "ko" ? "운영진" : "Admin")}
+                  </span>
+                  <StartChatButton
+                    targetUserId={match.created_by}
+                    className="p-1.5 text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 dark:text-blue-400 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 rounded-full"
+                    iconOnly
+                    label={t("match.contactManager")}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

@@ -148,7 +148,7 @@
         "startChatConfirm": "Start chatting with this user?",
         "userSelectorTitle": "Select User to Chat",
         "searchUser": "Search User",
-        "inputPlaceholder": "Enter a message (text only)",
+        "inputPlaceholder": "Enter a message",
         "send": "Send"
     },
     "match": {

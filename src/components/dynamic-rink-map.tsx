@@ -20,6 +20,7 @@ interface RinkMapProps {
   rinks: Rink[];
   matches?: Match[];
   clubs?: Club[];
+  isCompact?: boolean;
 }
 
 export function DynamicRinkMap(props: RinkMapProps) {

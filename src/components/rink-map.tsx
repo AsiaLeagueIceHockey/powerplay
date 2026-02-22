@@ -11,6 +11,7 @@ interface RinkMapProps {
   rinks: Rink[];
   matches?: Match[];
   clubs?: Club[];
+  isCompact?: boolean;
 }
 
 function RinkDetailCard({ rink, matches, clubs = [], onClose }: { rink: Rink; matches: Match[]; clubs?: Club[]; onClose: () => void }) {
@@ -112,7 +113,7 @@ function RinkDetailCard({ rink, matches, clubs = [], onClose }: { rink: Rink; ma
   );
 }
 
-function RinkMapContent({ rinks, matches = [], clubs = [] }: RinkMapProps) {
+function RinkMapContent({ rinks, matches = [], clubs = [], isCompact = false }: RinkMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const navermaps = useNavermaps();
   const [map, setMap] = useState<naver.maps.Map | null>(null);
@@ -160,8 +161,8 @@ function RinkMapContent({ rinks, matches = [], clubs = [] }: RinkMapProps) {
   };
 
   return (
-    <div ref={containerRef} className="relative w-full h-full min-h-[500px] rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-900">
-      <MapContainer className="w-full h-[600px]">
+    <div ref={containerRef} className={`relative w-full rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-900 ${isCompact ? "h-full" : "h-full min-h-[500px]"}`}>
+      <MapContainer className="w-full h-full">
         <NaverMap
             defaultCenter={initialCenter}
             defaultZoom={rinks.length === 1 ? 15 : 11}
@@ -229,7 +230,7 @@ function RinkMapContent({ rinks, matches = [], clubs = [] }: RinkMapProps) {
       </MapContainer>
 
       {/* Rink Detail Card Overlay */}
-      {selectedRink && (
+      {!isCompact && selectedRink && (
         <RinkDetailCard 
             rink={selectedRink} 
             matches={matches} 
@@ -239,18 +240,20 @@ function RinkMapContent({ rinks, matches = [], clubs = [] }: RinkMapProps) {
       )}
 
       {/* Floating My Location Button */}
-      <button
-        onClick={handleMyLocation}
-        className="absolute bottom-6 right-6 bg-white dark:bg-zinc-800 p-3 rounded-full shadow-lg border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-700 z-10 transition-transform active:scale-95 text-zinc-700 dark:text-zinc-200"
-        title="내 위치"
-      >
-        <Navigation className="w-5 h-5" />
-      </button>
+      {!isCompact && (
+        <button
+          onClick={handleMyLocation}
+          className="absolute bottom-6 right-6 bg-white dark:bg-zinc-800 p-3 rounded-full shadow-lg border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-700 z-10 transition-transform active:scale-95 text-zinc-700 dark:text-zinc-200"
+          title="내 위치"
+        >
+          <Navigation className="w-5 h-5" />
+        </button>
+      )}
     </div>
   );
 }
 
-export function RinkMap({ rinks, matches, clubs }: RinkMapProps) {
+export function RinkMap({ rinks, matches, clubs, isCompact = false }: RinkMapProps) {
   const clientId = process.env.NEXT_PUBLIC_NAVER_MAP_CLIENT_ID;
 
   if (!clientId) {
@@ -259,7 +262,7 @@ export function RinkMap({ rinks, matches, clubs }: RinkMapProps) {
 
   return (
     <NavermapsProvider ncpKeyId={clientId}>
-      <RinkMapContent rinks={rinks} matches={matches} clubs={clubs} />
+      <RinkMapContent rinks={rinks} matches={matches} clubs={clubs} isCompact={isCompact} />
     </NavermapsProvider>
   );
 }
