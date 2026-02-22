@@ -1062,3 +1062,57 @@ export async function getAdminDetail(targetUserId: string): Promise<{
     })) as AdminMatch[],
   };
 }
+
+// Get detailed profile of a participant (for Admin/Superuser)
+export async function getParticipantProfile(userId: string) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return null;
+  }
+
+  // Verify admin or superuser role
+  const { data: myProfile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  if (myProfile?.role !== "admin" && myProfile?.role !== "superuser") {
+    return null;
+  }
+
+  const { data: profile, error } = await supabase
+    .from("profiles")
+    .select(`
+      id,
+      email,
+      full_name,
+      phone,
+      bio,
+      hockey_start_date,
+      primary_club_id,
+      stick_direction,
+      detailed_positions,
+      club:clubs!primary_club_id(name)
+    `)
+    .eq("id", userId)
+    .single();
+
+  if (error || !profile) {
+    console.error("Error fetching participant profile:", error);
+    return null;
+  }
+
+  const clubObj = profile.club as any;
+  const clubName = Array.isArray(clubObj) ? clubObj[0]?.name : clubObj?.name;
+
+  return {
+    ...profile,
+    club_name: clubName || null,
+  };
+}

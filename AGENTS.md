@@ -615,3 +615,11 @@ UPDATE profiles SET role = 'superuser' WHERE email = 'your-email@example.com';
     - Created `tests/unit/rental-logic.test.ts` (18 tests) verifying cost calculation, status logic, refund logic, and availability validation.
     - Created `tests/unit/waitlist-rental.test.ts` (8 tests) verifying waitlist promotion logic.
 - **Next Steps**: Monitor the "Experience Equipment" usage and gather feedback on the rental fee pricing model.
+
+### [2026-02-22] Add Participant Profile Details to Admin Views
+- **Summary**: Enhanced the `AdminParticipantList` component used in Admin and SuperUser match cards to display detailed user profiles in a modal.
+- **Changes**:
+  - **Server Action**: Added `getParticipantProfile` in `src/app/actions/admin.ts` to asynchronously fetch profile information including Hockey Start Date, Bio, Stick Direction, and Detailed Positions.
+  - **UI/UX**: Added a "[상세] (Details)" button next to confirmed participants in the admin list.
+  - **Modal**: Built a modal component within `AdminParticipantList` displaying the fetched data clearly using existing i18n keys.
+- **Next Steps**: Gather feedback from admins to see if these details help in balancing matches more effectively.
