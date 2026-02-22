@@ -34,7 +34,9 @@ export function BottomNav({ locale }: { locale: string }) {
   return (
     <nav 
       className="fixed bottom-0 left-0 right-0 z-40 w-full border-t border-zinc-200 bg-white/80 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-950/80 md:hidden"
-      style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+      style={{ 
+        paddingBottom: "max(constant(safe-area-inset-bottom), env(safe-area-inset-bottom))"
+      }}
     >
       <div className="flex justify-around items-center h-14 px-2">
         {tabs.map((tab) => {

@@ -83,7 +83,9 @@ export default function PlayerCardClient({ initialData }: PlayerCardClientProps)
     );
   }
 
-  const isGoalie = data.detailed_positions?.includes("G") || data.position === "G";
+  const isGoalie =
+    (data.detailed_positions?.length === 1 && data.detailed_positions[0] === "G") ||
+    (!data.detailed_positions?.length && data.position === "G");
   const isLeftHanded = data.stick_direction === "LEFT";
   const imageSrc = isGoalie ? "/goalie.png" : "/player.svg";
   
