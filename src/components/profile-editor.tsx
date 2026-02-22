@@ -152,29 +152,32 @@ export function ProfileEditor({
   }, [startYear, startMonth, t]);
 
   return (
-    <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-6 space-y-8">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
+    <div className="space-y-4">
+      <div className="flex items-center justify-between px-1">
+        <h2 className="text-lg font-bold text-zinc-900 dark:text-white">
           {t("profile.title")}
         </h2>
-        {isChanged && (
-          <button
-            onClick={handleSave}
-            disabled={loading}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
-          >
-            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-            {t("common.save")}
-          </button>
-        )}
-        {!isChanged && saved && (
-          <span className="text-sm text-green-600 dark:text-green-400 font-medium">
-            {t("profile.saved")}
-          </span>
-        )}
+        <div className="flex items-center gap-3">
+          {!isChanged && saved && (
+            <span className="text-sm text-green-600 dark:text-green-400 font-medium">
+              {t("profile.saved")}
+            </span>
+          )}
+          {isChanged && (
+            <button
+              onClick={handleSave}
+              disabled={loading}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
+            >
+              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              {t("common.save")}
+            </button>
+          )}
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-6 space-y-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Full Name */}
         <div className="space-y-3">
           <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
@@ -368,6 +371,7 @@ export function ProfileEditor({
             </div>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

@@ -58,14 +58,21 @@ export default async function MyPage() {
       </div>
       <MyMatchList matches={myMatches} />
       
+      {/* Language Switcher */}
+      <div className="mt-8">
+        <LanguageSwitcher locale={locale} />
+      </div>
+
       {/* Notification Status */}
       <div className="mt-8">
-        <NotificationStatus />
-      </div>
-      
-      {/* Language Switcher */}
-      <div className="mt-6">
-        <LanguageSwitcher locale={locale} />
+        <div className="space-y-4">
+          <div className="px-1">
+            <h2 className="text-lg font-bold text-zinc-900 dark:text-white flex items-center gap-2">
+              {locale === "ko" ? "알림 설정" : "Notification Settings"}
+            </h2>
+          </div>
+          <NotificationStatus />
+        </div>
       </div>
     </div>
   );
