@@ -41,7 +41,7 @@ export function BottomNav({ locale }: { locale: string }) {
             <Link
               key={tab.href}
               href={tab.href}
-              className={`flex items-center justify-center w-full h-full transition-colors ${
+              className={`flex flex-col items-center justify-center w-full h-full gap-0.5 transition-colors ${
                 active
                   ? "text-blue-600 dark:text-blue-400"
                   : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
@@ -49,7 +49,8 @@ export function BottomNav({ locale }: { locale: string }) {
               title={tab.name}
               aria-label={tab.name}
             >
-              <Icon size={24} strokeWidth={active ? 2.5 : 2} />
+              <Icon size={22} strokeWidth={active ? 2.5 : 2} />
+              <span className={`text-[10px] ${active ? "font-semibold" : "font-medium"}`}>{tab.name}</span>
             </Link>
           );
         })}
