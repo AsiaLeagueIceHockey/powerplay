@@ -18,6 +18,12 @@ const POSITION_LABEL: Record<string, string> = {
   FW: "FW",
   DF: "DF",
   G: "G",
+  LW: "LW",
+  C: "C",
+  RW: "RW",
+  LD: "LD",
+  RD: "RD",
+  UNDECIDED: "미정",
 };
 
 function formatDateKST(dateStr: string | null) {
@@ -52,6 +58,21 @@ function UserDetailModal({
 }) {
   const roleInfo = ROLE_BADGE[user.role] ?? ROLE_BADGE.user;
 
+  const clubObj = user.club as any;
+  const clubName = Array.isArray(clubObj) ? clubObj[0]?.name : clubObj?.name;
+
+  const formatExperience = (dateString?: string | null) => {
+    if (!dateString) return "-";
+    const start = new Date(dateString);
+    const now = new Date();
+    const diffMonths = (now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth());
+    if (diffMonths < 1) return "1개월 미만";
+    const years = Math.floor(diffMonths / 12);
+    const months = diffMonths % 12;
+    if (years === 0) return `${months}개월`;
+    return `${years}년 ${months}개월`;
+  };
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
@@ -81,7 +102,7 @@ function UserDetailModal({
         </div>
 
         {/* Body */}
-        <div className="p-6 space-y-4">
+        <div className="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
           {/* Role & Position */}
           <div className="flex gap-3 flex-wrap">
             <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${roleInfo.className}`}>
@@ -99,6 +120,14 @@ function UserDetailModal({
             )}
           </div>
 
+          {/* Bio */}
+          {user.bio && (
+            <div className="bg-zinc-800/50 rounded-xl p-4 border border-zinc-700/50">
+              <p className="text-xs text-zinc-500 mb-1">자기소개</p>
+              <p className="text-sm text-zinc-300 leading-relaxed whitespace-pre-wrap">{user.bio}</p>
+            </div>
+          )}
+
           {/* Info Grid */}
           <div className="grid grid-cols-2 gap-3">
             <InfoItem icon={<Phone className="w-4 h-4" />} label="전화번호" value={user.phone || "-"} />
@@ -110,15 +139,23 @@ function UserDetailModal({
               highlight
             />
             <InfoItem icon={<Shield className="w-4 h-4" />} label="역할" value={roleInfo.label} />
+            
+            {/* New Hockey Info */}
+            <InfoItem icon={<User className="w-4 h-4" />} label="소속팀" value={clubName || "소속팀 없음"} />
+            <InfoItem icon={<Calendar className="w-4 h-4" />} label="구력" value={formatExperience(user.hockey_start_date)} />
+            <InfoItem 
+              icon={<User className="w-4 h-4" />} 
+              label="스틱 방향" 
+              value={user.stick_direction?.toUpperCase() === "LEFT" ? "레프트" : user.stick_direction?.toUpperCase() === "RIGHT" ? "라이트" : "-"} 
+            />
+            <InfoItem 
+              icon={<User className="w-4 h-4" />} 
+              label="상세 포지션" 
+              value={user.detailed_positions && user.detailed_positions.length > 0 
+                ? user.detailed_positions.map(p => POSITION_LABEL[p] || p).join(", ") 
+                : "-"} 
+            />
           </div>
-
-          {/* Bio */}
-          {user.bio && (
-            <div className="bg-zinc-800/50 rounded-xl p-4 border border-zinc-700/50">
-              <p className="text-xs text-zinc-500 mb-1">자기소개</p>
-              <p className="text-sm text-zinc-300 leading-relaxed whitespace-pre-wrap">{user.bio}</p>
-            </div>
-          )}
 
           {/* Timestamps */}
           <div className="grid grid-cols-1 gap-2 pt-2 border-t border-zinc-800">

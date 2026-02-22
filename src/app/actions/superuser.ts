@@ -709,6 +709,10 @@ export interface UserProfile {
   preferred_lang: string | null;
   created_at: string;
   updated_at: string;
+  hockey_start_date: string | null;
+  stick_direction: string | null;
+  detailed_positions: string[] | null;
+  club?: { name: string } | { name: string }[] | null;
 }
 
 /**
@@ -723,7 +727,7 @@ export async function getAllUsers(search?: string): Promise<UserProfile[]> {
   let query = supabase
     .from("profiles")
     .select(
-      "id, email, full_name, phone, bio, birth_date, role, position, points, preferred_lang, created_at, updated_at"
+      "id, email, full_name, phone, bio, birth_date, role, position, points, preferred_lang, created_at, updated_at, hockey_start_date, stick_direction, detailed_positions, club:clubs!primary_club_id(name)"
     )
     .order("created_at", { ascending: false });
 

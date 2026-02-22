@@ -623,3 +623,10 @@ UPDATE profiles SET role = 'superuser' WHERE email = 'your-email@example.com';
   - **UI/UX**: Added a "[상세] (Details)" button next to confirmed participants in the admin list.
   - **Modal**: Built a modal component within `AdminParticipantList` displaying the fetched data clearly using existing i18n keys.
 - **Next Steps**: Gather feedback from admins to see if these details help in balancing matches more effectively.
+
+### [2026-02-22] Display Full Profile Details in User Management Tab
+- **Summary**: Upgraded the `UserManagementTab` modal in the SuperUser dashboard to display all new hockey-related profile fields.
+- **Changes**:
+  - **Server Action Updates**: Modified the `getAllUsers` SELECT query in `src/app/actions/superuser.ts` to fetch `hockey_start_date`, `stick_direction`, `detailed_positions`, and a JOIN on `clubs`.
+  - **Type Definition**: Updated the `UserProfile` interface to accurately type the newly fetched columns.
+  - **Modal Refinements**: Added new `InfoItem` visual grid blocks to `user-management-tab.tsx` converting timestamps to relative experience periods ("X년 Y개월") and mapping database enum values to user-friendly Korean strings ("레프트", "FW" etc.).
