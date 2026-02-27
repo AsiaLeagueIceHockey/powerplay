@@ -75,16 +75,23 @@ export default async function ClubDetailPage({
                  <div className="flex flex-wrap gap-2">
                     {club.rinks.map(rink => {
                         const region = extractRegion(rink.address);
+                        const naverMapUrl = `https://map.naver.com/v5/search/${encodeURIComponent(rink.name_ko)}`;
                         return (
-                            <div key={rink.id} className="text-sm px-3 py-1.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 rounded-lg border border-zinc-200 dark:border-zinc-700">
-                                <span>{locale === "ko" ? rink.name_ko : rink.name_en}</span>
+                            <a
+                                key={rink.id}
+                                href={naverMapUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="flex flex-col gap-1 text-sm px-3 py-2 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors group"
+                            >
+                                <span className="font-medium group-hover:text-blue-600 dark:group-hover:text-blue-400">{locale === "ko" ? rink.name_ko : rink.name_en}</span>
                                 {region && (
-                                    <span className="flex items-center gap-0.5 text-xs text-zinc-400 dark:text-zinc-500 mt-0.5">
-                                        <MapPin className="w-3 h-3" />
+                                    <span className="flex items-center gap-1 text-xs text-zinc-400 dark:text-zinc-500">
+                                        <MapPin className="w-3 h-3 shrink-0" />
                                         {region}
                                     </span>
                                 )}
-                            </div>
+                            </a>
                         );
                     })}
                  </div>
