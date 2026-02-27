@@ -11,9 +11,11 @@ import { RinkExplorer } from "@/components/rink-explorer";
 import { useTranslations, useLocale } from "next-intl";
 import { RinkFilterDrawer } from "@/components/rink-filter-drawer";
 import { MatchTypeFilterDrawer } from "@/components/match-type-filter-drawer";
-import { List, CalendarDays, Loader2, ChevronDown } from "lucide-react";
+import { RegionFilterDrawer } from "@/components/region-filter-drawer";
+import { List, CalendarDays, Loader2, ChevronDown, Search } from "lucide-react";
 import { Club } from "@/app/actions/types";
 import { ClubCard } from "@/components/club-card";
+import { extractRegion, getUniqueRegions } from "@/lib/rink-utils";
 
 interface HomeClientProps {
   matches: Match[]; // This is now ALL matches passed from server
@@ -51,6 +53,11 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
   // Match Type Filter State
   const [selectedMatchTypes, setSelectedMatchTypes] = useState<string[]>([]);
   const [isMatchTypeFilterOpen, setIsMatchTypeFilterOpen] = useState(false);
+
+  // Club Search & Region Filter State
+  const [clubSearchQuery, setClubSearchQuery] = useState("");
+  const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
+  const [isRegionFilterOpen, setIsRegionFilterOpen] = useState(false);
 
   const setActiveTab = (tab: "match" | "rink" | "club") => {
     startTransition(() => {
@@ -143,12 +150,26 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
   });
 
   const filteredClubs = clubs.filter((club) => {
-    if (selectedRinkIds.length > 0) {
+    // 1. Name search filter
+    if (clubSearchQuery.trim()) {
+      if (!club.name.toLowerCase().includes(clubSearchQuery.trim().toLowerCase())) {
+        return false;
+      }
+    }
+    // 2. Region filter
+    if (selectedRegions.length > 0) {
       if (!club.rinks || club.rinks.length === 0) return false;
-      return club.rinks.some(r => selectedRinkIds.includes(r.id));
+      return club.rinks.some(r => {
+        const region = extractRegion(r.address);
+        return selectedRegions.includes(region);
+      });
     }
     return true;
   });
+
+  // Compute available regions from all clubs' rinks
+  const allClubRinks = clubs.flatMap(c => c.rinks || []);
+  const availableRegions = getUniqueRegions(allClubRinks);
 
   return (
     <div className="flex flex-col gap-6">
@@ -358,19 +379,31 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
           <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
             {/* Club Tab */}
             <div className="mb-6">
-              {/* Filter Chips for Clubs */}
+              {/* Search Input */}
+              <div className="relative mb-3">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                <input
+                  type="text"
+                  value={clubSearchQuery}
+                  onChange={(e) => setClubSearchQuery(e.target.value)}
+                  placeholder={t("filter.searchClub")}
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white text-sm placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                />
+              </div>
+
+              {/* Region Filter Chip */}
               <div className="flex overflow-x-auto gap-2 px-1 pb-4 no-scrollbar">
                 <button
-                  onClick={() => setIsRinkFilterOpen(true)}
+                  onClick={() => setIsRegionFilterOpen(true)}
                   className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium border transition-colors whitespace-nowrap ${
-                    selectedRinkIds.length > 0
+                    selectedRegions.length > 0
                       ? "bg-blue-600 text-white border-blue-600 shadow-sm"
                       : "bg-white text-zinc-600 border-zinc-200 hover:bg-zinc-50 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700 dark:hover:bg-zinc-700"
                   }`}
                 >
-                  {locale === "ko" ? "주 이용 링크장" : "Rinks"} 
-                  {selectedRinkIds.length > 0 && ` (${selectedRinkIds.length})`}
-                  <ChevronDown className={`w-3 h-3 transition-transform ${isRinkFilterOpen ? "rotate-180" : ""}`} />
+                  {t("filter.region")}
+                  {selectedRegions.length > 0 && ` (${selectedRegions.length})`}
+                  <ChevronDown className={`w-3 h-3 transition-transform ${isRegionFilterOpen ? "rotate-180" : ""}`} />
                 </button>
               </div>
 
@@ -439,17 +472,22 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
         </div>
       </div>
       
-      {/* Rink Filter Drawer */}
+      {/* Rink Filter Drawer (Match tab only) */}
       <RinkFilterDrawer
         isOpen={isRinkFilterOpen}
         onClose={() => setIsRinkFilterOpen(false)}
-        rinks={
-          activeTab === "club"
-            ? rinks.filter(r => clubs.some(c => c.rinks?.some(cr => cr.id === r.id)))
-            : rinks.filter(r => allMatchesSource.some(m => m.rink?.id === r.id && isMatchVisibleByDate(m)))
-        }
+        rinks={rinks.filter(r => allMatchesSource.some(m => m.rink?.id === r.id && isMatchVisibleByDate(m)))}
         selectedRinkIds={selectedRinkIds}
         onSelectRinkIds={setSelectedRinkIds}
+      />
+
+      {/* Region Filter Drawer (Club tab) */}
+      <RegionFilterDrawer
+        isOpen={isRegionFilterOpen}
+        onClose={() => setIsRegionFilterOpen(false)}
+        regions={availableRegions}
+        selectedRegions={selectedRegions}
+        onSelectRegions={setSelectedRegions}
       />
 
       {/* Match Type Filter Drawer */}

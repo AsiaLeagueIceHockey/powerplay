@@ -39,7 +39,9 @@
             "skaterSpots": "🏒 Player Spots",
             "goalieSpots": "🥅 Goalie Spots",
             "rentalAvailable": "Experience Equipment",
-            "matchType": "Match Type"
+            "matchType": "Match Type",
+            "region": "Region",
+            "searchClub": "Search clubs"
         }
     },
     "auth": {

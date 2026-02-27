@@ -7,7 +7,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
-import { MessageCircle, Users, Building2, ChevronDown, ChevronUp } from "lucide-react";
+import { MessageCircle, Users, Building2, ChevronDown, ChevronUp, MapPin } from "lucide-react";
+import { extractRegion } from "@/lib/rink-utils";
 
 interface ClubCardProps {
   club: Club;
@@ -121,11 +122,20 @@ export function ClubCard({ club, initialIsMember }: ClubCardProps) {
         {/* Rinks */}
         {club.rinks && club.rinks.length > 0 && (
             <div className="flex flex-wrap gap-1.5 mb-4">
-                {club.rinks.slice(0, 3).map(rink => (
-                    <span key={rink.id} className="text-xs px-2 py-1 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 rounded-md border border-zinc-200 dark:border-zinc-700">
-                        {locale === "ko" ? rink.name_ko : rink.name_en}
-                    </span>
-                ))}
+                {club.rinks.slice(0, 3).map(rink => {
+                    const region = extractRegion(rink.address);
+                    return (
+                        <span key={rink.id} className="text-xs px-2 py-1 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 rounded-md border border-zinc-200 dark:border-zinc-700">
+                            <span>{locale === "ko" ? rink.name_ko : rink.name_en}</span>
+                            {region && (
+                                <span className="flex items-center gap-0.5 text-[10px] text-zinc-400 dark:text-zinc-500 mt-0.5">
+                                    <MapPin className="w-2.5 h-2.5" />
+                                    {region}
+                                </span>
+                            )}
+                        </span>
+                    );
+                })}
                 {club.rinks.length > 3 && (
                     <span className="text-xs px-2 py-1 bg-zinc-100 dark:bg-zinc-800 text-zinc-500 rounded-md border border-zinc-200 dark:border-zinc-700">
                         +{club.rinks.length - 3}

@@ -1,9 +1,10 @@
 import { getClub, getClubNotices, isClubMember, joinClub } from "@/app/actions/clubs";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
-import { MessageCircle, Users, Calendar, Building2 } from "lucide-react";
+import { MessageCircle, Users, Calendar, Building2, MapPin } from "lucide-react";
 import { JoinClubButton } from "@/components/join-club-button";
 import Image from "next/image";
+import { extractRegion } from "@/lib/rink-utils";
 
 export default async function ClubDetailPage({
   params,
@@ -72,11 +73,20 @@ export default async function ClubDetailPage({
                     {locale === "ko" ? "주 이용 링크장" : "Main Rinks"}
                  </h4>
                  <div className="flex flex-wrap gap-2">
-                    {club.rinks.map(rink => (
-                        <div key={rink.id} className="text-sm px-3 py-1.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 rounded-lg border border-zinc-200 dark:border-zinc-700">
-                            {locale === "ko" ? rink.name_ko : rink.name_en}
-                        </div>
-                    ))}
+                    {club.rinks.map(rink => {
+                        const region = extractRegion(rink.address);
+                        return (
+                            <div key={rink.id} className="text-sm px-3 py-1.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 rounded-lg border border-zinc-200 dark:border-zinc-700">
+                                <span>{locale === "ko" ? rink.name_ko : rink.name_en}</span>
+                                {region && (
+                                    <span className="flex items-center gap-0.5 text-xs text-zinc-400 dark:text-zinc-500 mt-0.5">
+                                        <MapPin className="w-3 h-3" />
+                                        {region}
+                                    </span>
+                                )}
+                            </div>
+                        );
+                    })}
                  </div>
              </div>
           )}

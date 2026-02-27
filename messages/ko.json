@@ -39,7 +39,9 @@
             "skaterSpots": "🏒 플레이어 모집",
             "goalieSpots": "🥅 골리 모집",
             "rentalAvailable": "체험 장비 대여",
-            "matchType": "대관 구분"
+            "matchType": "대관 구분",
+            "region": "지역",
+            "searchClub": "동호회 검색"
         }
     },
     "auth": {
