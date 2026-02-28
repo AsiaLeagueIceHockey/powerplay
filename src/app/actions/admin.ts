@@ -50,6 +50,7 @@ export async function createMatch(formData: FormData) {
   const startTimeInput = formData.get("start_time") as string;
   const matchType = (formData.get("match_type") as "training" | "game" | "team_match") || "training";
   const isTeamMatch = matchType === "team_match";
+  const isTraining = matchType === "training";
 
   // 팀 매치: 금액/인원 관련 필드 모두 명시적으로 0/false/null 세팅
   const entryPointsStr = (formData.get("entry_points") as string)?.replace(/,/g, "");
@@ -58,17 +59,23 @@ export async function createMatch(formData: FormData) {
   const rentalFeeStr = (formData.get("rental_fee") as string)?.replace(/,/g, "");
   const rentalFee = isTeamMatch ? 0 : (rentalFeeStr ? parseInt(rentalFeeStr) : 0);
 
+  // 훈련 대관: max_guests로 게스트 인원 관리
+  const maxGuestsInput = formData.get("max_guests") as string;
+  const maxGuestsParsed = maxGuestsInput ? parseInt(maxGuestsInput) : NaN;
+  const maxGuests = isTraining ? (isNaN(maxGuestsParsed) ? null : maxGuestsParsed) : null;
+
   const skatersInput = formData.get("max_skaters") as string;
   const skatersParsed = parseInt(skatersInput);
   // 팀 매치: 상대팀 대표 1명만 신청 가능
-  const maxSkaters = isTeamMatch ? 1 : (isNaN(skatersParsed) ? 20 : skatersParsed);
+  // 훈련 대관: max_guests 값으로 max_skaters 동기화 (무제한이면 999)
+  const maxSkaters = isTeamMatch ? 1 : isTraining ? (maxGuests ?? 999) : (isNaN(skatersParsed) ? 20 : skatersParsed);
 
   const goaliesInput = formData.get("max_goalies") as string;
   const goaliesParsed = parseInt(goaliesInput);
-  const maxGoalies = isTeamMatch ? 0 : (isNaN(goaliesParsed) ? 2 : goaliesParsed);
+  const maxGoalies = (isTeamMatch || isTraining) ? 0 : (isNaN(goaliesParsed) ? 2 : goaliesParsed);
   const description = formData.get("description") as string;
   const bankAccount = isTeamMatch ? null : (formData.get("bank_account") as string);
-  const goalieFree = isTeamMatch ? false : formData.get("goalie_free") === "true";
+  const goalieFree = (isTeamMatch || isTraining) ? false : formData.get("goalie_free") === "true";
   const rentalAvailable = isTeamMatch ? false : formData.get("rental_available") === "true";
 
   // datetime-local 입력은 KST로 가정, UTC로 변환하여 저장
@@ -93,6 +100,7 @@ export async function createMatch(formData: FormData) {
       bank_account: bankAccount || null,
       goalie_free: goalieFree,
       match_type: matchType,
+      max_guests: maxGuests,
     })
     .select()
     .single();
@@ -158,21 +166,27 @@ export async function updateMatch(matchId: string, formData: FormData) {
   const startTimeInput = formData.get("start_time") as string;
   const matchType = (formData.get("match_type") as "training" | "game" | "team_match") || "training";
   const isTeamMatch = matchType === "team_match";
+  const isTraining = matchType === "training";
 
   const fee = isTeamMatch ? 0 : (parseInt((formData.get("fee") as string)?.replace(/,/g, "")) || 0);
   const rentalFee = isTeamMatch ? 0 : (parseInt((formData.get("rental_fee") as string)?.replace(/,/g, "")) || 0);
 
+  // 훈련 대관: max_guests로 게스트 인원 관리
+  const maxGuestsInput = formData.get("max_guests") as string;
+  const maxGuestsParsed = maxGuestsInput ? parseInt(maxGuestsInput) : NaN;
+  const maxGuests = isTraining ? (isNaN(maxGuestsParsed) ? null : maxGuestsParsed) : null;
+
   const skatersInput = formData.get("max_skaters") as string;
   const skatersParsed = parseInt(skatersInput);
-  const maxSkaters = isTeamMatch ? 1 : (isNaN(skatersParsed) ? 20 : skatersParsed);
+  const maxSkaters = isTeamMatch ? 1 : isTraining ? (maxGuests ?? 999) : (isNaN(skatersParsed) ? 20 : skatersParsed);
 
   const goaliesInput = formData.get("max_goalies") as string;
   const goaliesParsed = parseInt(goaliesInput);
-  const maxGoalies = isTeamMatch ? 0 : (isNaN(goaliesParsed) ? 2 : goaliesParsed);
+  const maxGoalies = (isTeamMatch || isTraining) ? 0 : (isNaN(goaliesParsed) ? 2 : goaliesParsed);
   const description = formData.get("description") as string;
   const bankAccount = isTeamMatch ? null : (formData.get("bank_account") as string);
   const status = formData.get("status") as string;
-  const goalieFree = isTeamMatch ? false : formData.get("goalie_free") === "true";
+  const goalieFree = (isTeamMatch || isTraining) ? false : formData.get("goalie_free") === "true";
   const rentalAvailable = isTeamMatch ? false : formData.get("rental_available") === "true";
 
   // datetime-local 입력은 KST로 가정, UTC로 변환하여 저장
@@ -195,6 +209,7 @@ export async function updateMatch(matchId: string, formData: FormData) {
       status: status as "open" | "closed" | "canceled" | "finished",
       goalie_free: goalieFree,
       match_type: matchType,
+      max_guests: maxGuests,
     })
     .eq("id", matchId);
 

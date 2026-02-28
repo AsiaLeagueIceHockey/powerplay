@@ -359,7 +359,8 @@ export async function confirmPointCharge(
       match_id,
       user_id,
       position,
-      match:match_id(id, entry_points, start_time, rink:rink_id(name_ko))
+      rental_opt_in,
+      match:match_id(id, entry_points, rental_fee, start_time, match_type, goalie_free, rink:rink_id(name_ko))
     `)
     .eq("user_id", chargeRequest.user_id)
     .eq("status", "pending_payment")
@@ -375,11 +376,17 @@ export async function confirmPointCharge(
 
     for (const participant of sortedParticipants) {
       const match = Array.isArray(participant.match) ? participant.match[0] : participant.match;
-      const entryPoints = match?.entry_points || 0;
+      
+      // Calculate total cost including rental fee if opted in
+      const isGoalieAndFree = participant.position === "G" && match?.goalie_free === true;
+      const entryPoints = isGoalieAndFree ? 0 : (match?.entry_points || 0);
+      const isRentalOptIn = participant.rental_opt_in === true;
+      const rentalFee = isRentalOptIn ? (match?.rental_fee || 0) : 0;
+      const totalCost = entryPoints + rentalFee;
 
-      if (currentBalance >= entryPoints && entryPoints > 0) {
-        // 포인트 차감
-        currentBalance -= entryPoints;
+      if (currentBalance >= totalCost && totalCost > 0) {
+        // 포인트 차감 (참가비 + 장비대여비)
+        currentBalance -= totalCost;
 
         // 참가자 상태 업데이트
         await supabase
@@ -390,16 +397,31 @@ export async function confirmPointCharge(
           })
           .eq("id", participant.id);
 
-        // 거래 내역 추가
+        // 거래 내역 추가 (match_type에 따라 description 분기)
+        const isTraining = match?.match_type === "training";
+        let txDesc = isTraining
+          ? (isRentalOptIn ? "게스트 참가 (자동 확정, 장비 대여 포함)" : "게스트 참가 (자동 확정)")
+          : (isRentalOptIn ? "경기 참가 (자동 확정, 장비 대여 포함)" : "경기 참가 (자동 확정)");
+
         await supabase.from("point_transactions").insert({
           user_id: chargeRequest.user_id,
           type: "use",
-          amount: -entryPoints,
+          amount: -totalCost,
           balance_after: currentBalance,
-          description: "경기 참가 (자동 확정)",
+          description: txDesc,
           reference_id: participant.match_id,
         });
 
+        autoConfirmedCount++;
+      } else if (totalCost === 0) {
+        // 무료 참가 (goalie_free 등) - 포인트 차감 없이 확정
+        await supabase
+          .from("participants")
+          .update({
+            status: "confirmed",
+            payment_status: true,
+          })
+          .eq("id", participant.id);
         autoConfirmedCount++;
       }
     }

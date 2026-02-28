@@ -118,6 +118,26 @@ export function MatchCard({ match }: { match: Match }) {
             {currentSkaters >= match.max_skaters ? t("teamJoined") : t("teamMatchWaiting")}
           </span>
         </div>
+      ) : match.match_type === "training" ? (
+        <div className="mb-3 flex gap-3 text-sm">
+          <div className="flex items-center gap-1">
+            <span className="font-medium">{t("guest")}</span>
+            <span
+              className={`rounded px-1.5 py-0.5 ${
+                match.max_guests
+                  ? (match.max_guests - currentSkaters > 0
+                    ? "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
+                    : "bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-500")
+                  : "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
+              }`}
+            >
+              {match.max_guests
+                ? `${currentSkaters}/${match.max_guests}`
+                : `${currentSkaters}/${t("guestUnlimited")}`
+              }
+            </span>
+          </div>
+        </div>
       ) : (
       <div className="mb-3 flex gap-3 text-sm">
         <div className="flex items-center gap-1">

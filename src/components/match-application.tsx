@@ -28,6 +28,7 @@ interface MatchApplicationProps {
   rentalOptIn?: boolean;
   rentalAvailable?: boolean;
   matchType?: "training" | "game" | "team_match";
+  isTraining?: boolean;
 }
 
 export function MatchApplication({
@@ -48,6 +49,7 @@ export function MatchApplication({
   rentalOptIn = false,
   rentalAvailable = false,
   matchType = "training",
+  isTraining = false,
 }: MatchApplicationProps) {
   const t = useTranslations("match");
   const tParticipant = useTranslations("participant");
@@ -114,8 +116,26 @@ export function MatchApplication({
     setLoading(false);
   };
 
-  // 1. If Match Closed/Canceled => Show nothing or status?
-  // User didn't specify, but typically we disable join.
+  // 1. If Match Canceled => Show canceled status regardless of participation
+  if (matchStatus === "canceled") {
+    return (
+      <div className="rounded-2xl border border-red-200 bg-red-50 p-6 dark:border-red-900/50 dark:bg-red-900/10">
+        <div className="flex items-center gap-2">
+          <span className="text-red-500 dark:text-red-400 font-bold text-lg">🚫</span>
+          <span className="font-bold text-red-600 dark:text-red-400 text-lg">
+            {locale === "ko" ? "취소된 경기입니다" : "This match has been canceled"}
+          </span>
+        </div>
+        {isJoined && (
+          <p className="mt-2 text-sm text-red-500 dark:text-red-400">
+            {locale === "ko" ? "확정 참가자에게는 전액 환불이 진행되었습니다." : "Full refund has been processed for confirmed participants."}
+          </p>
+        )}
+      </div>
+    );
+  }
+
+  // 1b. If Match Closed => Show nothing if not joined
    if (matchStatus !== "open" && !isJoined) {
     return null; 
   }
@@ -352,7 +372,10 @@ export function MatchApplication({
             <div className="flex items-center gap-2">
               <span className="text-green-600 dark:text-green-400 font-bold">✓</span>
               <span className="font-bold text-green-700 dark:text-green-300 text-lg">
-                {t(`position.${currentPosition}`)}로 참가 확정
+                {isTraining
+                  ? (locale === "ko" ? "게스트 참가 확정" : "Confirmed as Guest")
+                  : `${t(`position.${currentPosition}`)}로 참가 확정`
+                }
               </span>
             </div>
             {rentalOptIn && (
@@ -611,6 +634,64 @@ export function MatchApplication({
   }
 
   // 4b. Default: Join Button
+  // Training match: show rental option if available, then join directly as FW (guest)
+  if (isTraining) {
+    return (
+      <div className="space-y-4">
+        {/* Rental Option for Training */}
+        {rentalAvailable && (
+          <div className="rounded-2xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900 shadow-sm space-y-4">
+            <div className="p-4 rounded-xl border-2 transition-all cursor-pointer bg-white border-zinc-200 hover:border-blue-300 dark:bg-zinc-800 dark:border-zinc-700 dark:hover:border-blue-700"
+                 onClick={() => setRentalChecked(!rentalChecked)}>
+              <div className="flex items-center gap-3">
+                <div className={`w-6 h-6 rounded-md flex items-center justify-center border transition-colors ${
+                  rentalChecked 
+                    ? "bg-blue-600 border-blue-600 text-white" 
+                    : "bg-white border-zinc-300 dark:bg-zinc-700 dark:border-zinc-600"
+                }`}>
+                  {rentalChecked && <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
+                </div>
+                
+                <div className="flex-1">
+                  <div className="flex justify-between items-center">
+                    <span className="font-bold text-zinc-900 dark:text-zinc-100">
+                      {t("rentalFee")}
+                    </span>
+                    <span className="font-bold text-blue-600 dark:text-blue-400">
+                      +{rentalFee.toLocaleString()}{locale === "ko" ? "원" : "KRW"}
+                    </span>
+                  </div>
+                  <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
+                    {t("rentalCheckboxDesc")}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Total Cost Display */}
+            <div className="flex justify-between items-center px-2 py-3 bg-zinc-50 dark:bg-zinc-900/50 rounded-xl border border-zinc-100 dark:border-zinc-800">
+              <span className="text-zinc-600 dark:text-zinc-400 font-medium">
+                {t("totalCost")}
+              </span>
+              <span className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
+                {(entryPoints + currentRentalFee).toLocaleString()}{locale === "ko" ? "원" : "KRW"}
+              </span>
+            </div>
+          </div>
+        )}
+
+        <button
+          onClick={() => handleJoin("FW")}
+          disabled={loading}
+          className="w-full py-4 bg-zinc-900 text-white rounded-2xl text-lg font-bold hover:bg-zinc-800 transition shadow-sm dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
+        >
+          {loading ? "..." : t("guestJoin")}
+        </button>
+        {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
+      </div>
+    );
+  }
+
   return (
     <button
       onClick={() => setShowSelect(true)}

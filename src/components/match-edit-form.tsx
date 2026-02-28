@@ -34,6 +34,7 @@ interface Match {
   description: string | null;
   bank_account?: string | null;
   goalie_free?: boolean;
+  max_guests?: number | null;
   rink: Rink | null;
   club?: { id: string; name: string } | null;
   match_type: "training" | "game" | "team_match"; // added
@@ -57,6 +58,8 @@ export function MatchEditForm({
   const [error, setError] = useState<string | null>(null);
   const [isRentalAvailable, setIsRentalAvailable] = useState(match.rental_available ?? (match.rental_fee || 0) > 0);
   const isTeamMatch = match.match_type === "team_match";
+  const isTraining = match.match_type === "training";
+  const isGame = match.match_type === "game";
 
   // Format datetime for input (KST)
   const formatDateTimeLocal = (dateString: string) => {
@@ -86,18 +89,21 @@ export function MatchEditForm({
     const formData = new FormData(e.currentTarget);
     const maxSkaters = Number(formData.get("max_skaters"));
     const maxGoalies = Number(formData.get("max_goalies"));
+    const currentMatchType = formData.get("match_type") as string;
     // match_type is handled by radio input automatically in formData
 
-    // Validation: Current > Max Check
-    const currentSkaters = (match.participants_count?.fw || 0) + (match.participants_count?.df || 0);
-    const currentGoalies = match.participants_count?.g || 0;
+    // Validation: Current > Max Check (only for game matches)
+    if (currentMatchType === "game") {
+      const currentSkaters = (match.participants_count?.fw || 0) + (match.participants_count?.df || 0);
+      const currentGoalies = match.participants_count?.g || 0;
 
-    if (maxSkaters < currentSkaters || maxGoalies < currentGoalies) {
-      setError(t("admin.form.minParticipantsError"));
-      setLoading(false);
-      // Scroll to top to see error
-      window.scrollTo({ top: 0, behavior: "smooth" });
-      return;
+      if (maxSkaters < currentSkaters || maxGoalies < currentGoalies) {
+        setError(t("admin.form.minParticipantsError"));
+        setLoading(false);
+        // Scroll to top to see error
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+      }
     }
 
     const result = await updateMatch(match.id, formData);
@@ -331,23 +337,23 @@ export function MatchEditForm({
             <input
               type="radio"
               name="match_type"
-              value="training"
-              defaultChecked={match.match_type === "training" || !match.match_type}
-              disabled={isCanceled}
-              className="sr-only"
-            />
-            <span className="font-medium text-sm whitespace-nowrap">{t("match.types.training")}</span>
-          </label>
-          <label className="relative flex cursor-pointer items-center justify-center rounded-lg border border-zinc-700 bg-zinc-900 p-4 hover:bg-zinc-800 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-900/20 has-[:checked]:text-blue-200">
-            <input
-              type="radio"
-              name="match_type"
               value="game"
               defaultChecked={match.match_type === "game"}
               disabled={isCanceled}
               className="sr-only"
             />
             <span className="font-medium text-sm whitespace-nowrap">{t("match.types.game")}</span>
+          </label>
+          <label className="relative flex cursor-pointer items-center justify-center rounded-lg border border-zinc-700 bg-zinc-900 p-4 hover:bg-zinc-800 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-900/20 has-[:checked]:text-blue-200">
+            <input
+              type="radio"
+              name="match_type"
+              value="training"
+              defaultChecked={match.match_type === "training" || !match.match_type}
+              disabled={isCanceled}
+              className="sr-only"
+            />
+            <span className="font-medium text-sm whitespace-nowrap">{t("match.types.training")}</span>
           </label>
           <label className="relative flex cursor-pointer items-center justify-center rounded-lg border border-zinc-700 bg-zinc-900 p-4 hover:bg-zinc-800 has-[:checked]:border-teal-500 has-[:checked]:bg-teal-900/20 has-[:checked]:text-teal-200">
             <input
@@ -390,65 +396,92 @@ export function MatchEditForm({
         </div>
       </div>
 
-      {/* Position Limits (Consolidated) */}
-      <div className="grid grid-cols-2 gap-4">
+      {/* Training Match: Max Guests */}
+      {isTraining && (
         <div>
           <label className="block text-sm font-medium mb-2 text-zinc-300">
-            {t("admin.form.maxSkaters")}
+            {t("admin.form.maxGuests")}
           </label>
           <div className="relative">
             <input
               type="number"
-              name="max_skaters"
+              name="max_guests"
               disabled={isCanceled}
-              defaultValue={match.max_skaters}
-              min={0}
+              defaultValue={match.max_guests ?? ""}
+              min={1}
               className="w-full px-4 py-3 pr-8 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
             />
             <span className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 text-sm">명</span>
           </div>
+          <p className="text-xs text-zinc-500 mt-1">
+            {t("admin.form.maxGuestsHint")}
+          </p>
         </div>
-        <div>
-          <label className="block text-sm font-medium mb-2 text-zinc-300">
-            {t("admin.form.maxGoalies")}
-          </label>
-          <div className="relative">
-            <input
-              type="number"
-              name="max_goalies"
-              disabled={isCanceled}
-              defaultValue={match.max_goalies}
-              min={0}
-              className="w-full px-4 py-3 pr-8 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
-            />
-            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 text-sm">명</span>
-          </div>
-        </div>
-      </div>
+      )}
 
-      {/* Goalie Free Option */}
-      <div className={`flex items-center gap-3 p-4 rounded-lg border ${hasGoalies ? 'bg-zinc-800 border-zinc-700 opacity-60' : 'bg-zinc-900/50 border-zinc-700'}`}>
-        <input
-          type="checkbox"
-          name="goalie_free"
-          id="goalie_free_edit"
-          value="true"
-          disabled={isCanceled || hasGoalies}
-          defaultChecked={match.goalie_free === true}
-          className="w-5 h-5 rounded border-zinc-600 bg-zinc-800 text-blue-600 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-        />
-        <label htmlFor="goalie_free_edit" className="flex flex-col flex-1">
-          <span className="text-sm font-medium text-zinc-200">
-            🧤 {t("match.goalieFreeLabel")}
-          </span>
-          <span className="text-xs text-zinc-400">
-            {hasGoalies
-              ? (locale === "ko" ? "이미 신청한 골리가 있어 설정을 변경할 수 없습니다." : "Cannot change setting because goalies have already applied.")
-              : t("match.goalieFreeDesc")
-            }
-          </span>
-        </label>
-      </div>
+      {/* Game Match: Position Limits (Consolidated) */}
+      {isGame && (
+        <>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium mb-2 text-zinc-300">
+                {t("admin.form.maxSkaters")}
+              </label>
+              <div className="relative">
+                <input
+                  type="number"
+                  name="max_skaters"
+                  disabled={isCanceled}
+                  defaultValue={match.max_skaters}
+                  min={0}
+                  className="w-full px-4 py-3 pr-8 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
+                />
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 text-sm">명</span>
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2 text-zinc-300">
+                {t("admin.form.maxGoalies")}
+              </label>
+              <div className="relative">
+                <input
+                  type="number"
+                  name="max_goalies"
+                  disabled={isCanceled}
+                  defaultValue={match.max_goalies}
+                  min={0}
+                  className="w-full px-4 py-3 pr-8 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
+                />
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 text-sm">명</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Goalie Free Option */}
+          <div className={`flex items-center gap-3 p-4 rounded-lg border ${hasGoalies ? 'bg-zinc-800 border-zinc-700 opacity-60' : 'bg-zinc-900/50 border-zinc-700'}`}>
+            <input
+              type="checkbox"
+              name="goalie_free"
+              id="goalie_free_edit"
+              value="true"
+              disabled={isCanceled || hasGoalies}
+              defaultChecked={match.goalie_free === true}
+              className="w-5 h-5 rounded border-zinc-600 bg-zinc-800 text-blue-600 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            />
+            <label htmlFor="goalie_free_edit" className="flex flex-col flex-1">
+              <span className="text-sm font-medium text-zinc-200">
+                🧤 {t("match.goalieFreeLabel")}
+              </span>
+              <span className="text-xs text-zinc-400">
+                {hasGoalies
+                  ? (locale === "ko" ? "이미 신청한 골리가 있어 설정을 변경할 수 없습니다." : "Cannot change setting because goalies have already applied.")
+                  : t("match.goalieFreeDesc")
+                }
+              </span>
+            </label>
+          </div>
+        </>
+      )}
 
       {/* Rental Fee (장비 대여비) */}
       <div>

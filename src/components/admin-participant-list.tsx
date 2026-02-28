@@ -125,6 +125,7 @@ export function AdminParticipantList({
   };
 
   const isTeamMatch = matchType === "team_match";
+  const isTraining = matchType === "training";
   const selectedProfile = selectedUserId ? profileCache[selectedUserId] : null;
 
   return (
@@ -133,6 +134,17 @@ export function AdminParticipantList({
         <div>
           <h4 className="font-medium text-sm mb-2 text-zinc-400">
             {t("match.teamOpponent")} ({participants.length})
+          </h4>
+          {participants.length === 0 ? (
+            <p className="text-sm text-zinc-500">-</p>
+          ) : (
+            <div className="space-y-2">{participants.map(renderParticipantItem)}</div>
+          )}
+        </div>
+      ) : isTraining ? (
+        <div>
+          <h4 className="font-medium text-sm mb-2 text-zinc-400">
+            {t("match.guestParticipants")} ({participants.length})
           </h4>
           {participants.length === 0 ? (
             <p className="text-sm text-zinc-500">-</p>

@@ -86,13 +86,22 @@ export default async function MatchPage({
 
   // Calculate remaining spots from actual participant counts
   const skaterCount = players.fw.length + players.df.length;
-  const remaining = {
-    skaters: match.max_skaters - skaterCount,
-    g: match.max_goalies - players.g.length,
-  };
+  const isTraining = match.match_type === "training";
+
+  const remaining = isTraining
+    ? {
+        skaters: match.max_guests ? match.max_guests - skaterCount : 999,
+        g: 0,
+      }
+    : {
+        skaters: match.max_skaters - skaterCount,
+        g: match.max_goalies - players.g.length,
+      };
 
   // Check if match is full (no spots for skaters AND goalies)
-  const isFull = remaining.skaters <= 0 && remaining.g <= 0;
+  const isFull = isTraining
+    ? (match.max_guests ? remaining.skaters <= 0 : false)
+    : (remaining.skaters <= 0 && remaining.g <= 0);
 
   // User Status
   const userParticipant = match.participants?.find((p) => p.user?.id === user?.id);
@@ -205,6 +214,22 @@ export default async function MatchPage({
                   : "text-amber-600 dark:text-amber-400"
               }`}>
                 {isFull ? t("match.teamJoined") : t("match.teamMatchWaiting")}
+              </span>
+            </div>
+          ) : isTraining ? (
+            <div className="flex justify-between items-center text-sm">
+              <span className="text-zinc-500">{t("match.guestSpots")}</span>
+              <span className={`font-semibold ${
+                match.max_guests
+                  ? (remaining.skaters <= 0 ? 'text-red-500' : 'text-green-600 dark:text-green-400')
+                  : 'text-green-600 dark:text-green-400'
+              }`}>
+                {match.max_guests
+                  ? (remaining.skaters <= 0
+                    ? (locale === 'ko' ? '마감' : 'Full')
+                    : (locale === 'ko' ? `${remaining.skaters}자리 남음` : `${remaining.skaters} spots left`))
+                  : t("match.guestUnlimited")
+                }
               </span>
             </div>
           ) : (
@@ -342,6 +367,7 @@ export default async function MatchPage({
         rentalAvailable={match.rental_available}
         rentalOptIn={userParticipant?.rental_opt_in}
         matchType={match.match_type}
+        isTraining={isTraining}
       />
 
       {/* Participant List */}
@@ -402,6 +428,98 @@ export default async function MatchPage({
                 </div>
               )}
             </div>
+          </div>
+        </>
+      ) : isTraining ? (
+        /* Training match: single Guest participant list */
+        <>
+          <h2 className="text-xl font-bold pt-4">
+            {t("match.guestParticipants")}
+          </h2>
+          <div className="space-y-4">
+            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-sm">
+              <div className="flex items-center space-x-2 mb-4">
+                <span className="px-2 py-1 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 rounded text-xs font-bold">
+                  {t("match.guest")}
+                </span>
+                <span className="text-zinc-500 text-sm">({skaterCount})</span>
+                {match.max_guests ? (
+                  <span className="text-zinc-400 text-xs">/ {match.max_guests}</span>
+                ) : (
+                  <span className="text-zinc-400 text-xs">/ {t("match.guestUnlimited")}</span>
+                )}
+              </div>
+
+              {skaterCount === 0 ? (
+                <p className="text-sm text-zinc-400 pl-1">{t("match.noParticipants")}</p>
+              ) : (
+                <ul className="space-y-3">
+                  {[...players.fw, ...players.df].map((p, i) => (
+                    <li key={p.id} className="flex items-center space-x-3 text-sm p-3 bg-zinc-50 dark:bg-zinc-950/50 rounded-lg">
+                      <div className="w-6 h-6 bg-zinc-200 dark:bg-zinc-700 rounded-full flex items-center justify-center text-xs font-bold text-zinc-500">
+                        {i + 1}
+                      </div>
+                      <span className="font-medium">
+                        {p.user?.full_name || p.user?.email?.split('@')[0]}
+                      </span>
+                      {p.status === "pending_payment" && (
+                        <span className="text-xs bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 px-2 py-0.5 rounded">{t("participant.status.pending_payment")}</span>
+                      )}
+                      {p.user?.id && p.user.id !== user?.id && (
+                        <div className="ml-auto">
+                          <StartChatButton
+                            targetUserId={p.user.id}
+                            className="p-1.5 text-zinc-400 hover:text-blue-600 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full"
+                            iconOnly
+                            label={t("match.contactParticipant")}
+                          />
+                        </div>
+                      )}
+                      {p.id === userParticipant?.id && (
+                        <span className="ml-auto text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">Me</span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            {/* Waitlist Section */}
+            {waitlist.length > 0 && (
+              <div className="bg-white dark:bg-zinc-900 border border-blue-200 dark:border-blue-800 rounded-2xl p-5 shadow-sm">
+                <div className="flex items-center space-x-2 mb-4">
+                  <span className="px-2 py-1 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 rounded text-xs font-bold">
+                    {locale === "ko" ? "대기자" : "Waitlist"}
+                  </span>
+                  <span className="text-zinc-500 text-sm">({waitlist.length})</span>
+                </div>
+                <ul className="space-y-3">
+                  {waitlist.map((p, i) => (
+                    <li key={p.id} className="flex items-center space-x-3 text-sm p-3 bg-blue-50 dark:bg-blue-950/50 rounded-lg">
+                      <div className="w-6 h-6 bg-blue-200 dark:bg-blue-700 rounded-full flex items-center justify-center text-xs font-bold text-blue-700 dark:text-blue-200">
+                        {i + 1}
+                      </div>
+                      <span className="font-medium">
+                        {p.user?.full_name || p.user?.email?.split('@')[0]}
+                      </span>
+                      {p.user?.id && p.user.id !== user?.id && (
+                        <div className="ml-auto">
+                          <StartChatButton
+                            targetUserId={p.user.id}
+                            className="p-1.5 text-zinc-400 hover:text-blue-600 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full"
+                            iconOnly
+                            label={t("match.contactParticipant")}
+                          />
+                        </div>
+                      )}
+                      {p.id === userParticipant?.id && (
+                        <span className="ml-auto text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded">Me</span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         </>
       ) : (

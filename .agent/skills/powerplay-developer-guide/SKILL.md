@@ -177,3 +177,23 @@ Before compiling your work, verify:
 - **Rule**: Always provide fallbacks for new optional fields or fields that might be empty during migration.
     - Bad: `t(match.type)`
     - Good: `t(match.type || 'default')`
+
+### 7. 💰 Financial/Money Code (CRITICAL — Highest Priority)
+> **이 규칙은 최우선 순위로 반드시 준수해야 합니다.**
+
+- **반드시 테스트 코드 작성**: 돈과 관련된 모든 흐름(참가 신청, 자동 확정, 환불, 대기 승격 등)은 반드시 `__tests__/` 아래에 테스트 코드를 작성하고 검증한다.
+- **모든 비용 구성요소 고려**: 금액 계산 시 `entry_points`, `rental_fee`, `goalie_free` 등 **모든** 비용 구성요소를 빠짐없이 포함해야 한다.
+  - **차감 금액 = 환불 기준 금액**: 입금 시 차감하는 금액과 취소 시 환불의 기준이 되는 금액이 반드시 동일 로직이어야 한다.
+  - **체크리스트**: 새로운 비용 필드 추가 시, 아래 **모든** 코드 경로를 업데이트해야 한다:
+    1. `joinMatch()` — 직접 참가 차감
+    2. `confirmPointCharge()` — 충전 후 자동 확정 차감
+    3. `promoteWaitlistUser()` — 대기 승격 차감
+    4. `cancelJoin()` — 취소 환불 계산
+    5. 관리자 경기 취소 환불
+- **다양한 시나리오 테스트**: 단순 정상 케이스만이 아니라, 아래 케이스들을 모두 고려:
+  - 잔액 부족 → 충전 → 자동 확정 (entry + rental)
+  - 무료 골리 (goalie_free) 자동 확정
+  - 대기 → 승격 시 비용 처리
+  - 취소 시 환불 금액 = 실제 차감 금액 일치 여부
+- **임의 판단 금지, 소통 필수**: 자금 관련 로직은 **절대 임의로 판단하지 말 것**. 프롬프트를 입력하는 사용자는 4년차 개발자이므로 충분히 소통 가능하다. 불확실한 사항은 반드시 질문하고 확인받은 후 진행할 것.
+

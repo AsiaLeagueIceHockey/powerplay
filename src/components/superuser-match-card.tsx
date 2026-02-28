@@ -146,6 +146,15 @@ export function SuperUserMatchCard({
             }
           </span>
         </div>
+      ) : match.match_type === "training" ? (
+        <div className="flex justify-center items-center text-sm text-zinc-300 mb-6 bg-zinc-900/50 p-3 rounded-lg border border-zinc-700/50">
+          <span className="flex flex-col items-center">
+            <span className="text-xs text-zinc-500 mb-1">{locale === "ko" ? "게스트" : "Guest"}</span>
+            <span className="font-medium">
+              {match.participants_count.fw + match.participants_count.df + match.participants_count.g}{locale === "ko" ? "명" : ""}
+            </span>
+          </span>
+        </div>
       ) : (
         <div className="flex justify-between items-center text-sm text-zinc-300 mb-6 bg-zinc-900/50 p-3 rounded-lg border border-zinc-700/50">
           <span className="flex flex-col items-center">

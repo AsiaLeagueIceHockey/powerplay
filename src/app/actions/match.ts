@@ -52,6 +52,7 @@ export interface Match {
   description?: string;
   bank_account?: string;
   goalie_free?: boolean;
+  max_guests?: number | null;
   created_by?: string;
   rink: MatchRink | null;
   club: MatchClub | null;
@@ -72,6 +73,7 @@ export async function getMatches(): Promise<Match[]> {
       rental_fee,
       rental_available,
       match_type,
+      max_guests,
       max_skaters,
       max_goalies,
       status,
@@ -135,6 +137,7 @@ export async function getMatch(id: string): Promise<Match | null> {
       rental_fee,
       rental_available,
       match_type,
+      max_guests,
       max_skaters,
       max_goalies,
       status,
@@ -229,7 +232,7 @@ export async function joinMatch(
   // Get match entry_points, rental_fee, and goalie_free setting
   const { data: match } = await supabase
     .from("matches")
-    .select("entry_points, rental_fee, status, goalie_free, rental_available")
+    .select("entry_points, rental_fee, status, goalie_free, rental_available, match_type")
     .eq("id", matchId)
     .single();
 
@@ -287,8 +290,11 @@ export async function joinMatch(
     }
 
     // Record transaction
-    // Description: "경기 참가" or "경기 참가 (장비 대여 포함)"
-    const desc = isRentalOptIn ? "경기 참가 (장비 대여 포함)" : "경기 참가";
+    // Description varies by match type
+    const isTrainingTransaction = match.match_type === "training";
+    const desc = isTrainingTransaction
+      ? (isRentalOptIn ? "게스트 참가 (장비 대여 포함)" : "게스트 참가")
+      : (isRentalOptIn ? "경기 참가 (장비 대여 포함)" : "경기 참가");
     
     await supabase.from("point_transactions").insert({
       user_id: user.id,
@@ -353,15 +359,20 @@ export async function joinMatch(
     .select("match_type")
     .eq("id", matchId)
     .single();
-  const isTeamMatchNotif = matchForType?.match_type === "team_match";
+   const isTeamMatchNotif = matchForType?.match_type === "team_match";
+  const isTrainingNotif = matchForType?.match_type === "training";
 
   if (participantStatus === "confirmed") {
-    const notificationTitle = isTeamMatchNotif ? "팀 매칭 확정 🤝" : "경기 참가 확정 🏒";
+    const notificationTitle = isTeamMatchNotif ? "팀 매칭 확정 🤝" : isTrainingNotif ? "게스트 참가 확정 🏒" : "경기 참가 확정 🏒";
     const notificationBody = isTeamMatchNotif
       ? `${rinkName} (${startTime}) 팀 매칭이 확정되었습니다.`
-      : totalPoints > 0
-        ? `${rinkName} (${startTime}) 참가가 확정되었습니다. (${totalPoints.toLocaleString()}원 차감)`
-        : `${rinkName} (${startTime}) 참가 신청이 완료되었습니다.`;
+      : isTrainingNotif
+        ? (totalPoints > 0
+          ? `${rinkName} (${startTime}) 게스트 참가가 확정되었습니다. (${totalPoints.toLocaleString()}원 차감)`
+          : `${rinkName} (${startTime}) 게스트 참가 신청이 완료되었습니다.`)
+        : totalPoints > 0
+          ? `${rinkName} (${startTime}) 참가가 확정되었습니다. (${totalPoints.toLocaleString()}원 차감)`
+          : `${rinkName} (${startTime}) 참가 신청이 완료되었습니다.`;
 
     await sendPushNotification(
       user.id,
@@ -375,10 +386,14 @@ export async function joinMatch(
   if (matchDetails?.created_by && matchDetails.created_by !== user.id) {
     const adminMsg = isTeamMatchNotif
       ? `${participantName}님이 ${rinkName} (${startTime}) 팀 매칭에 상대팀으로 신청했습니다.`
-      : isRentalOptIn 
-        ? `${participantName}님이 ${rinkName} (${startTime}) 경기에 신청했습니다. (장비대여)`
-        : `${participantName}님이 ${rinkName} (${startTime}) 경기에 신청했습니다.`;
-    const adminTitle = isTeamMatchNotif ? "상대팀 매칭 신청 🤝" : "새 참가자 🏒";
+      : isTrainingNotif
+        ? (isRentalOptIn
+          ? `${participantName}님이 ${rinkName} (${startTime}) 훈련에 게스트로 신청했습니다. (장비대여)`
+          : `${participantName}님이 ${rinkName} (${startTime}) 훈련에 게스트로 신청했습니다.`)
+        : isRentalOptIn 
+          ? `${participantName}님이 ${rinkName} (${startTime}) 경기에 신청했습니다. (장비대여)`
+          : `${participantName}님이 ${rinkName} (${startTime}) 경기에 신청했습니다.`;
+    const adminTitle = isTeamMatchNotif ? "상대팀 매칭 신청 🤝" : isTrainingNotif ? "새 게스트 🏒" : "새 참가자 🏒";
 
     await sendPushNotification(
       matchDetails.created_by,
@@ -389,10 +404,14 @@ export async function joinMatch(
   }
 
   // Audit Log
+  const auditMatchLabel = isTrainingNotif ? "훈련" : "경기";
+  const auditJoinLabel = isTrainingNotif
+    ? (participantStatus === "confirmed" ? "게스트로 참가 확정" : "게스트로 참가 신청(입금대기)")
+    : (participantStatus === "confirmed" ? "참가 확정" : "참가 신청(입금대기)");
   await logAndNotify({
     userId: user.id,
     action: "MATCH_JOIN",
-    description: `${participantName}님이 ${rinkName} 경기에 ${participantStatus === "confirmed" ? "참가 확정" : "참가 신청(입금대기)"}했습니다. ${isRentalOptIn ? "(장비대여)" : ""}`,
+    description: `${participantName}님이 ${rinkName} ${auditMatchLabel}에 ${auditJoinLabel}했습니다. ${isRentalOptIn ? "(장비대여)" : ""}`,
     metadata: { matchId, rinkName, status: participantStatus, amount: totalPoints, rental: isRentalOptIn },
   });
 
@@ -429,12 +448,23 @@ export async function cancelJoin(matchId: string) {
   // Get match info for refund calculation including goalie_free and rental_fee
   const { data: match } = await supabase
     .from("matches")
-    .select("entry_points, rental_fee, start_time, goalie_free")
+    .select("entry_points, rental_fee, start_time, goalie_free, status")
     .eq("id", matchId)
     .single();
 
   if (!match) {
     return { error: "Match not found" };
+  }
+
+  // 🚨 경기가 이미 취소된 경우, 사용자 취소(및 환불)를 차단 — 이중 환불 방지
+  if (match.status === "canceled") {
+    // 참가 기록만 삭제하고, 환불은 하지 않음 (이미 관리자 취소 시 환불됨)
+    await supabase
+      .from("participants")
+      .delete()
+      .eq("match_id", matchId)
+      .eq("user_id", user.id);
+    return { success: true, refundAmount: 0 };
   }
 
   // 골리이고 goalie_free가 true면 참가비는 0원 처리
@@ -768,7 +798,7 @@ export async function joinWaitlist(
   // 알림 발송: 대기명단 등록 완료
   const { data: matchInfo } = await supabase
     .from("matches")
-    .select("start_time, created_by, rink:rinks(name_ko)")
+    .select("start_time, created_by, match_type, rink:rinks(name_ko)")
     .eq("id", matchId)
     .single();
 
@@ -807,10 +837,17 @@ export async function joinWaitlist(
         .single();
 
       const participantName = participantProfile?.full_name || user.email?.split("@")[0] || "대기자";
+
+      // @ts-ignore
+      const isTrainingWaitlist = matchInfo.match_type === "training";
       
-      const adminMsg = isRentalOptIn
-        ? `${participantName}님이 ${rinkName} (${startTime}) 경기에 대기 신청했습니다. (장비대여)`
-        : `${participantName}님이 ${rinkName} (${startTime}) 경기에 대기 신청했습니다.`;
+      const adminMsg = isTrainingWaitlist
+        ? (isRentalOptIn
+          ? `${participantName}님이 ${rinkName} (${startTime}) 훈련에 게스트 대기 신청했습니다. (장비대여)`
+          : `${participantName}님이 ${rinkName} (${startTime}) 훈련에 게스트 대기 신청했습니다.`)
+        : (isRentalOptIn
+          ? `${participantName}님이 ${rinkName} (${startTime}) 경기에 대기 신청했습니다. (장비대여)`
+          : `${participantName}님이 ${rinkName} (${startTime}) 경기에 대기 신청했습니다.`);
 
       await sendPushNotification(
         creatorId,

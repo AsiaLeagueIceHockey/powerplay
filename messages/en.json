@@ -205,7 +205,13 @@
         "refundPolicy": "Refund Policy",
         "goalieFree": "FREE",
         "goalieFreeLabel": "Free Goalie Entry",
-        "goalieFreeDesc": "Goalies can join for free without entry fee"
+        "goalieFreeDesc": "Goalies can join for free without entry fee",
+        "guest": "Guest",
+        "guestJoin": "Apply as Guest",
+        "guestParticipants": "Guest Participants",
+        "guestSpots": "Guest Recruitment",
+        "guestUnlimited": "No limit",
+        "guestCount": "{count} guests"
     },
     "participant": {
         "rentalOption": "Rental",
@@ -344,7 +350,9 @@
             "save": "Save",
             "saving": "Saving...",
             "status": "Status",
-            "minParticipantsError": "Cannot set capacity lower than current participants."
+            "minParticipantsError": "Cannot set capacity lower than current participants.",
+            "maxGuests": "Max Guests",
+            "maxGuestsHint": "Leave empty for unlimited"
         },
         "participants": {
             "title": "Participants",

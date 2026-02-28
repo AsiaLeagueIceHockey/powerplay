@@ -33,16 +33,22 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
   const [rentalFee, setRentalFee] = useState("");
   const [maxSkaters, setMaxSkaters] = useState("");
   const [maxGoalies, setMaxGoalies] = useState("");
+  const [maxGuests, setMaxGuests] = useState("");
   const [bankAccount, setBankAccount] = useState("");
   const [isRentalAvailable, setIsRentalAvailable] = useState(false);
-  const [matchType, setMatchType] = useState<"training" | "game" | "team_match">("training");
+  const [matchType, setMatchType] = useState<"training" | "game" | "team_match">("game");
 
   const isTeamMatch = matchType === "team_match";
+  const isTraining = matchType === "training";
+  const isGame = matchType === "game";
 
   // 모든 필수 필드가 채워졌는지 확인
   // 팀 매치: rink + date/time만 필수
   const isFormValid = isTeamMatch
     ? rinkId !== "" && date !== "" && hour !== "" && minute !== ""
+    : isTraining
+    ? rinkId !== "" && date !== "" && hour !== "" && minute !== "" &&
+      entryPoints.trim() !== "" && bankAccount.trim() !== ""
     : rinkId !== "" &&
       date !== "" &&
       hour !== "" &&
@@ -232,23 +238,23 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
             <input
               type="radio"
               name="match_type"
-              value="training"
-              checked={matchType === "training"}
-              onChange={() => setMatchType("training")}
-              className="sr-only"
-            />
-            <span className="font-medium text-sm whitespace-nowrap">{t("match.types.training")}</span>
-          </label>
-          <label className="relative flex cursor-pointer items-center justify-center rounded-lg border border-zinc-700 bg-zinc-900 p-4 hover:bg-zinc-800 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-900/20 has-[:checked]:text-blue-200">
-            <input
-              type="radio"
-              name="match_type"
               value="game"
               checked={matchType === "game"}
               onChange={() => setMatchType("game")}
               className="sr-only"
             />
             <span className="font-medium text-sm whitespace-nowrap">{t("match.types.game")}</span>
+          </label>
+          <label className="relative flex cursor-pointer items-center justify-center rounded-lg border border-zinc-700 bg-zinc-900 p-4 hover:bg-zinc-800 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-900/20 has-[:checked]:text-blue-200">
+            <input
+              type="radio"
+              name="match_type"
+              value="training"
+              checked={matchType === "training"}
+              onChange={() => setMatchType("training")}
+              className="sr-only"
+            />
+            <span className="font-medium text-sm whitespace-nowrap">{t("match.types.training")}</span>
           </label>
           <label className="relative flex cursor-pointer items-center justify-center rounded-lg border border-zinc-700 bg-zinc-900 p-4 hover:bg-zinc-800 has-[:checked]:border-teal-500 has-[:checked]:bg-teal-900/20 has-[:checked]:text-teal-200">
             <input
@@ -297,62 +303,90 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
             </p>
           </div>
 
-          {/* Position Limits (Consolidated) */}
-          <div className="grid grid-cols-2 gap-4">
+          {/* Training Match: Max Guests */}
+          {isTraining && (
             <div>
               <label className="block text-sm font-medium mb-2 text-zinc-300">
-                {t("admin.form.maxSkaters")}
+                {t("admin.form.maxGuests")}
               </label>
               <div className="relative">
                 <input
                   type="number"
-                  name="max_skaters"
-                  value={maxSkaters}
-                  onChange={(e) => setMaxSkaters(e.target.value)}
-                  placeholder="20"
-                  min={0}
+                  name="max_guests"
+                  value={maxGuests}
+                  onChange={(e) => setMaxGuests(e.target.value)}
+                  placeholder=""
+                  min={1}
                   className="w-full px-4 py-3 pr-8 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                 />
                 <span className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 text-sm">명</span>
               </div>
+              <p className="text-xs text-zinc-500 mt-1">
+                {t("admin.form.maxGuestsHint")}
+              </p>
             </div>
-            <div>
-              <label className="block text-sm font-medium mb-2 text-zinc-300">
-                {t("admin.form.maxGoalies")}
-              </label>
-              <div className="relative">
-                <input
-                  type="number"
-                  name="max_goalies"
-                  value={maxGoalies}
-                  onChange={(e) => setMaxGoalies(e.target.value)}
-                  placeholder="2"
-                  min={0}
-                  className="w-full px-4 py-3 pr-8 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                />
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 text-sm">명</span>
-              </div>
-            </div>
-          </div>
+          )}
 
-          {/* Goalie Free Option */}
-          <div className="flex items-center gap-3 p-4 bg-zinc-900/50 rounded-lg border border-zinc-700">
-            <input
-              type="checkbox"
-              name="goalie_free"
-              id="goalie_free"
-              value="true"
-              className="w-5 h-5 rounded border-zinc-600 bg-zinc-800 text-blue-600 focus:ring-blue-500"
-            />
-            <label htmlFor="goalie_free" className="flex flex-col">
-              <span className="text-sm font-medium text-zinc-200">
-                🧤 {t("match.goalieFreeLabel")}
-              </span>
-              <span className="text-xs text-zinc-400">
-                {t("match.goalieFreeDesc")}
-              </span>
-            </label>
-          </div>
+          {/* Game Match: Position Limits (Consolidated) */}
+          {isGame && (
+            <>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2 text-zinc-300">
+                    {t("admin.form.maxSkaters")}
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="number"
+                      name="max_skaters"
+                      value={maxSkaters}
+                      onChange={(e) => setMaxSkaters(e.target.value)}
+                      placeholder="20"
+                      min={0}
+                      className="w-full px-4 py-3 pr-8 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    />
+                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 text-sm">명</span>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2 text-zinc-300">
+                    {t("admin.form.maxGoalies")}
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="number"
+                      name="max_goalies"
+                      value={maxGoalies}
+                      onChange={(e) => setMaxGoalies(e.target.value)}
+                      placeholder="2"
+                      min={0}
+                      className="w-full px-4 py-3 pr-8 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    />
+                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 text-sm">명</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Goalie Free Option */}
+              <div className="flex items-center gap-3 p-4 bg-zinc-900/50 rounded-lg border border-zinc-700">
+                <input
+                  type="checkbox"
+                  name="goalie_free"
+                  id="goalie_free"
+                  value="true"
+                  className="w-5 h-5 rounded border-zinc-600 bg-zinc-800 text-blue-600 focus:ring-blue-500"
+                />
+                <label htmlFor="goalie_free" className="flex flex-col">
+                  <span className="text-sm font-medium text-zinc-200">
+                    🧤 {t("match.goalieFreeLabel")}
+                  </span>
+                  <span className="text-xs text-zinc-400">
+                    {t("match.goalieFreeDesc")}
+                  </span>
+                </label>
+              </div>
+            </>
+          )}
 
           {/* Rental Fee (장비 대여비) */}
           <div>

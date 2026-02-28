@@ -11,7 +11,7 @@ interface MatchTypeFilterDrawerProps {
   onSelectTypes: (types: string[]) => void;
 }
 
-const MATCH_TYPES = ["training", "game", "team_match"] as const;
+const MATCH_TYPES = ["game", "training", "team_match"] as const;
 
 export function MatchTypeFilterDrawer({
   isOpen,
