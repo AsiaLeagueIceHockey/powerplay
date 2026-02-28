@@ -573,9 +573,16 @@ export function MatchEditForm({
           className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
           placeholder="예: 카카오뱅크 3333-00-0000000 홍길동"
         />
-        <p className="text-xs text-zinc-500 mt-1">
+        <p className="text-xs text-zinc-500 mt-1 mb-3">
           경기 참가비를 정산 받을 계좌를 입력해주세요. (은행명, 계좌번호, 예금주)
         </p>
+        <div className="p-3 bg-amber-900/20 border border-amber-500/30 rounded-lg flex items-start gap-2">
+          <div className="flex flex-col">
+            <p className="text-sm font-bold text-amber-200">
+              * 각 참가자 별 1,000원의 수수료를 차감하여 정산됩니다.
+            </p>
+          </div>
+        </div>
       </div>
         </>
       )}

@@ -460,9 +460,16 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
               placeholder="예: 카카오뱅크 3333-00-0000000 홍길동"
               required
             />
-            <p className="text-xs text-zinc-500 mt-1">
+            <p className="text-xs text-zinc-500 mt-1 mb-3">
               경기 참가비를 정산 받을 계좌를 입력해주세요. (은행명, 계좌번호, 예금주)
             </p>
+            <div className="p-3 bg-amber-900/20 border border-amber-500/30 rounded-lg flex items-start gap-2">
+              <div className="flex flex-col">
+                <p className="text-sm font-bold text-amber-200">
+                  * 각 참가자 별 1,000원의 수수료를 차감하여 정산됩니다.
+                </p>
+              </div>
+            </div>
           </div>
         </>
       )}
