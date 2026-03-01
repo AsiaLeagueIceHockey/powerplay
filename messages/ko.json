@@ -363,6 +363,7 @@
             "selectRink": "경기장 선택",
             "dayOfWeek": "요일",
             "time": "시간",
+            "duration": "대관 시간",
             "weeklyOption": "주별 대관 옵션",
             "everyWeek": "매주",
             "week13": "1·3주",

@@ -361,6 +361,7 @@
             "selectRink": "Select rink",
             "dayOfWeek": "Day of Week",
             "time": "Time",
+            "duration": "Duration",
             "weeklyOption": "Weekly Schedule",
             "everyWeek": "Every week",
             "week13": "Weeks 1 & 3",

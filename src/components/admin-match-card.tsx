@@ -25,7 +25,8 @@ interface Match {
   max_skaters: number;
   max_goalies: number;
   fee: number;
-  match_type: "training" | "game" | "team_match"; // added
+  match_type: "training" | "game" | "team_match";
+  duration_minutes?: number | null;
 }
 
 export function AdminMatchCard({
@@ -184,6 +185,11 @@ export function AdminMatchCard({
           >
             {tMatch(`types.${match.match_type || 'training'}`)}
           </span>
+          {match.duration_minutes && (
+            <span className="px-2.5 py-1 rounded-md text-xs font-semibold whitespace-nowrap bg-zinc-700/50 text-zinc-300 border border-zinc-600/50">
+              {match.duration_minutes}{locale === "ko" ? "분" : "m"}
+            </span>
+          )}
         </div>
       </div>
 

@@ -260,6 +260,18 @@ export default async function MatchPage({
             </>
           )}
 
+          {match.duration_minutes && (
+            <>
+              <div className="border-t border-zinc-100 dark:border-zinc-800 my-2"></div>
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-zinc-500">{t("admin.bulk.duration")}</span>
+                <span className="font-semibold text-lg text-zinc-900 dark:text-zinc-100">
+                  {match.duration_minutes}{locale === "ko" ? "분" : " Minutes"}
+                </span>
+              </div>
+            </>
+          )}
+
           {/* Manager / 담당자 Contact (Moved between Goalie and Map) */}
           {match.created_by && match.created_by !== user?.id && (
             <div className="pt-2">

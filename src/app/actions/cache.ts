@@ -78,6 +78,7 @@ export async function getCachedMatches(): Promise<Match[]> {
       id,
       start_time,
       fee,
+      duration_minutes,
       max_skaters,
       max_goalies,
       status,

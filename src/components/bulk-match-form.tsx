@@ -52,6 +52,7 @@ function createEmptyPattern(): SchedulePattern {
     goalieFree: false,
     rentalAvailable: false,
     rentalFee: 0,
+    duration_minutes: 90,
   };
 }
 
@@ -213,6 +214,7 @@ export function BulkMatchForm({ rinks, clubs = [], initialMonth }: BulkMatchForm
         goalie_free: m.goalieFree,
         rental_available: m.rentalAvailable,
         rental_fee: m.rentalFee,
+        duration_minutes: m.duration_minutes,
         description: m.description,
       }));
 

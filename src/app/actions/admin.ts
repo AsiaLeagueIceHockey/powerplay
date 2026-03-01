@@ -78,6 +78,10 @@ export async function createMatch(formData: FormData) {
   const goalieFree = (isTeamMatch || isTraining) ? false : formData.get("goalie_free") === "true";
   const rentalAvailable = isTeamMatch ? false : formData.get("rental_available") === "true";
 
+  const durationInput = formData.get("duration_minutes") as string;
+  const durationParsed = durationInput ? parseInt(durationInput) : NaN;
+  const durationMinutes = isNaN(durationParsed) ? null : durationParsed;
+
   // datetime-local 입력은 KST로 가정, UTC로 변환하여 저장
   // 입력: "2026-01-11T00:00" (KST) → 저장: "2026-01-10T15:00:00.000Z" (UTC)
   const startTimeUTC = new Date(startTimeInput + "+09:00").toISOString();
@@ -101,6 +105,7 @@ export async function createMatch(formData: FormData) {
       goalie_free: goalieFree,
       match_type: matchType,
       max_guests: maxGuests,
+      duration_minutes: durationMinutes,
     })
     .select()
     .single();
@@ -189,6 +194,10 @@ export async function updateMatch(matchId: string, formData: FormData) {
   const goalieFree = (isTeamMatch || isTraining) ? false : formData.get("goalie_free") === "true";
   const rentalAvailable = isTeamMatch ? false : formData.get("rental_available") === "true";
 
+  const durationInput = formData.get("duration_minutes") as string;
+  const durationParsed = durationInput ? parseInt(durationInput) : NaN;
+  const durationMinutes = isNaN(durationParsed) ? null : durationParsed;
+
   // datetime-local 입력은 KST로 가정, UTC로 변환하여 저장
   const startTimeUTC = new Date(startTimeInput + "+09:00").toISOString();
 
@@ -210,6 +219,7 @@ export async function updateMatch(matchId: string, formData: FormData) {
       goalie_free: goalieFree,
       match_type: matchType,
       max_guests: maxGuests,
+      duration_minutes: durationMinutes,
     })
     .eq("id", matchId);
 
@@ -502,6 +512,7 @@ export interface BulkMatchInput {
   rink_id: string;
   club_id?: string;
   start_time: string; // KST datetime string e.g. "2026-03-04T22:00"
+  duration_minutes: number | null;
   match_type: "game" | "training" | "team_match";
   entry_points: number;
   bank_account: string | null;
@@ -566,6 +577,7 @@ export async function createBulkMatches(
       goalie_free: m.goalie_free,
       match_type: m.match_type,
       max_guests: m.max_guests,
+      duration_minutes: m.duration_minutes,
     };
   });
 
@@ -655,6 +667,7 @@ export async function getPreviousMonthMatches(
       `
       rink_id,
       start_time,
+      duration_minutes,
       match_type,
       entry_points,
       rental_fee,
@@ -710,6 +723,7 @@ export async function getAdminMatches() {
       `
       id,
       start_time,
+      duration_minutes,
       fee,
       entry_points,
       match_type,

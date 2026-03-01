@@ -37,6 +37,8 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
   const [bankAccount, setBankAccount] = useState("");
   const [isRentalAvailable, setIsRentalAvailable] = useState(false);
   const [matchType, setMatchType] = useState<"training" | "game" | "team_match">("game");
+  const [durationType, setDurationType] = useState<"90" | "120" | "custom">("90");
+  const [customDuration, setCustomDuration] = useState("");
 
   const isTeamMatch = matchType === "team_match";
   const isTraining = matchType === "training";
@@ -226,6 +228,81 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
           </div>
         </div>
       <input type="hidden" name="start_time" />
+      </div>
+
+      {/* Match Duration */}
+      <div>
+        <label className="block text-sm font-medium mb-2 text-zinc-300">
+          {t("admin.bulk.duration")}
+        </label>
+        <div className="space-y-3">
+          <div className="grid grid-cols-3 gap-3">
+            <label className={`relative flex cursor-pointer items-center justify-center rounded-lg border p-4 transition-all text-sm font-medium ${
+              durationType === "90"
+                ? "border-blue-500 bg-blue-900/20 text-blue-200"
+                : "border-zinc-700 bg-zinc-900 text-zinc-400 hover:bg-zinc-800"
+            }`}>
+              <input
+                type="radio"
+                className="sr-only"
+                checked={durationType === "90"}
+                onChange={() => setDurationType("90")}
+              />
+              90{locale === "ko" ? "분" : " min"}
+            </label>
+            <label className={`relative flex cursor-pointer items-center justify-center rounded-lg border p-4 transition-all text-sm font-medium ${
+              durationType === "120"
+                ? "border-blue-500 bg-blue-900/20 text-blue-200"
+                : "border-zinc-700 bg-zinc-900 text-zinc-400 hover:bg-zinc-800"
+            }`}>
+              <input
+                type="radio"
+                className="sr-only"
+                checked={durationType === "120"}
+                onChange={() => setDurationType("120")}
+              />
+              120{locale === "ko" ? "분" : " min"}
+            </label>
+            <label className={`relative flex cursor-pointer items-center justify-center rounded-lg border p-4 transition-all text-sm font-medium ${
+              durationType === "custom"
+                ? "border-amber-500 bg-amber-900/20 text-amber-200"
+                : "border-zinc-700 bg-zinc-900 text-zinc-400 hover:bg-zinc-800"
+            }`}>
+              <input
+                type="radio"
+                className="sr-only"
+                checked={durationType === "custom"}
+                onChange={() => setDurationType("custom")}
+              />
+              {locale === "ko" ? "직접 입력" : "Custom"}
+            </label>
+          </div>
+          {durationType === "custom" && (
+            <div className="relative animate-in fade-in slide-in-from-top-2 duration-200">
+              <input
+                type="number"
+                value={customDuration}
+                onChange={(e) => setCustomDuration(e.target.value)}
+                placeholder={locale === "ko" ? "분 단위 입력" : "Minutes"}
+                className="w-full px-4 py-3 pr-8 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
+                autoFocus
+                required
+              />
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 text-sm">
+                {locale === "ko" ? "분" : "m"}
+              </span>
+            </div>
+          )}
+          <input
+            type="hidden"
+            name="duration_minutes"
+            value={
+              durationType === "90" ? "90" :
+              durationType === "120" ? "120" :
+              durationType === "custom" ? customDuration : ""
+            }
+          />
+        </div>
       </div>
 
       {/* Match Type */}
