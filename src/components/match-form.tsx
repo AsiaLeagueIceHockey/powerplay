@@ -37,7 +37,7 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
   const [bankAccount, setBankAccount] = useState("");
   const [isRentalAvailable, setIsRentalAvailable] = useState(false);
   const [matchType, setMatchType] = useState<"training" | "game" | "team_match">("game");
-  const [durationType, setDurationType] = useState<"90" | "120" | "custom" | "null">("null");
+  const [durationType, setDurationType] = useState<"90" | "120" | "custom" | "null">("90");
   const [customDuration, setCustomDuration] = useState("");
 
   const isTeamMatch = matchType === "team_match";
@@ -230,10 +230,9 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
       <input type="hidden" name="start_time" />
       </div>
 
-      {/* Match Duration */}
       <div>
         <label className="block text-sm font-medium mb-2 text-zinc-300">
-          대관 시간 (Match Duration)
+          {t("admin.bulk.duration")}
         </label>
         <div className="flex gap-2">
           <select

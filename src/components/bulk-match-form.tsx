@@ -52,6 +52,7 @@ function createEmptyPattern(): SchedulePattern {
     goalieFree: false,
     rentalAvailable: false,
     rentalFee: 0,
+    duration_minutes: 90,
   };
 }
 
