@@ -194,35 +194,58 @@ export function SchedulePatternCard({
         <label className="block text-xs font-medium mb-2 text-zinc-400">
           ⏳ {t("duration")}
         </label>
-        <div className="flex gap-2">
-          <select
-            value={
-              pattern.duration_minutes === 90 ? "90" :
-              pattern.duration_minutes === 120 ? "120" :
-              pattern.duration_minutes === null || pattern.duration_minutes === undefined ? "null" :
-              "custom"
-            }
-            onChange={(e) => {
-              const val = e.target.value;
-              if (val === "null") update({ duration_minutes: null });
-              else if (val === "custom") update({ duration_minutes: 0 }); // 0 maps to custom input display
-              else update({ duration_minutes: parseInt(val) });
-            }}
-            className="flex-1 px-3 py-2.5 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-          >
-            <option value="null">{locale === "ko" ? "기본값 (표시안함)" : "Default (None)"}</option>
-            <option value="90">90{locale === "ko" ? "분" : " min"}</option>
-            <option value="120">120{locale === "ko" ? "분" : " min"}</option>
-            <option value="custom">{locale === "ko" ? "직접 입력" : "Custom"}</option>
-          </select>
-          {pattern.duration_minutes !== 90 && pattern.duration_minutes !== 120 && pattern.duration_minutes !== null && pattern.duration_minutes !== undefined && (
-            <div className="relative flex-1">
+        <div className="space-y-3">
+          <div className="grid grid-cols-3 gap-2">
+            <label className={`relative flex cursor-pointer items-center justify-center rounded-lg border p-3 transition-all text-xs font-medium ${
+              pattern.duration_minutes === 90
+                ? "border-blue-500 bg-blue-900/20 text-blue-200"
+                : "border-zinc-700 bg-zinc-900 text-zinc-400 hover:bg-zinc-800"
+            }`}>
+              <input
+                type="radio"
+                className="sr-only"
+                checked={pattern.duration_minutes === 90}
+                onChange={() => update({ duration_minutes: 90 })}
+              />
+              90{locale === "ko" ? "분" : " min"}
+            </label>
+            <label className={`relative flex cursor-pointer items-center justify-center rounded-lg border p-3 transition-all text-xs font-medium ${
+              pattern.duration_minutes === 120
+                ? "border-blue-500 bg-blue-900/20 text-blue-200"
+                : "border-zinc-700 bg-zinc-900 text-zinc-400 hover:bg-zinc-800"
+            }`}>
+              <input
+                type="radio"
+                className="sr-only"
+                checked={pattern.duration_minutes === 120}
+                onChange={() => update({ duration_minutes: 120 })}
+              />
+              120{locale === "ko" ? "분" : " min"}
+            </label>
+            <label className={`relative flex cursor-pointer items-center justify-center rounded-lg border p-3 transition-all text-xs font-medium ${
+              pattern.duration_minutes !== 90 && pattern.duration_minutes !== 120
+                ? "border-amber-500 bg-amber-900/20 text-amber-200"
+                : "border-zinc-700 bg-zinc-900 text-zinc-400 hover:bg-zinc-800"
+            }`}>
+              <input
+                type="radio"
+                className="sr-only"
+                checked={pattern.duration_minutes !== 90 && pattern.duration_minutes !== 120}
+                onChange={() => update({ duration_minutes: 0 })}
+              />
+              {locale === "ko" ? "직접 입력" : "Custom"}
+            </label>
+          </div>
+          {pattern.duration_minutes !== 90 && pattern.duration_minutes !== 120 && (
+            <div className="relative animate-in fade-in slide-in-from-top-2 duration-200">
               <input
                 type="number"
                 value={pattern.duration_minutes || ""}
                 onChange={(e) => update({ duration_minutes: e.target.value ? parseInt(e.target.value) : 0 })}
                 placeholder={locale === "ko" ? "분 단위 입력" : "Minutes"}
-                className="w-full px-3 py-2.5 pr-8 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="w-full px-3 py-2.5 pr-8 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 text-sm focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
+                autoFocus
+                required
               />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 text-xs">
                 {locale === "ko" ? "분" : "m"}
