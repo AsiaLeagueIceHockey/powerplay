@@ -283,6 +283,9 @@ export function SchedulePatternCard({
                 {locale === "ko" ? "원" : "KRW"}
               </span>
             </div>
+            <p className="text-[11px] text-zinc-500 mt-1">
+              {locale === "ko" ? "참가비 (0 = 무료)" : "Entry fee (0 = free)"}
+            </p>
           </div>
 
           {/* Bank Account */}
@@ -297,6 +300,11 @@ export function SchedulePatternCard({
               className="w-full px-3 py-2.5 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 text-sm"
               placeholder={t("bankAccountPlaceholder")}
             />
+            <p className="text-[11px] text-zinc-500 mt-1">
+              {locale === "ko"
+                ? "경기 참가비를 정산 받을 계좌를 입력해주세요. (은행명, 계좌번호, 예금주)"
+                : "Enter account to receive entry fee settlements. (Bank, Account #, Name)"}
+            </p>
           </div>
 
           {/* Game: Skaters / Goalies / GoalieFree */}
@@ -388,13 +396,16 @@ export function SchedulePatternCard({
                     })
                   }
                   className="w-full px-3 py-2.5 pr-8 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 text-sm"
-                  placeholder="10"
+                  placeholder=""
                   min={1}
                 />
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 text-xs">
                   명
                 </span>
               </div>
+              <p className="text-[11px] text-zinc-500 mt-1">
+                {locale === "ko" ? "미입력 시 무제한으로 모집합니다" : "If empty, unlimited guests"}
+              </p>
             </div>
           )}
 
