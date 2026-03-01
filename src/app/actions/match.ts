@@ -41,6 +41,7 @@ export interface MatchClub {
 export interface Match {
   id: string;
   start_time: string;
+  duration_minutes?: number | null;
   fee: number;  // deprecated, use entry_points
   entry_points: number;
   rental_fee: number; // Added for Equipment Rental
@@ -68,6 +69,7 @@ export async function getMatches(): Promise<Match[]> {
       `
       id,
       start_time,
+      duration_minutes,
       fee,
       entry_points,
       rental_fee,
@@ -132,6 +134,7 @@ export async function getMatch(id: string): Promise<Match | null> {
       `
       id,
       start_time,
+      duration_minutes,
       fee,
       entry_points,
       rental_fee,

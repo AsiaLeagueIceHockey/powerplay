@@ -56,6 +56,11 @@ export function MatchCard({ match }: { match: Match }) {
       <div className="mb-3 flex items-center justify-between">
         <div className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
           {formattedDate} · {formattedTime}
+          {match.duration_minutes && (
+            <span className="ml-1 text-xs font-normal text-zinc-400 dark:text-zinc-500">
+              ({match.duration_minutes}{locale === "ko" ? "분" : "m"})
+            </span>
+          )}
         </div>
         <div className="flex items-center gap-2">
           <span

@@ -31,6 +31,7 @@ export interface SchedulePattern {
   // training fields
   maxGuests?: number;
   // common
+  duration_minutes?: number | null;
   description?: string;
 }
 
@@ -49,6 +50,7 @@ export interface GeneratedMatch {
   goalieFree: boolean;
   rentalAvailable: boolean;
   rentalFee: number;
+  duration_minutes: number | null;
   description: string | null;
 }
 
@@ -190,6 +192,7 @@ function buildGeneratedMatch(
     goalieFree,
     rentalAvailable,
     rentalFee,
+    duration_minutes: pattern.duration_minutes ?? null,
     description: pattern.description ?? null,
   };
 }
@@ -208,6 +211,7 @@ interface PreviousMatch {
   max_goalies: number;
   max_guests: number | null;
   goalie_free: boolean;
+  duration_minutes?: number | null;
   description: string | null;
 }
 
@@ -243,6 +247,7 @@ export function groupMatchesByPattern(matches: PreviousMatch[]): SchedulePattern
       String(match.max_goalies),
       String(match.max_guests ?? ""),
       String(match.goalie_free),
+      String(match.duration_minutes ?? ""),
     ].join("|");
 
     if (!groups.has(key)) {
@@ -318,6 +323,7 @@ export function groupMatchesByPattern(matches: PreviousMatch[]): SchedulePattern
       goalieFree: sample.goalie_free,
       rentalAvailable: sample.rental_available,
       rentalFee: sample.rental_fee,
+      duration_minutes: sample.duration_minutes ?? undefined,
       description: sample.description ?? undefined,
     });
   }

@@ -88,6 +88,7 @@ describe("generateMatchDates", () => {
     goalieFree: true,
     rentalAvailable: true,
     rentalFee: 10000,
+    duration_minutes: 90,
     description: "정규 대관",
   };
 
@@ -142,6 +143,8 @@ describe("generateMatchDates", () => {
       maxGuests: 10,
       rentalAvailable: true,
       rentalFee: 5000,
+      duration_minutes: 120,
+      description: undefined,
     };
 
     const results = generateMatchDates(2026, 3, trainingPattern);
@@ -163,6 +166,8 @@ describe("generateMatchDates", () => {
       minute: "30",
       weeklyOption: "every",
       matchType: "team_match",
+      duration_minutes: null,
+      description: undefined,
     };
 
     const results = generateMatchDates(2026, 3, teamPattern);
@@ -230,12 +235,14 @@ describe("generateMatchDates", () => {
         weeklyOption: "every",
         matchType: "game",
         entryPoints: 25000,
-        bankAccount: "카뱅 3333",
-        maxSkaters: 20,
-        maxGoalies: 2,
-      },
-      {
-        id: "suwon-fri",
+      bankAccount: "카뱅 3333",
+      maxSkaters: 20,
+      maxGoalies: 2,
+      duration_minutes: 90,
+      description: undefined,
+    },
+    {
+      id: "suwon-fri",
         rinkId: "rink-bundang",
         daysOfWeek: [5], // Fri
         hour: "22",
@@ -244,10 +251,12 @@ describe("generateMatchDates", () => {
         matchType: "training",
         entryPoints: 15000,
         bankAccount: "카뱅 3333",
-        maxGuests: 10,
-      },
-      {
-        id: "suwon-sun-13",
+      maxGuests: 10,
+      duration_minutes: 120,
+      description: undefined,
+    },
+    {
+      id: "suwon-sun-13",
         rinkId: "rink-suwon",
         daysOfWeek: [0], // Sun
         hour: "22",
@@ -255,12 +264,14 @@ describe("generateMatchDates", () => {
         weeklyOption: "week13",
         matchType: "game",
         entryPoints: 25000,
-        bankAccount: "카뱅 3333",
-        maxSkaters: 20,
-        maxGoalies: 2,
-      },
-      {
-        id: "suwon-sun-24",
+      bankAccount: "카뱅 3333",
+      maxSkaters: 20,
+      maxGoalies: 2,
+      duration_minutes: null,
+      description: undefined,
+    },
+    {
+      id: "suwon-sun-24",
         rinkId: "rink-gwanggyo",
         daysOfWeek: [0], // Sun
         hour: "10",
@@ -268,11 +279,13 @@ describe("generateMatchDates", () => {
         weeklyOption: "week24",
         matchType: "game",
         entryPoints: 20000,
-        bankAccount: "카뱅 3333",
-        maxSkaters: 20,
-        maxGoalies: 2,
-      },
-    ];
+      bankAccount: "카뱅 3333",
+      maxSkaters: 20,
+      maxGoalies: 2,
+      duration_minutes: 120,
+      description: undefined,
+    },
+  ];
 
     const allMatches = patterns.flatMap((p) => generateMatchDates(2026, 3, p));
 
@@ -352,6 +365,7 @@ function createPrevMatch(
     max_goalies: 2,
     max_guests: null,
     goalie_free: false,
+    duration_minutes: 90,
     description: null,
   };
 }

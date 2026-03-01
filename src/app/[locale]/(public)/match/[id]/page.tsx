@@ -171,7 +171,17 @@ export default async function MatchPage({
         <h2 className="text-lg font-bold mb-4">{t("match.details")}</h2>
 
         <div className="space-y-3">
-
+          {match.duration_minutes && (
+            <>
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-zinc-500">{t("admin.bulk.duration")}</span>
+                <span className="font-semibold text-lg text-zinc-900 dark:text-zinc-100">
+                  {match.duration_minutes}{locale === "ko" ? "분" : " Minutes"}
+                </span>
+              </div>
+              <div className="border-t border-zinc-100 dark:border-zinc-800 my-2"></div>
+            </>
+          )}
 
           <div className="flex justify-between items-center text-sm">
             <span className="text-zinc-500">{t("match.fee")}</span>

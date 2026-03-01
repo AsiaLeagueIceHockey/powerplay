@@ -37,6 +37,8 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
   const [bankAccount, setBankAccount] = useState("");
   const [isRentalAvailable, setIsRentalAvailable] = useState(false);
   const [matchType, setMatchType] = useState<"training" | "game" | "team_match">("game");
+  const [durationType, setDurationType] = useState<"90" | "120" | "custom" | "null">("null");
+  const [customDuration, setCustomDuration] = useState("");
 
   const isTeamMatch = matchType === "team_match";
   const isTraining = matchType === "training";
@@ -226,6 +228,48 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
           </div>
         </div>
       <input type="hidden" name="start_time" />
+      </div>
+
+      {/* Match Duration */}
+      <div>
+        <label className="block text-sm font-medium mb-2 text-zinc-300">
+          대관 시간 (Match Duration)
+        </label>
+        <div className="flex gap-2">
+          <select
+            value={durationType}
+            onChange={(e) => setDurationType(e.target.value as any)}
+            className="px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 appearance-none flex-1"
+          >
+            <option value="null">{locale === "ko" ? "기본값 (표시안함)" : "Default (None)"}</option>
+            <option value="90">90{locale === "ko" ? "분" : " min"}</option>
+            <option value="120">120{locale === "ko" ? "분" : " min"}</option>
+            <option value="custom">{locale === "ko" ? "직접 입력" : "Custom"}</option>
+          </select>
+          {durationType === "custom" && (
+            <div className="relative flex-1">
+              <input
+                type="number"
+                value={customDuration}
+                onChange={(e) => setCustomDuration(e.target.value)}
+                placeholder={locale === "ko" ? "분 단위 입력" : "Minutes"}
+                className="w-full px-4 py-3 pr-8 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              />
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 text-sm">
+                {locale === "ko" ? "분" : "m"}
+              </span>
+            </div>
+          )}
+          <input
+            type="hidden"
+            name="duration_minutes"
+            value={
+              durationType === "90" ? "90" :
+              durationType === "120" ? "120" :
+              durationType === "custom" ? customDuration : ""
+            }
+          />
+        </div>
       </div>
 
       {/* Match Type */}

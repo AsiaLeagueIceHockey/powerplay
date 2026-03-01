@@ -213,6 +213,7 @@ export function BulkMatchForm({ rinks, clubs = [], initialMonth }: BulkMatchForm
         goalie_free: m.goalieFree,
         rental_available: m.rentalAvailable,
         rental_fee: m.rentalFee,
+        duration_minutes: m.duration_minutes,
         description: m.description,
       }));
 

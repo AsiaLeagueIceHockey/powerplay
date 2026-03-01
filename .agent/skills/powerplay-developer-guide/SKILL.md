@@ -114,12 +114,14 @@ export async function createItem(formData: FormData) {
 - `npm run lint`: Check code quality.
 
 ### Adding Features
-1.  **Plan**: Understand requirements and check `AGENTS.md` roadmap.
-2.  **Implementation Plan**: Create `.agent/implementation/{feature-name}.md` (see below).
-3.  **Schema**: Create `sql/v{N}_{feature}.sql` if DB changes are needed.
-4.  **i18n**: Add keys to `messages/*.json`.
-5.  **Implement**: Code components and server actions, checking off TODOs.
-6.  **Verify**: Test and check off verification TODOs.
+1.  **Branching**: `git checkout -b feature/{feature-name}`. All new features MUST be developed on a separate branch.
+2.  **Plan**: Understand requirements and check `AGENTS.md` roadmap.
+3.  **Implementation Plan**: Create `.agent/implementation/{feature-name}.md` (see below).
+4.  **Schema**: Create `sql/v{N}_{feature}.sql` if DB changes are needed.
+5.  **i18n**: Add keys to `messages/*.json`.
+6.  **Implement**: Code components and server actions, checking off TODOs.
+7.  **Verify**: Test and check off verification TODOs.
+8.  **PR**: Submit a Pull Request to the `main` branch.
 
 ### Implementation Tracking (Standard Workflow)
 Every non-trivial feature **MUST** have a tracking file at `.agent/implementation/{feature-name}.md`.
