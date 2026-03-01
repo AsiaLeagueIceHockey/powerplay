@@ -115,10 +115,44 @@ export async function createItem(formData: FormData) {
 
 ### Adding Features
 1.  **Plan**: Understand requirements and check `AGENTS.md` roadmap.
-2.  **Schema**: Create `sql/v{N}_{feature}.sql` if DB changes are needed.
-3.  **i18n**: Add keys to `messages/*.json`.
-4.  **Implement**: Code components and server actions.
-5.  **Verify**: Test manually.
+2.  **Implementation Plan**: Create `.agent/implementation/{feature-name}.md` (see below).
+3.  **Schema**: Create `sql/v{N}_{feature}.sql` if DB changes are needed.
+4.  **i18n**: Add keys to `messages/*.json`.
+5.  **Implement**: Code components and server actions, checking off TODOs.
+6.  **Verify**: Test and check off verification TODOs.
+
+### Implementation Tracking (Standard Workflow)
+Every non-trivial feature **MUST** have a tracking file at `.agent/implementation/{feature-name}.md`.
+
+**File structure:**
+```markdown
+# Feature Title
+
+## Goal
+(Brief description of what we're building and why)
+
+## TODO
+
+### Phase 1: [Foundation]
+- [ ] Task 1
+- [ ] Task 2
+
+### Phase 2: [UI/Components]
+- [ ] Task 3
+
+### Phase 3: [Integration]
+- [ ] Task 4
+
+### Phase 4: [Verification]
+- [ ] `npm run build` passes
+- [ ] Tests pass
+```
+
+**Rules:**
+- Mark `- [x]` as you complete each item.
+- Keep TODO items granular (one file or one logical unit per item).
+- Include verification tasks (build, tests) in the final phase.
+- Delete the file or move to `.agent/implementation/done/` after feature is fully merged.
 
 
 ### Feature Implementation Sets

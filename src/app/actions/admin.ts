@@ -496,7 +496,192 @@ export async function deleteMatch(matchId: string) {
   return { success: true };
 }
 
-// Get admin matches (created by current user)
+// ==================== BULK MATCH CREATION ====================
+
+export interface BulkMatchInput {
+  rink_id: string;
+  club_id?: string;
+  start_time: string; // KST datetime string e.g. "2026-03-04T22:00"
+  match_type: "game" | "training" | "team_match";
+  entry_points: number;
+  bank_account: string | null;
+  max_skaters: number;
+  max_goalies: number;
+  max_guests: number | null;
+  goalie_free: boolean;
+  rental_available: boolean;
+  rental_fee: number;
+  description: string | null;
+}
+
+// Create multiple matches at once
+export async function createBulkMatches(
+  matches: BulkMatchInput[],
+  clubId?: string
+) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "Not authenticated" };
+  }
+
+  // Verify admin or superuser role
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role, full_name")
+    .eq("id", user.id)
+    .single();
+
+  if (profile?.role !== "admin" && profile?.role !== "superuser") {
+    return { error: "Unauthorized" };
+  }
+
+  if (matches.length === 0) {
+    return { error: "No matches to create" };
+  }
+
+  // Build insert rows
+  const insertRows = matches.map((m) => {
+    // Convert KST to UTC
+    const startTimeUTC = new Date(m.start_time + "+09:00").toISOString();
+
+    return {
+      rink_id: m.rink_id || null,
+      club_id: clubId || null,
+      start_time: startTimeUTC,
+      fee: m.entry_points,
+      entry_points: m.entry_points,
+      rental_fee: m.rental_fee,
+      rental_available: m.rental_available,
+      max_skaters: m.max_skaters,
+      max_goalies: m.max_goalies,
+      description: m.description || null,
+      status: "open" as const,
+      created_by: user.id,
+      bank_account: m.bank_account || null,
+      goalie_free: m.goalie_free,
+      match_type: m.match_type,
+      max_guests: m.max_guests,
+    };
+  });
+
+  const { data, error } = await supabase
+    .from("matches")
+    .insert(insertRows)
+    .select("id");
+
+  if (error) {
+    console.error("Error creating bulk matches:", error);
+    return { error: error.message };
+  }
+
+  revalidatePath("/admin/matches");
+
+  // Fetch club name for audit log
+  let clubName = "";
+  if (clubId) {
+    const { data: clubData } = await supabase
+      .from("clubs")
+      .select("name")
+      .eq("id", clubId)
+      .single();
+    if (clubData) clubName = clubData.name;
+  }
+
+  const creatorName =
+    profile?.full_name || user.email?.split("@")[0] || "관리자";
+  const teamInfo = clubName ? `[${clubName}] ` : "";
+
+  await logAndNotify({
+    userId: user.id,
+    action: "MATCH_CREATE",
+    description: `${teamInfo}${creatorName}님이 ${matches.length}개의 매치를 일괄 생성했습니다.`,
+    metadata: {
+      matchIds: data?.map((d) => d.id),
+      count: matches.length,
+      clubId,
+      creatorName,
+    },
+  });
+
+  return { success: true, count: data?.length || 0 };
+}
+
+// Get previous month's matches for "copy from last month" feature
+export async function getPreviousMonthMatches(
+  targetYear: number,
+  targetMonth: number
+) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return [];
+  }
+
+  // Verify admin or superuser role
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  if (profile?.role !== "admin" && profile?.role !== "superuser") {
+    return [];
+  }
+
+  // Calculate previous month range
+  const prevDate = new Date(targetYear, targetMonth - 2, 1); // month is 0-based, -2 to go back one month
+  const prevYear = prevDate.getFullYear();
+  const prevMonth = prevDate.getMonth(); // 0-based
+
+  const startOfMonth = new Date(
+    Date.UTC(prevYear, prevMonth, 1) - 9 * 60 * 60 * 1000
+  ); // KST midnight → UTC
+  const endOfMonth = new Date(
+    Date.UTC(prevYear, prevMonth + 1, 1) - 9 * 60 * 60 * 1000
+  );
+
+  const { data: matches, error } = await supabase
+    .from("matches")
+    .select(
+      `
+      rink_id,
+      start_time,
+      match_type,
+      entry_points,
+      rental_fee,
+      rental_available,
+      bank_account,
+      max_skaters,
+      max_goalies,
+      max_guests,
+      goalie_free,
+      description
+    `
+    )
+    .eq("created_by", user.id)
+    .gte("start_time", startOfMonth.toISOString())
+    .lt("start_time", endOfMonth.toISOString())
+    .neq("status", "canceled")
+    .order("start_time", { ascending: true });
+
+  if (error) {
+    console.error("Error fetching previous month matches:", error);
+    return [];
+  }
+
+  return matches || [];
+}
+
+
 export async function getAdminMatches() {
   const supabase = await createClient();
 

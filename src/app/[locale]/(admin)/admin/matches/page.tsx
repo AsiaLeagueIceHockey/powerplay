@@ -35,15 +35,25 @@ export default async function AdminMatchesPage({
 
   return (
     <div>
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-        <h1 className="text-2xl font-bold">{t("admin.matches.title")}</h1>
-        <div className="flex items-center gap-3 flex-wrap">
+      <div className="mb-6 space-y-3">
+        {/* Row 1: Title + Month Selector */}
+        <div className="flex items-center justify-between gap-3">
+          <h1 className="text-2xl font-bold shrink-0">{t("admin.matches.title")}</h1>
           <AdminMonthSelector currentMonth={currentMonth} locale={locale} />
+        </div>
+        {/* Row 2: Action Buttons */}
+        <div className="flex gap-2">
           <Link
             href={`/${locale}/admin/matches/new`}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium whitespace-nowrap"
+            className="flex-1 flex items-center justify-center gap-1 px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium whitespace-nowrap"
           >
             + {t("admin.matches.create")}
+          </Link>
+          <Link
+            href={`/${locale}/admin/matches/bulk?month=${currentMonth}`}
+            className="flex-1 flex items-center justify-center gap-1 px-4 py-2.5 bg-zinc-700 text-zinc-200 rounded-lg hover:bg-zinc-600 transition-colors text-sm font-medium whitespace-nowrap"
+          >
+            📅 {t("admin.matches.bulkCreate")}
           </Link>
         </div>
       </div>
