@@ -114,7 +114,7 @@ export function BulkMatchForm({ rinks, clubs = [], initialMonth }: BulkMatchForm
   const getPatternErrors = useCallback(
     (p: SchedulePattern, idx: number): string[] => {
       const errs: string[] = [];
-      const label = locale === "ko" ? `대관 ${idx + 1}` : `Booking ${idx + 1}`;
+      const label = locale === "ko" ? `대관 유형 ${idx + 1}` : `Booking Type ${idx + 1}`;
       if (!p.rinkId) errs.push(`${label}: ${locale === "ko" ? "경기장을 선택해주세요" : "Select a rink"}`);
       if (!p.selectedDates || p.selectedDates.length === 0)
         errs.push(`${label}: ${locale === "ko" ? "날짜를 선택해주세요" : "Select at least one date"}`);
@@ -282,49 +282,44 @@ export function BulkMatchForm({ rinks, clubs = [], initialMonth }: BulkMatchForm
         </div>
       </div>
 
-      {/* Common Settings */}
+      {/* Host Club */}
       {clubs.length > 0 && (
         <div className="bg-zinc-800 p-5 rounded-xl border border-zinc-700">
-          <h3 className="text-sm font-bold text-zinc-200 mb-4">
-            {t("commonSettings")}
-          </h3>
-          <div>
-            <label className="block text-xs font-medium mb-2 text-zinc-400">
-              👥 {t("hostClub")}
-            </label>
-            <select
-              value={clubId}
-              onChange={(e) => setClubId(e.target.value)}
-              className="w-full px-3 py-2.5 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 text-sm"
-            >
-              <option value="">{t("noClub")}</option>
-              {clubs.map((club) => (
-                <option key={club.id} value={club.id}>
-                  {club.name}
-                </option>
-              ))}
-            </select>
-          </div>
+          <label className="block text-xs font-medium mb-2 text-zinc-400">
+            👥 {t("hostClub")}
+          </label>
+          <select
+            value={clubId}
+            onChange={(e) => setClubId(e.target.value)}
+            className="w-full px-3 py-2.5 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 text-sm"
+          >
+            <option value="">{t("noClub")}</option>
+            {clubs.map((club) => (
+              <option key={club.id} value={club.id}>
+                {club.name}
+              </option>
+            ))}
+          </select>
         </div>
       )}
 
       {/* Action Buttons */}
-      <div className="flex gap-2">
+      <div className="grid grid-cols-2 gap-2">
         <button
           type="button"
           onClick={addPattern}
-          className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+          className="flex items-center justify-center gap-1.5 px-3 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium whitespace-nowrap"
         >
-          <Plus className="w-4 h-4" />
+          <Plus className="w-4 h-4 shrink-0" />
           {t("addPattern")}
         </button>
         <button
           type="button"
           onClick={handleCopyPrevMonth}
           disabled={copyingPrev}
-          className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-zinc-700 text-zinc-200 rounded-lg hover:bg-zinc-600 disabled:opacity-50 transition-colors text-sm font-medium"
+          className="flex items-center justify-center gap-1.5 px-3 py-3 bg-zinc-700 text-zinc-200 rounded-lg hover:bg-zinc-600 disabled:opacity-50 transition-colors text-sm font-medium whitespace-nowrap"
         >
-          <Copy className="w-4 h-4" />
+          <Copy className="w-4 h-4 shrink-0" />
           {copyingPrev ? t("loadingPrev") : t("copyPrevMonth")}
         </button>
       </div>

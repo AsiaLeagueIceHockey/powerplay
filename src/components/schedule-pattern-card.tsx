@@ -364,7 +364,7 @@ export function SchedulePatternCard({
                   className="w-4 h-4 rounded border-zinc-600 bg-zinc-800 text-blue-600"
                 />
                 <span className="text-xs font-medium text-zinc-300">
-                  🧤 {t("goalieFree")}
+                  {t("goalieFree")}
                 </span>
               </div>
             </>
@@ -428,7 +428,7 @@ export function SchedulePatternCard({
                 )}
               </div>
               <span className={`text-xs font-medium ${pattern.rentalAvailable ? "text-blue-200" : "text-zinc-400"}`}>
-                🎿 {t("rentalAvailable")}
+                {t("rentalAvailable")}
               </span>
             </div>
             {pattern.rentalAvailable && (

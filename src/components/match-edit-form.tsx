@@ -470,7 +470,7 @@ export function MatchEditForm({
             />
             <label htmlFor="goalie_free_edit" className="flex flex-col flex-1">
               <span className="text-sm font-medium text-zinc-200">
-                🧤 {t("match.goalieFreeLabel")}
+                {t("match.goalieFreeLabel")}
               </span>
               <span className="text-xs text-zinc-400">
                 {hasGoalies

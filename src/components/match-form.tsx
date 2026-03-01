@@ -378,7 +378,7 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
                 />
                 <label htmlFor="goalie_free" className="flex flex-col">
                   <span className="text-sm font-medium text-zinc-200">
-                    🧤 {t("match.goalieFreeLabel")}
+                    {t("match.goalieFreeLabel")}
                   </span>
                   <span className="text-xs text-zinc-400">
                     {t("match.goalieFreeDesc")}
