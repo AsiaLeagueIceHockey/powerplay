@@ -114,10 +114,24 @@ export default function ClubCardClient({ club }: ClubCardClientProps) {
       setSharing(true);
       const { toBlob } = await import("html-to-image");
       
-      const blob = await toBlob(cardRef.current, {
-        quality: 1.0,
-        pixelRatio: 3, // High quality for crisp rendering
-      });
+      let blob: Blob | null = null;
+      let retries = 3;
+      
+      while (retries > 0 && !blob) {
+        try {
+          blob = await toBlob(cardRef.current, {
+            quality: 1.0,
+            pixelRatio: 3, // High quality for crisp rendering
+            cacheBust: true, // Help Safari invalidate cached failed renders
+          });
+          if (blob) break;
+        } catch (err) {
+          retries--;
+          if (retries === 0) throw err;
+          // Wait briefly, allowing browser to retry canvas paint
+          await new Promise(resolve => setTimeout(resolve, 300));
+        }
+      }
 
       if (!blob) throw new Error("Could not generate image");
 
@@ -234,12 +248,14 @@ export default function ClubCardClient({ club }: ClubCardClientProps) {
               <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-4 transition-all w-full flex-shrink-0 flex flex-col">
                 <div className="text-[10px] text-zinc-400 mb-2 uppercase tracking-wider flex justify-between items-center">
                   <span>About Us</span>
-                  <button 
-                    onClick={() => setShowFullDesc(!showFullDesc)}
-                    className="text-[10px] text-blue-400 hover:text-blue-300 transition-colors font-medium px-1 cursor-pointer select-none"
-                  >
-                    {showFullDesc ? t("common.fold", { fallback: "접기" }) : t("common.more", { fallback: "전체 보기" })}
-                  </button>
+                  {descPages.length > 1 && (
+                    <button 
+                      onClick={() => setShowFullDesc(!showFullDesc)}
+                      className="text-[10px] text-blue-400 hover:text-blue-300 transition-colors font-medium px-1 cursor-pointer select-none"
+                    >
+                      {showFullDesc ? t("common.fold", { fallback: "접기" }) : t("common.more", { fallback: "전체 보기" })}
+                    </button>
+                  )}
                 </div>
                 
                 {!showFullDesc ? (
@@ -248,7 +264,7 @@ export default function ClubCardClient({ club }: ClubCardClientProps) {
                   </div>
                 ) : (
                   <div className="flex flex-col">
-                    <div className="text-sm font-medium text-white/90 leading-relaxed whitespace-pre-wrap transition-all h-[155px]">
+                    <div className={`text-sm font-medium text-white/90 leading-relaxed whitespace-pre-wrap transition-all ${descPages.length > 1 ? "h-[155px]" : "h-auto"}`}>
                       {descPages[descPage]}
                     </div>
                     
@@ -297,9 +313,9 @@ export default function ClubCardClient({ club }: ClubCardClientProps) {
                       >
                         <MapPin className="w-3.5 h-3.5 text-blue-400 shrink-0" />
                         <span 
-                          className="font-bold whitespace-nowrap"
+                          className="font-bold whitespace-nowrap overflow-hidden text-ellipsis"
                           style={{
-                            fontSize: `min(0.75rem, 90cqi / ${Math.max(rText.length * 1.05, 1)})`
+                            fontSize: `min(0.85rem, 110cqi / ${Math.max(rText.length * 0.9, 1)})`
                           }}
                         >
                           {rink.name_ko} {region && <span className="text-white/60 font-medium">({region})</span>}
@@ -323,7 +339,7 @@ export default function ClubCardClient({ club }: ClubCardClientProps) {
         <div className="w-full max-w-sm mt-8">
           <button
             onClick={handleShare}
-            disabled={sharing}
+            disabled={sharing || (Boolean(club.logo_url) && !logoDataUrl)}
             className="w-full flex items-center justify-center gap-2 py-4 rounded-xl text-white font-bold text-lg shadow-lg disabled:opacity-70 transition-transform active:scale-95"
             style={{
               background: "linear-gradient(90deg, #3b82f6 0%, #2563eb 100%)", // Blue share button matches premium theme (like Player Card)

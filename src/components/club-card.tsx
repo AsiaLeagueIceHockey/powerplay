@@ -1,9 +1,7 @@
 "use client";
 
 import { Club } from "@/app/actions/types";
-import { joinClub } from "@/app/actions/clubs";
 import { useState } from "react";
-import Link from "next/link";
 import Image from "next/image";
 import { useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
@@ -12,42 +10,13 @@ import { extractRegion } from "@/lib/rink-utils";
 
 interface ClubCardProps {
   club: Club;
-  initialIsMember: boolean;
 }
 
-export function ClubCard({ club, initialIsMember }: ClubCardProps) {
-  const [isMember, setIsMember] = useState(initialIsMember);
-  const [loading, setLoading] = useState(false);
+export function ClubCard({ club }: ClubCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const locale = useLocale();
   const router = useRouter();
 
-  const handleJoin = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    if (isMember) return;
-    
-    if (!confirm(locale === "ko" ? "이 동호회에 가입하시겠습니까?" : "Do you want to join this club?")) {
-      return;
-    }
-
-    setLoading(true);
-    const res = await joinClub(club.id);
-    
-    if (res.error) {
-      if (res.error === "Not authenticated") {
-         alert(locale === "ko" ? "로그인이 필요합니다." : "Please login first.");
-      } else {
-         alert(locale === "ko" ? "가입 실패: " + res.error : "Failed to join: " + res.error);
-      }
-    } else {
-      setIsMember(true);
-      alert(locale === "ko" ? "가입되었습니다!" : "Successfully joined!");
-    }
-    setLoading(false);
-  };
-  
   const toggleExpand = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -146,25 +115,11 @@ export function ClubCard({ club, initialIsMember }: ClubCardProps) {
       </div>
 
       <div className="flex gap-2 mt-auto">
-        {/* Join Button */}
+        {/* View Details Button */}
         <button
-          onClick={handleJoin}
-          disabled={isMember || loading}
-          className={`flex-1 py-2.5 rounded-lg text-sm font-bold transition-colors ${
-            isMember
-              ? "bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 cursor-default"
-              : "bg-blue-600 text-white hover:bg-blue-700 shadow-sm"
-          }`}
+          className="flex-1 py-2.5 rounded-lg text-sm font-bold transition-colors bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white hover:bg-zinc-200 dark:hover:bg-zinc-700"
         >
-          {loading
-            ? "..."
-            : isMember
-            ? locale === "ko"
-              ? "가입됨"
-              : "Joined"
-            : locale === "ko"
-            ? "참여하기"
-            : "Join"}
+          {locale === "ko" ? "자세히 보기" : "View Details"}
         </button>
 
         {/* Kakao Link */}

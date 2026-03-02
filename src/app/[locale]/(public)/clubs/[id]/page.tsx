@@ -117,9 +117,11 @@ export default async function ClubDetailPage({
              </Link>
              
              {/* 2. Join Club */}
+             {/* 
              <div className="w-full">
                <JoinClubButton club={club} initialIsMember={isMember} className="w-full justify-center py-3.5 rounded-xl text-base" />
              </div>
+             */}
              
              {/* 3. Kakao Open Chat */}
              {club.kakao_open_chat_url && (

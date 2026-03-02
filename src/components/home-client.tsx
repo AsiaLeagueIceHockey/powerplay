@@ -480,7 +480,6 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
                   <ClubCard
                     key={club.id}
                     club={club}
-                    initialIsMember={myClubIds.includes(club.id)}
                   />
                 ))}
               </div>
