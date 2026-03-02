@@ -304,7 +304,14 @@ export default function ClubCardClient({ club }: ClubCardClientProps) {
                 <div className="flex flex-col gap-2">
                   {club.rinks.slice(0, 3).map(rink => {
                     const region = extractRegion(rink.address);
-                    const rText = `${rink.name_ko}${region ? ` (${region})` : ""}`;
+                    let displayName = rink.name_ko;
+                    let rText = `${displayName}${region ? ` (${region})` : ""}`;
+                    
+                    if (rText.length > 15 && displayName.includes("아이스링크")) {
+                      displayName = displayName.replace("아이스링크", "");
+                      rText = `${displayName}${region ? ` (${region})` : ""}`;
+                    }
+
                     return (
                       <div 
                         key={rink.id} 
@@ -318,7 +325,7 @@ export default function ClubCardClient({ club }: ClubCardClientProps) {
                             fontSize: `min(0.85rem, 110cqi / ${Math.max(rText.length * 0.9, 1)})`
                           }}
                         >
-                          {rink.name_ko} {region && <span className="text-white/60 font-medium">({region})</span>}
+                          {displayName} {region && <span className="text-white/60 font-medium">({region})</span>}
                         </span>
                       </div>
                     );
