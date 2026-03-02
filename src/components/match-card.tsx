@@ -53,23 +53,23 @@ export function MatchCard({ match }: { match: Match }) {
       className="group block rounded-xl border border-zinc-200 bg-white p-4 transition-all duration-300 hover:border-blue-500 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900"
     >
       {/* Header: Date & Status */}
-      <div className="mb-3 flex items-center justify-between">
-        <div className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
+      <div className="mb-3 flex items-center justify-between gap-1 sm:gap-2">
+        <div className="shrink truncate text-[13px] sm:text-sm font-medium text-zinc-500 dark:text-zinc-400">
           {formattedDate} · {formattedTime}
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-1 sm:gap-2">
           {match.duration_minutes && (
-            <span className="inline-block rounded px-2 py-0.5 text-xs font-semibold bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700">
+            <span className="whitespace-nowrap inline-block rounded px-1.5 sm:px-2 py-0.5 text-[11px] sm:text-xs font-semibold bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700">
               {match.duration_minutes}{locale === "ko" ? "분" : "m"}
             </span>
           )}
           <span
-            className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColors[displayStatus]}`}
+            className={`whitespace-nowrap rounded-full px-2 sm:px-2.5 py-0.5 text-[11px] sm:text-xs font-medium ${statusColors[displayStatus]}`}
           >
             {t(`status.${displayStatus}`)}
           </span>
           <span
-            className={`inline-block rounded px-2 py-0.5 text-xs font-semibold ${
+            className={`whitespace-nowrap inline-block rounded px-1.5 sm:px-2 py-0.5 text-[11px] sm:text-xs font-semibold ${
               match.match_type === "game"
                 ? "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300"
                 : match.match_type === "team_match"
