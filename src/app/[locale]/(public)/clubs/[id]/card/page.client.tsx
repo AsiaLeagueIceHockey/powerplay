@@ -307,11 +307,6 @@ export default function ClubCardClient({ club }: ClubCardClientProps) {
                     let displayName = rink.name_ko;
                     let rText = `${displayName}${region ? ` (${region})` : ""}`;
                     
-                    if (rText.length >= 25 && displayName.includes("아이스링크")) {
-                      displayName = displayName.replace("아이스링크", "");
-                      rText = `${displayName}${region ? ` (${region})` : ""}`;
-                    }
-
                     return (
                       <div 
                         key={rink.id} 
