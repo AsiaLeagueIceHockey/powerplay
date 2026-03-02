@@ -307,7 +307,7 @@ export default function ClubCardClient({ club }: ClubCardClientProps) {
                     let displayName = rink.name_ko;
                     let rText = `${displayName}${region ? ` (${region})` : ""}`;
                     
-                    if (rText.length >= 13 && displayName.includes("아이스링크")) {
+                    if (rText.length >= 25 && displayName.includes("아이스링크")) {
                       displayName = displayName.replace("아이스링크", "");
                       rText = `${displayName}${region ? ` (${region})` : ""}`;
                     }
@@ -322,7 +322,7 @@ export default function ClubCardClient({ club }: ClubCardClientProps) {
                         <span 
                           className="font-bold whitespace-nowrap overflow-hidden text-ellipsis"
                           style={{
-                            fontSize: `min(0.85rem, 110cqi / ${Math.max(rText.length * 0.9, 1)})`
+                            fontSize: `min(0.85rem, 105cqi / ${Math.max(rText.length * 0.95, 1)})`
                           }}
                         >
                           {displayName} {region && <span className="text-white/60 font-medium">({region})</span>}
