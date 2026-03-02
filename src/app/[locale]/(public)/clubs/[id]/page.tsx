@@ -1,8 +1,10 @@
 import { getClub, getClubNotices, isClubMember, joinClub } from "@/app/actions/clubs";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
-import { MessageCircle, Users, Calendar, Building2, MapPin } from "lucide-react";
+import { MessageCircle, Users, Calendar, Building2, MapPin, CreditCard } from "lucide-react";
 import { JoinClubButton } from "@/components/join-club-button";
+import { ClubShareButton } from "@/components/club-share-button";
+import Link from "next/link";
 import Image from "next/image";
 import { extractRegion } from "@/lib/rink-utils";
 
@@ -27,39 +29,44 @@ export default async function ClubDetailPage({
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
-      {/* Club Header */}
-      {/* Club Header */}
+      {/* Club Header Extraction */}
+      <div className="flex justify-between items-start mb-6">
+        <div className="flex items-center gap-4">
+          {/* Club Logo */}
+          <div className="w-16 h-16 rounded-2xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center overflow-hidden shrink-0 border border-zinc-200 dark:border-zinc-700 shadow-sm">
+            {club.logo_url ? (
+              <Image 
+                src={club.logo_url} 
+                alt={club.name} 
+                width={64} 
+                height={64} 
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <Building2 className="w-8 h-8 text-zinc-400" />
+            )}
+          </div>
+          
+          {/* Club Name & Member Count */}
+          <div className="flex flex-col gap-1.5">
+            <h1 className="text-2xl font-black text-zinc-900 dark:text-white tracking-tight break-keep">
+              {club.name}
+            </h1>
+            {club.member_count !== undefined && (
+              <span className="inline-flex items-center text-xs font-medium text-zinc-500 bg-zinc-100 dark:bg-zinc-800 px-2.5 py-1 rounded-full w-fit">
+                <Users className="w-3.5 h-3.5 mr-1" />
+                {club.member_count} {locale === "ko" ? "명" : "Members"}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Share Button */}
+        <ClubShareButton club={club} />
+      </div>
+
       <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 mb-8 shadow-sm">
         <div className="flex flex-col gap-6">
-          {/* Top Row: Title + Logo */}
-          <div className="flex justify-between items-center gap-3">
-            <div className="flex-1 min-w-0">
-              <h1 className="text-xl font-bold text-zinc-900 dark:text-white flex items-center gap-2 flex-wrap tracking-tight break-keep">
-                {club.name}
-                {club.member_count !== undefined && (
-                  <span className="flex items-center text-xs font-medium text-zinc-500 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-full shrink-0">
-                    <Users className="w-3 h-3 mr-1" />
-                    {club.member_count}
-                  </span>
-                )}
-              </h1>
-            </div>
-            
-             {/* Club Logo - Smaller and on the right */}
-            <div className="w-12 h-12 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center overflow-hidden shrink-0 border border-zinc-100 dark:border-zinc-700">
-              {club.logo_url ? (
-                <Image 
-                  src={club.logo_url} 
-                  alt={club.name} 
-                  width={48} 
-                  height={48} 
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <Building2 className="w-6 h-6 text-zinc-400" />
-              )}
-            </div>
-          </div>
 
           {/* Middle Row: Description */}
           <p className="text-zinc-600 dark:text-zinc-400 whitespace-pre-wrap leading-relaxed">
@@ -99,15 +106,28 @@ export default async function ClubDetailPage({
           )}
 
           {/* Bottom Row: Actions */}
-          <div className="flex flex-col gap-3 mt-2">
-             <JoinClubButton club={club} initialIsMember={isMember} className="w-full justify-center" />
+          <div className="flex flex-col gap-3 mt-4">
+             {/* 1. View Card */}
+             <Link
+               href={`/${locale}/clubs/${club.id}/card`}
+               className="flex items-center justify-center gap-2 px-4 py-3.5 bg-zinc-900 border border-zinc-200 dark:border-zinc-700 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-xl font-bold hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors w-full"
+             >
+               <CreditCard className="w-5 h-5 flex-shrink-0" />
+               <span>{t("card.view", { fallback: "동호회 카드 보기" })}</span>
+             </Link>
              
+             {/* 2. Join Club */}
+             <div className="w-full">
+               <JoinClubButton club={club} initialIsMember={isMember} className="w-full justify-center py-3.5 rounded-xl text-base" />
+             </div>
+             
+             {/* 3. Kakao Open Chat */}
              {club.kakao_open_chat_url && (
                <a
                  href={club.kakao_open_chat_url}
                  target="_blank"
                  rel="noreferrer"
-                 className="flex items-center justify-center gap-2 px-4 py-3 bg-[#FAE100] text-[#371D1E] rounded-lg font-bold hover:bg-[#FCE620] transition-colors w-full"
+                 className="flex items-center justify-center gap-2 px-4 py-3.5 bg-[#FAE100] text-[#371D1E] rounded-xl font-bold hover:bg-[#FCE620] transition-colors w-full"
                >
                  <MessageCircle className="w-5 h-5 fill-current" />
                  {locale === "ko" ? "오픈채팅 참여" : "KakaoTalk Open Chat"}

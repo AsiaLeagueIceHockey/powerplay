@@ -15,7 +15,9 @@
             "description": "Join to ask questions and share feedback.",
             "action": "Join"
         },
-        "error": "An error occurred."
+        "error": "An error occurred.",
+        "more": "See more",
+        "fold": "Fold"
     },
     "home": {
         "title": "Matches",
@@ -135,6 +137,15 @@
             "needSave": "Please save your changes first."
         },
         "saved": "Saved successfully"
+    },
+    "club": {
+        "card": {
+            "title": "Club Digital Card",
+            "view": "View Club Card",
+            "share": "Share",
+            "shareTitle": "Check out our club!",
+            "shareText": "Check out our club on PowerPlay."
+        }
     },
     "chat": {
         "title": "Chat",
