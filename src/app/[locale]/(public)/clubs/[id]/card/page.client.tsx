@@ -248,7 +248,7 @@ export default function ClubCardClient({ club }: ClubCardClientProps) {
               <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-4 transition-all w-full flex-shrink-0 flex flex-col">
                 <div className="text-[10px] text-zinc-400 mb-2 uppercase tracking-wider flex justify-between items-center">
                   <span>About Us</span>
-                  {descPages.length > 1 && (
+                  {(descPages.length > 1 || (club.description && club.description.length > 50) || (club.description && club.description.split('\n').length > 2)) && (
                     <button 
                       onClick={() => setShowFullDesc(!showFullDesc)}
                       className="text-[10px] text-blue-400 hover:text-blue-300 transition-colors font-medium px-1 cursor-pointer select-none"
