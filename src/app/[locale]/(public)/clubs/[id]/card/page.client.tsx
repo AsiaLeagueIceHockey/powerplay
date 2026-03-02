@@ -212,8 +212,8 @@ export default function ClubCardClient({ club }: ClubCardClientProps) {
           }`}>
               <div className={`${
                 showFullDesc 
-                  ? "w-12 h-12 rounded-2xl mb-0 shrink-0" 
-                  : (hasManyRinks ? "w-24 h-24 md:w-28 md:h-28 rounded-3xl mb-3 shrink-0" : "w-32 h-32 md:w-36 md:h-36 rounded-3xl mb-4 shrink-0")
+                  ? "w-12 h-12 min-w-[48px] min-h-[48px] rounded-2xl mb-0 shrink-0" 
+                  : (hasManyRinks ? "w-24 h-24 md:w-28 md:h-28 min-h-[96px] rounded-3xl mb-3 shrink-0" : "w-32 h-32 md:w-36 md:h-36 min-h-[128px] rounded-3xl mb-4 shrink-0")
               } bg-zinc-800/80 flex items-center justify-center overflow-hidden border border-white/10 shadow-xl transition-all duration-300`}>
                 {club.logo_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
@@ -247,7 +247,7 @@ export default function ClubCardClient({ club }: ClubCardClientProps) {
             {club.description && (
               <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-4 transition-all w-full flex-shrink-0 flex flex-col">
                 <div className="text-[10px] text-zinc-400 mb-2 uppercase tracking-wider flex justify-between items-center">
-                  <span>About Us</span>
+                  <span className="whitespace-nowrap">About Us</span>
                   {(descPages.length > 1 || (club.description && club.description.length > 50) || (club.description && club.description.split('\n').length > 2)) && (
                     <button 
                       onClick={() => setShowFullDesc(!showFullDesc)}
