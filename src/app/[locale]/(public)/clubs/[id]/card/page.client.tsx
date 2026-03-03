@@ -234,7 +234,7 @@ export default function ClubCardClient({ club }: ClubCardClientProps) {
               } bg-zinc-800/80 flex items-center justify-center overflow-hidden border border-white/10 shadow-xl transition-all duration-300`}>
                 {club.logo_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img crossOrigin="anonymous" src={logoDataUrl || club.logo_url} alt={club.name} className="w-full h-full object-cover" />
+                  <img crossOrigin={logoDataUrl ? undefined : "anonymous"} src={logoDataUrl || club.logo_url} alt={club.name} className="w-full h-full object-cover" />
                 ) : (
                   <div className={`${showFullDesc ? "text-xl" : "text-5xl"} font-black text-white p-2 transition-all`}>
                     {club.name.charAt(0)}
