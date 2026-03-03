@@ -90,21 +90,41 @@ export default function ClubCardClient({ club }: ClubCardClientProps) {
     if (!showFullDesc) setDescPage(0);
   }, [showFullDesc]);
 
-  const descPages = club.description ? paginateTextByLines(club.description, 5) : [];
+  const descPages = club.description ? paginateTextByLines(club.description, ratio === 'post' ? 2 : 5) : [];
 
   // Convert external logo to base64 to avoid cross-origin canvas tainting in html-to-image
   useEffect(() => {
     if (club.logo_url) {
-      // Proxy through Next.js image optimizer to bypass CORS issues on external images
-      const proxiedUrl = `/_next/image?url=${encodeURIComponent(club.logo_url)}&w=256&q=75`;
-      fetch(proxiedUrl)
-        .then((res) => res.blob())
-        .then((blob) => {
-          const reader = new FileReader();
-          reader.onloadend = () => setLogoDataUrl(reader.result as string);
-          reader.readAsDataURL(blob);
-        })
-        .catch((err) => console.error("Failed to convert club logo to base64", err));
+      const loadLogo = async () => {
+        const fetchAsBase64 = async (url: string) => {
+          const res = await fetch(url);
+          if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+          const blob = await res.blob();
+          return new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result as string);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+          });
+        };
+
+        try {
+          // Proxy through Next.js image optimizer to bypass CORS issues on external images
+          const proxiedUrl = `/_next/image?url=${encodeURIComponent(club.logo_url!)}&w=256&q=75`;
+          const base64 = await fetchAsBase64(proxiedUrl);
+          setLogoDataUrl(base64);
+        } catch (err) {
+          console.warn("Failed to fetch image via proxy, falling back to direct URL", err);
+          try {
+            const base64 = await fetchAsBase64(club.logo_url!);
+            setLogoDataUrl(base64);
+          } catch (fallbackErr) {
+            console.error("Failed to convert club logo to base64", fallbackErr);
+          }
+        }
+      };
+      
+      loadLogo();
     }
   }, [club.logo_url]);
 
@@ -303,12 +323,12 @@ export default function ClubCardClient({ club }: ClubCardClientProps) {
                 </div>
                 
                 {!showFullDesc ? (
-                  <div className="text-sm font-medium text-white/90 leading-relaxed whitespace-pre-wrap transition-all line-clamp-2">
+                  <div className={`text-sm font-medium text-white/90 leading-relaxed whitespace-pre-wrap transition-all ${ratio === 'post' ? 'line-clamp-1' : 'line-clamp-2'}`}>
                     {club.description}
                   </div>
                 ) : (
                   <div className="flex flex-col">
-                    <div className={`text-sm font-medium text-white/90 leading-relaxed whitespace-pre-wrap transition-all ${descPages.length > 1 ? "h-[155px]" : "h-auto"}`}>
+                    <div className={`text-sm font-medium text-white/90 leading-relaxed whitespace-pre-wrap transition-all ${descPages.length > 1 ? (ratio === 'post' ? "h-[65px]" : "h-[155px]") : "h-auto"}`}>
                       {descPages[descPage]}
                     </div>
                     
