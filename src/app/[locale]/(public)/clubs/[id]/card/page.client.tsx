@@ -18,6 +18,11 @@ function paginateTextByLines(text: string, maxLines: number = 6): string[] {
   for (let i = 0; i < rawLines.length; i++) {
     let line = rawLines[i];
     
+    // Ignore empty lines completely if we are in 4:5 mode (maxLines <= 2)
+    if (maxLines <= 2 && line.trim().length === 0) {
+      continue;
+    }
+    
     // Handle empty lines (explicit newlines)
     if (line.trim().length === 0) {
       if (currentLineCount + 1 > maxLines && currentPageContent.length > 0) {
@@ -135,9 +140,9 @@ export default function ClubCardClient({ club }: ClubCardClientProps) {
       setSharing(true);
       const { toBlob } = await import("html-to-image");
       
-      // Small delay to let the browser and Next.js Image component settle
-      // This helps prevent missing logo issues by ensuring all DOM repaints have finished
-      await new Promise(resolve => setTimeout(resolve, 300));
+      // Longer delay to let the browser and Next.js Image component settle
+      // This helps prevent missing logo issues by ensuring all DOM repaints especially external images have finished
+      await new Promise(resolve => setTimeout(resolve, 800));
       
       let blob: Blob | null = null;
       let retries = 3;
