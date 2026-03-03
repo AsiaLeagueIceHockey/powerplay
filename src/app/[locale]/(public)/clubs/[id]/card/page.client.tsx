@@ -114,6 +114,10 @@ export default function ClubCardClient({ club }: ClubCardClientProps) {
       setSharing(true);
       const { toBlob } = await import("html-to-image");
       
+      // Small delay to let the browser and Next.js Image component settle
+      // This helps prevent missing logo issues by ensuring all DOM repaints have finished
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
       let blob: Blob | null = null;
       let retries = 3;
       
