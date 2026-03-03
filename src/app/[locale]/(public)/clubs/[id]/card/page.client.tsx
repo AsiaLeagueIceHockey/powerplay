@@ -122,7 +122,6 @@ export default function ClubCardClient({ club }: ClubCardClientProps) {
           blob = await toBlob(cardRef.current, {
             quality: 1.0,
             pixelRatio: 3, // High quality for crisp rendering
-            cacheBust: true, // Help Safari invalidate cached failed renders
           });
           if (blob) break;
         } catch (err) {
@@ -137,14 +136,7 @@ export default function ClubCardClient({ club }: ClubCardClientProps) {
 
       const file = new File([blob], `powerplay_club_${club.id}.png`, { type: "image/png" });
       
-      if (navigator.share && navigator.canShare({ files: [file] })) {
-        await navigator.share({
-          files: [file],
-          title: t("club.card.shareTitle", { fallback: "우리 동호회를 소개합니다!" }),
-          text: t("club.card.shareText", { fallback: "파워플레이에서 우리 동호회를 확인해보세요." }),
-        });
-      } else {
-        // Fallback to download
+      const downloadFallback = () => {
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
@@ -153,6 +145,31 @@ export default function ClubCardClient({ club }: ClubCardClientProps) {
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
+      };
+
+      if (navigator.share && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({
+            files: [file],
+            title: t("club.card.shareTitle", { fallback: "우리 동호회를 소개합니다!" }),
+            text: t("club.card.shareText", { fallback: "파워플레이에서 우리 동호회를 확인해보세요." }),
+          });
+        } catch (shareErr) {
+          if (shareErr instanceof Error) {
+            if (shareErr.name === 'AbortError') {
+              console.log("User cancelled share");
+              return;
+            }
+            if (shareErr.name === 'NotAllowedError') {
+              console.log("Share not allowed, falling back to download");
+              downloadFallback();
+              return;
+            }
+          }
+          throw shareErr;
+        }
+      } else {
+        downloadFallback();
       }
     } catch (err) {
       console.error("Error sharing card:", err);
@@ -251,7 +268,7 @@ export default function ClubCardClient({ club }: ClubCardClientProps) {
                   {(descPages.length > 1 || (club.description && club.description.length > 50) || (club.description && club.description.split('\n').length > 2)) && (
                     <button 
                       onClick={() => setShowFullDesc(!showFullDesc)}
-                      className="text-[10px] text-blue-400 hover:text-blue-300 transition-colors font-medium px-1 cursor-pointer select-none"
+                      className="text-[10px] text-blue-400 hover:text-blue-300 transition-colors font-medium px-1 cursor-pointer select-none whitespace-nowrap shrink-0"
                     >
                       {showFullDesc ? t("common.fold", { fallback: "접기" }) : t("common.more", { fallback: "전체 보기" })}
                     </button>
