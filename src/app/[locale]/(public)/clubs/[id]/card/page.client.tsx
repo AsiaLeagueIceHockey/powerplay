@@ -333,7 +333,7 @@ export default function ClubCardClient({ club }: ClubCardClientProps) {
                 </div>
                 
                 {!showFullDesc ? (
-                  <div className={`text-sm font-medium text-white/90 leading-relaxed whitespace-pre-wrap transition-all ${ratio === 'post' ? 'line-clamp-1' : 'line-clamp-2'}`}>
+                  <div className={`text-sm font-medium text-white/90 leading-relaxed whitespace-pre-wrap transition-all line-clamp-2`}>
                     {club.description}
                   </div>
                 ) : (
