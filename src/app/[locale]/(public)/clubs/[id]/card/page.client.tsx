@@ -84,6 +84,7 @@ export default function ClubCardClient({ club }: ClubCardClientProps) {
   const [logoDataUrl, setLogoDataUrl] = useState<string | null>(null);
   const [showFullDesc, setShowFullDesc] = useState(false);
   const [descPage, setDescPage] = useState(0);
+  const [ratio, setRatio] = useState<'story' | 'post'>('story');
 
   useEffect(() => {
     if (!showFullDesc) setDescPage(0);
@@ -193,20 +194,36 @@ export default function ClubCardClient({ club }: ClubCardClientProps) {
   return (
     <div className="fixed inset-0 bg-white dark:bg-zinc-950 z-50 flex flex-col pt-safe px-4 pb-safe-bottom overflow-y-auto">
       {/* Header */}
-      <div className="flex items-center justify-between py-4 max-w-sm mx-auto w-full">
+      <div className="flex items-center justify-between py-4 max-w-[420px] mx-auto w-full">
         <button 
           onClick={() => router.back()}
-          className="p-2 -ml-2 text-zinc-900 dark:text-white hover:bg-zinc-100 dark:hover:bg-white/10 rounded-full transition-colors flex items-center"
+          className="p-2 -ml-2 text-zinc-900 dark:text-white hover:bg-zinc-100 dark:hover:bg-white/10 rounded-full transition-colors flex items-center shrink-0"
         >
           <ChevronLeft className="w-6 h-6 mr-1" />
           <span className="font-semibold">{t("club.card.title", { fallback: "동호회 디지털 카드" })}</span>
         </button>
+        
+        {/* Ratio Toggle */}
+        <div className="flex bg-zinc-100 dark:bg-zinc-800 p-1 rounded-lg shrink-0">
+          <button
+            onClick={() => setRatio('story')}
+            className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors ${ratio === 'story' ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'}`}
+          >
+            {t("club.card.ratioStory", { fallback: "스토리 9:16" })}
+          </button>
+          <button
+            onClick={() => setRatio('post')}
+            className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors ${ratio === 'post' ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'}`}
+          >
+            {t("club.card.ratioPost", { fallback: "게시물 4:5" })}
+          </button>
+        </div>
       </div>
 
       {/* Card Container Layout Wrapper (prevents html-to-image margin bleeding) */}
       <div className="flex-1 flex flex-col items-center justify-center py-4 w-full">
         
-        <div className="relative w-full max-w-[340px] md:max-w-sm aspect-[5/8] max-h-[80vh] mx-auto">
+        <div className={`relative w-full mx-auto transition-all duration-300 ${ratio === 'post' ? 'max-w-[380px] md:max-w-[420px] aspect-[4/5]' : 'max-w-[340px] md:max-w-sm aspect-[5/8]'} max-h-[80vh]`}>
           {/* The Actual Card */}
           <div 
             ref={cardRef}
@@ -229,25 +246,29 @@ export default function ClubCardClient({ club }: ClubCardClientProps) {
           <div className={`relative w-full z-10 flex transition-all duration-300 drop-shadow-2xl ${
             showFullDesc 
               ? "flex-row items-center justify-start gap-4 mt-0 mb-4 h-14 shrink-0" 
-              : "flex-1 flex-col justify-center items-center my-2 min-h-0"
+              : ratio === 'post'
+                ? "flex-row items-center justify-start gap-5 my-4 min-h-0"
+                : "flex-1 flex-col justify-center items-center my-2 min-h-0"
           }`}>
               <div className={`${
                 showFullDesc 
                   ? "w-12 h-12 min-w-[48px] min-h-[48px] rounded-2xl mb-0 shrink-0" 
-                  : (hasManyRinks ? "w-24 h-24 md:w-28 md:h-28 min-h-[96px] rounded-3xl mb-3 shrink-0" : "w-32 h-32 md:w-36 md:h-36 min-h-[128px] rounded-3xl mb-4 shrink-0")
+                  : ratio === 'post'
+                    ? "w-20 h-20 md:w-24 md:h-24 min-h-[80px] rounded-3xl mb-0 shrink-0"
+                    : (hasManyRinks ? "w-24 h-24 md:w-28 md:h-28 min-h-[96px] rounded-3xl mb-3 shrink-0" : "w-32 h-32 md:w-36 md:h-36 min-h-[128px] rounded-3xl mb-4 shrink-0")
               } bg-zinc-800/80 flex items-center justify-center overflow-hidden border border-white/10 shadow-xl transition-all duration-300`}>
                 {club.logo_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img crossOrigin={logoDataUrl ? undefined : "anonymous"} src={logoDataUrl || club.logo_url} alt={club.name} className="w-full h-full object-cover" />
                 ) : (
-                  <div className={`${showFullDesc ? "text-xl" : "text-5xl"} font-black text-white p-2 transition-all`}>
+                  <div className={`${showFullDesc ? "text-xl" : ratio === 'post' ? "text-3xl" : "text-5xl"} font-black text-white p-2 transition-all`}>
                     {club.name.charAt(0)}
                   </div>
                 )}
               </div>
               
               <div 
-                className={`w-full min-w-0 flex-1 px-1 flex flex-col justify-center ${showFullDesc ? "items-start" : "items-center"}`}
+                className={`w-full min-w-0 flex-1 px-1 flex flex-col justify-center ${showFullDesc || ratio === 'post' ? "items-start" : "items-center"}`}
                 style={{ containerType: "inline-size" }}
               >
                 <h2 
@@ -255,7 +276,9 @@ export default function ClubCardClient({ club }: ClubCardClientProps) {
                   style={{
                     fontSize: showFullDesc
                       ? `min(1.25rem, 100cqi / ${Math.max(club.name.length * 1.1, 1)})`
-                      : `min(${hasManyRinks ? "1.75" : "2"}rem, 100cqi / ${Math.max(club.name.length * 1.1, 1)})`
+                      : ratio === 'post'
+                        ? `min(1.8rem, 100cqi / ${Math.max(club.name.length * 0.9, 1)})`
+                        : `min(${hasManyRinks ? "1.75" : "2"}rem, 100cqi / ${Math.max(club.name.length * 1.1, 1)})`
                   }}
                 >
                   {club.name}
@@ -359,7 +382,7 @@ export default function ClubCardClient({ club }: ClubCardClientProps) {
         </div>
 
         {/* Share Button Placeholder outside card */}
-        <div className="w-full max-w-sm mt-8">
+        <div className={`w-full ${ratio === 'post' ? 'max-w-[380px] md:max-w-[420px]' : 'max-w-sm'} mt-8 transition-all`}>
           <button
             onClick={handleShare}
             disabled={sharing || (Boolean(club.logo_url) && !logoDataUrl)}

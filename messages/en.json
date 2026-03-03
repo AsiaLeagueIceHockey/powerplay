@@ -144,7 +144,9 @@
             "view": "View Club Card",
             "share": "Share",
             "shareTitle": "Check out our club!",
-            "shareText": "Check out our club on PowerPlay."
+            "shareText": "Check out our club on PowerPlay.",
+            "ratioStory": "Story 9:16",
+            "ratioPost": "Post 4:5"
         }
     },
     "chat": {
