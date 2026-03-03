@@ -142,16 +142,21 @@ export default function ClubCardClient({ club }: ClubCardClientProps) {
       
       // Longer delay to let the browser and Next.js Image component settle
       // This helps prevent missing logo issues by ensuring all DOM repaints especially external images have finished
-      await new Promise(resolve => setTimeout(resolve, 800));
+      await new Promise(resolve => setTimeout(resolve, 300));
       
       let blob: Blob | null = null;
       let retries = 3;
       
       while (retries > 0 && !blob) {
         try {
+          // iOS Safari blank image workaround: call it once before the final call to force rendering 
+          await toBlob(cardRef.current, { pixelRatio: 0.5, cacheBust: true });
+          await new Promise(resolve => setTimeout(resolve, 100));
+
           blob = await toBlob(cardRef.current, {
             quality: 1.0,
             pixelRatio: 3, // High quality for crisp rendering
+            cacheBust: true
           });
           if (blob) break;
         } catch (err) {
@@ -260,33 +265,33 @@ export default function ClubCardClient({ club }: ClubCardClientProps) {
             {/* Background accent */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
           
-          <div className="flex justify-between items-start z-10 w-full mb-6 text-white shrink-0">
+          <div className="flex justify-between items-start z-10 w-full mb-3 text-white shrink-0">
             {/* POWERPLAY Branding top-left */}
-            <div className="flex items-center gap-2 bg-white/5 backdrop-blur-sm rounded-lg px-2 py-1 border border-white/10">
-              <span className="font-black text-[10px] tracking-widest text-blue-400">POWERPLAY</span>
+            <div className="flex items-center gap-1.5 bg-white/5 backdrop-blur-sm rounded-md px-1.5 py-0.5 border border-white/10">
+              <span className="font-black text-[8px] md:text-[9px] tracking-widest text-blue-400">POWERPLAY</span>
             </div>
           </div>
 
           {/* Main Visual Section */}
           <div className={`relative w-full z-10 flex transition-all duration-300 drop-shadow-2xl ${
             showFullDesc 
-              ? "flex-row items-center justify-start gap-4 mt-0 mb-4 h-14 shrink-0" 
+              ? "flex-row items-center justify-start gap-3 mt-0 mb-3 h-12 shrink-0" 
               : ratio === 'post'
-                ? "flex-row items-center justify-start gap-5 my-4 min-h-0"
-                : "flex-1 flex-col justify-center items-center my-2 min-h-0"
+                ? "flex-row items-center justify-start gap-4 my-2 min-h-0"
+                : "flex-1 flex-col justify-center items-center my-1 min-h-0"
           }`}>
               <div className={`${
                 showFullDesc 
-                  ? "w-12 h-12 min-w-[48px] min-h-[48px] rounded-2xl mb-0 shrink-0" 
+                  ? "w-10 h-10 min-w-[40px] min-h-[40px] rounded-xl mb-0 shrink-0" 
                   : ratio === 'post'
-                    ? "w-20 h-20 md:w-24 md:h-24 min-h-[80px] rounded-3xl mb-0 shrink-0"
-                    : (hasManyRinks ? "w-24 h-24 md:w-28 md:h-28 min-h-[96px] rounded-3xl mb-3 shrink-0" : "w-32 h-32 md:w-36 md:h-36 min-h-[128px] rounded-3xl mb-4 shrink-0")
+                    ? "w-16 h-16 md:w-20 md:h-20 min-h-[64px] rounded-2xl mb-0 shrink-0"
+                    : (hasManyRinks ? "w-20 h-20 md:w-24 md:h-24 min-h-[80px] rounded-3xl mb-2 shrink-0" : "w-28 h-28 md:w-32 md:h-32 min-h-[112px] rounded-3xl mb-3 shrink-0")
               } bg-zinc-800/80 flex items-center justify-center overflow-hidden border border-white/10 shadow-xl transition-all duration-300`}>
                 {club.logo_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img crossOrigin={logoDataUrl ? undefined : "anonymous"} src={logoDataUrl || club.logo_url} alt={club.name} className="w-full h-full object-cover" />
                 ) : (
-                  <div className={`${showFullDesc ? "text-xl" : ratio === 'post' ? "text-3xl" : "text-5xl"} font-black text-white p-2 transition-all`}>
+                  <div className={`${showFullDesc ? "text-lg" : ratio === 'post' ? "text-2xl" : "text-4xl"} font-black text-white p-2 transition-all`}>
                     {club.name.charAt(0)}
                   </div>
                 )}
@@ -312,7 +317,7 @@ export default function ClubCardClient({ club }: ClubCardClientProps) {
           </div>
 
           {/* Details Sections - two separate cards */}
-          <div className="z-10 w-full flex flex-col gap-3 mt-auto">
+          <div className="z-10 w-full flex flex-col gap-2.5 mt-auto">
             {club.description && (
               <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-4 transition-all w-full flex-shrink-0 flex flex-col">
                 <div className="text-[10px] text-zinc-400 mb-2 uppercase tracking-wider flex justify-between items-center">
