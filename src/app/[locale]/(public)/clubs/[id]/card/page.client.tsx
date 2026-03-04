@@ -87,7 +87,6 @@ export default function ClubCardClient({ club }: ClubCardClientProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [sharing, setSharing] = useState(false);
   const [logoDataUrl, setLogoDataUrl] = useState<string | null>(null);
-  const [faviconDataUrl, setFaviconDataUrl] = useState<string | null>(null);
   const [showFullDesc, setShowFullDesc] = useState(false);
   const [descPage, setDescPage] = useState(0);
   const [ratio, setRatio] = useState<'story' | 'post'>('story');
@@ -132,22 +131,6 @@ export default function ClubCardClient({ club }: ClubCardClientProps) {
       
       loadLogo();
     }
-
-    // Also load favicon as base64 to prevent it from not rendering during html-to-image capture
-    const loadFavicon = async () => {
-      try {
-        const res = await fetch('/favicon.png');
-        if (res.ok) {
-          const blob = await res.blob();
-          const reader = new FileReader();
-          reader.onloadend = () => setFaviconDataUrl(reader.result as string);
-          reader.readAsDataURL(blob);
-        }
-      } catch (err) {
-        console.error("Failed to load favicon", err);
-      }
-    };
-    loadFavicon();
   }, [club.logo_url]);
 
   const handleShare = async () => {
@@ -286,7 +269,7 @@ export default function ClubCardClient({ club }: ClubCardClientProps) {
             {/* POWERPLAY Branding top-right */}
             <div className="flex items-center gap-1.5 bg-white/5 backdrop-blur-sm rounded-md px-1.5 py-0.5 border border-white/10">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={faviconDataUrl || "/favicon.png"} alt="Powerplay" className="w-3 h-3 object-contain rounded-sm" />
+              <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAAAXNSR0IArs4c6QAAAHhlWElmTU0AKgAAAAgABAEaAAUAAAABAAAAPgEbAAUAAAABAAAARgEoAAMAAAABAAIAAIdpAAQAAAABAAAATgAAAAAAAAEsAAAAAQAAASwAAAABAAOgAQADAAAAAQABAACgAgAEAAAAAQAAACCgAwAEAAAAAQAAACAAAAAA+eom7wAAAAlwSFlzAAAuIwAALiMBeKU/dgAABJhJREFUSA3VVl1oW2UYzvnLX9ukacmWpl2bpdZqYZsDXZm9mBTEzZuJPwPR6o3idqHgUG8GTsGKNzqnCAoqjHohw4n1QpgXooMhFWSblNl2TbYmOWmypG1I2/ydP58vX3pyzkka1ks/6Jfvfd6f533f7/0OZfrHXrDZbAzDYNeXpmk4A6QHHacHozEMLKLFhqeyHoha09A6aCTQw+layqGLloA1At3NGIvWZfGEQSNi8jILrC5St7ozegah2ivdBodGZDuQetUJ9CJoCMZmuhUiGQHjueEKjQnVWlSHiOc2dwsGRq+A5INUaFqNZVW1JKqVgCZOZsiyCGTo11bIrd+6NSgB6qa1FlUhGqM2oHWP6om4WSCIDY2qmpkMTRWAhpYsK6osy9UAsCYY/niOo69FUaFV6nQMw7EMx3HGCnWtiYCgmk3V1IGezqE9AZXKNkZV1cxqfjGWLlZkjuX6/J7hvb0aTKsLZMlMLpq4q2gkCYLqDbLcASlQ08rl8sRT4ycnnqH+dK9I0rXZW++dn5q5PnfiyWOnX3vRqN0sFq/M/PPuuQvLmRzH1icTNiaBJsVx7GB/EDpJURYTqYVYUsys2gVh9ODIp++/3u1rHwoPQLteLC3ERGizufU2l+vYY6MfvPMKa74VmJlbVGVoc9n7ggHobkbFE6fOKrIq8NzkWy8/ffTI8EDw0IGh/uAuaL/7+fcPz19wOhyedtdXk288vP/BwwdHegP+xHKWNfDUK6DXq6maz+Pe7e9CiGgstbK2USxLYnrl34UIEPR3V7cvGPDjjI4VSlKhVIksiUtxEQiZBZY0mYYCglWvAArImJAev8/racc5k8ns9rmdDvvYgdDzxx8HImZzlXKl29eJ247cjvX6OwSeP3Rk3/jYI9DeWkot311F+jQUEKw6AZUVRQn1BjAqECeOjz93dAzpdHo9yA/857691OF2sCwbiYuH9w+efvUMLszrgda2WZY++fqHUrFstws0FN3NBGSK1MFQD9XZnS67y4XC0Kb5O+I3Fy9f/OnXz8+ehHYhGh8ZHvT5OhXNltssXrsZ/WJq+urMDRId90x6UVtmAk3DkwlXR2hto3DqzGeruTwq2CgUk6lsoVhqdzvuD++B61w08eMvV6am/8ATyeU3k+msLMm13A3RYWkigMrtFEJ9ZEYx0X/+PVupSOQRk7fK8jzv7XCggdDOzt++k0iJ6SzSZRn0jLV0BjZ0mQiQjtfj7uruklU1Ek9VJFkQBNYmC+QroOKNP/vEo91dvpX1wnwk7rTbcQFbcbb9NREgl3xBmnjzIzRqLV/geU5T5cm3Xxp9aAThBYHf29+HSJcuX02mMnh6GubS3BBoLaCJAIMsycrcYhxeLNrCsZKiapxwXzhEM8RtT//218dffo9vDpDG6I0gQ/+roP50R8f1QVY1raPNte+BMMtxqqIm05lobBncaLrRpcW5CYHRGmSKokrk000WaqK5U/FedlOLGh1QCl6mw/x2Gs1aIPdaqR4Cd7ijtWOCphfbgrI5AU3TuLcI0VrVnICmadxbR2mhbU7QwmGnqv8TQfPx+g/CewA1dFm/AgAAAABJRU5ErkJggg==" alt="Powerplay" className="w-3 h-3 object-contain rounded-sm" />
               <span className="font-black text-[8px] md:text-[9px] tracking-widest text-blue-400">POWERPLAY</span>
             </div>
           </div>
