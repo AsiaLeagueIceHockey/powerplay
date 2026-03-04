@@ -15,6 +15,11 @@
             "description": "궁금한 점이나 의견을 자유롭게 이야기해주세요.",
             "action": "참여"
         },
+        "instagram": {
+            "title": "파워플레이 인스타그램",
+            "description": "새로운 소식과 이벤트를 확인해보세요.",
+            "action": "방문"
+        },
         "error": "오류가 발생했습니다.",
         "more": "전체 보기",
         "fold": "접기"

@@ -15,6 +15,11 @@
             "description": "Join to ask questions and share feedback.",
             "action": "Join"
         },
+        "instagram": {
+            "title": "Power Play Instagram",
+            "description": "Check out our latest news and events.",
+            "action": "Visit"
+        },
         "error": "An error occurred.",
         "more": "See more",
         "fold": "Fold"

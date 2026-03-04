@@ -44,7 +44,7 @@ export default async function HomePage({
   setRequestLocale(locale);
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 -mt-2">
       {/* Feedback Banner - shows immediately */}
       <FeedbackBanner />
 
