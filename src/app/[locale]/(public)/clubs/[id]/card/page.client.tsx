@@ -265,9 +265,11 @@ export default function ClubCardClient({ club }: ClubCardClientProps) {
             {/* Background accent */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
           
-          <div className="flex justify-between items-start z-10 w-full mb-3 text-white shrink-0">
-            {/* POWERPLAY Branding top-left */}
+          <div className="flex justify-end items-start z-10 w-full mb-3 text-white shrink-0">
+            {/* POWERPLAY Branding top-right */}
             <div className="flex items-center gap-1.5 bg-white/5 backdrop-blur-sm rounded-md px-1.5 py-0.5 border border-white/10">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/favicon.png" alt="Powerplay" className="w-3 h-3 object-contain rounded-sm" />
               <span className="font-black text-[8px] md:text-[9px] tracking-widest text-blue-400">POWERPLAY</span>
             </div>
           </div>
@@ -275,14 +277,14 @@ export default function ClubCardClient({ club }: ClubCardClientProps) {
           {/* Main Visual Section */}
           <div className={`relative w-full z-10 flex transition-all duration-300 drop-shadow-2xl ${
             showFullDesc 
-              ? "flex-row items-center justify-start gap-3 mt-0 mb-3 h-12 shrink-0" 
+              ? "flex-row items-center justify-start gap-4 mt-0 mb-3 h-16 md:h-20 shrink-0" 
               : ratio === 'post'
                 ? "flex-row items-center justify-start gap-4 my-2 min-h-0"
                 : "flex-1 flex-col justify-center items-center my-1 min-h-0"
           }`}>
               <div className={`${
                 showFullDesc 
-                  ? "w-10 h-10 min-w-[40px] min-h-[40px] rounded-xl mb-0 shrink-0" 
+                  ? "w-16 h-16 md:w-20 md:h-20 min-w-[64px] min-h-[64px] rounded-2xl mb-0 shrink-0" 
                   : ratio === 'post'
                     ? "w-16 h-16 md:w-20 md:h-20 min-h-[64px] rounded-2xl mb-0 shrink-0"
                     : (hasManyRinks ? "w-20 h-20 md:w-24 md:h-24 min-h-[80px] rounded-3xl mb-2 shrink-0" : "w-28 h-28 md:w-32 md:h-32 min-h-[112px] rounded-3xl mb-3 shrink-0")
@@ -291,7 +293,7 @@ export default function ClubCardClient({ club }: ClubCardClientProps) {
                   // eslint-disable-next-line @next/next/no-img-element
                   <img crossOrigin={logoDataUrl ? undefined : "anonymous"} src={logoDataUrl || club.logo_url} alt={club.name} className="w-full h-full object-cover" />
                 ) : (
-                  <div className={`${showFullDesc ? "text-lg" : ratio === 'post' ? "text-2xl" : "text-4xl"} font-black text-white p-2 transition-all`}>
+                  <div className={`${showFullDesc ? "text-2xl" : ratio === 'post' ? "text-2xl" : "text-4xl"} font-black text-white p-2 transition-all`}>
                     {club.name.charAt(0)}
                   </div>
                 )}
@@ -305,7 +307,7 @@ export default function ClubCardClient({ club }: ClubCardClientProps) {
                   className="font-black text-white tracking-tighter whitespace-nowrap transition-all"
                   style={{
                     fontSize: showFullDesc
-                      ? `min(1.25rem, 100cqi / ${Math.max(club.name.length * 1.1, 1)})`
+                      ? `min(1.75rem, 100cqi / ${Math.max(club.name.length * 1.0, 1)})`
                       : ratio === 'post'
                         ? `min(1.8rem, 100cqi / ${Math.max(club.name.length * 0.9, 1)})`
                         : `min(${hasManyRinks ? "1.75" : "2"}rem, 100cqi / ${Math.max(club.name.length * 1.1, 1)})`
