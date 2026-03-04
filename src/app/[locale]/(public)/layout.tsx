@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import Image from "next/image";
 import { setRequestLocale } from "next-intl/server";
 import { UserHeaderSkeleton } from "@/components/skeletons";
 import { UserHeaderLoader } from "@/components/user-header-loader";
@@ -28,9 +29,17 @@ export default async function PublicLayout({
       <header className="sticky top-0 z-50 w-full border-b border-zinc-200 bg-white/80 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-950/80">
         <div className="container mx-auto flex h-16 items-center justify-between px-4 gap-2">
           {/* Logo - Left */}
-          <a href={`/${locale}`} className="flex items-center gap-2 flex-shrink-0">
-            <span className="text-xl font-bold tracking-tight">
-              🏒 Power Play
+          <a href={`/${locale}`} className="flex items-center gap-1.5 flex-shrink-0 transition-opacity hover:opacity-80">
+            <Image
+              src="/favicon.png"
+              alt="PowerPlay Logo"
+              width={26}
+              height={26}
+              className="object-contain drop-shadow-sm rounded-sm"
+              priority
+            />
+            <span className="text-[18px] font-bold tracking-tight text-[#1e293b] dark:text-zinc-100 uppercase mt-0.5">
+              POWERPLAY
             </span>
           </a>
 
