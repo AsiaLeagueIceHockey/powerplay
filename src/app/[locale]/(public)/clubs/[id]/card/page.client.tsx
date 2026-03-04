@@ -87,6 +87,7 @@ export default function ClubCardClient({ club }: ClubCardClientProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [sharing, setSharing] = useState(false);
   const [logoDataUrl, setLogoDataUrl] = useState<string | null>(null);
+  const [faviconDataUrl, setFaviconDataUrl] = useState<string | null>(null);
   const [showFullDesc, setShowFullDesc] = useState(false);
   const [descPage, setDescPage] = useState(0);
   const [ratio, setRatio] = useState<'story' | 'post'>('story');
@@ -131,6 +132,22 @@ export default function ClubCardClient({ club }: ClubCardClientProps) {
       
       loadLogo();
     }
+
+    // Also load favicon as base64 to prevent it from not rendering during html-to-image capture
+    const loadFavicon = async () => {
+      try {
+        const res = await fetch('/favicon.png');
+        if (res.ok) {
+          const blob = await res.blob();
+          const reader = new FileReader();
+          reader.onloadend = () => setFaviconDataUrl(reader.result as string);
+          reader.readAsDataURL(blob);
+        }
+      } catch (err) {
+        console.error("Failed to load favicon", err);
+      }
+    };
+    loadFavicon();
   }, [club.logo_url]);
 
   const handleShare = async () => {
@@ -269,7 +286,7 @@ export default function ClubCardClient({ club }: ClubCardClientProps) {
             {/* POWERPLAY Branding top-right */}
             <div className="flex items-center gap-1.5 bg-white/5 backdrop-blur-sm rounded-md px-1.5 py-0.5 border border-white/10">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/favicon.png" alt="Powerplay" className="w-3 h-3 object-contain rounded-sm" />
+              <img src={faviconDataUrl || "/favicon.png"} alt="Powerplay" className="w-3 h-3 object-contain rounded-sm" />
               <span className="font-black text-[8px] md:text-[9px] tracking-widest text-blue-400">POWERPLAY</span>
             </div>
           </div>
