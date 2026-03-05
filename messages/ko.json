@@ -379,8 +379,10 @@
             "pattern": "대관 유형 {index}",
             "deletePattern": "삭제",
             "matchType": "대관 구분",
-            "rink": "경기장",
-            "selectRink": "경기장 선택",
+            "rink": "링크장",
+            "selectRink": "링크장 선택",
+            "noRinkNotice": "찾는 링크장이 없다면 직접 등록해보세요!",
+            "registerRink": "링크장 등록하기",
             "dayOfWeek": "요일",
             "time": "시간",
             "duration": "대관 시간",
@@ -412,8 +414,8 @@
             }
         },
         "form": {
-            "rink": "링크",
-            "selectRink": "링크 선택",
+            "rink": "링크장",
+            "selectRink": "링크장 선택",
             "dateTime": "날짜 및 시간",
             "fee": "참가비",
             "entryPoints": "참가비",

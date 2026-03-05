@@ -158,6 +158,15 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
             </option>
           ))}
         </select>
+        <p className="text-xs text-zinc-500 mt-1.5">
+          {t("admin.bulk.noRinkNotice")}{" "}
+          <a
+            href={`/${locale}/admin/rinks/new`}
+            className="text-blue-400 hover:text-blue-300 transition-colors"
+          >
+            {t("admin.bulk.registerRink")} →
+          </a>
+        </p>
       </div>
 
       {/* Date/Time */}
