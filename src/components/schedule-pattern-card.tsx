@@ -196,7 +196,7 @@ export function SchedulePatternCard({
         </label>
         <div className="space-y-3">
           <div className="grid grid-cols-3 gap-2">
-            <label className={`relative flex cursor-pointer items-center justify-center rounded-lg border p-3 transition-all text-xs font-medium ${
+            <label className={`relative flex cursor-pointer items-center justify-center rounded-lg border p-3 transition-all text-xs font-medium whitespace-nowrap ${
               pattern.duration_minutes === 90
                 ? "border-blue-500 bg-blue-900/20 text-blue-200"
                 : "border-zinc-700 bg-zinc-900 text-zinc-400 hover:bg-zinc-800"
@@ -209,7 +209,7 @@ export function SchedulePatternCard({
               />
               90{locale === "ko" ? "분" : " min"}
             </label>
-            <label className={`relative flex cursor-pointer items-center justify-center rounded-lg border p-3 transition-all text-xs font-medium ${
+            <label className={`relative flex cursor-pointer items-center justify-center rounded-lg border p-3 transition-all text-xs font-medium whitespace-nowrap ${
               pattern.duration_minutes === 120
                 ? "border-blue-500 bg-blue-900/20 text-blue-200"
                 : "border-zinc-700 bg-zinc-900 text-zinc-400 hover:bg-zinc-800"
@@ -222,7 +222,7 @@ export function SchedulePatternCard({
               />
               120{locale === "ko" ? "분" : " min"}
             </label>
-            <label className={`relative flex cursor-pointer items-center justify-center rounded-lg border p-3 transition-all text-xs font-medium ${
+            <label className={`relative flex cursor-pointer items-center justify-center rounded-lg border p-3 transition-all text-xs font-medium whitespace-nowrap ${
               pattern.duration_minutes !== 90 && pattern.duration_minutes !== 120
                 ? "border-amber-500 bg-amber-900/20 text-amber-200"
                 : "border-zinc-700 bg-zinc-900 text-zinc-400 hover:bg-zinc-800"

@@ -105,28 +105,40 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
         </div>
       )}
 
-      {/* Club Selection (Optional) */}
-      {clubs.length > 0 && (
-        <div>
-          <label className="block text-sm font-medium mb-2 text-zinc-300">
-            👥 주최 동호회 (선택)
-          </label>
-          <select
-            name="club_id"
-            className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-          >
-            <option value="">동호회 없음 (개인 주최)</option>
-            {clubs.map((club) => (
-              <option key={club.id} value={club.id}>
-                {club.name}
-              </option>
-            ))}
-          </select>
+      {/* Club Selection */}
+      <div>
+        <label className="block text-sm font-medium mb-2 text-zinc-300">
+          👥 {t("admin.bulk.hostClub")} ({locale === "ko" ? "선택" : "Optional"})
+        </label>
+        <select
+          name="club_id"
+          className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+        >
+          <option value="">{t("admin.bulk.noClub")}</option>
+          {clubs.map((club) => (
+            <option key={club.id} value={club.id}>
+              {club.name}
+            </option>
+          ))}
+        </select>
+        {clubs.length > 0 ? (
           <p className="text-xs text-zinc-500 mt-1">
-            동호회를 선택하면 해당 동호회 경기로 등록됩니다.
+            {locale === "ko" ? "동호회를 선택하면 해당 동호회 경기로 등록됩니다." : "Select a club to register the match under that club."}
           </p>
-        </div>
-      )}
+        ) : (
+          <div className="mt-3 p-3 bg-amber-900/20 border border-amber-700/40 rounded-lg">
+            <p className="text-xs text-amber-200/90 mb-2">
+              ⚠️ {t("admin.bulk.noClubNotice")}
+            </p>
+            <a
+              href={`/${locale}/admin/clubs`}
+              className="inline-flex items-center gap-1 text-xs font-medium text-amber-300 hover:text-amber-200 transition-colors"
+            >
+              → {t("admin.bulk.registerClub")}
+            </a>
+          </div>
+        )}
+      </div>
 
       {/* Rink Selection */}
       <div>
@@ -237,7 +249,7 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
         </label>
         <div className="space-y-3">
           <div className="grid grid-cols-3 gap-3">
-            <label className={`relative flex cursor-pointer items-center justify-center rounded-lg border p-4 transition-all text-sm font-medium ${
+            <label className={`relative flex cursor-pointer items-center justify-center rounded-lg border p-4 transition-all text-sm font-medium whitespace-nowrap ${
               durationType === "90"
                 ? "border-blue-500 bg-blue-900/20 text-blue-200"
                 : "border-zinc-700 bg-zinc-900 text-zinc-400 hover:bg-zinc-800"
@@ -250,7 +262,7 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
               />
               90{locale === "ko" ? "분" : " min"}
             </label>
-            <label className={`relative flex cursor-pointer items-center justify-center rounded-lg border p-4 transition-all text-sm font-medium ${
+            <label className={`relative flex cursor-pointer items-center justify-center rounded-lg border p-4 transition-all text-sm font-medium whitespace-nowrap ${
               durationType === "120"
                 ? "border-blue-500 bg-blue-900/20 text-blue-200"
                 : "border-zinc-700 bg-zinc-900 text-zinc-400 hover:bg-zinc-800"
@@ -263,7 +275,7 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
               />
               120{locale === "ko" ? "분" : " min"}
             </label>
-            <label className={`relative flex cursor-pointer items-center justify-center rounded-lg border p-4 transition-all text-sm font-medium ${
+            <label className={`relative flex cursor-pointer items-center justify-center rounded-lg border p-4 transition-all text-sm font-medium whitespace-nowrap ${
               durationType === "custom"
                 ? "border-amber-500 bg-amber-900/20 text-amber-200"
                 : "border-zinc-700 bg-zinc-900 text-zinc-400 hover:bg-zinc-800"

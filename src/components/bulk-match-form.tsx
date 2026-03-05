@@ -285,25 +285,36 @@ export function BulkMatchForm({ rinks, clubs = [], initialMonth }: BulkMatchForm
       </div>
 
       {/* Host Club */}
-      {clubs.length > 0 && (
-        <div className="bg-zinc-800 p-5 rounded-xl border border-zinc-700">
-          <label className="block text-xs font-medium mb-2 text-zinc-400">
-            👥 {t("hostClub")}
-          </label>
-          <select
-            value={clubId}
-            onChange={(e) => setClubId(e.target.value)}
-            className="w-full px-3 py-2.5 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 text-sm"
-          >
-            <option value="">{t("noClub")}</option>
-            {clubs.map((club) => (
-              <option key={club.id} value={club.id}>
-                {club.name}
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
+      <div className="bg-zinc-800 p-5 rounded-xl border border-zinc-700">
+        <label className="block text-xs font-medium mb-2 text-zinc-400">
+          👥 {t("hostClub")}
+        </label>
+        <select
+          value={clubId}
+          onChange={(e) => setClubId(e.target.value)}
+          className="w-full px-3 py-2.5 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 text-sm"
+        >
+          <option value="">{t("noClub")}</option>
+          {clubs.map((club) => (
+            <option key={club.id} value={club.id}>
+              {club.name}
+            </option>
+          ))}
+        </select>
+        {clubs.length === 0 && (
+          <div className="mt-3 p-3 bg-amber-900/20 border border-amber-700/40 rounded-lg">
+            <p className="text-xs text-amber-200/90 mb-2">
+              ⚠️ {t("noClubNotice")}
+            </p>
+            <a
+              href={`/${locale}/admin/clubs`}
+              className="inline-flex items-center gap-1 text-xs font-medium text-amber-300 hover:text-amber-200 transition-colors"
+            >
+              → {t("registerClub")}
+            </a>
+          </div>
+        )}
+      </div>
 
       {/* Action Buttons */}
       <div className="grid grid-cols-2 gap-2">

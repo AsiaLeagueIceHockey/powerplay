@@ -359,6 +359,8 @@
             "commonSettings": "Common Settings",
             "hostClub": "Host Club",
             "noClub": "No club (Personal)",
+            "noClubNotice": "No club registered. Without a club, matches can only be created as \"No club (Personal)\".",
+            "registerClub": "Register Club",
             "schedulePatterns": "Bookings",
             "addPattern": "Add Booking Type",
             "copyPrevMonth": "Load Last Month",

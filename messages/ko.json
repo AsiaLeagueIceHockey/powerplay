@@ -361,6 +361,8 @@
             "commonSettings": "공통 설정",
             "hostClub": "주최 동호회",
             "noClub": "동호회 없음 (개인 주최)",
+            "noClubNotice": "동호회가 등록되지 않았습니다. 동호회를 등록하지 않으면 \"동호회 없음 (개인 주최)\"로만 경기를 생성할 수 있습니다.",
+            "registerClub": "동호회 등록하기",
             "schedulePatterns": "대관 일정",
             "addPattern": "대관 유형 추가",
             "copyPrevMonth": "이전달 대관 불러오기",
