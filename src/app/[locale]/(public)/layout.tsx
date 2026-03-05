@@ -31,15 +31,26 @@ export default async function PublicLayout({
           {/* Logo - Left */}
           <a
             href={`/${locale}`}
-            className="flex items-center flex-shrink-0 transition-opacity hover:opacity-80"
+            className="flex items-center flex-shrink-0 transition-opacity hover:opacity-80 relative"
             style={{ marginTop: "5px" }}
           >
+            {/* Light Mode Logo */}
             <Image
               src="/long-logo.jpg"
               alt="PowerPlay Logo"
               width={146}
               height={50}
-              className="h-10 w-auto object-contain rounded-sm"
+              className="h-10 w-auto object-contain rounded-sm dark:hidden"
+              quality={100}
+              priority
+            />
+            {/* Dark Mode Logo */}
+            <Image
+              src="/long-logo-darkmode.png"
+              alt="PowerPlay Logo"
+              width={146}
+              height={50}
+              className="hidden h-10 w-auto object-contain rounded-sm dark:block"
               quality={100}
               priority
             />
