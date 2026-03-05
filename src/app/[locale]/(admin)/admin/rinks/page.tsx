@@ -1,6 +1,9 @@
 import { setRequestLocale } from "next-intl/server";
 import { getRinks } from "@/app/actions/admin";
 import Link from "next/link";
+import { createClient } from "@/lib/supabase/server";
+import { ApproveRinkButton } from "@/components/approve-rink-button";
+import { MapPin } from "lucide-react";
 
 export default async function AdminRinksPage({
   params,
@@ -9,6 +12,20 @@ export default async function AdminRinksPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  let isSuperUser = false;
+  if (user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+    isSuperUser = profile?.role === "superuser";
+  }
+
   const rinks = await getRinks();
 
   return (
@@ -38,18 +55,45 @@ export default async function AdminRinksPage({
           {rinks.map((rink) => (
             <div
               key={rink.id}
-              className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 bg-zinc-800 rounded-lg"
+              className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 bg-zinc-800 rounded-lg relative"
             >
-              <div>
-                <div className="font-medium">{rink.name_ko}</div>
+              <div className="pr-8 sm:pr-0 w-full sm:w-auto flex-1">
+                <div className="flex items-center flex-wrap gap-2">
+                  <span className="font-medium">{rink.name_ko}</span>
+                  {rink.map_url && (
+                    <a
+                      href={rink.map_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-700/50 hover:bg-zinc-700 text-xs text-zinc-300 transition-colors"
+                      title="지도 보기"
+                    >
+                      <MapPin className="w-3 h-3" />
+                      지도에서 보기
+                    </a>
+                  )}
+                  {!rink.is_approved && (
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-500 border border-amber-500/30">
+                      승인 대기 중
+                    </span>
+                  )}
+                </div>
                 <div className="text-sm text-zinc-400">{rink.name_en}</div>
               </div>
-              <Link
-                href={`/${locale}/admin/rinks/${rink.id}/edit`}
-                className="text-sm text-blue-400 hover:underline"
-              >
-                수정
-              </Link>
+              
+              <div className="flex items-center gap-3">
+                {!rink.is_approved && isSuperUser && (
+                  <ApproveRinkButton rinkId={rink.id} />
+                )}
+                {isSuperUser && (
+                  <Link
+                    href={`/${locale}/admin/rinks/${rink.id}/edit`}
+                    className="text-sm text-blue-400 hover:underline"
+                  >
+                    수정
+                  </Link>
+                )}
+              </div>
             </div>
           ))}
         </div>

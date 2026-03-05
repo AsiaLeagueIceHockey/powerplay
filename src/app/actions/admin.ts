@@ -11,7 +11,7 @@ export async function getRinks() {
 
   const { data: rinks, error } = await supabase
     .from("rinks")
-    .select("id, name_ko, name_en")
+    .select("id, name_ko, name_en, is_approved, map_url")
     .order("name_ko");
 
   if (error) {
@@ -990,6 +990,8 @@ export async function createRink(formData: FormData) {
     return { error: "이름은 필수입니다 (한국어, 영어)" };
   }
 
+  const isApproved = profile?.role === "superuser";
+
   const { data, error } = await supabase
     .from("rinks")
     .insert({
@@ -1000,6 +1002,7 @@ export async function createRink(formData: FormData) {
       lat: lat ? parseFloat(lat) : null,
       lng: lng ? parseFloat(lng) : null,
       rink_type: rinkType || null,
+      is_approved: isApproved,
     })
     .select()
     .single();
@@ -1008,6 +1011,16 @@ export async function createRink(formData: FormData) {
     console.error("Error creating rink:", error);
     return { error: error.message };
   }
+
+  // Audit Log (Background)
+  await logAndNotify({
+    userId: user.id,
+    action: "OTHER",
+    description: isApproved 
+      ? `슈퍼유저 ${user.email}님이 새 링크장 '${nameKo}'를 생성했습니다.`
+      : `${user.email}님이 새 링크장 '${nameKo}' 승인을 요청했습니다. (승인 대기 중)`,
+    metadata: { rinkId: data.id, nameKo, isApproved },
+  });
 
   revalidatePath("/admin/rinks");
   return { success: true, rinkId: data.id };
@@ -1025,15 +1038,15 @@ export async function updateRink(rinkId: string, formData: FormData) {
     return { error: "Not authenticated" };
   }
 
-  // Verify admin or superuser role
+  // Verify superuser role
   const { data: profile } = await supabase
     .from("profiles")
     .select("role")
     .eq("id", user.id)
     .single();
 
-  if (profile?.role !== "admin" && profile?.role !== "superuser") {
-    return { error: "Unauthorized" };
+  if (profile?.role !== "superuser") {
+    return { error: "Unauthorized. Superuser required to edit rinks." };
   }
 
   const nameKo = formData.get("name_ko") as string;
@@ -1060,6 +1073,72 @@ export async function updateRink(rinkId: string, formData: FormData) {
   if (error) {
     console.error("Error updating rink:", error);
     return { error: error.message };
+  }
+
+  revalidatePath("/admin/rinks");
+  return { success: true };
+}
+
+// Approve a rink
+export async function approveRink(rinkId: string) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "Not authenticated" };
+  }
+
+  // Verify superuser role
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  if (profile?.role !== "superuser") {
+    return { error: "Unauthorized. Superuser required to approve rinks." };
+  }
+
+  // 1. Get the original creator's user ID before approving
+  const { data: rink } = await supabase
+    .from("rinks")
+    .select("created_by, name_ko")
+    .eq("id", rinkId)
+    .single();
+
+  const { error } = await supabase
+    .from("rinks")
+    .update({
+      is_approved: true,
+    })
+    .eq("id", rinkId);
+
+  if (error) {
+    console.error("Error approving rink:", error);
+    return { error: error.message };
+  }
+
+  // Audit Log and Notification
+  if (rink) {
+    await logAndNotify({
+      userId: user.id,
+      action: "OTHER",
+      description: `슈퍼유저가 링크장 '${rink.name_ko}' 승인을 완료했습니다.`,
+      metadata: { rinkId, nameKo: rink.name_ko },
+      skipPush: true, // Don't notify superusers about superuser action
+    });
+
+    if (rink.created_by) {
+      await sendPushNotification(
+        rink.created_by,
+        "링크장 승인 완료 🏟️",
+        `요청하신 '${rink.name_ko}' 링크장의 승인이 완료되었습니다.`,
+        "/admin/rinks"
+      );
+    }
   }
 
   revalidatePath("/admin/rinks");

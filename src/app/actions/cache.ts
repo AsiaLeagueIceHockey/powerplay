@@ -20,6 +20,7 @@ export async function getCachedRinks(): Promise<Rink[]> {
   const { data: rinks, error } = await supabase
     .from("rinks")
     .select("*")
+    .eq("is_approved", true)
     .order("name_ko", { ascending: true });
 
   if (error) {
