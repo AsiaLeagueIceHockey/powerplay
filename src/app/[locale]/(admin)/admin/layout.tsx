@@ -35,7 +35,7 @@ export default async function AdminLayout({
   return (
     <div className="min-h-screen bg-zinc-900 text-zinc-100">
       {/* Mobile Header */}
-      <header className="sticky top-0 z-50 flex items-center justify-between border-b border-zinc-800 bg-zinc-900 px-4 py-3 md:hidden">
+      <header className="sticky top-0 z-50 flex items-center justify-between border-b border-zinc-800 bg-black px-4 py-3 md:hidden">
         <div className="flex items-center gap-1">
           <Image
             src="/long-logo-darkmode.png"
