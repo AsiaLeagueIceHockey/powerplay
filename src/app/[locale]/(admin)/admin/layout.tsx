@@ -1,5 +1,6 @@
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import { AdminUserMenu } from "@/components/admin-user-menu";
 
@@ -35,15 +36,33 @@ export default async function AdminLayout({
     <div className="min-h-screen bg-zinc-900 text-zinc-100">
       {/* Mobile Header */}
       <header className="sticky top-0 z-50 flex items-center justify-between border-b border-zinc-800 bg-zinc-900/95 px-4 py-3 backdrop-blur md:hidden">
-        <span className="text-lg font-bold">🏒 {t("menu.dashboard")}</span>
+        <div className="flex items-center gap-1">
+          <Image
+            src="/long-logo-darkmode.png"
+            alt="PowerPlay"
+            width={110}
+            height={38}
+            className="h-7 w-auto object-contain"
+            quality={100}
+          />
+          <span className="text-sm font-medium" style={{ color: '#F4A261' }}>관리자</span>
+        </div>
         <AdminUserMenu user={user} locale={locale} />
       </header>
 
       <div className="flex flex-col md:flex-row">
         {/* Desktop Sidebar - Hidden on mobile */}
         <aside className="hidden w-64 shrink-0 border-r border-zinc-800 bg-zinc-950 p-4 md:block md:min-h-screen">
-          <div className="mb-8 flex items-center justify-between">
-            <span className="text-xl font-bold">🏒 {t("menu.dashboard")}</span>
+          <div className="mb-8 flex items-center gap-1">
+            <Image
+              src="/long-logo-darkmode.png"
+              alt="PowerPlay"
+              width={130}
+              height={44}
+              className="h-8 w-auto object-contain"
+              quality={100}
+            />
+            <span className="text-sm font-medium" style={{ color: '#F4A261' }}>관리자</span>
           </div>
           <nav className="space-y-1">
             <Link
