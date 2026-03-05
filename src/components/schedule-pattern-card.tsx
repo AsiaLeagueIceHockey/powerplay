@@ -157,7 +157,7 @@ export function SchedulePatternCard({
         <p className="text-[11px] text-zinc-500 mt-1.5">
           {t("noRinkNotice")}{" "}
           <a
-            href={`/${locale}/admin/rinks/new`}
+            href={`/${locale}/admin/rinks`}
             className="text-blue-400 hover:text-blue-300 transition-colors"
           >
             {t("registerRink")} →
