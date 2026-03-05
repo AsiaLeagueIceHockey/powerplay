@@ -31,7 +31,8 @@ export default async function PublicLayout({
           {/* Logo - Left */}
           <a
             href={`/${locale}`}
-            className="flex items-center flex-shrink-0 transition-opacity hover:opacity-80 mt-[3px]"
+            className="flex items-center flex-shrink-0 transition-opacity hover:opacity-80"
+            style={{ marginTop: "5px" }}
           >
             <Image
               src="/long-logo.jpg"
