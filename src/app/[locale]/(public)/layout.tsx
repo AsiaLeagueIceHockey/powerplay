@@ -15,7 +15,7 @@ export default async function PublicLayout({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  
+
   // 병렬 데이터 페칭 - User 정보는 이제 Suspense로 처리하므로 여기서 기다리지 않음
   // const supabase = await createClient();
   // const [, { data: { user } }] = await Promise.all([
@@ -29,18 +29,19 @@ export default async function PublicLayout({
       <header className="sticky top-0 z-50 w-full border-b border-zinc-200 bg-white/80 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-950/80">
         <div className="container mx-auto flex h-16 items-center justify-between px-4 gap-2">
           {/* Logo - Left */}
-          <a href={`/${locale}`} className="flex items-center gap-1.5 flex-shrink-0 transition-opacity hover:opacity-80">
+          <a
+            href={`/${locale}`}
+            className="flex items-center flex-shrink-0 transition-opacity hover:opacity-80 mt-[3px]"
+          >
             <Image
-              src="/favicon.png"
+              src="/long-logo.jpg"
               alt="PowerPlay Logo"
-              width={26}
-              height={26}
-              className="object-contain drop-shadow-sm rounded-sm"
+              width={146}
+              height={50}
+              className="h-10 w-auto object-contain rounded-sm"
+              quality={100}
               priority
             />
-            <span className="text-[18px] font-bold tracking-tight text-[#1e293b] dark:text-zinc-100 uppercase mt-0.5">
-              POWERPLAY
-            </span>
           </a>
 
           {/* User Menu - Right (Suspense Streaming) */}
@@ -58,5 +59,3 @@ export default async function PublicLayout({
     </div>
   );
 }
-
-
