@@ -1,4 +1,31 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { Metadata } from "next";
+
+const siteUrl = "https://powerplay.kr";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const isKo = locale === "ko";
+
+  return {
+    title: isKo ? "이용약관 및 개인정보 처리방침" : "Terms & Privacy Policy",
+    description: isKo
+      ? "파워플레이 이용약관 및 개인정보 처리방침"
+      : "PowerPlay Terms of Service and Privacy Policy",
+    alternates: {
+      canonical: `${siteUrl}/${locale}/terms`,
+      languages: {
+        ko: `${siteUrl}/ko/terms`,
+        en: `${siteUrl}/en/terms`,
+      },
+    },
+    robots: { index: true, follow: true },
+  };
+}
 
 export default async function TermsPage({
   params,

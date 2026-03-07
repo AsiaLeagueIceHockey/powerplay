@@ -8,6 +8,73 @@ import { AdminControls } from "@/components/admin-controls";
 import { MatchShareButton } from "@/components/match-share-button";
 import { DynamicRinkMap } from "@/components/dynamic-rink-map";
 import { StartChatButton } from "@/components/start-chat-button";
+import { SportsEventJsonLd } from "@/components/json-ld";
+import { Metadata } from "next";
+
+const siteUrl = "https://powerplay.kr";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string; id: string }>;
+}): Promise<Metadata> {
+  const { locale, id } = await params;
+  const match = await getMatch(id);
+  if (!match) return {};
+
+  const isKo = locale === "ko";
+  const rinkName = match.rink
+    ? (isKo ? match.rink.name_ko : match.rink.name_en || match.rink.name_ko)
+    : "";
+
+  const date = new Date(match.start_time);
+  const dateStr = date.toLocaleDateString(isKo ? "ko-KR" : "en-US", {
+    month: "numeric",
+    day: "numeric",
+    weekday: "short",
+    timeZone: "Asia/Seoul",
+  });
+  const timeStr = date.toLocaleTimeString(isKo ? "ko-KR" : "en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    timeZone: "Asia/Seoul",
+  });
+
+  const matchTypeLabel = match.match_type === "game"
+    ? (isKo ? "경기" : "Game")
+    : match.match_type === "team_match"
+    ? (isKo ? "팀매치" : "Team Match")
+    : (isKo ? "훈련" : "Training");
+
+  const title = `${dateStr} ${rinkName} ${matchTypeLabel}`;
+  const description = isKo
+    ? `${dateStr} ${timeStr} | ${rinkName} | ${matchTypeLabel} | ${(match.entry_points || match.fee).toLocaleString()}원 | 파워플레이에서 아이스하키 경기에 참가하세요`
+    : `${dateStr} ${timeStr} | ${rinkName} | ${matchTypeLabel} | ${(match.entry_points || match.fee).toLocaleString()} KRW | Join ice hockey matches on PowerPlay`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: `${siteUrl}/${locale}/match/${id}`,
+      type: "article",
+      images: [{ url: `${siteUrl}/og-image.png`, width: 1200, height: 630 }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+    },
+    alternates: {
+      canonical: `${siteUrl}/${locale}/match/${id}`,
+      languages: {
+        ko: `${siteUrl}/ko/match/${id}`,
+        en: `${siteUrl}/en/match/${id}`,
+      },
+    },
+  };
+}
 
 export default async function MatchPage({
   params,
@@ -121,6 +188,8 @@ export default async function MatchPage({
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
+      {/* JSON-LD Structured Data */}
+      <SportsEventJsonLd match={match} locale={locale} />
       {/* Admin Controls - One line, Edit only */}
       <AdminControls matchId={match.id} locale={locale} createdBy={match.created_by} />
 

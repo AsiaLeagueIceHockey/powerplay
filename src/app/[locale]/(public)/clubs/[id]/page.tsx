@@ -4,9 +4,57 @@ import { notFound } from "next/navigation";
 import { MessageCircle, Users, Calendar, Building2, MapPin, CreditCard } from "lucide-react";
 import { JoinClubButton } from "@/components/join-club-button";
 import { ClubShareButton } from "@/components/club-share-button";
+import { SportsTeamJsonLd } from "@/components/json-ld";
 import Link from "next/link";
 import Image from "next/image";
 import { extractRegion } from "@/lib/rink-utils";
+import { Metadata } from "next";
+
+const siteUrl = "https://powerplay.kr";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string; id: string }>;
+}): Promise<Metadata> {
+  const { locale, id } = await params;
+  const club = await getClub(id);
+  if (!club) return {};
+
+  const isKo = locale === "ko";
+  const title = club.name;
+  const description = club.description
+    ? club.description.substring(0, 160)
+    : isKo
+    ? `${club.name} - 아이스하키 동호회 | 파워플레이`
+    : `${club.name} - Ice Hockey Club | PowerPlay`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: `${siteUrl}/${locale}/clubs/${id}`,
+      ...(club.logo_url && {
+        images: [{ url: club.logo_url, width: 256, height: 256, alt: club.name }],
+      }),
+      type: "profile",
+    },
+    twitter: {
+      card: "summary",
+      title,
+      description,
+    },
+    alternates: {
+      canonical: `${siteUrl}/${locale}/clubs/${id}`,
+      languages: {
+        ko: `${siteUrl}/ko/clubs/${id}`,
+        en: `${siteUrl}/en/clubs/${id}`,
+      },
+    },
+  };
+}
 
 export default async function ClubDetailPage({
   params,
@@ -29,7 +77,7 @@ export default async function ClubDetailPage({
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
-      {/* Club Header Extraction */}
+      <SportsTeamJsonLd club={club} locale={locale} />
       <div className="flex justify-between items-start mb-6">
         <div className="flex items-center gap-4">
           {/* Club Logo */}

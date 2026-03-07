@@ -1,14 +1,24 @@
 import { MetadataRoute } from "next";
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://powerplay.kr";
+  const baseUrl = "https://powerplay.kr";
 
   return {
     rules: [
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/admin/", "/api/"],
+        disallow: [
+          "/admin/",
+          "/api/",
+          "/mypage/",
+          "/chat/",
+          "/onboarding/",
+          "/profile/",
+          "/admin-apply/",
+          "/mypage/points/",
+          "/mypage/card/",
+        ],
       },
     ],
     sitemap: `${baseUrl}/sitemap.xml`,

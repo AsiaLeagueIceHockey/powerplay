@@ -5,6 +5,7 @@ import { routing, type Locale } from "@/i18n/routing";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Metadata } from "next";
 import { ScrollToTop } from "@/components/scroll-to-top";
+import { WebSiteJsonLd } from "@/components/json-ld";
 import { PushServiceWorkerRegister } from "@/components/push-manager";
 import { NotificationProvider } from "@/contexts/notification-context";
 import { NotificationGuideModal } from "@/components/notification-guide-modal";
@@ -39,7 +40,7 @@ export const viewport = {
   viewportFit: "cover",
 };
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://powerplay.kr";
+const siteUrl = "https://powerplay.kr";
 
 export async function generateMetadata({
   params,
@@ -92,6 +93,13 @@ export async function generateMetadata({
       index: true,
       follow: true,
     },
+    alternates: {
+      canonical: `${siteUrl}/${locale}`,
+      languages: {
+        "ko": `${siteUrl}/ko`,
+        "en": `${siteUrl}/en`,
+      },
+    },
     verification: {
       google: process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION,
       other: {
@@ -134,6 +142,7 @@ export default async function LocaleLayout({
             <InstallPrompt />
           </NotificationProvider>
         </NextIntlClientProvider>
+        <WebSiteJsonLd locale={locale} />
         <Analytics />
       </body>
     </html>
