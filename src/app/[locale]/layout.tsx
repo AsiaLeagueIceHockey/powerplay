@@ -74,7 +74,7 @@ export async function generateMetadata({
       siteName: "PowerPlay",
       images: [
         {
-          url: `${siteUrl}/og-image.jpg`,
+          url: `${siteUrl}/og-image.png`,
           width: 1200,
           height: 630,
           alt: "PowerPlay - Ice Hockey Match Management",
@@ -87,7 +87,7 @@ export async function generateMetadata({
       card: "summary_large_image",
       title,
       description,
-      images: [`${siteUrl}/og-image.jpg`],
+      images: [`${siteUrl}/og-image.png`],
     },
     robots: {
       index: true,

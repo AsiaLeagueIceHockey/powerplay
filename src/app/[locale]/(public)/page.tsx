@@ -29,7 +29,7 @@ export async function generateMetadata({
         ? "아이스하키 동호회 경기 운영 및 게스트 매칭 관리 플랫폼"
         : "Ice hockey club match management and player matching platform",
       url: `${siteUrl}/${locale}`,
-      images: [{ url: `${siteUrl}/og-image.jpg`, width: 1200, height: 630 }],
+      images: [{ url: `${siteUrl}/og-image.png`, width: 1200, height: 630 }],
     },
     alternates: {
       canonical: `${siteUrl}/${locale}`,

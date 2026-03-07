@@ -59,7 +59,7 @@ export async function generateMetadata({
       description,
       url: `${siteUrl}/${locale}/match/${id}`,
       type: "article",
-      images: [{ url: `${siteUrl}/og-image.jpg`, width: 1200, height: 630 }],
+      images: [{ url: `${siteUrl}/og-image.png`, width: 1200, height: 630 }],
     },
     twitter: {
       card: "summary_large_image",
