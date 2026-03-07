@@ -49,7 +49,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
 
-  const title = locale === "ko" ? "파워플레이 - 아이스하키 경기 매칭" : "Power Play - Ice Hockey Match Management";
+  const title = locale === "ko" ? "파워플레이 - 아이스하키 경기 매칭" : "PowerPlay - Ice Hockey Match Management";
   const description =
     locale === "ko"
       ? "아이스하키 동호회 경기 운영 및 게스트 매칭 관리 플랫폼"
@@ -58,7 +58,7 @@ export async function generateMetadata({
   return {
     title: {
       default: title,
-      template: `%s | ${locale === "ko" ? "파워플레이" : "Power Play"}`,
+      template: `%s | ${locale === "ko" ? "파워플레이" : "PowerPlay"}`,
     },
     description,
     metadataBase: new URL(siteUrl),
@@ -71,13 +71,13 @@ export async function generateMetadata({
       title,
       description,
       url: siteUrl,
-      siteName: "Power Play",
+      siteName: "PowerPlay",
       images: [
         {
           url: `${siteUrl}/og-image.jpg`,
           width: 1200,
           height: 630,
-          alt: "Power Play - Ice Hockey Match Management",
+          alt: "PowerPlay - Ice Hockey Match Management",
         },
       ],
       locale: locale === "ko" ? "ko_KR" : "en_US",

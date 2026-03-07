@@ -6,7 +6,7 @@ export const runtime = "edge";
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   
-  const title = searchParams.get("title") || "Power Play";
+  const title = searchParams.get("title") || "PowerPlay";
   const rink = searchParams.get("rink") || "";
   const date = searchParams.get("date") || "";
   const time = searchParams.get("time") || "";
@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
               color: "#ffffff",
             }}
           >
-            Power Play
+            PowerPlay
           </span>
         </div>
 

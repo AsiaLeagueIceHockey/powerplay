@@ -19,12 +19,12 @@ export async function generateMetadata({
   const isKo = locale === "ko";
 
   return {
-    title: isKo ? "파워플레이 - 아이스하키 경기 매칭" : "Power Play - Ice Hockey Match Management",
+    title: isKo ? "파워플레이 - 아이스하키 경기 매칭" : "PowerPlay - Ice Hockey Match Management",
     description: isKo
       ? "아이스하키 동호회 경기 일정 확인, 게스트 참가 신청, 팀 매칭까지. 파워플레이에서 경기를 찾아보세요."
       : "Find ice hockey matches, register as a guest player, and manage team matchups. Discover games on PowerPlay.",
     openGraph: {
-      title: isKo ? "파워플레이 - 아이스하키 경기 매칭" : "Power Play - Ice Hockey Match Management",
+      title: isKo ? "파워플레이 - 아이스하키 경기 매칭" : "PowerPlay - Ice Hockey Match Management",
       description: isKo
         ? "아이스하키 동호회 경기 운영 및 게스트 매칭 관리 플랫폼"
         : "Ice hockey club match management and player matching platform",

@@ -63,7 +63,7 @@ export default function AdminApplyPage() {
           <p className="text-zinc-600 dark:text-zinc-400 mb-5 leading-relaxed">
             {locale === "ko"
               ? "동호회를 생성하고 멤버들을 관리하세요. 파워 플레이를 통해 게스트를 모집해보세요!"
-              : "Create clubs and manage members. Recruit guests through Power Play!"}
+              : "Create clubs and manage members. Recruit guests through PowerPlay!"}
           </p>
           <div className="grid grid-cols-2 gap-3">
             <div className="relative aspect-[9/16] overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-100">

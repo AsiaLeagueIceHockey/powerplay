@@ -30,7 +30,7 @@ export function MatchShareButton({ match }: MatchShareButtonProps) {
     // Rink Name
     const rinkName = locale === "ko" ? match.rink?.name_ko : match.rink?.name_en || match.rink?.name_ko;
     
-    const title = locale === "ko" ? "[Power Play] 경기 모집" : "[Power Play] Match Invitation";
+    const title = locale === "ko" ? "[PowerPlay] 경기 모집" : "[PowerPlay] Match Invitation";
     let text = "";
     let toastMsg = "";
 

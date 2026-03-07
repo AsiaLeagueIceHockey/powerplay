@@ -122,13 +122,13 @@ export function InstallPrompt() {
           <div className="relative w-12 h-12 rounded-xl overflow-hidden shadow-sm border border-zinc-200 dark:border-zinc-700 flex-shrink-0">
              <Image 
                src="/favicon.png" 
-               alt="Power Play" 
+               alt="PowerPlay" 
                fill
                className="object-cover"
              />
           </div>
           <div>
-            <p className="font-bold text-base">Power Play 앱 설치</p>
+            <p className="font-bold text-base">PowerPlay 앱 설치</p>
             <p className="text-xs text-zinc-400">
                 {isIOS ? "홈 화면에 추가하여 앱처럼 사용하세요" : "더 빠르고 편리하게 이용하세요"}
             </p>

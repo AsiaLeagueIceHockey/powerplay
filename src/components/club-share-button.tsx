@@ -14,7 +14,7 @@ export function ClubShareButton({ club }: ClubShareButtonProps) {
   const [toastMessage, setToastMessage] = useState("");
 
   const handleShare = async () => {
-    const title = locale === "ko" ? "[Power Play] 동호회 소개" : "[Power Play] Club Info";
+    const title = locale === "ko" ? "[PowerPlay] 동호회 소개" : "[PowerPlay] Club Info";
     let text = "";
     let toastMsg = "";
 
