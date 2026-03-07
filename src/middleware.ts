@@ -41,6 +41,7 @@ export const config = {
     // - Static files (images, fonts, etc.)
     // - Internal Next.js paths
     // - PWA files (manifest, favicon, sw.js, workbox flow etc.)
-    "/((?!api|_next/static|_next/image|favicon.ico|manifest.json|sw.js|workbox-.*|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    // - SEO files (sitemap.xml, robots.txt)
+    "/((?!api|_next/static|_next/image|favicon.ico|manifest.json|sw.js|workbox-.*|sitemap\\.xml|robots\\.txt|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };
