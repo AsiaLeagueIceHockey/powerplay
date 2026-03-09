@@ -29,9 +29,9 @@ export function ScheduleView({ matches, rinks }: ScheduleViewProps) {
     : null;
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-6">
       {/* View Toggle */}
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 bg-white p-3 rounded-lg border border-zinc-200 shadow-sm dark:bg-zinc-900 dark:border-zinc-800">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 bg-white p-4 rounded-2xl border border-zinc-200 shadow-sm dark:bg-zinc-900 dark:border-zinc-800">
         {viewMode === 'list' && (
           <label className="flex items-center gap-2 text-sm text-zinc-600 cursor-pointer dark:text-zinc-400">
             <input 
@@ -78,18 +78,18 @@ export function ScheduleView({ matches, rinks }: ScheduleViewProps) {
             <div className="space-y-6">
                 {Object.entries(groupedMatches).map(([rinkName, rinkMatches]) => (
                     <div key={rinkName}>
-                        <h3 className="text-lg font-bold mb-3 px-1">{rinkName}</h3>
-                        <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+                        <h3 className="text-xl font-black mb-4 px-2 text-[#172554] dark:text-zinc-200">{rinkName}</h3>
+                        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                             {rinkMatches.map((match) => <MatchCard key={match.id} match={match} />)}
                         </div>
                     </div>
                 ))}
             </div>
           ) : (
-            <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {matches.length === 0 ? (
-                <div className="col-span-full rounded-lg border border-zinc-200 p-6 dark:border-zinc-800">
-                    <p className="text-center text-zinc-500 dark:text-zinc-400">
+                <div className="col-span-full rounded-2xl border border-zinc-200 p-10 bg-zinc-50/50 dark:bg-zinc-900/50 dark:border-zinc-800">
+                    <p className="text-center font-bold text-zinc-400 dark:text-zinc-500 italic">
                     {t("noMatches")}
                     </p>
                 </div>
