@@ -100,68 +100,77 @@ export function MatchCard({ match }: { match: Match }) {
       </div>
 
       {/* Position Availability */}
-      {match.match_type === "team_match" ? (
-        <div className="mb-3 text-[11px]">
-          <span className={`rounded-lg px-2 py-0.5 font-bold border ${
-            currentSkaters >= match.max_skaters
-              ? "bg-teal-50 text-teal-700 border-teal-100 dark:bg-teal-900/20 dark:text-teal-400 dark:border-teal-800"
-              : "bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800"
-          }`}>
-            {currentSkaters >= match.max_skaters ? t("teamJoined") : t("teamMatchWaiting")}
-          </span>
-        </div>
-      ) : (
-        <div className="mb-3 flex gap-3 text-xs">
-          <div className="flex items-center gap-1.5">
-            <span className="font-bold text-zinc-400 dark:text-zinc-500">{match.match_type === "training" ? t("guest") : t("skater")}</span>
-            <span
-              className={`rounded-lg px-1.5 py-0.5 font-black ${
-                (match.match_type === "training" ? (match.max_guests ? match.max_guests - currentSkaters > 0 : true) : remainingSkaters > 0)
-                  ? "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
-                  : "bg-zinc-50 text-zinc-400 dark:bg-zinc-800 dark:text-zinc-600"
-              }`}
-            >
-              {match.match_type === "training" 
-                ? (match.max_guests ? `${currentSkaters}/${match.max_guests}` : `${currentSkaters}/${t("guestUnlimited")}`)
-                : `${currentSkaters}/${match.max_skaters}`
-              }
+      <div className="mb-3 flex items-center justify-between gap-x-3 gap-y-2 flex-wrap min-h-[28px]">
+        {match.match_type === "team_match" ? (
+          <div className="text-[11px]">
+            <span className={`rounded-lg px-2 py-0.5 font-bold border ${
+              currentSkaters >= match.max_skaters
+                ? "bg-teal-50 text-teal-700 border-teal-100 dark:bg-teal-900/20 dark:text-teal-400 dark:border-teal-800"
+                : "bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800"
+            }`}>
+              {currentSkaters >= match.max_skaters ? t("teamJoined") : t("teamMatchWaiting")}
             </span>
           </div>
-          {match.match_type !== "training" && (
+        ) : (
+          <div className="flex items-center gap-x-3 gap-y-2 text-xs">
             <div className="flex items-center gap-1.5">
-              <span className="font-bold text-zinc-400 dark:text-zinc-500">{t("position.G")}</span>
+              <span className="font-bold text-zinc-400 dark:text-zinc-500">{match.match_type === "training" ? t("guest") : t("skater")}</span>
               <span
                 className={`rounded-lg px-1.5 py-0.5 font-black ${
-                  remainingGoalies > 0
+                  (match.match_type === "training" ? (match.max_guests ? match.max_guests - currentSkaters > 0 : true) : remainingSkaters > 0)
                     ? "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
                     : "bg-zinc-50 text-zinc-400 dark:bg-zinc-800 dark:text-zinc-600"
                 }`}
               >
-                {counts.g}/{match.max_goalies}
+                {match.match_type === "training" 
+                  ? (match.max_guests ? `${currentSkaters}/${match.max_guests}` : `${currentSkaters}/${t("guestUnlimited")}`)
+                  : `${currentSkaters}/${match.max_skaters}`
+                }
               </span>
             </div>
-          )}
-        </div>
-      )}
+            {match.match_type !== "training" && (
+              <div className="flex items-center gap-1.5">
+                <span className="font-bold text-zinc-400 dark:text-zinc-500">{t("position.G")}</span>
+                <span
+                  className={`rounded-lg px-1.5 py-0.5 font-black ${
+                    remainingGoalies > 0
+                      ? "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
+                      : "bg-zinc-50 text-zinc-400 dark:bg-zinc-800 dark:text-zinc-600"
+                  }`}
+                >
+                  {counts.g}/{match.max_goalies}
+                </span>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Rental Badge aligned to right */}
+        {match.rental_available && (
+          <span className="ml-auto whitespace-nowrap inline-block rounded-lg px-2 py-0.5 text-[10px] font-bold bg-blue-50 text-blue-600 border border-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-900/30 shadow-sm">
+            + {t("rentalFee")} {match.rental_fee >= 0 ? `${match.rental_fee.toLocaleString()}원` : t("goalieFree")}
+          </span>
+        )}
+      </div>
 
       {/* Footer: Club (Left) & Price (Right) */}
       <div className="mt-auto flex items-end justify-between border-t border-zinc-50 pt-3 dark:border-zinc-800/50">
         {/* Club Info */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 overflow-hidden mr-2">
           {match.club ? (
-            <div className="flex items-center gap-1.5 text-xs font-bold text-[#172554] dark:text-blue-400 bg-blue-50/50 dark:bg-blue-900/10 px-2 py-0.5 rounded-lg border border-blue-100/50 dark:border-blue-900/20">
+            <div className="flex items-center gap-1.5 text-xs font-bold text-[#172554] dark:text-blue-400 bg-blue-50/50 dark:bg-blue-900/10 px-2 py-0.5 rounded-lg border border-blue-100/50 dark:border-blue-900/20 truncate">
               {match.club.logo_url ? (
                 <Image 
                   src={match.club.logo_url} 
                   alt={match.club.name} 
                   width={16} 
                   height={16} 
-                  className="w-4 h-4 rounded object-cover shadow-sm bg-white"
+                  className="w-4 h-4 rounded shrink-0 object-cover shadow-sm bg-white"
                 />
               ) : (
-                <Building2 className="h-3 w-3 opacity-80" />
+                <Building2 className="h-3 w-3 shrink-0 opacity-80" />
               )}
-              <span className="truncate max-w-[100px]">{match.club.name}</span>
+              <span className="truncate">{match.club.name}</span>
             </div>
           ) : (
             <div className="h-6" /> /* Spacer */
@@ -175,20 +184,13 @@ export function MatchCard({ match }: { match: Match }) {
               {t("feeDescriptionRef")}
             </span>
           ) : (
-            <div className="flex flex-col items-end gap-1">
-              <div className="flex items-baseline gap-1">
-                <span className="text-lg font-black text-[#172554] dark:text-zinc-100">
-                  {(match.entry_points || match.fee).toLocaleString()}
-                </span>
-                <span className="text-[11px] font-bold text-zinc-400 dark:text-zinc-500">
-                  {locale === "ko" ? "원" : "KRW"}
-                </span>
-              </div>
-              {match.rental_available && (
-                <span className="whitespace-nowrap inline-block rounded px-1.5 py-0.5 text-[9px] font-bold bg-blue-50 text-blue-600 border border-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-900/30">
-                  + {t("rentalFee")} {match.rental_fee >= 0 ? `${match.rental_fee.toLocaleString()}원` : t("goalieFree")}
-                </span>
-              )}
+            <div className="flex items-baseline gap-1">
+              <span className="text-lg font-black text-[#172554] dark:text-zinc-100">
+                {(match.entry_points || match.fee).toLocaleString()}
+              </span>
+              <span className="text-[11px] font-bold text-zinc-400 dark:text-zinc-500">
+                {locale === "ko" ? "원" : "KRW"}
+              </span>
             </div>
           )}
         </div>
