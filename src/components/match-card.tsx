@@ -3,7 +3,7 @@
 import { Link } from "@/i18n/navigation";
 import { useTranslations, useLocale } from "next-intl";
 import type { Match } from "@/app/actions/match";
-import { Users, Building2 } from "lucide-react";
+import { Building2 } from "lucide-react";
 import Image from "next/image";
 
 export function MatchCard({ match }: { match: Match }) {
@@ -36,10 +36,10 @@ export function MatchCard({ match }: { match: Match }) {
   const displayStatus = isPastMatch ? 'finished' : match.status;
 
   const statusColors: Record<string, string> = {
-    open: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
-    closed: "bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-400",
-    canceled: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
-    finished: "bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-400",
+    open: "bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800",
+    closed: "bg-zinc-50 text-zinc-600 border-zinc-100 dark:bg-zinc-800/40 dark:text-zinc-400 dark:border-zinc-700",
+    canceled: "bg-red-50 text-red-700 border-red-100 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800",
+    finished: "bg-zinc-50 text-zinc-500 border-zinc-100 dark:bg-zinc-800/20 dark:text-zinc-500 dark:border-zinc-800",
   };
 
   const counts = match.participants_count || { fw: 0, df: 0, g: 0 };
@@ -50,31 +50,34 @@ export function MatchCard({ match }: { match: Match }) {
   return (
     <Link
       href={`/match/${match.id}`}
-      className="group block rounded-xl border border-zinc-200 bg-white p-4 transition-all duration-300 hover:border-blue-500 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900"
+      className="group relative block flex flex-col rounded-2xl border border-zinc-200 bg-white p-5 transition-all duration-300 hover:border-blue-500 hover:shadow-lg dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-blue-400 overflow-hidden"
     >
+      {/* Top Accent Line */}
+      <div className="absolute top-0 left-0 h-1 w-full bg-[#172554] dark:bg-blue-600" />
+
       {/* Header: Date & Status */}
-      <div className="mb-3 flex items-center justify-between gap-1 sm:gap-2">
-        <div className="shrink truncate text-[13px] sm:text-sm font-medium text-zinc-500 dark:text-zinc-400">
-          {formattedDate} · {formattedTime}
+      <div className="mb-4 flex items-center justify-between gap-2">
+        <div className="shrink truncate text-sm font-bold text-zinc-400 dark:text-zinc-500">
+          {formattedDate} <span className="mx-1 text-zinc-200 dark:text-zinc-700">|</span> <span className="text-[#172554] dark:text-blue-400">{formattedTime}</span>
         </div>
-        <div className="flex shrink-0 items-center gap-1 sm:gap-2">
+        <div className="flex shrink-0 items-center gap-1.5">
           {match.duration_minutes && (
-            <span className="whitespace-nowrap inline-block rounded px-1.5 sm:px-2 py-0.5 text-[11px] sm:text-xs font-semibold bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700">
+            <span className="whitespace-nowrap inline-block rounded-lg px-2 py-0.5 text-[11px] font-bold bg-zinc-50 text-zinc-500 border border-zinc-100 dark:bg-zinc-800 dark:text-zinc-400 dark:border-zinc-700">
               {match.duration_minutes}{locale === "ko" ? "분" : "m"}
             </span>
           )}
           <span
-            className={`whitespace-nowrap rounded-full px-2 sm:px-2.5 py-0.5 text-[11px] sm:text-xs font-medium ${statusColors[displayStatus]}`}
+            className={`whitespace-nowrap rounded-full px-2.5 py-0.5 text-[11px] font-bold tracking-tight border ${statusColors[displayStatus]}`}
           >
             {t(`status.${displayStatus}`)}
           </span>
           <span
-            className={`whitespace-nowrap inline-block rounded px-1.5 sm:px-2 py-0.5 text-[11px] sm:text-xs font-semibold ${
+            className={`whitespace-nowrap inline-block rounded-lg px-2 py-0.5 text-[11px] font-bold border ${
               match.match_type === "game"
-                ? "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300"
+                ? "bg-purple-50 text-purple-700 border-purple-100 dark:bg-purple-900/20 dark:text-purple-300 dark:border-purple-800"
                 : match.match_type === "team_match"
-                ? "bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-300"
-                : "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"
+                ? "bg-teal-50 text-teal-700 border-teal-100 dark:bg-teal-900/20 dark:text-teal-300 dark:border-teal-800"
+                : "bg-zinc-50 text-zinc-600 border-zinc-100 dark:bg-zinc-800/40 dark:text-zinc-400 dark:border-zinc-700"
             }`}
           >
             {t(`types.${match.match_type || 'training'}`)}
@@ -83,113 +86,110 @@ export function MatchCard({ match }: { match: Match }) {
       </div>
 
       {/* Rink Name & Address */}
-      <div className="mb-2">
-        <h3 className="text-lg font-semibold group-hover:text-blue-600 dark:group-hover:text-blue-400 leading-tight">
+      <div className="mb-4">
+        <h3 className="text-xl font-bold text-[#172554] group-hover:text-blue-600 dark:text-zinc-100 dark:group-hover:text-blue-400 leading-tight transition-colors">
           {rinkName || "Unknown Rink"}
         </h3>
         {match.rink?.address && (
-          <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+          <p className="mt-1 text-xs font-medium text-zinc-400 dark:text-zinc-500">
             {match.rink.address.split(" ").slice(0, 2).join(" ")}
           </p>
         )}
       </div>
 
-      {/* Club Name with Logo */}
-      {match.club && (
-        <div className="mb-3 flex items-center gap-2 text-sm font-medium text-blue-600 dark:text-blue-400">
-          {match.club.logo_url ? (
-            <Image 
-              src={match.club.logo_url} 
-              alt={match.club.name} 
-              width={20} 
-              height={20} 
-              className="w-5 h-5 rounded object-cover"
-            />
-          ) : (
-            <Building2 className="h-4 w-4" />
-          )}
-          {match.club.name}
-        </div>
-      )}
-
       {/* Position Availability */}
       {match.match_type === "team_match" ? (
-        <div className="mb-3 text-sm">
-          <span className={`rounded px-2 py-1 font-medium ${
+        <div className="mb-4 text-xs">
+          <span className={`rounded-lg px-2 py-1 font-bold ${
             currentSkaters >= match.max_skaters
-              ? "bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400"
-              : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+              ? "bg-teal-50 text-teal-700 border border-teal-100 dark:bg-teal-900/20 dark:text-teal-400 dark:border-teal-800"
+              : "bg-amber-50 text-amber-700 border border-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800"
           }`}>
             {currentSkaters >= match.max_skaters ? t("teamJoined") : t("teamMatchWaiting")}
           </span>
         </div>
-      ) : match.match_type === "training" ? (
-        <div className="mb-3 flex gap-3 text-sm">
-          <div className="flex items-center gap-1">
-            <span className="font-medium">{t("guest")}</span>
+      ) : (
+        <div className="mb-4 flex gap-3 text-[13px]">
+          <div className="flex items-center gap-1.5">
+            <span className="font-bold text-zinc-400 dark:text-zinc-500">{match.match_type === "training" ? t("guest") : t("skater")}</span>
             <span
-              className={`rounded px-1.5 py-0.5 ${
-                match.max_guests
-                  ? (match.max_guests - currentSkaters > 0
-                    ? "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
-                    : "bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-500")
-                  : "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
+              className={`rounded-lg px-1.5 py-0.5 font-black ${
+                (match.match_type === "training" ? (match.max_guests ? match.max_guests - currentSkaters > 0 : true) : remainingSkaters > 0)
+                  ? "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
+                  : "bg-zinc-50 text-zinc-400 dark:bg-zinc-800 dark:text-zinc-600"
               }`}
             >
-              {match.max_guests
-                ? `${currentSkaters}/${match.max_guests}`
-                : `${currentSkaters}/${t("guestUnlimited")}`
+              {match.match_type === "training" 
+                ? (match.max_guests ? `${currentSkaters}/${match.max_guests}` : `${currentSkaters}/${t("guestUnlimited")}`)
+                : `${currentSkaters}/${match.max_skaters}`
               }
             </span>
           </div>
+          {match.match_type !== "training" && (
+            <div className="flex items-center gap-1.5">
+              <span className="font-bold text-zinc-400 dark:text-zinc-500">{t("position.G")}</span>
+              <span
+                className={`rounded-lg px-1.5 py-0.5 font-black ${
+                  remainingGoalies > 0
+                    ? "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
+                    : "bg-zinc-50 text-zinc-400 dark:bg-zinc-800 dark:text-zinc-600"
+                }`}
+              >
+                {counts.g}/{match.max_goalies}
+              </span>
+            </div>
+          )}
         </div>
-      ) : (
-      <div className="mb-3 flex gap-3 text-sm">
-        <div className="flex items-center gap-1">
-          <span className="font-medium">{t("skater")}</span>
-          <span
-            className={`rounded px-1.5 py-0.5 ${
-              remainingSkaters > 0
-                ? "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
-                : "bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-500"
-            }`}
-          >
-            {remainingSkaters}/{match.max_skaters}
-          </span>
-        </div>
-        <div className="flex items-center gap-1">
-          <span className="font-medium">{t("position.G")}</span>
-          <span
-            className={`rounded px-1.5 py-0.5 ${
-              remainingGoalies > 0
-                ? "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
-                : "bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-500"
-            }`}
-          >
-            {remainingGoalies}/{match.max_goalies}
-          </span>
-        </div>
-      </div>
       )}
 
-      {/* Fee */}
-      <div className="flex items-center gap-2 text-sm">
-        {match.match_type === "team_match" ? (
-          <span className="font-semibold text-teal-600 dark:text-teal-400">
-            {t("feeDescriptionRef")}
-          </span>
-        ) : (
-          <>
-            <span className="font-semibold text-zinc-900 dark:text-zinc-200">
-              {(match.entry_points || match.fee).toLocaleString()} {locale === "ko" ? "원" : "KRW"}
+      {/* Footer: Club (Left) & Price (Right) */}
+      <div className="mt-auto flex items-end justify-between border-t border-zinc-50 pt-4 dark:border-zinc-800/50">
+        {/* Club Info */}
+        <div className="flex items-center gap-2">
+          {match.club ? (
+            <div className="flex items-center gap-2 text-[13px] font-bold text-[#172554] dark:text-blue-400 bg-blue-50/50 dark:bg-blue-900/10 px-2.5 py-1 rounded-lg border border-blue-100/50 dark:border-blue-900/20">
+              {match.club.logo_url ? (
+                <Image 
+                  src={match.club.logo_url} 
+                  alt={match.club.name} 
+                  width={18} 
+                  height={18} 
+                  className="w-4.5 h-4.5 rounded object-cover shadow-sm"
+                />
+              ) : (
+                <Building2 className="h-3.5 w-3.5 opacity-80" />
+              )}
+              <span className="truncate max-w-[120px]">{match.club.name}</span>
+            </div>
+          ) : (
+            <div className="h-7" /> /* Spacer */
+          )}
+        </div>
+
+        {/* Price Info */}
+        <div className="flex flex-col items-end gap-1">
+          {match.match_type === "team_match" ? (
+            <span className="text-sm font-bold text-teal-600 dark:text-teal-400">
+              {t("feeDescriptionRef")}
             </span>
-            {match.rental_available && (
-              <span className="text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-1.5 py-0.5 rounded">
-                (+ {t("rentalFee")} {match.rental_fee >= 0 ? `${match.rental_fee.toLocaleString()} ${locale === "ko" ? "원" : "KRW"}` : t("goalieFree")})
-              </span>
-            )}
-          </>
-        )}
+          ) : (
+            <div className="flex flex-col items-end gap-1">
+              <div className="flex items-baseline gap-1">
+                <span className="text-xl font-black text-[#172554] dark:text-zinc-100">
+                  {(match.entry_points || match.fee).toLocaleString()}
+                </span>
+                <span className="text-[13px] font-bold text-zinc-400 dark:text-zinc-500">
+                  {locale === "ko" ? "원" : "KRW"}
+                </span>
+              </div>
+              {match.rental_available && (
+                <span className="whitespace-nowrap inline-block rounded px-1.5 py-0.5 text-[10px] font-bold bg-blue-50 text-blue-600 border border-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-900/30">
+                  + {t("rentalFee")} {match.rental_fee >= 0 ? `${match.rental_fee.toLocaleString()}원` : t("goalieFree")}
+                </span>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </Link>
   );

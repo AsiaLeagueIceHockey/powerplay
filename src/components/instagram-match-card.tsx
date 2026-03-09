@@ -127,7 +127,7 @@ export function InstagramMatchCard({ match }: { match: Match }) {
                 <span className="text-xl font-bold text-zinc-400">{locale === "ko" ? "원" : "KRW"}</span>
               </div>
               {match.rental_available && (
-                <span className="text-sm font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-lg border border-blue-100">
+                <span className="mt-1 text-base font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-xl border border-blue-100 shadow-sm">
                   + {t("rentalFee")} {match.rental_fee >= 0 ? `${match.rental_fee.toLocaleString()}원` : t("goalieFree")}
                 </span>
               )}
