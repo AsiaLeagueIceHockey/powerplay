@@ -555,7 +555,10 @@ export async function getAllMatchesForSuperuser() {
     .select("id, full_name, email")
     .in("id", creatorIds);
   
-  const creatorMap = new Map(creators?.map(c => [c.id, c]));
+  const creatorMap: Record<string, any> = {};
+  creators?.forEach(c => {
+    creatorMap[c.id] = c;
+  });
 
   // Fetch participants for each match
   const matchesWithDetails = await Promise.all(
@@ -582,7 +585,7 @@ export async function getAllMatchesForSuperuser() {
         g: validParticipants.filter(p => p.position === 'G').length || 0,
       };
 
-      // Transform for UI (flatten user array if needed, usually supabase returns object or array depending on query. `user:user_id` implies object if single relation, but type is slightly ambiguous without checking. I'll treat it safely.)
+      // Transform for UI (flatten user array if needed, usually supabase returns object or array depending on query. \`user:user_id\` implies object if single relation, but type is slightly ambiguous without checking. I'll treat it safely.)
       const transformedParticipants = (participants || []).map((p) => {
         const user = Array.isArray(p.user) ? p.user[0] : p.user;
         return {
@@ -594,7 +597,7 @@ export async function getAllMatchesForSuperuser() {
       return {
         ...match,
         rink: Array.isArray(match.rink) ? match.rink[0] : match.rink,
-        creator: creatorMap.get(match.created_by) || { email: "Unknown", full_name: "Unknown" },
+        creator: creatorMap[match.created_by] || { email: "Unknown", full_name: "Unknown" },
         participants: transformedParticipants, // Include full list for Card
         participants_count: counts,
       };
