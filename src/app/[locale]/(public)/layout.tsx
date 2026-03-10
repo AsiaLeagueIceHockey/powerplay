@@ -41,7 +41,6 @@ export default async function PublicLayout({
               width={146}
               height={50}
               className="h-10 w-auto object-contain rounded-sm dark:hidden"
-              quality={100}
               priority
             />
             {/* Dark Mode Logo */}
@@ -51,7 +50,6 @@ export default async function PublicLayout({
               width={146}
               height={50}
               className="hidden h-10 w-auto object-contain rounded-sm dark:block"
-              quality={100}
               priority
             />
           </a>
