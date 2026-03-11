@@ -39,6 +39,7 @@ export function ClubCard({ club }: ClubCardProps) {
                 alt={club.name} 
                 width={48} 
                 height={48} 
+                unoptimized
                 className="w-full h-full object-cover"
               />
             ) : (

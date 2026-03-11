@@ -165,6 +165,7 @@ export function MatchCard({ match }: { match: Match }) {
                   alt={match.club.name} 
                   width={16} 
                   height={16} 
+                  unoptimized
                   className="w-4 h-4 rounded shrink-0 object-cover shadow-sm bg-white"
                 />
               ) : (

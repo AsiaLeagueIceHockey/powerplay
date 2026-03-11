@@ -88,6 +88,7 @@ export default async function ClubDetailPage({
                 alt={club.name} 
                 width={64} 
                 height={64} 
+                unoptimized
                 className="w-full h-full object-cover"
               />
             ) : (

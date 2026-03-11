@@ -100,6 +100,7 @@ export function InstagramMatchCard({ match }: { match: Match }) {
                   alt={match.club.name} 
                   width={28} 
                   height={28} 
+                  unoptimized
                   className="w-7 h-7 rounded-lg object-cover bg-white"
                 />
               ) : (
