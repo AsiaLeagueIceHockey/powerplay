@@ -232,7 +232,7 @@ export async function requestPointCharge(
   await logAndNotify({
     userId: user.id,
     action: "POINT_CHARGE_REQUEST",
-    description: `${user.email}님이 ${amount.toLocaleString()}원 충전을 요청했습니다.`,
+    description: `${amount.toLocaleString()}원 충전을 요청했습니다.`,
     metadata: { requestId: data.id, amount, depositorName },
   });
 

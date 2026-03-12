@@ -191,7 +191,7 @@ export async function updateProfile(formData: FormData) {
     await logAndNotify({
       userId: user.id,
       action: "USER_SIGNUP",
-      description: `새 사용자 가입: ${userName} (${userEmail})`,
+      description: `새 사용자 가입 완료`,
       metadata: { email: userEmail, name: userName },
     });
   } else {
@@ -203,7 +203,7 @@ export async function updateProfile(formData: FormData) {
     await logAndNotify({
       userId: user.id,
       action: "PROFILE_UPDATE",
-      description: `프로필 정보 수정: ${userName} (${userEmail})`,
+      description: `프로필 정보 수정`,
       metadata: { email: userEmail, name: userName, updatedFields: Object.keys(updateData) },
     });
   }
@@ -263,7 +263,7 @@ export async function issuePlayerCard() {
   await logAndNotify({
     userId: user.id,
     action: "CARD_ISSUE",
-    description: `선수 카드 발급: ${userName} (${userEmail})`,
+    description: `선수 카드 발급`,
     metadata: { serialNum, email: userEmail, name: userName },
   });
 

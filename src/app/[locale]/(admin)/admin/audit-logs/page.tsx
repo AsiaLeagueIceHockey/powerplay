@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { getAuditLogs, AuditLog } from "@/app/actions/superuser";
 import { useFormatter } from "next-intl";
+import { Link } from "@/i18n/navigation";
 
 export default function AuditLogsPage() {
   const [logs, setLogs] = useState<AuditLog[]>([]);
@@ -90,7 +91,7 @@ export default function AuditLogsPage() {
                         {log.description}
                     </td>
                     <td className="p-4 font-mono text-xs text-zinc-500">
-                      {JSON.stringify(log.metadata, null, 2)}
+                      <MetadataRenderer metadata={log.metadata} />
                     </td>
                   </tr>
                 ))}
@@ -99,6 +100,74 @@ export default function AuditLogsPage() {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function MetadataRenderer({ metadata }: { metadata: any }) {
+  if (!metadata) return <span>null</span>;
+
+  const renderValue = (key: string, value: any) => {
+    if (typeof value === "string") {
+      if (key === "matchId" || key === "match_id") {
+        return (
+          <Link
+            href={`/match/${value}`}
+            target="_blank"
+            className="text-blue-400 underline hover:text-blue-300"
+          >
+            "{value}"
+          </Link>
+        );
+      }
+      if (key === "clubId" || key === "club_id") {
+        return (
+          <Link
+            href={`/clubs/${value}`}
+            target="_blank"
+            className="text-blue-400 underline hover:text-blue-300"
+          >
+            "{value}"
+          </Link>
+        );
+      }
+      return `"${value}"`;
+    }
+
+    if (Array.isArray(value) && (key === "matchIds" || key === "match_ids")) {
+      return (
+        <span>
+          [
+          {value.map((id, index) => (
+            <span key={`${id}-${index}`}>
+              <Link
+                href={`/match/${id}`}
+                target="_blank"
+                className="text-blue-400 underline hover:text-blue-300"
+              >
+                "{id}"
+              </Link>
+              {index < value.length - 1 ? ", " : ""}
+            </span>
+          ))}
+          ]
+        </span>
+      );
+    }
+
+    return JSON.stringify(value);
+  };
+
+  return (
+    <div className="whitespace-pre-wrap">
+      {"{"}
+      {Object.entries(metadata).map(([key, value], index, array) => (
+        <div key={key} className="pl-4">
+          <span className="text-zinc-400">"{key}"</span>: {renderValue(key, value)}
+          {index < array.length - 1 ? "," : ""}
+        </div>
+      ))}
+      {"}"}
     </div>
   );
 }

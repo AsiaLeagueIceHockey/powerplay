@@ -22,6 +22,7 @@ interface AuditLogParams {
   description: string; // Human readable description for Notification & Log
   metadata?: Record<string, any>;
   skipPush?: boolean; // If true, only log to DB, don't ping SuperUsers
+  url?: string; // Optional URL for the push notification
 }
 
 /**
@@ -34,43 +35,46 @@ export async function logAndNotify({
   description,
   metadata = {},
   skipPush = false,
+  url = "/admin/audit-logs",
 }: AuditLogParams) {
   // Use `after` to execute independently of the response lifecycle
   after(async () => {
     try {
-      // 1. Log to DB (Using Admin Client or ignoring RLS if possible, but here we use createClient which uses cookie auth)
-      // Since `after` might run after response is sent, cookie might be tricky? 
-      // Actually `createClient` uses `cookies()` which is valid in Server Actions. 
-      // But inside `after`, the request context might be gone.
-      // Safer to use SERVICE_ROLE for background logging to ensure permissions.
-      
-
-
-      // We'll try standard client first. If `after` context loses auth, we might need Service Role.
-      // However, for simplicity and ensuring "SuperUser" visibility, let's just use standard client 
-      // but ensure 'Users can insert' RLS policy is in place (which we added).
-      
       const supabase = await createClient();
+
+      // Fetch user profile for standardized label: Name(Email)
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("full_name, email")
+        .eq("id", userId)
+        .single();
+
+      const userLabel = profile 
+        ? `${profile.full_name || "Unknown"}(${profile.email || "No Email"})`
+        : userId;
       
+      const finalDescription = `${userLabel}: ${description}`;
+
+      // 1. Log to DB
       const { error } = await supabase.from("audit_logs").insert({
         user_id: userId,
         action_type: action,
-        description,
+        description: finalDescription,
         metadata,
       });
 
       if (error) {
         console.error("[AUDIT] DB Log Failed:", error);
       } else {
-        console.log(`[AUDIT] Logged: ${action} - ${description}`);
+        console.log(`[AUDIT] Logged: ${action} - ${finalDescription}`);
       }
 
       // 2. Send Push Notification to SuperUsers
       if (!skipPush) {
         await sendPushToSuperUsers(
           `🔔 알림: ${action}`, // Title
-          description, // Body
-          "/admin/audit-logs" // URL (We'll point to a log page, or just admin home)
+          finalDescription, // Body
+          url // URL
         );
       }
 

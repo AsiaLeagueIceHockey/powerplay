@@ -414,7 +414,7 @@ export async function joinMatch(
   await logAndNotify({
     userId: user.id,
     action: "MATCH_JOIN",
-    description: `${participantName}님이 ${rinkName} ${auditMatchLabel}에 ${auditJoinLabel}했습니다. ${isRentalOptIn ? "(장비대여)" : ""}`,
+    description: `${rinkName} ${auditMatchLabel}에 ${auditJoinLabel}했습니다. ${isRentalOptIn ? "(장비대여)" : ""}`,
     metadata: { matchId, rinkName, status: participantStatus, amount: totalPoints, rental: isRentalOptIn },
   });
 
@@ -603,7 +603,7 @@ export async function cancelJoin(matchId: string) {
   await logAndNotify({
     userId: user.id,
     action: "MATCH_CANCEL",
-    description: `${user.email}님이 경기 참가를 취소했습니다. (환불: ${refundAmount.toLocaleString()}원)`,
+    description: `경기 참가를 취소했습니다. (환불: ${refundAmount.toLocaleString()}원)`,
     metadata: { matchId, refundAmount },
   });
 

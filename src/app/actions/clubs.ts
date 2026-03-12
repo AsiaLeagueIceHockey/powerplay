@@ -261,7 +261,7 @@ export async function createClub(formData: FormData) {
   await logAndNotify({
     userId: user.id,
     action: "CLUB_CREATE",
-    description: `${user.email}님이 새 동호회 '${name}'를 생성했습니다.`,
+    description: `새 동호회 '${name}'를 생성했습니다.`,
     metadata: { clubId: club.id, name },
   });
 

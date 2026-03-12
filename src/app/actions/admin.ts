@@ -136,7 +136,7 @@ export async function createMatch(formData: FormData) {
   await logAndNotify({
     userId: user.id,
     action: "MATCH_CREATE",
-    description: `${teamInfo}${creatorName}님이 새 매치를 생성했습니다. (일시: ${startTimeInput})`,
+    description: `${teamInfo}매치를 생성했습니다. (일시: ${startTimeInput})`,
     metadata: { matchId: data.id, rinkId, startTime: startTimeInput, clubId, creatorName },
   });
 
@@ -498,7 +498,7 @@ export async function deleteMatch(matchId: string) {
     await logAndNotify({
       userId: user.id,
       action: "MATCH_DELETE",
-      description: `${teamInfo}${creatorName}님이 ${rinkName} (${startTime}) 매치를 삭제했습니다.`,
+      description: `${teamInfo}${rinkName} (${startTime}) 매치를 삭제했습니다.`,
       metadata: { matchId, rinkName, startTime, creatorName },
     });
   }
@@ -611,7 +611,7 @@ export async function createBulkMatches(
   await logAndNotify({
     userId: user.id,
     action: "MATCH_CREATE",
-    description: `${teamInfo}${creatorName}님이 ${matches.length}개의 매치를 일괄 생성했습니다.`,
+    description: `${teamInfo}${matches.length}개의 매치를 일괄 생성했습니다.`,
     metadata: {
       matchIds: data?.map((d) => d.id),
       count: matches.length,
