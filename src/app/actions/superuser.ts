@@ -166,6 +166,7 @@ export interface ChargeRequestWithUser {
     id: string;
     email: string;
     full_name: string | null;
+    phone: string | null;
   } | null;
 }
 
@@ -191,7 +192,7 @@ export async function getPendingChargeRequests(): Promise<ChargeRequestWithUser[
       reject_reason,
       created_at,
       updated_at,
-      user:user_id(id, email, full_name)
+      user:user_id(id, email, full_name, phone)
     `
     )
     .eq("status", "pending")
@@ -232,7 +233,7 @@ export async function getAllChargeRequests(
       reject_reason,
       created_at,
       updated_at,
-      user:user_id(id, email, full_name)
+      user:user_id(id, email, full_name, phone)
     `
     )
     .order("created_at", { ascending: false })
@@ -683,6 +684,7 @@ export interface UserPointStatus {
   id: string;
   email: string;
   full_name: string | null;
+  phone: string | null;
   points: number;
 }
 
@@ -700,7 +702,7 @@ export async function getAllUserPoints(search?: string): Promise<UserPointStatus
   const isSuperUser = await checkIsSuperUser();
   if (!isSuperUser) return [];
 
-  let query = supabase.from("profiles").select("id, email, full_name, points").order("full_name");
+  let query = supabase.from("profiles").select("id, email, full_name, phone, points").order("full_name");
 
   if (search) {
      query = query.or(`email.ilike.%${search}%,full_name.ilike.%${search}%`);

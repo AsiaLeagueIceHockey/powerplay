@@ -8,6 +8,7 @@ import {
   type ChargeRequestWithUser,
 } from "@/app/actions/superuser";
 import { CircleDollarSign, Loader2, Check, X } from "lucide-react";
+import { CopyButton } from "./copy-button";
 
 interface Item {
   id: string;
@@ -132,6 +133,17 @@ export function ChargeRequestsList({
             <div>
               <p className="text-white font-medium">{item.userName}</p>
               <p className="text-xs text-zinc-500">{item.userEmail}</p>
+              {chargeRequests.find(r => r.id === item.id)?.user?.phone && (
+                <div className="flex items-center gap-2 mt-0.5">
+                  <a 
+                    href={`tel:${chargeRequests.find(r => r.id === item.id)?.user?.phone}`}
+                    className="text-[10px] text-blue-400 hover:text-blue-300 flex items-center gap-1"
+                  >
+                    📞 {chargeRequests.find(r => r.id === item.id)?.user?.phone}
+                  </a>
+                  <CopyButton text={chargeRequests.find(r => r.id === item.id)!.user!.phone!} showText={false} className="scale-75 origin-left" />
+                </div>
+              )}
             </div>
             <div className="text-right">
               <p className="text-xl text-amber-400 font-bold">

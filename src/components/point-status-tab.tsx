@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { Search, ChevronRight, Edit2, Loader2, Save, X } from "lucide-react";
+import { CopyButton } from "./copy-button";
 import { 
   getAllUserPoints, 
   getUserTransactionHistory, 
@@ -148,6 +149,14 @@ export function PointStatusTab({ initialUsers = [] }: PointStatusTabProps) {
                 <h2 className="text-xl font-bold text-white flex items-center gap-2">
                   {selectedUser.full_name}
                   <span className="text-sm font-normal text-zinc-400">({selectedUser.email})</span>
+                  {selectedUser.phone && (
+                    <div className="flex items-center gap-2 ml-2">
+                      <a href={`tel:${selectedUser.phone}`} className="text-xs font-normal text-blue-400 hover:text-blue-300">
+                        📞 {selectedUser.phone}
+                      </a>
+                      <CopyButton text={selectedUser.phone} showText={false} className="scale-75" />
+                    </div>
+                  )}
                 </h2>
                 <div className="mt-2 flex items-center gap-3">
                   <span className="text-zinc-400 text-sm">{t("currentPoints")}:</span>

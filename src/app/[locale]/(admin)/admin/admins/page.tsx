@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { ChevronRight, User, Users } from "lucide-react";
 import { UserManagementTab } from "@/components/user-management-tab";
+import { CopyButton } from "@/components/copy-button";
 
 export default async function AdminListPage({
     params,
@@ -112,7 +113,14 @@ export default async function AdminListPage({
                                                     {admin.email}
                                                 </td>
                                                 <td className="px-6 py-4 text-zinc-400 text-sm">
-                                                    {admin.phone || "-"}
+                                                    {admin.phone ? (
+                                                        <div className="flex items-center gap-2">
+                                                            <a href={`tel:${admin.phone}`} className="hover:text-blue-400 underline decoration-zinc-700 underline-offset-4 decoration-dashed transition-colors">
+                                                                {admin.phone}
+                                                            </a>
+                                                            <CopyButton text={admin.phone} showText={false} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                                                        </div>
+                                                    ) : "-"}
                                                 </td>
                                                 <td className="px-6 py-4 text-zinc-400 text-sm">
                                                     {/* @ts-ignore - Supabase type inference limitation */}

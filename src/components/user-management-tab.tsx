@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import { Search, ChevronDown, ChevronUp, User, Phone, Calendar, CreditCard, Shield, X } from "lucide-react";
 import type { UserProfile } from "@/app/actions/superuser";
+import { CopyButton } from "./copy-button";
 
 interface UserManagementTabProps {
   initialUsers: UserProfile[];
@@ -130,7 +131,7 @@ function UserDetailModal({
 
           {/* Info Grid */}
           <div className="grid grid-cols-2 gap-3">
-            <InfoItem icon={<Phone className="w-4 h-4" />} label="전화번호" value={user.phone || "-"} />
+            <InfoItem icon={<Phone className="w-4 h-4" />} label="전화번호" value={user.phone || "-"} isPhone />
             <InfoItem icon={<Calendar className="w-4 h-4" />} label="생년월일" value={user.birth_date || "-"} />
             <InfoItem
               icon={<CreditCard className="w-4 h-4" />}
@@ -183,11 +184,13 @@ function InfoItem({
   label,
   value,
   highlight,
+  isPhone,
 }: {
   icon: React.ReactNode;
   label: string;
   value: string;
   highlight?: boolean;
+  isPhone?: boolean;
 }) {
   return (
     <div className="bg-zinc-800/50 rounded-xl p-3 border border-zinc-700/50">
@@ -195,7 +198,16 @@ function InfoItem({
         {icon}
         <span className="text-[11px]">{label}</span>
       </div>
-      <p className={`text-sm font-medium ${highlight ? "text-emerald-400" : "text-zinc-200"}`}>{value}</p>
+      {isPhone && value !== "-" ? (
+        <div className="flex items-center justify-between gap-2">
+          <a href={`tel:${value}`} className="text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors">
+            {value}
+          </a>
+          <CopyButton text={value} showText={false} />
+        </div>
+      ) : (
+        <p className={`text-sm font-medium ${highlight ? "text-emerald-400" : "text-zinc-200"}`}>{value}</p>
+      )}
     </div>
   );
 }
@@ -349,7 +361,20 @@ export function UserManagementTab({ initialUsers }: UserManagementTabProps) {
 
                       {/* Phone */}
                       <td className="px-5 py-3.5 text-zinc-400 text-sm">
-                        {user.phone || (
+                        {user.phone ? (
+                          <div 
+                            className="flex items-center gap-2"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <a 
+                              href={`tel:${user.phone}`} 
+                              className="hover:text-blue-400 underline decoration-zinc-700 underline-offset-4 decoration-dashed transition-colors"
+                            >
+                              {user.phone}
+                            </a>
+                            <CopyButton text={user.phone} showText={false} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                          </div>
+                        ) : (
                           <span className="text-zinc-700">-</span>
                         )}
                       </td>
