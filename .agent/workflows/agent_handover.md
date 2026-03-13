@@ -13,6 +13,7 @@ At the beginning of every new thread or task, you MUST read `AGENTS.md` to under
 1. **Read AGENTS.md**
    - Use `view_file` to read the entire `AGENTS.md` file.
    - Pay close attention to the "Critical Development Guidelines" and "Roadmap".
+   - Then read `.agent/skills/codex-bootstrap/SKILL.md` and only the referenced files needed for the task.
 
 2. **Check Status**
    - Review the "Agent Handover Log" at the bottom of the file (if present) to understand the previous agent's status.

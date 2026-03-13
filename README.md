@@ -1,5 +1,11 @@
 # 🏒 Power Play (파워플레이)
 
+## Current Status Note
+
+- The canonical implementation guide is `AGENTS.md`.
+- The fastest Codex bootstrap path is `.agent/skills/codex-bootstrap/SKILL.md`.
+- Some sections below reflect the original planning state. When README and code differ, trust `AGENTS.md`, `.agent`, and the current `src/` + `sql/` tree.
+
 > **Global Standard Ice Hockey Match Management Platform**
 >
 > *"No more copy-pasting. Manage your roster, payments, and team balance with a single link."*
