@@ -175,17 +175,19 @@ export async function sendMessage(roomId: string, content: string, receiverId: s
     return { error: "Not authenticated" };
   }
 
-  const { error: insertError } = await supabase
+  const { data: newMessage, error: insertError } = await supabase
     .from("chat_messages")
     .insert({
       room_id: roomId,
       sender_id: user.id,
       content,
-    });
+    })
+    .select()
+    .single();
 
-  if (insertError) {
+  if (insertError || !newMessage) {
     console.error("Error sending message:", insertError);
-    return { error: insertError.message };
+    return { error: insertError?.message || "Failed to insert message" };
   }
 
   // Get sender's profile for the push notification title
@@ -209,7 +211,7 @@ export async function sendMessage(roomId: string, content: string, receiverId: s
     `/chat/${roomId}`
   );
 
-  return { success: true };
+  return { success: true, message: newMessage };
 }
 
 // ============================================

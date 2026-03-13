@@ -68,10 +68,30 @@ export function ChatRoomClient({
           if (newMessage.room_id !== roomId) return;
 
           setMessages((prev) => {
-            // Prevent duplicates if the message was already added optimistically
+            // 1. Prevent exact ID duplicates
             if (prev.some((msg) => msg.id === newMessage.id)) {
               return prev;
             }
+
+            // 2. If it's my message, try to find and replace the optimistic one
+            if (newMessage.sender_id === currentUserId) {
+              // Find a message with a temporary ID (UUIDv4) that matches content
+              // crypto.randomUUID() generates a UUID, so we can check for that
+              // or just look for any message from me that isn't the real ID yet
+              const optimisticIdx = prev.findLastIndex(
+                (msg) => 
+                  msg.sender_id === currentUserId && 
+                  msg.content === newMessage.content &&
+                  msg.id.length > 30 // Rough check for UUID length
+              );
+
+              if (optimisticIdx !== -1) {
+                const newMessages = [...prev];
+                newMessages[optimisticIdx] = newMessage;
+                return newMessages;
+              }
+            }
+
             return [...prev, newMessage];
           });
           
@@ -131,11 +151,11 @@ export function ChatRoomClient({
       // Remove optimistic message on error and show alert
       setMessages((prev) => prev.filter(msg => msg.id !== tempId));
       alert("Failed to send message: " + result.error);
-    } else {
-      // We don't need to do anything else here because the Realtime INSERT event 
-      // will eventually match the sent message. 
-      // However, to ensure smooth transition, we might want to replace the tempId message with the real one
-      // but Supabase Realtime 'INSERT' usually comes back with the real ID.
+    } else if (result.message) {
+      // Replace optimistic message with real message
+      setMessages((prev) => 
+        prev.map((msg) => msg.id === tempId ? result.message : msg)
+      );
     }
 
     setIsSending(false);
