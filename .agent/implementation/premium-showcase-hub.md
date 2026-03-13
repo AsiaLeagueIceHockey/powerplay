@@ -59,31 +59,57 @@ This hub should support:
 - [x] Finalize partner subscription entitlement model
 - [x] Finalize content model: showcase + schedule/event cards
 - [x] Finalize supported CTA link types
-- [ ] Define v1 analytics scope (impression/click metrics)
+- [x] Define v1 analytics scope (impression/click metrics + CTA breakdown + detail click tracking)
 
 ### Phase 2: Data Model
-- [ ] Design subscription tables for partner membership period and status
-- [ ] Design partner listing table and categories
-- [ ] Design optional partner events / schedule model if included in v1
-- [ ] Design analytics event storage
-- [ ] Create SQL migration plan with RLS
+- [x] Design subscription tables for partner membership period and status
+- [x] Design partner listing table and categories
+- [x] Design optional partner events / schedule model if included in v1
+- [x] Design analytics event storage
+- [x] Create SQL migration plan with RLS
 
 ### Phase 3: Admin / SuperUser UX
-- [ ] Add admin partners entry page
-- [ ] Show marketing/paywall page for non-subscribers
-- [ ] Show expired-state renewal page for lapsed subscribers
-- [ ] Build partner publishing UI for active subscribers
-- [ ] Build superuser controls for subscription contract start/end management
+- [x] Add admin partners entry page
+- [x] Show marketing/paywall page for non-subscribers
+- [x] Show expired-state renewal page for lapsed subscribers
+- [x] Build partner publishing UI for active subscribers
+- [x] Build superuser controls for subscription contract start/end management
 
 ### Phase 4: Public UX
-- [ ] Add new bottom navigation tab
-- [ ] Add home promotional banner entry
-- [ ] Build public partners discovery page
-- [ ] Build partner detail page / CTA routing
-- [ ] Track impressions and clicks
+- [x] Add new bottom navigation tab
+- [x] Add home promotional banner entry
+- [x] Build public partners discovery page
+- [x] Build partner detail page / CTA routing
+- [x] Track impressions and clicks
 
 ### Phase 5: Polish / TODOs
-- [ ] Reserve space for future premium extras
-- [ ] Add i18n keys (KR/EN)
-- [ ] Add verification plan
-- [ ] Commit in small checkpoints during implementation
+- [x] Reserve space for future premium extras
+- [x] Add i18n keys (KR/EN)
+- [x] Add verification plan
+- [x] Commit in small checkpoints during implementation
+
+## Current State
+
+- SQL `v33_lounge_memberships.sql` is applied.
+- Public lounge supports:
+  - listing page
+  - business detail page
+  - event list/calendar discovery
+  - CTA tracking for phone / Kakao / Instagram / website
+  - `detail` click tracking from business cards and event cards
+- Admin lounge supports:
+  - paywall / expired renewal state
+  - one representative business editor
+  - multiple lounge event creation and deletion
+  - summary metrics + CTA click breakdown
+  - superuser manual membership contract entry
+
+## Remaining Next Slice
+
+- exposure ordering / featured ranking rules
+- event editing UX
+- richer analytics dashboard:
+  - date trend
+  - per-event conversion
+  - source attribution from banner vs direct tab
+- media optimization for remote lounge images

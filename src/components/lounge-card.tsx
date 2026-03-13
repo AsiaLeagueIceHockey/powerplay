@@ -1,12 +1,14 @@
 "use client";
 
-import { Globe, Instagram, MessageCircle, Phone, Sparkles } from "lucide-react";
+import { ArrowRight, Globe, Instagram, MessageCircle, Phone, Sparkles } from "lucide-react";
 import type { LoungeBusiness } from "@/app/actions/lounge";
 import { LoungeCtaButton } from "./lounge-cta-button";
+import { LoungeDetailLink } from "./lounge-detail-link";
 import { LoungeImpressionTracker } from "./lounge-impression-tracker";
 
 export function LoungeCard({ business, locale }: { business: LoungeBusiness; locale: string }) {
   const upcomingCount = business.upcoming_events?.length ?? 0;
+  const detailHref = `/${locale}/lounge/${business.id}`;
   const categoryLabel = {
     lesson: locale === "ko" ? "하키 레슨" : "Lessons",
     training_center: locale === "ko" ? "훈련장 / 슈팅센터" : "Training Center",
@@ -51,6 +53,17 @@ export function LoungeCard({ business, locale }: { business: LoungeBusiness; loc
           </span>
         ) : null}
       </div>
+
+      <LoungeDetailLink
+        entityType="business"
+        businessId={business.id}
+        href={detailHref}
+        locale={locale}
+        className="mb-4 flex w-full items-center justify-between rounded-xl border border-amber-200 bg-amber-50 px-3.5 py-3 text-sm font-semibold text-amber-800 transition-colors hover:bg-amber-100 dark:border-amber-900/40 dark:bg-amber-900/10 dark:text-amber-200 dark:hover:bg-amber-900/20"
+      >
+        <span>{locale === "ko" ? "상세 페이지에서 일정과 소개 더 보기" : "See full profile and schedule"}</span>
+        <ArrowRight className="h-4 w-4" />
+      </LoungeDetailLink>
 
       <div className="grid grid-cols-2 gap-2">
         <LoungeCtaButton

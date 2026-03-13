@@ -6,6 +6,8 @@ import { getAdminInfo } from "./admin-check";
 import { getAdmins } from "./admin";
 import { checkIsSuperUser } from "./superuser";
 
+type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
+
 export type LoungeBusinessCategory =
   | "lesson"
   | "training_center"
@@ -139,6 +141,57 @@ async function getLatestMembership(userId: string) {
   return (data as LoungeMembership | null) ?? null;
 }
 
+async function getActivePublishedBusinesses(supabase: SupabaseServerClient) {
+  const { data: businesses } = await supabase
+    .from("lounge_businesses")
+    .select("*")
+    .eq("is_published", true)
+    .order("created_at", { ascending: false });
+
+  const businessRows = (businesses as LoungeBusiness[] | null) ?? [];
+  if (businessRows.length === 0) {
+    return [];
+  }
+
+  const ownerIds = businessRows.map((business) => business.owner_user_id);
+  const { data: memberships } = await supabase
+    .from("lounge_memberships")
+    .select("user_id, starts_at, ends_at, status")
+    .in("user_id", ownerIds);
+
+  const activeOwnerIds = new Set(
+    ((memberships as Array<Pick<LoungeMembership, "user_id" | "starts_at" | "ends_at" | "status">> | null) ?? [])
+      .filter((membership) => {
+        if (membership.status !== "active") return false;
+        const now = new Date();
+        return new Date(membership.starts_at) <= now && new Date(membership.ends_at) >= now;
+      })
+      .map((membership) => membership.user_id)
+  );
+
+  return businessRows.filter((business) => activeOwnerIds.has(business.owner_user_id));
+}
+
+async function getUpcomingPublishedEvents(
+  supabase: SupabaseServerClient,
+  businessIds: string[]
+) {
+  if (businessIds.length === 0) {
+    return [];
+  }
+
+  const { data: events } = await supabase
+    .from("lounge_events")
+    .select("*")
+    .in("business_id", businessIds)
+    .eq("is_published", true)
+    .order("start_time", { ascending: true });
+
+  return ((events as LoungeEvent[] | null) ?? []).filter(
+    (event) => new Date(event.start_time) >= new Date()
+  );
+}
+
 export async function getLoungeAdminPageData() {
   const supabase = await createClient();
   const adminInfo = await getAdminInfo();
@@ -213,49 +266,14 @@ export async function getPublicLoungeData(): Promise<{
   events: LoungeEvent[];
 }> {
   const supabase = await createClient();
-
-  const { data: businesses } = await supabase
-    .from("lounge_businesses")
-    .select("*")
-    .eq("is_published", true)
-    .order("created_at", { ascending: false });
-
-  const businessRows = (businesses as LoungeBusiness[] | null) ?? [];
-  if (businessRows.length === 0) {
-    return { businesses: [], events: [] };
-  }
-
-  const ownerIds = businessRows.map((business) => business.owner_user_id);
-  const { data: memberships } = await supabase
-    .from("lounge_memberships")
-    .select("user_id, starts_at, ends_at, status")
-    .in("user_id", ownerIds);
-
-  const activeOwnerIds = new Set(
-    ((memberships as Array<Pick<LoungeMembership, "user_id" | "starts_at" | "ends_at" | "status">> | null) ?? [])
-      .filter((membership) => {
-        if (membership.status !== "active") return false;
-        const now = new Date();
-        return new Date(membership.starts_at) <= now && new Date(membership.ends_at) >= now;
-      })
-      .map((membership) => membership.user_id)
-  );
-
-  const activeBusinesses = businessRows.filter((business) => activeOwnerIds.has(business.owner_user_id));
+  const activeBusinesses = await getActivePublishedBusinesses(supabase);
   if (activeBusinesses.length === 0) {
     return { businesses: [], events: [] };
   }
 
-  const businessIds = activeBusinesses.map((business) => business.id);
-  const { data: events } = await supabase
-    .from("lounge_events")
-    .select("*")
-    .in("business_id", businessIds)
-    .eq("is_published", true)
-    .order("start_time", { ascending: true });
-
-  const upcomingEvents = ((events as LoungeEvent[] | null) ?? []).filter(
-    (event) => new Date(event.start_time) >= new Date()
+  const upcomingEvents = await getUpcomingPublishedEvents(
+    supabase,
+    activeBusinesses.map((business) => business.id)
   );
 
   const eventsByBusiness = new Map<string, LoungeEvent[]>();
@@ -271,6 +289,37 @@ export async function getPublicLoungeData(): Promise<{
       upcoming_events: eventsByBusiness.get(business.id) ?? [],
     })),
     events: upcomingEvents,
+  };
+}
+
+export async function getPublicLoungeBusinessDetail(businessId: string): Promise<{
+  business: LoungeBusiness | null;
+  events: LoungeEvent[];
+  relatedBusinesses: LoungeBusiness[];
+}> {
+  const supabase = await createClient();
+  const activeBusinesses = await getActivePublishedBusinesses(supabase);
+  const business = activeBusinesses.find((item) => item.id === businessId) ?? null;
+
+  if (!business) {
+    return {
+      business: null,
+      events: [],
+      relatedBusinesses: [],
+    };
+  }
+
+  const events = await getUpcomingPublishedEvents(supabase, [business.id]);
+
+  return {
+    business: {
+      ...business,
+      upcoming_events: events,
+    },
+    events,
+    relatedBusinesses: activeBusinesses
+      .filter((item) => item.id !== business.id)
+      .slice(0, 3),
   };
 }
 
@@ -325,6 +374,10 @@ export async function upsertLoungeBusiness(formData: FormData) {
   revalidatePath("/en/lounge");
   revalidatePath("/ko/admin/lounge");
   revalidatePath("/en/admin/lounge");
+  if (existing?.id) {
+    revalidatePath(`/ko/lounge/${existing.id}`);
+    revalidatePath(`/en/lounge/${existing.id}`);
+  }
   return { success: true };
 }
 
@@ -383,6 +436,8 @@ export async function createLoungeEvent(formData: FormData) {
   revalidatePath("/en/lounge");
   revalidatePath("/ko/admin/lounge");
   revalidatePath("/en/admin/lounge");
+  revalidatePath(`/ko/lounge/${business.id}`);
+  revalidatePath(`/en/lounge/${business.id}`);
   return { success: true };
 }
 
@@ -394,6 +449,17 @@ export async function deleteLoungeEvent(eventId: string) {
     return { success: false, error: "Unauthorized" };
   }
 
+  const { data: existingEvent } = await supabase
+    .from("lounge_events")
+    .select("id, business_id, lounge_businesses!inner(owner_user_id)")
+    .eq("id", eventId)
+    .eq("lounge_businesses.owner_user_id", adminInfo.userId)
+    .maybeSingle();
+
+  if (!existingEvent) {
+    return { success: false, error: "Event not found" };
+  }
+
   const { error } = await supabase.from("lounge_events").delete().eq("id", eventId);
   if (error) {
     return { success: false, error: error.message };
@@ -403,6 +469,8 @@ export async function deleteLoungeEvent(eventId: string) {
   revalidatePath("/en/lounge");
   revalidatePath("/ko/admin/lounge");
   revalidatePath("/en/admin/lounge");
+  revalidatePath(`/ko/lounge/${existingEvent.business_id}`);
+  revalidatePath(`/en/lounge/${existingEvent.business_id}`);
   return { success: true };
 }
 
