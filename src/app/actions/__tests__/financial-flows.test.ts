@@ -20,7 +20,7 @@ vi.mock('@/lib/audit', () => ({
 }));
 
 vi.mock('../points', async (importOriginal) => {
-  const actual = await importOriginal();
+  const actual = await importOriginal<typeof import('../points')>();
   return {
     ...actual,
     calculateRefundPercent: vi.fn(), 

@@ -6,7 +6,10 @@
     "dev": "concurrently -p none \"serwist build --watch\" \"next dev\"",
     "build": "next build && serwist build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@sentry/nextjs": "^10.38.0",
