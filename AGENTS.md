@@ -664,3 +664,15 @@ UPDATE profiles SET role = 'superuser' WHERE email = 'your-email@example.com';
   - Added `npm run test`, `npm run test:watch`, `npm run typecheck`
   - Updated `README.md` and `AGENTS.md` to point to canonical sources
 - **Next Steps**: Keep the bootstrap references aligned whenever major routes, env usage, or SQL milestones change.
+### [2026-03-14] Lounge Foundation
+- **Summary**: Started the new `라운지 / Lounge` premium membership feature on a dedicated branch with DB schema, public page, admin page, bottom-nav/banner entry points, and superuser membership management foundation.
+- **Changes**:
+  - Added `sql/v33_lounge_memberships.sql`
+  - Added `src/app/actions/lounge.ts`
+  - Added public route `src/app/[locale]/(public)/lounge/page.tsx`
+  - Added admin route `src/app/[locale]/(admin)/admin/lounge/page.tsx`
+  - Added lounge components for cards, calendar, CTA tracking, business/event forms, and membership manager
+  - Updated `src/components/bottom-nav.tsx` and `src/components/feedback-banner.tsx` to expose Lounge
+  - Updated `src/app/[locale]/(admin)/admin/layout.tsx` to expose admin Lounge entry
+  - Updated `.agent/implementation/premium-showcase-hub.md` with the confirmed `라운지 / Lounge` naming and v1 scope
+- **Next Steps**: Apply `sql/v33_lounge_memberships.sql`, review UI/UX in preview, then iterate on ranking/exposure rules, richer media handling, event editing, and analytics dashboards.
