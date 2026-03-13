@@ -10,6 +10,7 @@ interface LoungeDetailLinkProps {
   href: string;
   locale: string;
   eventId?: string;
+  source?: string;
   className?: string;
   children: ReactNode;
 }
@@ -20,6 +21,7 @@ export function LoungeDetailLink({
   href,
   locale,
   eventId,
+  source,
   className = "",
   children,
 }: LoungeDetailLinkProps) {
@@ -28,7 +30,7 @@ export function LoungeDetailLink({
 
   const handleClick = () => {
     startTransition(async () => {
-      await trackLoungeClick(entityType, businessId, "detail", eventId, locale);
+      await trackLoungeClick(entityType, businessId, "detail", eventId, locale, source);
       router.push(href);
     });
   };

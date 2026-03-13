@@ -10,6 +10,7 @@ interface LoungeCtaButtonProps {
   ctaType: LoungeCtaType;
   url: string | null | undefined;
   locale: string;
+  source?: string;
   className?: string;
   children: ReactNode;
 }
@@ -21,6 +22,7 @@ export function LoungeCtaButton({
   ctaType,
   url,
   locale,
+  source,
   className = "",
   children,
 }: LoungeCtaButtonProps) {
@@ -30,7 +32,7 @@ export function LoungeCtaButton({
     if (!url) return;
 
     startTransition(async () => {
-      await trackLoungeClick(entityType, businessId, ctaType, eventId, locale);
+      await trackLoungeClick(entityType, businessId, ctaType, eventId, locale, source);
     });
 
     if (ctaType === "phone") {

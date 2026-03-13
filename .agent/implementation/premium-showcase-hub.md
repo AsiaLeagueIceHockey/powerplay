@@ -91,17 +91,22 @@ This hub should support:
 ## Current State
 
 - SQL `v33_lounge_memberships.sql` is applied.
+- Next SQL to apply: `v34_lounge_priority_and_sources.sql`
 - Public lounge supports:
   - listing page
   - business detail page
   - event list/calendar discovery
   - CTA tracking for phone / Kakao / Instagram / website
   - `detail` click tracking from business cards and event cards
+  - source attribution from bottom nav / home banner
+  - source-preserving detail navigation
 - Admin lounge supports:
   - paywall / expired renewal state
   - one representative business editor
-  - multiple lounge event creation and deletion
-  - summary metrics + CTA click breakdown
+  - multiple lounge event creation, editing, and deletion
+  - business / event display priority controls
+  - summary metrics + CTA click breakdown + source attribution
+  - recent daily trend and per-event performance blocks
   - superuser manual membership contract entry
 
 ## Remaining Next Slice
@@ -109,7 +114,6 @@ This hub should support:
 - exposure ordering / featured ranking rules
 - event editing UX
 - richer analytics dashboard:
-  - date trend
-  - per-event conversion
-  - source attribution from banner vs direct tab
+  - separate impression vs click source attribution
+  - richer filters / longer history
 - media optimization for remote lounge images

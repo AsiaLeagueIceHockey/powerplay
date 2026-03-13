@@ -6,9 +6,17 @@ import { LoungeCtaButton } from "./lounge-cta-button";
 import { LoungeDetailLink } from "./lounge-detail-link";
 import { LoungeImpressionTracker } from "./lounge-impression-tracker";
 
-export function LoungeCard({ business, locale }: { business: LoungeBusiness; locale: string }) {
+export function LoungeCard({
+  business,
+  locale,
+  source,
+}: {
+  business: LoungeBusiness;
+  locale: string;
+  source?: string;
+}) {
   const upcomingCount = business.upcoming_events?.length ?? 0;
-  const detailHref = `/${locale}/lounge/${business.id}`;
+  const detailHref = `/${locale}/lounge/${business.id}${source ? `?source=${encodeURIComponent(source)}` : ""}`;
   const categoryLabel = {
     lesson: locale === "ko" ? "하키 레슨" : "Lessons",
     training_center: locale === "ko" ? "훈련장 / 슈팅센터" : "Training Center",
@@ -19,7 +27,7 @@ export function LoungeCard({ business, locale }: { business: LoungeBusiness; loc
 
   return (
     <article className="relative rounded-xl border border-zinc-200 bg-white p-5 shadow-sm transition-all duration-300 hover:border-amber-500 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900">
-      <LoungeImpressionTracker entityType="business" businessId={business.id} locale={locale} />
+      <LoungeImpressionTracker entityType="business" businessId={business.id} locale={locale} source={source} />
       <div className="absolute inset-x-0 top-0 h-1 rounded-t-xl bg-gradient-to-r from-amber-400 via-orange-500 to-red-500" />
       <div className="mb-4 flex items-start justify-between gap-3">
         <div>
@@ -59,6 +67,7 @@ export function LoungeCard({ business, locale }: { business: LoungeBusiness; loc
         businessId={business.id}
         href={detailHref}
         locale={locale}
+        source={source}
         className="mb-4 flex w-full items-center justify-between rounded-xl border border-amber-200 bg-amber-50 px-3.5 py-3 text-sm font-semibold text-amber-800 transition-colors hover:bg-amber-100 dark:border-amber-900/40 dark:bg-amber-900/10 dark:text-amber-200 dark:hover:bg-amber-900/20"
       >
         <span>{locale === "ko" ? "상세 페이지에서 일정과 소개 더 보기" : "See full profile and schedule"}</span>
@@ -72,6 +81,7 @@ export function LoungeCard({ business, locale }: { business: LoungeBusiness; loc
           ctaType="phone"
           url={business.phone ? `tel:${business.phone}` : null}
           locale={locale}
+          source={source}
           className="flex items-center justify-center gap-2 rounded-xl bg-zinc-900 px-3 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40 dark:bg-zinc-100 dark:text-zinc-900"
         >
           <Phone className="h-4 w-4" />
@@ -83,6 +93,7 @@ export function LoungeCard({ business, locale }: { business: LoungeBusiness; loc
           ctaType="kakao"
           url={business.kakao_open_chat_url}
           locale={locale}
+          source={source}
           className="flex items-center justify-center gap-2 rounded-xl bg-[#FEE500] px-3 py-2.5 text-sm font-semibold text-[#3B1E1E] disabled:cursor-not-allowed disabled:opacity-40"
         >
           <MessageCircle className="h-4 w-4" />
@@ -94,6 +105,7 @@ export function LoungeCard({ business, locale }: { business: LoungeBusiness; loc
           ctaType="instagram"
           url={business.instagram_url}
           locale={locale}
+          source={source}
           className="flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045] px-3 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40"
         >
           <Instagram className="h-4 w-4" />
@@ -105,6 +117,7 @@ export function LoungeCard({ business, locale }: { business: LoungeBusiness; loc
           ctaType="website"
           url={business.website_url}
           locale={locale}
+          source={source}
           className="flex items-center justify-center gap-2 rounded-xl border border-zinc-200 px-3 py-2.5 text-sm font-semibold text-zinc-700 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-700 dark:text-zinc-200"
         >
           <Globe className="h-4 w-4" />

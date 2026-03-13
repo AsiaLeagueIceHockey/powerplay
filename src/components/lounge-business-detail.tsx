@@ -13,6 +13,7 @@ interface LoungeBusinessDetailProps {
   events: LoungeEvent[];
   relatedBusinesses: LoungeBusiness[];
   locale: string;
+  source?: string;
 }
 
 export function LoungeBusinessDetail({
@@ -20,6 +21,7 @@ export function LoungeBusinessDetail({
   events,
   relatedBusinesses,
   locale,
+  source,
 }: LoungeBusinessDetailProps) {
   const formatter = new Intl.DateTimeFormat(locale === "ko" ? "ko-KR" : "en-US", {
     month: "long",
@@ -50,7 +52,7 @@ export function LoungeBusinessDetail({
       </Link>
 
       <section className="overflow-hidden rounded-[28px] border border-amber-200/60 bg-white shadow-sm dark:border-amber-900/40 dark:bg-zinc-950">
-        <LoungeImpressionTracker entityType="business" businessId={business.id} locale={locale} />
+        <LoungeImpressionTracker entityType="business" businessId={business.id} locale={locale} source={source} />
         {business.cover_image_url ? (
           <img
             src={business.cover_image_url}
@@ -94,6 +96,7 @@ export function LoungeBusinessDetail({
                 ctaType="phone"
                 url={business.phone ? `tel:${business.phone}` : null}
                 locale={locale}
+                source={source}
                 className="flex items-center justify-center gap-2 rounded-xl bg-zinc-900 px-3 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40 dark:bg-zinc-100 dark:text-zinc-900"
               >
                 <Phone className="h-4 w-4" />
@@ -105,6 +108,7 @@ export function LoungeBusinessDetail({
                 ctaType="kakao"
                 url={business.kakao_open_chat_url}
                 locale={locale}
+                source={source}
                 className="flex items-center justify-center gap-2 rounded-xl bg-[#FEE500] px-3 py-2.5 text-sm font-semibold text-[#3B1E1E] disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <MessageCircle className="h-4 w-4" />
@@ -116,6 +120,7 @@ export function LoungeBusinessDetail({
                 ctaType="instagram"
                 url={business.instagram_url}
                 locale={locale}
+                source={source}
                 className="flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045] px-3 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <Instagram className="h-4 w-4" />
@@ -127,6 +132,7 @@ export function LoungeBusinessDetail({
                 ctaType="website"
                 url={business.website_url}
                 locale={locale}
+                source={source}
                 className="flex items-center justify-center gap-2 rounded-xl border border-zinc-200 px-3 py-2.5 text-sm font-semibold text-zinc-700 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-700 dark:text-zinc-200"
               >
                 <Globe className="h-4 w-4" />
@@ -219,6 +225,7 @@ export function LoungeBusinessDetail({
                 event={event}
                 business={business}
                 locale={locale}
+                source={source}
               />
             ))}
           </div>
@@ -237,7 +244,7 @@ export function LoungeBusinessDetail({
           </div>
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {relatedBusinesses.map((item) => (
-              <LoungeCard key={item.id} business={item} locale={locale} />
+              <LoungeCard key={item.id} business={item} locale={locale} source={source} />
             ))}
           </div>
         </section>
