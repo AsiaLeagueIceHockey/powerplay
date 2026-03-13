@@ -1,7 +1,8 @@
 "use client";
 
-import { CalendarDays, MapPin } from "lucide-react";
+import { ArrowRight, CalendarDays, MapPin } from "lucide-react";
 import type { LoungeBusiness, LoungeEvent } from "@/app/actions/lounge";
+import { LoungeDetailLink } from "./lounge-detail-link";
 import { LoungeImpressionTracker } from "./lounge-impression-tracker";
 import { LoungeCtaButton } from "./lounge-cta-button";
 
@@ -63,6 +64,20 @@ export function LoungeEventCard({
       </div>
 
       {event.summary ? <p className="mb-4 text-sm leading-6 text-zinc-600 dark:text-zinc-300">{event.summary}</p> : null}
+
+      <div className="mb-3">
+        <LoungeDetailLink
+          entityType="event"
+          businessId={event.business_id}
+          eventId={event.id}
+          href={`/${locale}/lounge/${event.business_id}`}
+          locale={locale}
+          className="flex w-full items-center justify-between rounded-xl border border-zinc-200 px-3.5 py-2.5 text-sm font-semibold text-zinc-700 transition-colors hover:border-amber-300 hover:bg-amber-50 dark:border-zinc-700 dark:text-zinc-200 dark:hover:border-amber-900/40 dark:hover:bg-amber-900/10"
+        >
+          <span>{locale === "ko" ? "사업장 상세 보기" : "View business details"}</span>
+          <ArrowRight className="h-4 w-4" />
+        </LoungeDetailLink>
+      </div>
 
       <div className="flex flex-wrap gap-2">
         <LoungeCtaButton
