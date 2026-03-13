@@ -83,6 +83,12 @@ export default async function AdminLayout({
             >
               🏟️ {t("menu.rinks")}
             </Link>
+            <Link
+              href={`/${locale}/admin/lounge`}
+              className="block rounded-lg px-4 py-2.5 text-sm font-medium text-zinc-300 hover:bg-zinc-800 hover:text-white"
+            >
+              ✨ {locale === "ko" ? "라운지" : "Lounge"}
+            </Link>
 
             {/* SuperUser Only Menus */}
             {isSuperUser && (
@@ -158,6 +164,13 @@ export default async function AdminLayout({
           <span className="text-xl">🏟️</span>
           <span className="text-xs">{t("menu.rinksShort")}</span>
         </Link>
+        <Link
+          href={`/${locale}/admin/lounge`}
+          className="flex flex-col items-center gap-1 px-4 py-2 text-zinc-400 hover:text-white"
+        >
+          <span className="text-xl">✨</span>
+          <span className="text-xs">{locale === "ko" ? "라운지" : "Lounge"}</span>
+        </Link>
         {isSuperUser && (
           <>
             <Link
@@ -194,4 +207,3 @@ export default async function AdminLayout({
     </div>
   );
 }
-

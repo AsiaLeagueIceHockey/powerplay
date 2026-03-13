@@ -15,10 +15,10 @@ This hub should support:
 
 ### Recommended
 
-- `파트너` / `Partners`
-  - Broad enough for lessons, off-ice centers, tournaments, and brands
-  - Feels premium and durable
-  - Works as a business-facing paid membership zone
+- `라운지` / `Lounge`
+  - Covers lessons, training centers, tournaments, and brands without sounding ad-only
+  - Feels premium and community-adjacent
+  - Works for both public discovery and paid partner positioning
 
 ### Alternatives
 
@@ -32,10 +32,10 @@ This hub should support:
 ## Working Assumptions
 
 - Internal feature name: `premium-showcase-hub`
-- Tentative public tab label: `파트너`
-- New bottom nav order: `홈 > 파트너 > 채팅 > 마이페이지`
-- Public route: `/${locale}/partners`
-- Admin route: `/${locale}/admin/partners`
+- Public tab label: `라운지`
+- New bottom nav order: `홈 > 라운지 > 채팅 > 마이페이지`
+- Public route: `/${locale}/lounge`
+- Admin route: `/${locale}/admin/lounge`
 - First version uses manual subscription confirmation by SuperUser after bank transfer or external inquiry
 - Partner posts drive users to external contact methods, not in-platform payment
 - Categories start with:
@@ -46,19 +46,19 @@ This hub should support:
 
 ## Open Questions
 
-- Should paid partners also require global `admin` access, or do we need a separate role / entitlement?
-- Is one partner account tied to one business listing, or can one subscriber publish multiple listings?
-- Should lessons support date-based schedule cards in v1, or should v1 stay closer to a business showcase with optional event cards?
-- What exact external CTAs should be supported in v1: phone, Kakao open chat, Instagram, website?
+- Admin role is reused, but only while the stored lounge subscription period is active.
+- One subscribed account can publish exactly one representative business profile.
+- V1 includes both business showcase cards and lesson/event schedule cards with calendar exposure.
+- Supported v1 CTAs: phone, Kakao open chat, Instagram, website.
 - Is exposure ranking curated manually, newest-first, or boosted by subscription tier?
 
 ## TODO
 
 ### Phase 1: Product Definition
-- [ ] Finalize public tab naming
-- [ ] Finalize partner subscription entitlement model
-- [ ] Finalize content model: showcase page only vs showcase + schedule/event cards
-- [ ] Finalize supported CTA link types
+- [x] Finalize public tab naming
+- [x] Finalize partner subscription entitlement model
+- [x] Finalize content model: showcase + schedule/event cards
+- [x] Finalize supported CTA link types
 - [ ] Define v1 analytics scope (impression/click metrics)
 
 ### Phase 2: Data Model
