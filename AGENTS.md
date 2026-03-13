@@ -30,8 +30,23 @@ Use `npm run <command>` to execute the following scripts:
 | `build` | Creates a production build (`next build`). |
 | `start` | Starts a production server (`next start`). |
 | `lint` | Runs ESLint to check for code quality issues (`eslint`). |
+| `test` | Runs Vitest in run mode (`vitest run`). |
+| `test:watch` | Runs Vitest in watch mode (`vitest`). |
+| `typecheck` | Runs TypeScript type-checking (`tsc --noEmit`). |
 
-**Note:** There is no dedicated test script. Ensure code is high quality and manually verify changes.
+**Note:** Manual verification is still required for UI and data flows even when lint/tests pass.
+
+## 🤖 Codex Bootstrap Sources
+
+When starting work, treat these as the fastest reliable context sources:
+
+1. `AGENTS.md`
+2. `.agent/skills/codex-bootstrap/SKILL.md`
+3. `.agent/skills/codex-bootstrap/references/project-map.md`
+4. `.agent/skills/codex-bootstrap/references/task-runbook.md`
+5. `.agent/skills/codex-bootstrap/references/env-checklist.md`
+
+**Important:** `README.md` contains some earlier planning-era context. If it conflicts with code, trust `AGENTS.md`, `.agent`, and the current `src/` + `sql/` tree.
 
 ---
 
@@ -54,7 +69,7 @@ Use `npm run <command>` to execute the following scripts:
 ### 4. Data Patterns
 - **Soft Deletes**: Never permanently delete user profiles. Instead, set the `profiles.deleted_at` timestamp.
 - **Parallel Fetching**: For independent data fetching operations, use `Promise.all()` to improve performance.
-- **Schema Changes**: All database schema modifications must be logged in `schema_changes.sql`.
+- **Schema Changes**: All database schema modifications must be added in `sql/v{next}_{description}.sql`.
 
 ---
 
@@ -661,3 +676,15 @@ UPDATE profiles SET role = 'superuser' WHERE email = 'your-email@example.com';
   - **Layout Isolation**: Moved the `onboarding` page routing directory natively outside of the `(public)` group to naturally shed any inherited Layout bindings.
   - **Form Updates**: Supercharged `OnboardingForm` to require `hockeyStartDate`, `stickDirection`, and `detailedPositions` in its validation logic before form submission is enabled. 
 - **Next Steps**: Monitor sign-up completion rates.
+### [2026-03-13] Codex Bootstrap Setup
+- **Summary**: Added a Codex bootstrap layer so future agents can load the current architecture, env requirements, and task checklists quickly without depending on stale docs.
+- **Changes**:
+  - Added `.agent/skills/codex-bootstrap/SKILL.md`
+  - Added `.agent/skills/codex-bootstrap/references/project-map.md`
+  - Added `.agent/skills/codex-bootstrap/references/task-runbook.md`
+  - Added `.agent/skills/codex-bootstrap/references/env-checklist.md`
+  - Updated `.agent/workflows/agent_handover.md` to include the bootstrap skill
+  - Expanded `.env.example` with current runtime variables
+  - Added `npm run test`, `npm run test:watch`, `npm run typecheck`
+  - Updated `README.md` and `AGENTS.md` to point to canonical sources
+- **Next Steps**: Keep the bootstrap references aligned whenever major routes, env usage, or SQL milestones change.
