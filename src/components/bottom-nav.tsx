@@ -26,7 +26,7 @@ export function BottomNav({ locale }: { locale: string }) {
     },
     {
       name: t("lounge"),
-      href: `/${locale}/lounge`,
+      href: `/${locale}/lounge?source=bottom-nav`,
       icon: Sparkles,
     },
     {

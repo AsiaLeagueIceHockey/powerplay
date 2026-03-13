@@ -10,10 +10,12 @@ export function LoungeEventCard({
   event,
   business,
   locale,
+  source,
 }: {
   event: LoungeEvent;
   business: LoungeBusiness | undefined;
   locale: string;
+  source?: string;
 }) {
   const formatter = new Intl.DateTimeFormat(locale === "ko" ? "ko-KR" : "en-US", {
     month: "short",
@@ -34,7 +36,7 @@ export function LoungeEventCard({
 
   return (
     <article className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-      <LoungeImpressionTracker entityType="event" businessId={event.business_id} eventId={event.id} locale={locale} />
+      <LoungeImpressionTracker entityType="event" businessId={event.business_id} eventId={event.id} locale={locale} source={source} />
       <div className="mb-3 flex items-start justify-between gap-3">
         <div>
           <span className="rounded-full bg-orange-50 px-2.5 py-1 text-[11px] font-bold text-orange-700 dark:bg-orange-900/20 dark:text-orange-300">
@@ -70,8 +72,9 @@ export function LoungeEventCard({
           entityType="event"
           businessId={event.business_id}
           eventId={event.id}
-          href={`/${locale}/lounge/${event.business_id}`}
+          href={`/${locale}/lounge/${event.business_id}${source ? `?source=${encodeURIComponent(source)}` : ""}`}
           locale={locale}
+          source={source}
           className="flex w-full items-center justify-between rounded-xl border border-zinc-200 px-3.5 py-2.5 text-sm font-semibold text-zinc-700 transition-colors hover:border-amber-300 hover:bg-amber-50 dark:border-zinc-700 dark:text-zinc-200 dark:hover:border-amber-900/40 dark:hover:bg-amber-900/10"
         >
           <span>{locale === "ko" ? "사업장 상세 보기" : "View business details"}</span>
@@ -87,6 +90,7 @@ export function LoungeEventCard({
           ctaType="kakao"
           url={business?.kakao_open_chat_url}
           locale={locale}
+          source={source}
           className="rounded-xl bg-[#FEE500] px-3 py-2 text-sm font-semibold text-[#3B1E1E] disabled:cursor-not-allowed disabled:opacity-40"
         >
           {locale === "ko" ? "카카오 문의" : "Kakao"}
@@ -98,6 +102,7 @@ export function LoungeEventCard({
           ctaType="instagram"
           url={business?.instagram_url}
           locale={locale}
+          source={source}
           className="rounded-xl bg-zinc-900 px-3 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40 dark:bg-zinc-100 dark:text-zinc-900"
         >
           Instagram
@@ -109,6 +114,7 @@ export function LoungeEventCard({
           ctaType="website"
           url={business?.website_url}
           locale={locale}
+          source={source}
           className="rounded-xl border border-zinc-200 px-3 py-2 text-sm font-semibold text-zinc-700 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-700 dark:text-zinc-200"
         >
           {locale === "ko" ? "자세히 보기" : "Website"}

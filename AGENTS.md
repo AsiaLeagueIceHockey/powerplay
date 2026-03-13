@@ -711,3 +711,22 @@ UPDATE profiles SET role = 'superuser' WHERE email = 'your-email@example.com';
   - Updated `src/app/[locale]/(admin)/admin/lounge/page.tsx` to show CTA click breakdown and simple CTR guidance
   - Updated `.agent/implementation/premium-showcase-hub.md` with the implemented state and remaining next slice
 - **Next Steps**: Decide exposure ordering rules, add event editing, and expand analytics into date-based/event-based reporting.
+### [2026-03-14] Lounge Priority, Source Attribution, and Event Editing
+- **Summary**: Extended Lounge so partners can control exposure order, edit existing schedules, and inspect which entry points are driving Lounge interactions.
+- **Changes**:
+  - Added `sql/v34_lounge_priority_and_sources.sql`
+  - Extended `src/app/actions/lounge.ts` with `display_priority`, source-aware metric tracking, and event upsert support
+  - Updated `src/components/lounge-business-form.tsx` to edit business display priority
+  - Rebuilt `src/components/lounge-event-form.tsx` to support create/edit/delete flows and event priority control
+  - Updated Lounge public navigation entry points in `src/components/bottom-nav.tsx` and `src/components/feedback-banner.tsx` to pass Lounge source attribution
+  - Updated public Lounge components to preserve and track source through list, detail, impression, and CTA flows
+  - Updated `src/app/[locale]/(admin)/admin/lounge/page.tsx` to display source attribution alongside CTA metrics
+  - Updated `.agent/implementation/premium-showcase-hub.md` with the new SQL dependency and current implemented scope
+- **Next Steps**: Apply `sql/v34_lounge_priority_and_sources.sql`, then iterate on richer analytics filters and remote image optimization.
+### [2026-03-14] Lounge Trend and Event Performance Analytics
+- **Summary**: Expanded the admin Lounge analytics view so partners can see recent momentum and which specific schedules are generating engagement.
+- **Changes**:
+  - Extended `src/app/actions/lounge.ts` to build 7-day daily metrics and per-event performance summaries from `lounge_metrics`
+  - Updated `src/app/[locale]/(admin)/admin/lounge/page.tsx` to render recent trend blocks and event-level CTR/impression/click summaries
+  - Updated `.agent/implementation/premium-showcase-hub.md` to reflect that date trend and event performance are now implemented
+- **Next Steps**: Add richer filtering windows, split impression-source vs click-source reporting more explicitly, and improve image delivery for partner media.

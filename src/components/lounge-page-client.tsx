@@ -12,9 +12,10 @@ interface LoungePageClientProps {
   businesses: LoungeBusiness[];
   events: LoungeEvent[];
   locale: string;
+  source?: string;
 }
 
-export function LoungePageClient({ businesses, events, locale }: LoungePageClientProps) {
+export function LoungePageClient({ businesses, events, locale, source }: LoungePageClientProps) {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
 
@@ -73,7 +74,7 @@ export function LoungePageClient({ businesses, events, locale }: LoungePageClien
         ) : (
           <div className="grid gap-4 md:grid-cols-2">
             {businesses.map((business) => (
-              <LoungeCard key={business.id} business={business} locale={locale} />
+              <LoungeCard key={business.id} business={business} locale={locale} source={source} />
             ))}
           </div>
         )}
@@ -120,7 +121,7 @@ export function LoungePageClient({ businesses, events, locale }: LoungePageClien
         ) : (
           <div className="grid gap-4 md:grid-cols-2">
             {filteredEvents.map((event) => (
-              <LoungeEventCard key={event.id} event={event} business={businessMap.get(event.business_id)} locale={locale} />
+              <LoungeEventCard key={event.id} event={event} business={businessMap.get(event.business_id)} locale={locale} source={source} />
             ))}
           </div>
         )}

@@ -55,6 +55,15 @@ export function LoungeBusinessForm({
             <option value="service">{locale === "ko" ? "서비스" : "Service"}</option>
           </select>
         </label>
+        <label className="space-y-2 text-sm">
+          <span className="font-medium">{locale === "ko" ? "노출 우선순위" : "Display priority"}</span>
+          <input
+            name="display_priority"
+            inputMode="numeric"
+            defaultValue={business?.display_priority ?? 0}
+            className="w-full rounded-xl border border-zinc-300 bg-white px-3 py-2.5 dark:border-zinc-700 dark:bg-zinc-950"
+          />
+        </label>
         <label className="space-y-2 text-sm md:col-span-2">
           <span className="font-medium">{locale === "ko" ? "한 줄 소개" : "Tagline"}</span>
           <input name="tagline" defaultValue={business?.tagline ?? ""} className="w-full rounded-xl border border-zinc-300 bg-white px-3 py-2.5 dark:border-zinc-700 dark:bg-zinc-950" />
