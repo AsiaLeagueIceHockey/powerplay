@@ -112,6 +112,13 @@ export interface LoungeEventMetricRow {
   ctr: number;
 }
 
+export interface LoungeSourceMetricRow {
+  source: string;
+  impressions: number;
+  clicks: number;
+  ctr: number;
+}
+
 function isMembershipActive(membership: LoungeMembership | null) {
   if (!membership || membership.status === "canceled") return false;
   const now = new Date();
@@ -153,7 +160,6 @@ function buildMetricsSummary(rows: LoungeMetricRow[]): LoungeMetricsSummary {
     if (row.cta_type) {
       summary.ctaClicks[row.cta_type] += 1;
     }
-
   });
 
   return summary;
@@ -211,6 +217,36 @@ function buildEventMetricRows(events: LoungeEvent[], rows: LoungeMetricRow[]): L
       if (b.clicks !== a.clicks) return b.clicks - a.clicks;
       if (b.impressions !== a.impressions) return b.impressions - a.impressions;
       return new Date(a.startTime).getTime() - new Date(b.startTime).getTime();
+    });
+}
+
+function buildSourceMetricRows(rows: LoungeMetricRow[]): LoungeSourceMetricRow[] {
+  const map = new Map<string, LoungeSourceMetricRow>();
+
+  rows.forEach((row) => {
+    const sourceKey = row.source ?? "unknown";
+    const current = map.get(sourceKey) ?? {
+      source: sourceKey,
+      impressions: 0,
+      clicks: 0,
+      ctr: 0,
+    };
+
+    if (row.metric_type === "impression") current.impressions += 1;
+    else current.clicks += 1;
+
+    map.set(sourceKey, current);
+  });
+
+  return [...map.values()]
+    .map((item) => ({
+      ...item,
+      ctr: item.impressions > 0 ? Number(((item.clicks / item.impressions) * 100).toFixed(1)) : 0,
+    }))
+    .sort((a, b) => {
+      if (b.clicks !== a.clicks) return b.clicks - a.clicks;
+      if (b.impressions !== a.impressions) return b.impressions - a.impressions;
+      return a.source.localeCompare(b.source);
     });
 }
 
@@ -346,6 +382,7 @@ export async function getLoungeAdminPageData() {
     metrics: buildMetricsSummary(metricRows),
     dailyMetrics: buildDailyMetricPoints(metricRows),
     eventMetrics: buildEventMetricRows((events.data as LoungeEvent[]) ?? [], metricRows),
+    sourceMetrics: buildSourceMetricRows(metricRows),
     isSuperUser,
     memberships: (superuserData?.[0].data as LoungeMembership[]) ?? [],
     admins: superuserData?.[1] ?? [],

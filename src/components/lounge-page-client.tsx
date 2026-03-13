@@ -18,11 +18,26 @@ interface LoungePageClientProps {
 export function LoungePageClient({ businesses, events, locale, source }: LoungePageClientProps) {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
+  const [selectedCategory, setSelectedCategory] = useState<"all" | LoungeBusiness["category"]>("all");
 
   const businessMap = useMemo(
     () => new Map(businesses.map((business) => [business.id, business])),
     [businesses]
   );
+
+  const categoryOptions: Array<{ value: "all" | LoungeBusiness["category"]; label: string }> = [
+    { value: "all", label: locale === "ko" ? "전체" : "All" },
+    { value: "lesson", label: locale === "ko" ? "레슨" : "Lessons" },
+    { value: "training_center", label: locale === "ko" ? "훈련장" : "Training" },
+    { value: "tournament", label: locale === "ko" ? "대회" : "Tournament" },
+    { value: "brand", label: locale === "ko" ? "브랜드" : "Brand" },
+    { value: "service", label: locale === "ko" ? "서비스" : "Service" },
+  ];
+
+  const filteredBusinesses = businesses.filter((business) => {
+    if (selectedCategory === "all") return true;
+    return business.category === selectedCategory;
+  });
 
   const filteredEvents = events.filter((event) => {
     if (!selectedDate) return true;
@@ -67,13 +82,33 @@ export function LoungePageClient({ businesses, events, locale, source }: LoungeP
           </span>
         </div>
 
-        {businesses.length === 0 ? (
+        <div className="flex gap-2 overflow-x-auto pb-1">
+          {categoryOptions.map((option) => {
+            const active = selectedCategory === option.value;
+            return (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => setSelectedCategory(option.value)}
+                className={`whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
+                  active
+                    ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900"
+                    : "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300"
+                }`}
+              >
+                {option.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {filteredBusinesses.length === 0 ? (
           <div className="rounded-xl border border-dashed border-zinc-300 p-8 text-center text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
-            {locale === "ko" ? "아직 공개된 라운지 사업장이 없습니다." : "No lounge businesses are published yet."}
+            {locale === "ko" ? "선택한 카테고리에 공개된 라운지 사업장이 없습니다." : "No lounge businesses in this category yet."}
           </div>
         ) : (
           <div className="grid gap-4 md:grid-cols-2">
-            {businesses.map((business) => (
+            {filteredBusinesses.map((business) => (
               <LoungeCard key={business.id} business={business} locale={locale} source={source} />
             ))}
           </div>
