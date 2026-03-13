@@ -96,6 +96,8 @@ This hub should support:
   - listing page
   - business detail page
   - event list/calendar discovery
+  - business category filtering
+  - featured badges driven by display priority
   - CTA tracking for phone / Kakao / Instagram / website
   - `detail` click tracking from business cards and event cards
   - source attribution from bottom nav / home banner
@@ -107,6 +109,7 @@ This hub should support:
   - business / event display priority controls
   - summary metrics + CTA click breakdown + source attribution
   - recent daily trend and per-event performance blocks
+  - source-level impressions/clicks/CTR breakdown
   - superuser manual membership contract entry
 
 ## Remaining Next Slice

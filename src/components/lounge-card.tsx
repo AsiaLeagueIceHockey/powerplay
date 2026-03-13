@@ -17,6 +17,7 @@ export function LoungeCard({
 }) {
   const upcomingCount = business.upcoming_events?.length ?? 0;
   const detailHref = `/${locale}/lounge/${business.id}${source ? `?source=${encodeURIComponent(source)}` : ""}`;
+  const isFeatured = business.display_priority > 0;
   const categoryLabel = {
     lesson: locale === "ko" ? "하키 레슨" : "Lessons",
     training_center: locale === "ko" ? "훈련장 / 슈팅센터" : "Training Center",
@@ -31,10 +32,17 @@ export function LoungeCard({
       <div className="absolute inset-x-0 top-0 h-1 rounded-t-xl bg-gradient-to-r from-amber-400 via-orange-500 to-red-500" />
       <div className="mb-4 flex items-start justify-between gap-3">
         <div>
-          <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-bold text-amber-700 dark:bg-amber-900/20 dark:text-amber-300">
-            <Sparkles className="h-3 w-3" />
-            {categoryLabel}
-          </span>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-bold text-amber-700 dark:bg-amber-900/20 dark:text-amber-300">
+              <Sparkles className="h-3 w-3" />
+              {categoryLabel}
+            </span>
+            {isFeatured ? (
+              <span className="inline-flex items-center gap-1 rounded-full bg-zinc-900 px-2.5 py-1 text-[11px] font-bold text-white dark:bg-zinc-100 dark:text-zinc-900">
+                {locale === "ko" ? "추천 파트너" : "Featured"}
+              </span>
+            ) : null}
+          </div>
           <h3 className="mt-3 text-xl font-bold text-zinc-900 dark:text-zinc-100">{business.name}</h3>
           {business.tagline && (
             <p className="mt-1 text-sm font-medium text-zinc-600 dark:text-zinc-300">{business.tagline}</p>

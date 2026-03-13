@@ -60,9 +60,7 @@ export default async function AdminLoungePage({
   const totalImpressions = metrics.businessImpressions + metrics.eventImpressions;
   const totalClicks = metrics.businessClicks + metrics.eventClicks;
   const clickThroughRate = totalImpressions > 0 ? ((totalClicks / totalImpressions) * 100).toFixed(1) : "0.0";
-  const sourceStats = Object.entries(metrics.sourceBreakdown)
-    .sort((a, b) => b[1] - a[1])
-    .map(([source, value]) => ({ source, value }));
+  const sourceStats = data.sourceMetrics ?? [];
   const eventDateFormatter = new Intl.DateTimeFormat(locale === "ko" ? "ko-KR" : "en-US", {
     month: "short",
     day: "numeric",
@@ -202,11 +200,19 @@ export default async function AdminLoungePage({
                   ) : (
                     <div className="mt-3 space-y-2">
                       {sourceStats.map((item) => (
-                        <div key={item.source} className="flex items-center justify-between gap-3 text-sm">
-                          <span className="rounded-full bg-zinc-100 px-2.5 py-1 font-medium text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200">
-                            {item.source}
-                          </span>
-                          <span className="font-black text-zinc-900 dark:text-zinc-100">{item.value}</span>
+                        <div key={item.source} className="rounded-xl border border-zinc-200 p-3 dark:border-zinc-800">
+                          <div className="flex items-center justify-between gap-3 text-sm">
+                            <span className="rounded-full bg-zinc-100 px-2.5 py-1 font-medium text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200">
+                              {item.source}
+                            </span>
+                            <span className="rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-bold text-amber-700 dark:bg-amber-900/20 dark:text-amber-300">
+                              CTR {item.ctr}%
+                            </span>
+                          </div>
+                          <div className="mt-2 flex items-center gap-4 text-xs text-zinc-500 dark:text-zinc-400">
+                            <span>{locale === "ko" ? "노출" : "Imp"} {item.impressions}</span>
+                            <span>{locale === "ko" ? "클릭" : "Clk"} {item.clicks}</span>
+                          </div>
                         </div>
                       ))}
                     </div>
