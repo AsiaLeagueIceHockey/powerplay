@@ -676,3 +676,14 @@ UPDATE profiles SET role = 'superuser' WHERE email = 'your-email@example.com';
   - Updated `src/app/[locale]/(admin)/admin/layout.tsx` to expose admin Lounge entry
   - Updated `.agent/implementation/premium-showcase-hub.md` with the confirmed `라운지 / Lounge` naming and v1 scope
 - **Next Steps**: Apply `sql/v33_lounge_memberships.sql`, review UI/UX in preview, then iterate on ranking/exposure rules, richer media handling, event editing, and analytics dashboards.
+### [2026-03-14] Lounge Public Detail and CTA Metrics
+- **Summary**: Strengthened the Lounge conversion funnel by adding business detail pages, tracked internal detail navigation, and more readable admin CTA metrics.
+- **Changes**:
+  - Added public route `src/app/[locale]/(public)/lounge/[businessId]/page.tsx`
+  - Added `src/components/lounge-business-detail.tsx` for full public partner detail presentation
+  - Added `src/components/lounge-detail-link.tsx` to track `detail` CTA clicks before internal navigation
+  - Updated `src/components/lounge-card.tsx` and `src/components/lounge-event-card.tsx` to route users into business detail pages
+  - Extended `src/app/actions/lounge.ts` with reusable active-business/event helpers, `getPublicLoungeBusinessDetail`, stronger detail-page revalidation, and safer event deletion ownership checks
+  - Updated `src/app/[locale]/(admin)/admin/lounge/page.tsx` to show CTA click breakdown and simple CTR guidance
+  - Updated `.agent/implementation/premium-showcase-hub.md` with the implemented state and remaining next slice
+- **Next Steps**: Decide exposure ordering rules, add event editing, and expand analytics into date-based/event-based reporting.
