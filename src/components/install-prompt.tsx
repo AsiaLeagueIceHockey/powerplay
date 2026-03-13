@@ -13,7 +13,8 @@ export function InstallPrompt() {
 
   useEffect(() => {
     // Check if mobile device
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    const userAgent = window.navigator.userAgent || window.navigator.vendor || (window as any).opera;
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(userAgent);
     
     // Don't show on desktop
     if (!isMobile) {
@@ -31,14 +32,20 @@ export function InstallPrompt() {
 
     window.addEventListener("beforeinstallprompt", handler);
 
-    // iOS Detection
-    const userAgent = window.navigator.userAgent.toLowerCase();
-    const isIosDevice = /iphone|ipad|ipod/.test(userAgent);
-    const isStandalone = (window.navigator as any).standalone;
+    // iOS and In-App Browser Detection
+    const ua = userAgent.toLowerCase();
+    const isIosDevice = /iphone|ipad|ipod/.test(ua);
+    const isStandalone = (window.navigator as any).standalone === true || 
+                        window.matchMedia("(display-mode: standalone)").matches;
     
-    // Show prompt if iOS and NOT standalone (in browser)
-    if (isIosDevice && !isStandalone) {
-        setIsIOS(true);
+    // Detect In-App Browsers (KakaoTalk, Instagram, Facebook, Line, etc.)
+    const isInApp = /kakaotalk|instagram|fban|fbav|line/i.test(ua);
+
+    // Show prompt if:
+    // 1. iOS and NOT standalone
+    // 2. Any Mobile In-App Browser and NOT standalone (since beforeinstallprompt often fails there)
+    if (!isStandalone && (isIosDevice || isInApp)) {
+        if (isIosDevice) setIsIOS(true);
         setIsVisible(true);
     }
 
@@ -54,7 +61,8 @@ export function InstallPrompt() {
   }, []);
 
   const handleInstallClick = async () => {
-    if (isIOS) {
+    // If iOS or if Android in-app (no deferredPrompt), show the guide
+    if (isIOS || !deferredPrompt) {
         // Show the guide modal in INSTALL mode
         openGuide("install");
         return;
