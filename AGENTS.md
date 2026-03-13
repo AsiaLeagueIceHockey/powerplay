@@ -706,3 +706,12 @@ UPDATE profiles SET role = 'superuser' WHERE email = 'your-email@example.com';
   - Updated `src/app/[locale]/(admin)/admin/lounge/page.tsx` to render recent trend blocks and event-level CTR/impression/click summaries
   - Updated `.agent/implementation/premium-showcase-hub.md` to reflect that date trend and event performance are now implemented
 - **Next Steps**: Add richer filtering windows, split impression-source vs click-source reporting more explicitly, and improve image delivery for partner media.
+### [2026-03-14] Lounge Discovery Filters and Source Performance
+- **Summary**: Improved public Lounge discovery with category filtering and surfaced source-level performance more explicitly in admin analytics.
+- **Changes**:
+  - Updated `src/components/lounge-page-client.tsx` with business category filters
+  - Updated `src/components/lounge-card.tsx` and `src/components/lounge-event-card.tsx` to highlight featured items via `display_priority`
+  - Extended `src/app/actions/lounge.ts` with per-source impression/click/CTR analytics rows
+  - Updated `src/app/[locale]/(admin)/admin/lounge/page.tsx` to show source-level impressions, clicks, and CTR instead of a flat count only
+  - Updated `.agent/implementation/premium-showcase-hub.md` with the expanded public/admin scope
+- **Next Steps**: Add preview/testing checklist for manual QA and decide whether to localize/optimize partner images via `next/image` or keep remote `<img>` usage for flexibility.
