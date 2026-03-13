@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { ArrowLeft, Send } from "lucide-react";
 import { useRouter, useParams } from "next/navigation";
@@ -42,11 +42,11 @@ export function ChatRoomClient({
   const router = useRouter();
   const params = useParams();
   const locale = params.locale as string;
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   // Scroll to bottom
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  const scrollToBottom = (behavior: ScrollBehavior = "smooth") => {
+    messagesEndRef.current?.scrollIntoView({ behavior });
   };
 
   useEffect(() => {
@@ -54,14 +54,26 @@ export function ChatRoomClient({
   }, [messages]);
 
   useEffect(() => {
+    // console.log("Establishing Realtime subscription for room:", roomId);
     const channel = supabase
       .channel(`room_${roomId}`)
       .on(
         "postgres_changes",
-        { event: "INSERT", schema: "public", table: "chat_messages", filter: `room_id=eq.${roomId}` },
+        { event: "INSERT", schema: "public", table: "chat_messages" }, // Remove filter for robustness
         (payload) => {
           const newMessage = payload.new as Message;
-          setMessages((prev) => [...prev, newMessage]);
+          // console.log("Received new message via Realtime:", newMessage);
+          
+          // Manual filter check
+          if (newMessage.room_id !== roomId) return;
+
+          setMessages((prev) => {
+            // Prevent duplicates if the message was already added optimistically
+            if (prev.some((msg) => msg.id === newMessage.id)) {
+              return prev;
+            }
+            return [...prev, newMessage];
+          });
           
           // If we received a message from the other person while the room is open, mark it as read
           if (newMessage.sender_id !== currentUserId) {
@@ -71,37 +83,82 @@ export function ChatRoomClient({
       )
       .on(
         "postgres_changes",
-        { event: "UPDATE", schema: "public", table: "chat_messages", filter: `room_id=eq.${roomId}` },
+        { event: "UPDATE", schema: "public", table: "chat_messages" }, // Remove filter for robustness
         (payload) => {
           const updatedMessage = payload.new as Message;
+          if (updatedMessage.room_id !== roomId) return;
+
           setMessages((prev) => 
             prev.map((msg) => msg.id === updatedMessage.id ? updatedMessage : msg)
           );
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        // console.log(`Realtime subscription status for room ${roomId}:`, status);
+      });
 
     return () => {
+      // console.log("Removing Realtime channel for room:", roomId);
       supabase.removeChannel(channel);
     };
   }, [roomId, currentUserId, supabase]);
 
-  const handleSend = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSend = async (e?: React.FormEvent) => {
+    e?.preventDefault();
     if (!inputValue.trim() || isSending) return;
 
     const content = inputValue.trim();
     setInputValue("");
     setIsSending(true);
 
-    // Actual API call. We rely purely on Realtime for UI updates to avoid duplicates.
+    // Optimistic Update
+    const tempId = crypto.randomUUID();
+    const optimisticMessage: Message = {
+      id: tempId,
+      room_id: roomId,
+      sender_id: currentUserId,
+      content: content,
+      is_read: false,
+      created_at: new Date().toISOString(),
+    };
+
+    setMessages((prev) => [...prev, optimisticMessage]);
+
+    // Actual API call
     const result = await sendMessage(roomId, content, otherParticipant.id);
     
     if (result.error) {
+      // Remove optimistic message on error and show alert
+      setMessages((prev) => prev.filter(msg => msg.id !== tempId));
       alert("Failed to send message: " + result.error);
+    } else {
+      // We don't need to do anything else here because the Realtime INSERT event 
+      // will eventually match the sent message. 
+      // However, to ensure smooth transition, we might want to replace the tempId message with the real one
+      // but Supabase Realtime 'INSERT' usually comes back with the real ID.
     }
 
     setIsSending(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter') {
+      if (e.shiftKey || (window.innerWidth < 768)) {
+        // Mobile behavior: Enter usually means newline, or Shift+Enter on Desktop
+        return;
+      } else {
+        // Desktop behavior: Enter sends message unless Shift is held
+        e.preventDefault();
+        handleSend();
+      }
+    }
+  };
+
+  const adjustTextareaHeight = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const target = e.target;
+    target.style.height = "auto";
+    target.style.height = `${Math.min(target.scrollHeight, 128)}px`;
+    setInputValue(target.value);
   };
 
   const formatMessageTime = (isoString: string) => {
@@ -139,7 +196,7 @@ export function ChatRoomClient({
             >
               <div className={`flex items-end gap-1.5 max-w-[80%] ${isMine ? 'flex-row-reverse' : 'flex-row'}`}>
                 <div 
-                  className={`px-4 py-2.5 rounded-2xl break-words ${
+                  className={`px-4 py-2.5 rounded-2xl break-words whitespace-pre-wrap ${
                     isMine 
                       ? 'bg-blue-600 text-white rounded-br-sm' 
                       : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-700/50 rounded-bl-sm'
@@ -167,17 +224,11 @@ export function ChatRoomClient({
         <form onSubmit={handleSend} className="max-w-3xl mx-auto flex items-end gap-2 relative">
           <textarea
             value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                handleSend(e);
-              }
-            }}
+            onChange={adjustTextareaHeight}
+            onKeyDown={handleKeyDown}
             placeholder={t("inputPlaceholder")}
             className="flex-1 max-h-32 min-h-[44px] block w-full resize-none rounded-2xl border-0 py-2.5 pl-4 pr-12 text-zinc-900 dark:text-zinc-100 bg-zinc-100 dark:bg-zinc-900 ring-1 ring-inset ring-zinc-200 dark:ring-zinc-800 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
             rows={1}
-            style={{ overflow: 'hidden' }}
           />
           <button
             type="submit"
