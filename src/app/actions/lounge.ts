@@ -53,6 +53,7 @@ export interface LoungeEvent {
   location: string | null;
   price_krw: number | null;
   max_participants: number | null;
+  display_priority: number;
   is_published: boolean;
   created_at: string;
   updated_at: string;
@@ -72,6 +73,7 @@ export interface LoungeBusiness {
   kakao_open_chat_url: string | null;
   instagram_url: string | null;
   website_url: string | null;
+  display_priority: number;
   is_published: boolean;
   created_at: string;
   updated_at: string;
@@ -84,6 +86,30 @@ export interface LoungeMetricsSummary {
   eventImpressions: number;
   eventClicks: number;
   ctaClicks: Record<LoungeCtaType, number>;
+  sourceBreakdown: Record<string, number>;
+}
+
+interface LoungeMetricRow {
+  metric_type: "impression" | "click";
+  cta_type: LoungeCtaType | null;
+  event_id: string | null;
+  source: string | null;
+  created_at: string;
+}
+
+export interface LoungeDailyMetricPoint {
+  date: string;
+  impressions: number;
+  clicks: number;
+}
+
+export interface LoungeEventMetricRow {
+  eventId: string;
+  title: string;
+  startTime: string;
+  impressions: number;
+  clicks: number;
+  ctr: number;
 }
 
 function isMembershipActive(membership: LoungeMembership | null) {
@@ -92,9 +118,7 @@ function isMembershipActive(membership: LoungeMembership | null) {
   return new Date(membership.starts_at) <= now && new Date(membership.ends_at) >= now;
 }
 
-function buildMetricsSummary(
-  rows: Array<{ metric_type: "impression" | "click"; cta_type: LoungeCtaType | null; event_id: string | null }>
-): LoungeMetricsSummary {
+function buildMetricsSummary(rows: LoungeMetricRow[]): LoungeMetricsSummary {
   const summary: LoungeMetricsSummary = {
     businessImpressions: 0,
     businessClicks: 0,
@@ -107,10 +131,16 @@ function buildMetricsSummary(
       website: 0,
       detail: 0,
     },
+    sourceBreakdown: {},
   };
 
   rows.forEach((row) => {
     const isEvent = !!row.event_id;
+
+    if (row.source) {
+      summary.sourceBreakdown[row.source] = (summary.sourceBreakdown[row.source] ?? 0) + 1;
+    }
+
     if (row.metric_type === "impression") {
       if (isEvent) summary.eventImpressions += 1;
       else summary.businessImpressions += 1;
@@ -123,9 +153,65 @@ function buildMetricsSummary(
     if (row.cta_type) {
       summary.ctaClicks[row.cta_type] += 1;
     }
+
   });
 
   return summary;
+}
+
+function buildDailyMetricPoints(rows: LoungeMetricRow[]): LoungeDailyMetricPoint[] {
+  const map = new Map<string, LoungeDailyMetricPoint>();
+
+  rows.forEach((row) => {
+    const dateKey = row.created_at.slice(0, 10);
+    const current = map.get(dateKey) ?? {
+      date: dateKey,
+      impressions: 0,
+      clicks: 0,
+    };
+
+    if (row.metric_type === "impression") current.impressions += 1;
+    else current.clicks += 1;
+
+    map.set(dateKey, current);
+  });
+
+  return [...map.values()].sort((a, b) => a.date.localeCompare(b.date)).slice(-7);
+}
+
+function buildEventMetricRows(events: LoungeEvent[], rows: LoungeMetricRow[]): LoungeEventMetricRow[] {
+  const map = new Map<string, LoungeEventMetricRow>();
+
+  events.forEach((event) => {
+    map.set(event.id, {
+      eventId: event.id,
+      title: event.title,
+      startTime: event.start_time,
+      impressions: 0,
+      clicks: 0,
+      ctr: 0,
+    });
+  });
+
+  rows.forEach((row) => {
+    if (!row.event_id) return;
+    const current = map.get(row.event_id);
+    if (!current) return;
+
+    if (row.metric_type === "impression") current.impressions += 1;
+    else current.clicks += 1;
+  });
+
+  return [...map.values()]
+    .map((item) => ({
+      ...item,
+      ctr: item.impressions > 0 ? Number(((item.clicks / item.impressions) * 100).toFixed(1)) : 0,
+    }))
+    .sort((a, b) => {
+      if (b.clicks !== a.clicks) return b.clicks - a.clicks;
+      if (b.impressions !== a.impressions) return b.impressions - a.impressions;
+      return new Date(a.startTime).getTime() - new Date(b.startTime).getTime();
+    });
 }
 
 async function getLatestMembership(userId: string) {
@@ -185,6 +271,7 @@ async function getUpcomingPublishedEvents(
     .select("*")
     .in("business_id", businessIds)
     .eq("is_published", true)
+    .order("display_priority", { ascending: false })
     .order("start_time", { ascending: true });
 
   return ((events as LoungeEvent[] | null) ?? []).filter(
@@ -225,11 +312,13 @@ export async function getLoungeAdminPageData() {
   const metrics = businessData
     ? await supabase
         .from("lounge_metrics")
-        .select("metric_type, cta_type, event_id")
+        .select("metric_type, cta_type, event_id, source, created_at")
         .eq("business_id", businessData.id)
         .order("created_at", { ascending: false })
         .limit(1000)
-    : { data: [] as Array<{ metric_type: "impression" | "click"; cta_type: LoungeCtaType | null; event_id: string | null }> };
+    : { data: [] as LoungeMetricRow[] };
+
+  const metricRows = (metrics.data as LoungeMetricRow[] | null) ?? [];
 
   const membershipStatus = !membership ? "none" : isMembershipActive(membership) ? "active" : "expired";
 
@@ -254,7 +343,9 @@ export async function getLoungeAdminPageData() {
     membershipStatus,
     business: businessData,
     events: (events.data as LoungeEvent[]) ?? [],
-    metrics: buildMetricsSummary(metrics.data ?? []),
+    metrics: buildMetricsSummary(metricRows),
+    dailyMetrics: buildDailyMetricPoints(metricRows),
+    eventMetrics: buildEventMetricRows((events.data as LoungeEvent[]) ?? [], metricRows),
     isSuperUser,
     memberships: (superuserData?.[0].data as LoungeMembership[]) ?? [],
     admins: superuserData?.[1] ?? [],
@@ -284,10 +375,17 @@ export async function getPublicLoungeData(): Promise<{
   });
 
   return {
-    businesses: activeBusinesses.map((business) => ({
-      ...business,
-      upcoming_events: eventsByBusiness.get(business.id) ?? [],
-    })),
+    businesses: activeBusinesses
+      .map((business) => ({
+        ...business,
+        upcoming_events: eventsByBusiness.get(business.id) ?? [],
+      }))
+      .sort((a, b) => {
+        if (b.display_priority !== a.display_priority) {
+          return b.display_priority - a.display_priority;
+        }
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      }),
     events: upcomingEvents,
   };
 }
@@ -349,6 +447,7 @@ export async function upsertLoungeBusiness(formData: FormData) {
     kakao_open_chat_url: ((formData.get("kakao_open_chat_url") as string) || "").trim() || null,
     instagram_url: ((formData.get("instagram_url") as string) || "").trim() || null,
     website_url: ((formData.get("website_url") as string) || "").trim() || null,
+    display_priority: Number((formData.get("display_priority") as string) || "0") || 0,
     is_published: formData.get("is_published") === "true",
   };
 
@@ -381,7 +480,7 @@ export async function upsertLoungeBusiness(formData: FormData) {
   return { success: true };
 }
 
-export async function createLoungeEvent(formData: FormData) {
+export async function upsertLoungeEvent(formData: FormData) {
   const supabase = await createClient();
   const adminInfo = await getAdminInfo();
 
@@ -405,6 +504,7 @@ export async function createLoungeEvent(formData: FormData) {
   }
 
   const title = (formData.get("title") as string)?.trim();
+  const eventId = ((formData.get("event_id") as string) || "").trim();
   const startTimeInput = formData.get("start_time") as string;
   if (!title || !startTimeInput) {
     return { success: false, error: "Title and start time are required" };
@@ -414,7 +514,7 @@ export async function createLoungeEvent(formData: FormData) {
   const priceRaw = (formData.get("price_krw") as string) || "";
   const maxRaw = (formData.get("max_participants") as string) || "";
 
-  const { error } = await supabase.from("lounge_events").insert({
+  const payload = {
     business_id: business.id,
     category: (formData.get("category") as LoungeEventCategory) || "promotion",
     title,
@@ -425,8 +525,17 @@ export async function createLoungeEvent(formData: FormData) {
     location: ((formData.get("location") as string) || "").trim() || null,
     price_krw: priceRaw ? Number(priceRaw.replace(/,/g, "")) : null,
     max_participants: maxRaw ? Number(maxRaw) : null,
+    display_priority: Number((formData.get("display_priority") as string) || "0") || 0,
     is_published: formData.get("is_published") === "true",
-  });
+  };
+
+  const { error } = eventId
+    ? await supabase
+        .from("lounge_events")
+        .update(payload)
+        .eq("id", eventId)
+        .eq("business_id", business.id)
+    : await supabase.from("lounge_events").insert(payload);
 
   if (error) {
     return { success: false, error: error.message };
@@ -525,7 +634,8 @@ export async function trackLoungeImpression(
   entityType: "business" | "event",
   businessId: string,
   eventId?: string,
-  locale?: string
+  locale?: string,
+  source?: string
 ) {
   const supabase = await createClient();
   const {
@@ -539,6 +649,7 @@ export async function trackLoungeImpression(
     entity_type: entityType,
     metric_type: "impression",
     locale: locale ?? null,
+    source: source ?? null,
   });
 
   return { success: true };
@@ -549,7 +660,8 @@ export async function trackLoungeClick(
   businessId: string,
   ctaType: LoungeCtaType,
   eventId?: string,
-  locale?: string
+  locale?: string,
+  source?: string
 ) {
   const supabase = await createClient();
   const {
@@ -564,6 +676,7 @@ export async function trackLoungeClick(
     metric_type: "click",
     cta_type: ctaType,
     locale: locale ?? null,
+    source: source ?? null,
   });
 
   return { success: true };

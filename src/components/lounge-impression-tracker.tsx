@@ -8,6 +8,7 @@ interface LoungeImpressionTrackerProps {
   businessId: string;
   eventId?: string;
   locale: string;
+  source?: string;
 }
 
 export function LoungeImpressionTracker({
@@ -15,13 +16,14 @@ export function LoungeImpressionTracker({
   businessId,
   eventId,
   locale,
+  source,
 }: LoungeImpressionTrackerProps) {
   useEffect(() => {
-    const key = `lounge-impression:${entityType}:${businessId}:${eventId || "none"}`;
+    const key = `lounge-impression:${entityType}:${businessId}:${eventId || "none"}:${source || "direct"}`;
     if (sessionStorage.getItem(key)) return;
     sessionStorage.setItem(key, "1");
-    void trackLoungeImpression(entityType, businessId, eventId, locale);
-  }, [businessId, entityType, eventId, locale]);
+    void trackLoungeImpression(entityType, businessId, eventId, locale, source);
+  }, [businessId, entityType, eventId, locale, source]);
 
   return null;
 }

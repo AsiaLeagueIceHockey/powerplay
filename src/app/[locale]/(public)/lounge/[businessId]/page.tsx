@@ -5,10 +5,13 @@ import { LoungeBusinessDetail } from "@/components/lounge-business-detail";
 
 export default async function LoungeBusinessDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string; businessId: string }>;
+  searchParams: Promise<{ source?: string }>;
 }) {
   const { locale, businessId } = await params;
+  const { source } = await searchParams;
   setRequestLocale(locale);
 
   const data = await getPublicLoungeBusinessDetail(businessId);
@@ -23,6 +26,7 @@ export default async function LoungeBusinessDetailPage({
       events={data.events}
       relatedBusinesses={data.relatedBusinesses}
       locale={locale}
+      source={source}
     />
   );
 }
