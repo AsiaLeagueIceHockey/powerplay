@@ -715,3 +715,9 @@ UPDATE profiles SET role = 'superuser' WHERE email = 'your-email@example.com';
   - Updated `src/app/[locale]/(admin)/admin/lounge/page.tsx` to show source-level impressions, clicks, and CTR instead of a flat count only
   - Updated `.agent/implementation/premium-showcase-hub.md` with the expanded public/admin scope
 - **Next Steps**: Add preview/testing checklist for manual QA and decide whether to localize/optimize partner images via `next/image` or keep remote `<img>` usage for flexibility.
+### [2026-03-14] Lounge Manual QA Checklist
+- **Summary**: Added a dedicated manual QA checklist so preview review can be done systematically across public flows, admin flows, analytics, mobile, and regressions.
+- **Changes**:
+  - Added `.agent/implementation/lounge-qa-checklist.md`
+  - Updated `.agent/implementation/premium-showcase-hub.md` to mark `v34` as applied and point to the QA checklist
+- **Next Steps**: Use the checklist during preview review, collect UX/product feedback, then iterate on issues in a focused batch.

@@ -91,7 +91,7 @@ This hub should support:
 ## Current State
 
 - SQL `v33_lounge_memberships.sql` is applied.
-- Next SQL to apply: `v34_lounge_priority_and_sources.sql`
+- SQL `v34_lounge_priority_and_sources.sql` is applied.
 - Public lounge supports:
   - listing page
   - business detail page
@@ -120,3 +120,8 @@ This hub should support:
   - separate impression vs click source attribution
   - richer filters / longer history
 - media optimization for remote lounge images
+
+## QA
+
+- Manual QA checklist:
+  - `.agent/implementation/lounge-qa-checklist.md`
