@@ -7,6 +7,7 @@
         "signup": "회원가입",
         "profile": "프로필",
         "myPage": "마이페이지",
+        "lounge": "라운지",
         "chat": "채팅",
         "admin": "관리자",
         "save": "저장",
@@ -19,6 +20,11 @@
             "title": "파워플레이 인스타그램",
             "description": "새로운 소식과 이벤트를 확인해보세요.",
             "action": "방문"
+        },
+        "loungeBanner": {
+            "title": "PowerPlay 라운지",
+            "description": "하키 레슨, 훈련장, 대회, 브랜드를 한 번에 만나보세요.",
+            "action": "둘러보기"
         },
         "error": "오류가 발생했습니다.",
         "more": "전체 보기",
