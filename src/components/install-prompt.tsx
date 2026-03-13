@@ -11,20 +11,7 @@ export function InstallPrompt() {
   const [isIOS, setIsIOS] = useState(false);
   const { openGuide, isOpen } = useNotification();
 
-  // 1 hour in milliseconds
-  const DISMISS_TTL = 60 * 60 * 1000;
-
   useEffect(() => {
-    // Helper to check if dismissed within TTL
-    const isDismissedRecently = () => {
-        const dismissedTimestamp = localStorage.getItem("install_prompt_dismissed");
-        if (!dismissedTimestamp) return false;
-        
-        // Return true if dismissed less than TTL ago
-        const timePassed = Date.now() - parseInt(dismissedTimestamp, 10);
-        return timePassed < DISMISS_TTL;
-    };
-
     // Check if mobile device
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     
@@ -39,11 +26,7 @@ export function InstallPrompt() {
       e.preventDefault();
       // Stash the event so it can be triggered later.
       setDeferredPrompt(e);
-      
-      // Check if previously dismissed recently
-      if (!isDismissedRecently()) {
-        setIsVisible(true);
-      }
+      setIsVisible(true);
     };
 
     window.addEventListener("beforeinstallprompt", handler);
@@ -56,18 +39,13 @@ export function InstallPrompt() {
     // Show prompt if iOS and NOT standalone (in browser)
     if (isIosDevice && !isStandalone) {
         setIsIOS(true);
-        // Check if previously dismissed recently
-        if (!isDismissedRecently()) {
-             setIsVisible(true);
-        }
+        setIsVisible(true);
     }
 
     window.addEventListener("appinstalled", () => {
       // Log app installed to analytics if needed
       setDeferredPrompt(null);
       setIsVisible(false);
-      // Also mark as dismissed when installed (save timestamp)
-      localStorage.setItem("install_prompt_dismissed", Date.now().toString());
     });
 
     return () => {
@@ -102,8 +80,6 @@ export function InstallPrompt() {
 
   const handleDismiss = () => {
     setIsVisible(false);
-    // Save dismiss state for both iOS and Android (save timestamp)
-    localStorage.setItem("install_prompt_dismissed", Date.now().toString());
   };
 
   return (
