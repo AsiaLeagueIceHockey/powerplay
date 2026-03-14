@@ -129,7 +129,7 @@ export function LoungeEventForm({ locale, events }: { locale: string; events: Lo
           </select>
         </label>
         <label className="space-y-2 text-sm">
-          <span className="font-semibold text-zinc-900 dark:text-zinc-100">{locale === "ko" ? "노출 우선순위" : "Display priority"}</span>
+          <span className="font-semibold text-zinc-900 dark:text-zinc-100">{locale === "ko" ? "추천 노출 순서" : "Featured order"}</span>
           <input
             name="display_priority"
             inputMode="numeric"
@@ -137,6 +137,11 @@ export function LoungeEventForm({ locale, events }: { locale: string; events: Lo
             onChange={(event) => setFormState((prev) => ({ ...prev, display_priority: event.target.value }))}
             className="w-full rounded-xl border border-zinc-300 bg-white px-3 py-2.5 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
           />
+          <p className="text-xs leading-5 text-zinc-500 dark:text-zinc-400">
+            {locale === "ko"
+              ? "숫자가 높을수록 목록과 상세 화면의 위쪽에 먼저 보입니다. 기본값은 0입니다."
+              : "Higher numbers appear closer to the top of lists and detail pages. Default is 0."}
+          </p>
         </label>
         <label className="space-y-2 text-sm">
           <span className="font-semibold text-zinc-900 dark:text-zinc-100">{locale === "ko" ? "시작 일시" : "Start time"}</span>
@@ -325,7 +330,7 @@ export function LoungeEventForm({ locale, events }: { locale: string; events: Lo
                     <div className="flex flex-wrap items-center gap-2">
                       <p className="font-semibold text-zinc-900 dark:text-zinc-100">{eventItem.title}</p>
                       <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-[11px] font-semibold text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
-                        {locale === "ko" ? `우선순위 ${eventItem.display_priority}` : `Priority ${eventItem.display_priority}`}
+                        {locale === "ko" ? `추천 순서 ${eventItem.display_priority}` : `Order ${eventItem.display_priority}`}
                       </span>
                       {!eventItem.is_published ? (
                         <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-700 dark:bg-amber-900/20 dark:text-amber-300">
@@ -336,6 +341,9 @@ export function LoungeEventForm({ locale, events }: { locale: string; events: Lo
                     <p className="text-sm text-zinc-500 dark:text-zinc-400">{formatEventTime(eventItem.start_time)}</p>
                     {eventItem.location ? (
                       <p className="text-sm text-zinc-500 dark:text-zinc-400">{eventItem.location}</p>
+                    ) : null}
+                    {eventItem.location_address ? (
+                      <p className="text-sm text-zinc-500 dark:text-zinc-400">{eventItem.location_address}</p>
                     ) : null}
                   </div>
                   <div className="flex flex-wrap gap-2">
