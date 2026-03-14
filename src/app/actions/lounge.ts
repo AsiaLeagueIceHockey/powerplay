@@ -81,10 +81,18 @@ export interface LoungeBusiness {
   instagram_url: string | null;
   website_url: string | null;
   display_priority: number;
+  is_featured: boolean;
+  featured_order: number;
   is_published: boolean;
   created_at: string;
   updated_at: string;
   upcoming_events?: LoungeEvent[];
+  owner?: {
+    id: string;
+    email: string | null;
+    full_name: string | null;
+    phone: string | null;
+  } | null;
 }
 
 export interface LoungeMetricsSummary {
@@ -314,7 +322,6 @@ async function getUpcomingPublishedEvents(
     .select("*")
     .in("business_id", businessIds)
     .eq("is_published", true)
-    .order("display_priority", { ascending: false })
     .order("start_time", { ascending: true });
 
   return ((events as LoungeEvent[] | null) ?? []).filter(
@@ -375,6 +382,13 @@ export async function getLoungeAdminPageData() {
           `)
           .order("created_at", { ascending: false })
           .limit(30),
+        supabase
+          .from("lounge_businesses")
+          .select(`
+            *,
+            owner:owner_user_id(id, email, full_name, phone)
+          `)
+          .order("created_at", { ascending: false }),
         getAdmins(),
       ])
     : null;
@@ -392,7 +406,8 @@ export async function getLoungeAdminPageData() {
     sourceMetrics: buildSourceMetricRows(metricRows),
     isSuperUser,
     memberships: (superuserData?.[0].data as LoungeMembership[]) ?? [],
-    admins: superuserData?.[1] ?? [],
+    featuredBusinesses: (superuserData?.[1].data as LoungeBusiness[]) ?? [],
+    admins: superuserData?.[2] ?? [],
   };
 }
 
@@ -425,8 +440,15 @@ export async function getPublicLoungeData(): Promise<{
         upcoming_events: eventsByBusiness.get(business.id) ?? [],
       }))
       .sort((a, b) => {
-        if (b.display_priority !== a.display_priority) {
-          return b.display_priority - a.display_priority;
+        if (a.is_featured !== b.is_featured) {
+          return a.is_featured ? -1 : 1;
+        }
+        if (a.is_featured && b.is_featured && a.featured_order !== b.featured_order) {
+          return a.featured_order - b.featured_order;
+        }
+        const eventDiff = (b.upcoming_events?.length ?? 0) - (a.upcoming_events?.length ?? 0);
+        if (eventDiff !== 0) {
+          return eventDiff;
         }
         return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
       }),
@@ -461,6 +483,15 @@ export async function getPublicLoungeBusinessDetail(businessId: string): Promise
     events,
     relatedBusinesses: activeBusinesses
       .filter((item) => item.id !== business.id)
+      .sort((a, b) => {
+        if (a.is_featured !== b.is_featured) {
+          return a.is_featured ? -1 : 1;
+        }
+        if (a.is_featured && b.is_featured && a.featured_order !== b.featured_order) {
+          return a.featured_order - b.featured_order;
+        }
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      })
       .slice(0, 3),
   };
 }
@@ -733,6 +764,44 @@ export async function uploadLoungeImage(formData: FormData): Promise<{ url?: str
   } = supabase.storage.from("club-logos").getPublicUrl(fileName);
 
   return { url: publicUrl };
+}
+
+export async function updateLoungeBusinessFeature(formData: FormData) {
+  const supabase = await createClient();
+  const isSuperUser = await checkIsSuperUser();
+
+  if (!isSuperUser) {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  const businessId = (formData.get("business_id") as string) || "";
+  if (!businessId) {
+    return { success: false, error: "Business is required" };
+  }
+
+  const isFeatured = formData.get("is_featured") === "true";
+  const featuredOrderRaw = (formData.get("featured_order") as string) || "0";
+  const featuredOrder = Math.max(0, Number(featuredOrderRaw) || 0);
+
+  const { error } = await supabase
+    .from("lounge_businesses")
+    .update({
+      is_featured: isFeatured,
+      featured_order: isFeatured ? featuredOrder : 0,
+    })
+    .eq("id", businessId);
+
+  if (error) {
+    return { success: false, error: error.message };
+  }
+
+  revalidatePath("/ko/lounge");
+  revalidatePath("/en/lounge");
+  revalidatePath("/ko/admin/lounge");
+  revalidatePath("/en/admin/lounge");
+  revalidatePath(`/ko/lounge/${businessId}`);
+  revalidatePath(`/en/lounge/${businessId}`);
+  return { success: true };
 }
 
 export async function trackLoungeImpression(
