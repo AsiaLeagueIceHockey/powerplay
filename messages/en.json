@@ -23,7 +23,7 @@
         },
         "loungeBanner": {
             "title": "PowerPlay Lounge",
-            "description": "Discover hockey lessons, training centers, tournaments, and brands.",
+            "description": "Check the hockey info you need in Lounge.",
             "action": "Explore"
         },
         "error": "An error occurred.",

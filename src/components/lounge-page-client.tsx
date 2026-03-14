@@ -68,8 +68,8 @@ export function LoungePageClient({ businesses, events, locale, source }: LoungeP
           <div className="min-w-0">
             <p className="text-[13px] font-semibold leading-5 text-zinc-800 dark:text-zinc-100">
               {locale === "ko"
-                ? "PowerPlay Lounge에서 프리미엄 하키 레슨, 대회 정보, 하키인을 위한 서비스를 만나보세요."
-                : "Discover premium hockey lessons, tournaments, and services on PowerPlay Lounge."}
+                ? "지금 필요한 하키 레슨, 훈련장, 대회 정보를 라운지에서 확인해보세요."
+                : "Find the hockey lessons, training centers, and tournament info you need in Lounge."}
             </p>
           </div>
         </div>
