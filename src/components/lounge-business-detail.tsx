@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, CalendarDays, Globe, Instagram, MapPin, MessageCircle, Phone, ShieldCheck } from "lucide-react";
+import { ArrowLeft, CalendarDays, Globe, Instagram, MapPin, MessageCircle, Phone, Trophy } from "lucide-react";
 import type { LoungeBusiness, LoungeEvent } from "@/app/actions/lounge";
 import { LoungeCard } from "./lounge-card";
 import { LoungeCtaButton } from "./lounge-cta-button";
@@ -75,7 +75,7 @@ export function LoungeBusinessDetail({
               ) : null}
               <div>
                 <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-bold text-amber-700 dark:bg-amber-900/20 dark:text-amber-300">
-                  <ShieldCheck className="h-3 w-3" />
+                  <Trophy className="h-3 w-3" />
                   {categoryLabel}
                 </span>
                 <h1 className="mt-3 text-3xl font-black tracking-tight text-zinc-900 dark:text-zinc-100">

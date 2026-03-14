@@ -1,7 +1,7 @@
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 import Image from "next/image";
-import { ShieldCheck } from "lucide-react";
+import { Trophy } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { AdminUserMenu } from "@/components/admin-user-menu";
 
@@ -88,7 +88,7 @@ export default async function AdminLayout({
               href={`/${locale}/admin/lounge`}
               className="flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium text-zinc-300 hover:bg-zinc-800 hover:text-white"
             >
-              <ShieldCheck className="h-4 w-4" />
+              <Trophy className="h-4 w-4" />
               <span>{locale === "ko" ? "라운지" : "Lounge"}</span>
             </Link>
 
@@ -170,7 +170,7 @@ export default async function AdminLayout({
           href={`/${locale}/admin/lounge`}
           className="flex flex-col items-center gap-1 px-4 py-2 text-zinc-400 hover:text-white"
         >
-          <ShieldCheck className="h-5 w-5" />
+          <Trophy className="h-5 w-5" />
           <span className="text-xs">{locale === "ko" ? "라운지" : "Lounge"}</span>
         </Link>
         {isSuperUser && (
