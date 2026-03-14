@@ -1,9 +1,9 @@
 "use client";
 
-import { ArrowRight, Globe, Instagram, MessageCircle, Phone, Trophy } from "lucide-react";
+import { ArrowRight, Trophy } from "lucide-react";
 import type { LoungeBusiness } from "@/app/actions/lounge";
 import { extractRegion } from "@/lib/rink-utils";
-import { LoungeCtaButton } from "./lounge-cta-button";
+import { LoungeContactMenu } from "./lounge-contact-menu";
 import { LoungeDetailLink } from "./lounge-detail-link";
 import { LoungeImpressionTracker } from "./lounge-impression-tracker";
 
@@ -30,29 +30,21 @@ export function LoungeCard({
   const availableLinks = [
     {
       key: "phone",
-      href: business.phone ? `tel:${business.phone}` : null,
-      icon: <Phone className="h-4 w-4" />,
-      className: "border border-zinc-200 text-zinc-700 dark:border-zinc-700 dark:text-zinc-200",
+      url: business.phone ? `tel:${business.phone}` : null,
     },
     {
       key: "kakao",
-      href: business.kakao_open_chat_url,
-      icon: <MessageCircle className="h-4 w-4" />,
-      className: "bg-[#FEE500] text-[#3B1E1E]",
+      url: business.kakao_open_chat_url,
     },
     {
       key: "instagram",
-      href: business.instagram_url,
-      icon: <Instagram className="h-4 w-4" />,
-      className: "bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045] text-white",
+      url: business.instagram_url,
     },
     {
       key: "website",
-      href: business.website_url,
-      icon: <Globe className="h-4 w-4" />,
-      className: "border border-zinc-200 text-zinc-700 dark:border-zinc-700 dark:text-zinc-200",
+      url: business.website_url,
     },
-  ].filter((item) => item.href);
+  ].filter((item): item is { key: "phone" | "kakao" | "instagram" | "website"; url: string } => Boolean(item.url));
 
   return (
     <article className="relative rounded-xl border border-zinc-200 bg-white p-5 shadow-sm transition-all duration-300 hover:border-amber-500 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900">
@@ -104,24 +96,15 @@ export function LoungeCard({
         </div>
       </LoungeDetailLink>
 
-      {availableLinks.length > 0 ? (
-        <div className="flex items-center gap-2 overflow-x-auto pb-1">
-          {availableLinks.map((item) => (
-            <LoungeCtaButton
-              key={item.key}
-              entityType="business"
-              businessId={business.id}
-              ctaType={item.key as "phone" | "kakao" | "instagram" | "website"}
-              url={item.href}
-              locale={locale}
-              source={source}
-              className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${item.className} disabled:cursor-not-allowed disabled:opacity-40`}
-            >
-              {item.icon}
-            </LoungeCtaButton>
-          ))}
-        </div>
-      ) : null}
+      <div className="flex justify-end">
+        <LoungeContactMenu
+          locale={locale}
+          items={availableLinks}
+          entityType="business"
+          businessId={business.id}
+          source={source}
+        />
+      </div>
     </article>
   );
 }
