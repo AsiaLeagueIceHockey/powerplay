@@ -59,9 +59,9 @@ export function LoungeEventCard({
     promotion: locale === "ko" ? "프로모션" : "Promotion",
   }[event.category];
   const regionLabel = extractRegion(event.location_address ?? event.location ?? undefined);
-  const compactLocationLabel = regionLabel
-    ? regionLabel.split(" ").slice(-1)[0]
-    : (event.location ?? "").split(" ").slice(0, 1)[0] || null;
+  const compactLocationLabel =
+    regionLabel ||
+    ((event.location ?? "").split(" ").slice(0, 2).join(" ") || null);
   const availableLinks = [
     {
       key: "phone",
