@@ -18,7 +18,7 @@ export function LoungeCard({
 }) {
   const upcomingCount = business.upcoming_events?.length ?? 0;
   const detailHref = `/${locale}/lounge/${business.id}${source ? `?source=${encodeURIComponent(source)}` : ""}`;
-  const isFeatured = business.display_priority > 0;
+  const isFeatured = business.is_featured;
   const region = extractRegion(business.address ?? undefined);
   const categoryLabel = {
     lesson: locale === "ko" ? "하키 레슨" : "Lessons",
@@ -41,7 +41,7 @@ export function LoungeCard({
             </span>
             {isFeatured ? (
               <span className="inline-flex items-center gap-1 rounded-full bg-zinc-900 px-2.5 py-1 text-[11px] font-bold text-white dark:bg-zinc-100 dark:text-zinc-900">
-                {locale === "ko" ? "추천 파트너" : "Featured"}
+                {locale === "ko" ? "추천 비즈니스" : "Featured"}
               </span>
             ) : null}
           </div>
