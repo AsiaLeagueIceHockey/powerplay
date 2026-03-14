@@ -88,7 +88,9 @@ export default async function AdminLayout({
               href={`/${locale}/admin/lounge`}
               className="flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium text-zinc-300 hover:bg-zinc-800 hover:text-white"
             >
-              <Trophy className="h-4 w-4" />
+              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-amber-500/15 text-amber-300 ring-1 ring-amber-500/30">
+                <Trophy className="h-3.5 w-3.5" strokeWidth={2.4} />
+              </span>
               <span>{locale === "ko" ? "라운지" : "Lounge"}</span>
             </Link>
 
@@ -170,7 +172,9 @@ export default async function AdminLayout({
           href={`/${locale}/admin/lounge`}
           className="flex flex-col items-center gap-1 px-4 py-2 text-zinc-400 hover:text-white"
         >
-          <Trophy className="h-5 w-5" />
+          <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-amber-500/15 text-amber-300 ring-1 ring-amber-500/30">
+            <Trophy className="h-4 w-4" strokeWidth={2.4} />
+          </span>
           <span className="text-xs">{locale === "ko" ? "라운지" : "Lounge"}</span>
         </Link>
         {isSuperUser && (
