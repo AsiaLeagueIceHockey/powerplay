@@ -721,3 +721,14 @@ UPDATE profiles SET role = 'superuser' WHERE email = 'your-email@example.com';
   - Added `.agent/implementation/lounge-qa-checklist.md`
   - Updated `.agent/implementation/premium-showcase-hub.md` to mark `v34` as applied and point to the QA checklist
 - **Next Steps**: Use the checklist during preview review, collect UX/product feedback, then iterate on issues in a focused batch.
+### [2026-03-14] Lounge Location and Map Foundation
+- **Summary**: Added first-pass location support for Lounge so businesses and events can store map metadata and expose location context to users.
+- **Changes**:
+  - Added `sql/v35_lounge_location_maps.sql`
+  - Extended `src/app/actions/lounge.ts` with business/event map fields
+  - Updated `src/components/lounge-business-form.tsx` to parse Naver map URLs for business address/coordinates
+  - Updated `src/components/lounge-event-form.tsx` to parse Naver map URLs for event address/coordinates
+  - Added `src/components/lounge-location-map.tsx`
+  - Updated public Lounge cards/detail components to show region text and embed compact maps in detail views
+  - Updated `.agent/implementation/premium-showcase-hub.md` with the new SQL dependency and location scope
+- **Next Steps**: Apply `sql/v35_lounge_location_maps.sql`, then tune public location UX density and consider nearby/location-based filtering.

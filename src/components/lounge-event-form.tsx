@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
-import { CalendarRange } from "lucide-react";
+import { CalendarRange, Loader2, MapPin, Search } from "lucide-react";
+import { parseNaverMapUrl } from "@/app/actions/admin";
 import type { LoungeEvent } from "@/app/actions/lounge";
 import { deleteLoungeEvent, upsertLoungeEvent } from "@/app/actions/lounge";
 
@@ -22,6 +23,10 @@ const emptyForm = {
   start_time: "",
   end_time: "",
   location: "",
+  location_address: "",
+  location_map_url: "",
+  location_lat: "",
+  location_lng: "",
   summary: "",
   price_krw: "",
   max_participants: "",
@@ -33,6 +38,8 @@ const emptyForm = {
 export function LoungeEventForm({ locale, events }: { locale: string; events: LoungeEvent[] }) {
   const [isPending, startTransition] = useTransition();
   const [formState, setFormState] = useState(emptyForm);
+  const [parsing, setParsing] = useState(false);
+  const [mapError, setMapError] = useState<string | null>(null);
 
   const sortedEvents = useMemo(
     () =>
@@ -161,6 +168,69 @@ export function LoungeEventForm({ locale, events }: { locale: string; events: Lo
             className="w-full rounded-xl border border-zinc-300 bg-white px-3 py-2.5 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
           />
         </label>
+        <div className="space-y-3 md:col-span-2 rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900/70">
+          <div>
+            <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+              {locale === "ko" ? "이 일정의 위치" : "Event location"}
+            </p>
+            <p className="mt-1 text-xs leading-5 text-zinc-500 dark:text-zinc-400">
+              {locale === "ko"
+                ? "이벤트가 열리는 실제 위치를 지도 기반으로 등록합니다."
+                : "Register the actual event location with map metadata."}
+            </p>
+          </div>
+          <div className="grid gap-3 md:grid-cols-[1fr_auto]">
+            <input
+              type="url"
+              value={formState.location_map_url}
+              onChange={(event) => setFormState((prev) => ({ ...prev, location_map_url: event.target.value }))}
+              placeholder="https://naver.me/..."
+              className="w-full rounded-xl border border-zinc-300 bg-white px-3 py-2.5 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+            />
+            <button
+              type="button"
+              onClick={async () => {
+                if (!formState.location_map_url) {
+                  setMapError(locale === "ko" ? "네이버 지도 URL을 입력하세요." : "Enter a Naver Map URL.");
+                  return;
+                }
+                setParsing(true);
+                setMapError(null);
+                const result = await parseNaverMapUrl(formState.location_map_url);
+                if (!result.success || !result.data) {
+                  setMapError(result.error || (locale === "ko" ? "지도 정보를 가져오지 못했습니다." : "Failed to parse map URL."));
+                  setParsing(false);
+                  return;
+                }
+                setFormState((prev) => ({
+                  ...prev,
+                  location_map_url: result.data!.mapUrl,
+                  location_address: result.data!.address,
+                  location_lat: result.data!.lat.toString(),
+                  location_lng: result.data!.lng.toString(),
+                  location: prev.location || result.data!.name || "",
+                }));
+                setParsing(false);
+              }}
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-zinc-900 px-4 py-2.5 text-sm font-semibold text-white dark:bg-zinc-100 dark:text-zinc-900"
+            >
+              {parsing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+              {locale === "ko" ? "정보 가져오기" : "Fetch info"}
+            </button>
+          </div>
+          {mapError ? <p className="text-sm text-red-600 dark:text-red-400">{mapError}</p> : null}
+          <div className="flex items-start gap-2 text-sm text-zinc-700 dark:text-zinc-200">
+            <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
+            <div>
+              <p className="font-medium">{formState.location_address || (locale === "ko" ? "주소 미등록" : "No address yet")}</p>
+              <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                {formState.location_lat && formState.location_lng
+                  ? `${formState.location_lat}, ${formState.location_lng}`
+                  : (locale === "ko" ? "좌표 미등록" : "No coordinates yet")}
+              </p>
+            </div>
+          </div>
+        </div>
         <label className="space-y-2 text-sm">
           <span className="font-semibold text-zinc-900 dark:text-zinc-100">{locale === "ko" ? "한 줄 설명" : "Summary"}</span>
           <input
@@ -279,6 +349,10 @@ export function LoungeEventForm({ locale, events }: { locale: string; events: Lo
                           start_time: toLocalInputValue(eventItem.start_time),
                           end_time: eventItem.end_time ? toLocalInputValue(eventItem.end_time) : "",
                           location: eventItem.location ?? "",
+                          location_address: eventItem.location_address ?? "",
+                          location_map_url: eventItem.location_map_url ?? "",
+                          location_lat: eventItem.location_lat?.toString() ?? "",
+                          location_lng: eventItem.location_lng?.toString() ?? "",
                           summary: eventItem.summary ?? "",
                           price_krw: eventItem.price_krw?.toString() ?? "",
                           max_participants: eventItem.max_participants?.toString() ?? "",
