@@ -46,11 +46,11 @@ export function LoungeShareButton({ businessName }: { businessName: string }) {
       <button
         type="button"
         onClick={handleShare}
-        className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-zinc-200 bg-white text-zinc-500 transition-colors hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:border-blue-900/40 dark:hover:bg-blue-900/20 dark:hover:text-blue-400"
+        className="inline-flex items-center justify-center p-1 text-zinc-500 transition-colors hover:text-blue-600 dark:text-zinc-300 dark:hover:text-blue-400"
         title={locale === "ko" ? "공유하기" : "Share"}
         aria-label={locale === "ko" ? "공유하기" : "Share"}
       >
-        <Share2 className="h-4 w-4" />
+        <Share2 className="h-5 w-5" />
       </button>
 
       {toastMessage ? (

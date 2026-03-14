@@ -108,6 +108,10 @@ export function LoungeBusinessDetail({
         )}
 
         <div className="space-y-6 p-6">
+          <div className="flex justify-end">
+            <LoungeShareButton businessName={business.name} />
+          </div>
+
           <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
             <div className="flex items-start gap-4">
               {business.logo_url ? (
@@ -132,60 +136,6 @@ export function LoungeBusinessDetail({
                 ) : null}
               </div>
             </div>
-
-            <div className="flex items-start gap-2 md:w-[372px]">
-              <div className="grid flex-1 grid-cols-2 gap-2">
-              <LoungeCtaButton
-                entityType="business"
-                businessId={business.id}
-                ctaType="phone"
-                url={business.phone ? `tel:${business.phone}` : null}
-                locale={locale}
-                source={source}
-                className="flex items-center justify-center gap-2 rounded-xl bg-zinc-900 px-3 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40 dark:bg-zinc-100 dark:text-zinc-900"
-              >
-                <Phone className="h-4 w-4" />
-                {locale === "ko" ? "전화" : "Call"}
-              </LoungeCtaButton>
-              <LoungeCtaButton
-                entityType="business"
-                businessId={business.id}
-                ctaType="kakao"
-                url={business.kakao_open_chat_url}
-                locale={locale}
-                source={source}
-                className="flex items-center justify-center gap-2 rounded-xl bg-[#FEE500] px-3 py-2.5 text-sm font-semibold text-[#3B1E1E] disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                <MessageCircle className="h-4 w-4" />
-                Kakao
-              </LoungeCtaButton>
-              <LoungeCtaButton
-                entityType="business"
-                businessId={business.id}
-                ctaType="instagram"
-                url={business.instagram_url}
-                locale={locale}
-                source={source}
-                className="flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045] px-3 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                <Instagram className="h-4 w-4" />
-                Instagram
-              </LoungeCtaButton>
-              <LoungeCtaButton
-                entityType="business"
-                businessId={business.id}
-                ctaType="website"
-                url={business.website_url}
-                locale={locale}
-                source={source}
-                className="flex items-center justify-center gap-2 rounded-xl border border-zinc-200 px-3 py-2.5 text-sm font-semibold text-zinc-700 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-700 dark:text-zinc-200"
-              >
-                <Globe className="h-4 w-4" />
-                {locale === "ko" ? "웹사이트" : "Website"}
-              </LoungeCtaButton>
-              </div>
-              <LoungeShareButton businessName={business.name} />
-            </div>
           </div>
 
           <div className="flex flex-wrap gap-2 text-sm text-zinc-600 dark:text-zinc-300">
@@ -209,6 +159,61 @@ export function LoungeBusinessDetail({
                 {business.address}
               </p>
             ) : null}
+            <div className="mt-5 border-t border-zinc-200 pt-5 dark:border-zinc-800">
+              <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
+                {locale === "ko" ? "연락하기" : "Contact"}
+              </h3>
+              <div className="mt-3 grid grid-cols-2 gap-2 md:max-w-[420px]">
+                <LoungeCtaButton
+                  entityType="business"
+                  businessId={business.id}
+                  ctaType="phone"
+                  url={business.phone ? `tel:${business.phone}` : null}
+                  locale={locale}
+                  source={source}
+                  className="flex items-center justify-center gap-2 rounded-xl bg-zinc-900 px-3 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40 dark:bg-zinc-100 dark:text-zinc-900"
+                >
+                  <Phone className="h-4 w-4" />
+                  {locale === "ko" ? "전화" : "Call"}
+                </LoungeCtaButton>
+                <LoungeCtaButton
+                  entityType="business"
+                  businessId={business.id}
+                  ctaType="kakao"
+                  url={business.kakao_open_chat_url}
+                  locale={locale}
+                  source={source}
+                  className="flex items-center justify-center gap-2 rounded-xl bg-[#FEE500] px-3 py-2.5 text-sm font-semibold text-[#3B1E1E] disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  <MessageCircle className="h-4 w-4" />
+                  {locale === "ko" ? "카카오톡" : "KakaoTalk"}
+                </LoungeCtaButton>
+                <LoungeCtaButton
+                  entityType="business"
+                  businessId={business.id}
+                  ctaType="instagram"
+                  url={business.instagram_url}
+                  locale={locale}
+                  source={source}
+                  className="flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045] px-3 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  <Instagram className="h-4 w-4" />
+                  {locale === "ko" ? "인스타그램" : "Instagram"}
+                </LoungeCtaButton>
+                <LoungeCtaButton
+                  entityType="business"
+                  businessId={business.id}
+                  ctaType="website"
+                  url={business.website_url}
+                  locale={locale}
+                  source={source}
+                  className="flex items-center justify-center gap-2 rounded-xl border border-zinc-200 px-3 py-2.5 text-sm font-semibold text-zinc-700 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-700 dark:text-zinc-200"
+                >
+                  <Globe className="h-4 w-4" />
+                  {locale === "ko" ? "웹사이트" : "Website"}
+                </LoungeCtaButton>
+              </div>
+            </div>
             <div className="mt-4">
               <LoungeLocationMap
                 name={business.name}
