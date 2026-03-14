@@ -2,20 +2,24 @@
 
 import { ArrowRight, CalendarDays, MapPin } from "lucide-react";
 import type { LoungeBusiness, LoungeEvent } from "@/app/actions/lounge";
+import { extractRegion } from "@/lib/rink-utils";
 import { LoungeDetailLink } from "./lounge-detail-link";
 import { LoungeImpressionTracker } from "./lounge-impression-tracker";
 import { LoungeCtaButton } from "./lounge-cta-button";
+import { LoungeLocationMap } from "./lounge-location-map";
 
 export function LoungeEventCard({
   event,
   business,
   locale,
   source,
+  showMap = false,
 }: {
   event: LoungeEvent;
   business: LoungeBusiness | undefined;
   locale: string;
   source?: string;
+  showMap?: boolean;
 }) {
   const formatter = new Intl.DateTimeFormat(locale === "ko" ? "ko-KR" : "en-US", {
     month: "short",
@@ -34,6 +38,7 @@ export function LoungeEventCard({
     promotion: locale === "ko" ? "프로모션" : "Promotion",
   }[event.category];
   const isFeatured = event.display_priority > 0;
+  const eventRegion = extractRegion(event.location_address ?? event.location ?? undefined);
 
   return (
     <article className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
@@ -71,9 +76,27 @@ export function LoungeEventCard({
             <span>{event.location}</span>
           </div>
         ) : null}
+        {eventRegion && eventRegion !== event.location ? (
+          <div className="flex items-center gap-2">
+            <MapPin className="h-4 w-4 text-zinc-400" />
+            <span>{eventRegion}</span>
+          </div>
+        ) : null}
       </div>
 
       {event.summary ? <p className="mb-4 text-sm leading-6 text-zinc-600 dark:text-zinc-300">{event.summary}</p> : null}
+
+      {showMap && event.location_lat && event.location_lng && event.location_address ? (
+        <div className="mb-4">
+          <LoungeLocationMap
+            name={event.location || event.title}
+            address={event.location_address}
+            mapUrl={event.location_map_url}
+            lat={event.location_lat}
+            lng={event.location_lng}
+          />
+        </div>
+      ) : null}
 
       <div className="mb-3">
         <LoungeDetailLink

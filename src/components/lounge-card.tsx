@@ -2,6 +2,7 @@
 
 import { ArrowRight, Globe, Instagram, MessageCircle, Phone, Trophy } from "lucide-react";
 import type { LoungeBusiness } from "@/app/actions/lounge";
+import { extractRegion } from "@/lib/rink-utils";
 import { LoungeCtaButton } from "./lounge-cta-button";
 import { LoungeDetailLink } from "./lounge-detail-link";
 import { LoungeImpressionTracker } from "./lounge-impression-tracker";
@@ -18,6 +19,7 @@ export function LoungeCard({
   const upcomingCount = business.upcoming_events?.length ?? 0;
   const detailHref = `/${locale}/lounge/${business.id}${source ? `?source=${encodeURIComponent(source)}` : ""}`;
   const isFeatured = business.display_priority > 0;
+  const region = extractRegion(business.address ?? undefined);
   const categoryLabel = {
     lesson: locale === "ko" ? "하키 레슨" : "Lessons",
     training_center: locale === "ko" ? "훈련장 / 슈팅센터" : "Training Center",
@@ -62,7 +64,7 @@ export function LoungeCard({
       </p>
 
       <div className="mb-4 flex flex-wrap gap-2 text-xs text-zinc-500 dark:text-zinc-400">
-        {business.address ? <span className="rounded-full bg-zinc-100 px-2.5 py-1 dark:bg-zinc-800">{business.address}</span> : null}
+        {region ? <span className="rounded-full bg-zinc-100 px-2.5 py-1 dark:bg-zinc-800">{region}</span> : null}
         {upcomingCount > 0 ? (
           <span className="rounded-full bg-amber-50 px-2.5 py-1 font-semibold text-amber-700 dark:bg-amber-900/20 dark:text-amber-300">
             {locale === "ko" ? `예정 일정 ${upcomingCount}개` : `${upcomingCount} upcoming events`}

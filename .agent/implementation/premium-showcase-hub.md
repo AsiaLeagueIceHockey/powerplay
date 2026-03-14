@@ -92,6 +92,7 @@ This hub should support:
 
 - SQL `v33_lounge_memberships.sql` is applied.
 - SQL `v34_lounge_priority_and_sources.sql` is applied.
+- Next SQL to apply: `v35_lounge_location_maps.sql`
 - Public lounge supports:
   - listing page
   - business detail page
@@ -102,6 +103,10 @@ This hub should support:
   - `detail` click tracking from business cards and event cards
   - source attribution from bottom nav / home banner
   - source-preserving detail navigation
+  - business region exposure in cards
+  - event region exposure in cards
+  - business detail map
+  - event detail maps
 - Admin lounge supports:
   - paywall / expired renewal state
   - one representative business editor
@@ -111,6 +116,7 @@ This hub should support:
   - recent daily trend and per-event performance blocks
   - source-level impressions/clicks/CTR breakdown
   - superuser manual membership contract entry
+  - business/event Naver map URL parsing for location metadata
 
 ## Remaining Next Slice
 
@@ -120,6 +126,9 @@ This hub should support:
   - separate impression vs click source attribution
   - richer filters / longer history
 - media optimization for remote lounge images
+- location polish:
+  - public map placement / density tuning
+  - optional nearby filtering
 
 ## QA
 
