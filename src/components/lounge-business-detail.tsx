@@ -1,8 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, CalendarDays, Globe, Instagram, MapPin, MessageCircle, Phone, Trophy } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { ArrowLeft, CalendarDays, Globe, Instagram, List, MessageCircle, Phone, Trophy } from "lucide-react";
 import type { LoungeBusiness, LoungeEvent } from "@/app/actions/lounge";
+import { DateFilter } from "./date-filter";
+import { LoungeCalendarView } from "./lounge-calendar-view";
 import { LoungeCard } from "./lounge-card";
 import { LoungeCtaButton } from "./lounge-cta-button";
 import { LoungeEventCard } from "./lounge-event-card";
@@ -15,6 +18,22 @@ interface LoungeBusinessDetailProps {
   relatedBusinesses: LoungeBusiness[];
   locale: string;
   source?: string;
+  selectedEventId?: string;
+  initialDate?: string;
+}
+
+function toDateKeyKst(isoString: string) {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    timeZone: "Asia/Seoul",
+  }).formatToParts(new Date(isoString));
+
+  const year = parts.find((part) => part.type === "year")?.value ?? "";
+  const month = parts.find((part) => part.type === "month")?.value ?? "";
+  const day = parts.find((part) => part.type === "day")?.value ?? "";
+  return `${year}-${month}-${day}`;
 }
 
 export function LoungeBusinessDetail({
@@ -23,6 +42,8 @@ export function LoungeBusinessDetail({
   relatedBusinesses,
   locale,
   source,
+  selectedEventId,
+  initialDate,
 }: LoungeBusinessDetailProps) {
   const formatter = new Intl.DateTimeFormat(locale === "ko" ? "ko-KR" : "en-US", {
     month: "long",
@@ -39,8 +60,40 @@ export function LoungeBusinessDetail({
     training_center: locale === "ko" ? "훈련장 / 슈팅센터" : "Training Center",
     tournament: locale === "ko" ? "대회" : "Tournament",
     brand: locale === "ko" ? "브랜드" : "Brand",
-    service: locale === "ko" ? "서비스" : "Service",
+    service: locale === "ko" ? "퍼포먼스 솔루션" : "Performance Solution",
   }[business.category];
+
+  const [selectedDate, setSelectedDate] = useState<string | null>(initialDate ?? null);
+  const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
+  const allSchedulesRef = useRef<HTMLElement | null>(null);
+
+  const filteredEvents = useMemo(() => {
+    if (!selectedDate) return events;
+    return events.filter((event) => toDateKeyKst(event.start_time) === selectedDate);
+  }, [events, selectedDate]);
+
+  useEffect(() => {
+    if (!selectedEventId && !initialDate) return;
+
+    const sectionTimer = window.setTimeout(() => {
+      allSchedulesRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 180);
+
+    return () => window.clearTimeout(sectionTimer);
+  }, [initialDate, selectedEventId]);
+
+  useEffect(() => {
+    if (!selectedEventId || viewMode !== "list") return;
+
+    const highlightTimer = window.setTimeout(() => {
+      document.getElementById(`lounge-event-${selectedEventId}`)?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }, 420);
+
+    return () => window.clearTimeout(highlightTimer);
+  }, [selectedDate, selectedEventId, viewMode]);
 
   return (
     <div className="space-y-8">
@@ -143,12 +196,6 @@ export function LoungeBusinessDetail({
           </div>
 
           <div className="flex flex-wrap gap-2 text-sm text-zinc-600 dark:text-zinc-300">
-            {business.address ? (
-              <span className="inline-flex items-center gap-2 rounded-full bg-zinc-100 px-3 py-1.5 dark:bg-zinc-800">
-                <MapPin className="h-4 w-4" />
-                {business.address}
-              </span>
-            ) : null}
             <span className="inline-flex items-center gap-2 rounded-full bg-amber-50 px-3 py-1.5 font-semibold text-amber-800 dark:bg-amber-900/20 dark:text-amber-200">
               <CalendarDays className="h-4 w-4" />
               {locale === "ko"
@@ -194,7 +241,11 @@ export function LoungeBusinessDetail({
                   {events.slice(0, 3).map((event) => (
                     <div
                       key={event.id}
-                      className="rounded-xl border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-950"
+                      className={`rounded-xl border p-3 transition-colors ${
+                        selectedEventId === event.id
+                          ? "border-amber-300 bg-amber-50/70 dark:border-amber-700 dark:bg-amber-900/10"
+                          : "border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950"
+                      }`}
                     >
                       <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
                         {event.title}
@@ -202,16 +253,6 @@ export function LoungeBusinessDetail({
                       <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
                         {formatter.format(new Date(event.start_time))}
                       </p>
-                      {event.location ? (
-                        <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
-                          {event.location}
-                        </p>
-                      ) : null}
-                      {event.location_address ? (
-                        <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
-                          {event.location_address}
-                        </p>
-                      ) : null}
                     </div>
                   ))}
                 </div>
@@ -221,20 +262,49 @@ export function LoungeBusinessDetail({
         </div>
       </section>
 
-      <section className="space-y-4">
-        <div>
-          <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
-            {locale === "ko" ? "전체 일정" : "All schedules"}
-          </h2>
+      <section id="all-schedules" ref={allSchedulesRef} className="space-y-4">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
+              {locale === "ko" ? "전체 일정" : "All schedules"}
+            </h2>
+          </div>
+          <div className="flex items-center rounded-lg bg-zinc-100 p-1 dark:bg-zinc-800">
+            <button
+              type="button"
+              onClick={() => setViewMode("list")}
+              className={`flex items-center gap-2 rounded-md px-4 py-2 text-sm font-bold transition-colors ${viewMode === "list" ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-700 dark:text-white" : "text-zinc-500 dark:text-zinc-400"}`}
+            >
+              <List className="h-4 w-4" />
+              {locale === "ko" ? "목록" : "List"}
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode("calendar")}
+              className={`flex items-center gap-2 rounded-md px-4 py-2 text-sm font-bold transition-colors ${viewMode === "calendar" ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-700 dark:text-white" : "text-zinc-500 dark:text-zinc-400"}`}
+            >
+              <CalendarDays className="h-4 w-4" />
+              {locale === "ko" ? "캘린더" : "Calendar"}
+            </button>
+          </div>
         </div>
 
-        {events.length === 0 ? (
+        <DateFilter selectedDate={selectedDate} onSelect={setSelectedDate} />
+
+        {viewMode === "calendar" ? (
+          <LoungeCalendarView
+            events={events}
+            locale={locale}
+            onDateSelect={setSelectedDate}
+            selectedDate={selectedDate}
+          />
+        ) : filteredEvents.length === 0 ? (
           <div className="rounded-xl border border-dashed border-zinc-300 p-8 text-center text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
-            {locale === "ko" ? "현재 공개된 예정 일정이 없습니다." : "No upcoming public events yet."}
+            {locale === "ko" ? "선택한 날짜에 등록된 일정이 없습니다." : "No events for the selected date."}
           </div>
         ) : (
           <div className="grid gap-4 md:grid-cols-2">
-            {events.map((event) => (
+            {filteredEvents.map((event) => (
               <LoungeEventCard
                 key={event.id}
                 event={event}
@@ -242,6 +312,7 @@ export function LoungeBusinessDetail({
                 locale={locale}
                 source={source}
                 showMap={true}
+                isHighlighted={selectedEventId === event.id}
               />
             ))}
           </div>

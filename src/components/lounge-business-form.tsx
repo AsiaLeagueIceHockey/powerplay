@@ -112,7 +112,7 @@ export function LoungeBusinessForm({
             <option value="training_center">{locale === "ko" ? "훈련장 / 슈팅센터" : "Training Center"}</option>
             <option value="tournament">{locale === "ko" ? "대회" : "Tournament"}</option>
             <option value="brand">{locale === "ko" ? "브랜드" : "Brand"}</option>
-            <option value="service">{locale === "ko" ? "서비스" : "Service"}</option>
+            <option value="service">{locale === "ko" ? "퍼포먼스 솔루션" : "Performance Solution"}</option>
           </select>
         </label>
         <label className="space-y-2 text-sm md:col-span-2">

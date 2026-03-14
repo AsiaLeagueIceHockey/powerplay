@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import { MapPin } from "lucide-react";
 import type { LoungeBusiness, LoungeEvent } from "@/app/actions/lounge";
 import { extractRegion } from "@/lib/rink-utils";
 import { LoungeContactMenu } from "./lounge-contact-menu";
@@ -15,12 +14,14 @@ export function LoungeEventCard({
   locale,
   source,
   showMap = false,
+  isHighlighted = false,
 }: {
   event: LoungeEvent;
   business: LoungeBusiness | undefined;
   locale: string;
   source?: string;
   showMap?: boolean;
+  isHighlighted?: boolean;
 }) {
   const formatter = new Intl.DateTimeFormat(locale === "ko" ? "ko-KR" : "en-US", {
     month: "short",
@@ -38,6 +39,18 @@ export function LoungeEventCard({
   const startDate = new Date(event.start_time);
   const formattedDate = formatter.format(startDate);
   const formattedTime = timeFormatter.format(startDate);
+  const eventDateKey = (() => {
+    const parts = new Intl.DateTimeFormat("en-CA", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      timeZone: "Asia/Seoul",
+    }).formatToParts(startDate);
+    const year = parts.find((part) => part.type === "year")?.value ?? "";
+    const month = parts.find((part) => part.type === "month")?.value ?? "";
+    const day = parts.find((part) => part.type === "day")?.value ?? "";
+    return `${year}-${month}-${day}`;
+  })();
 
   const categoryLabel = {
     lesson: locale === "ko" ? "레슨 일정" : "Lesson",
@@ -45,7 +58,10 @@ export function LoungeEventCard({
     tournament: locale === "ko" ? "대회 일정" : "Tournament",
     promotion: locale === "ko" ? "프로모션" : "Promotion",
   }[event.category];
-  const eventRegion = extractRegion(event.location_address ?? event.location ?? undefined);
+  const regionLabel = extractRegion(event.location_address ?? event.location ?? undefined);
+  const compactLocationLabel = regionLabel
+    ? regionLabel.split(" ").slice(-1)[0]
+    : (event.location ?? "").split(" ").slice(0, 1)[0] || null;
   const availableLinks = [
     {
       key: "phone",
@@ -66,14 +82,21 @@ export function LoungeEventCard({
   ].filter((item): item is { key: "phone" | "kakao" | "instagram" | "website"; url: string } => Boolean(item.url));
 
   return (
-    <article className="relative overflow-hidden rounded-xl border border-zinc-200 bg-white p-4 shadow-sm transition-all duration-300 hover:border-amber-500 hover:shadow-lg dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-amber-400">
+    <article
+      id={`lounge-event-${event.id}`}
+      className={`relative overflow-hidden rounded-xl border bg-white p-4 shadow-sm transition-all duration-300 dark:bg-zinc-900 ${
+        isHighlighted
+          ? "border-amber-400 ring-2 ring-amber-300/70 shadow-lg shadow-amber-100 animate-[pulse_1.8s_ease-in-out_3] dark:border-amber-400 dark:ring-amber-500/40"
+          : "border-zinc-200 hover:border-amber-500 hover:shadow-lg dark:border-zinc-800 dark:hover:border-amber-400"
+      }`}
+    >
       <LoungeImpressionTracker entityType="event" businessId={event.business_id} eventId={event.id} locale={locale} source={source} />
       <div className="absolute inset-x-0 top-0 h-1 w-full bg-gradient-to-r from-amber-400 via-orange-500 to-red-500" />
       <LoungeDetailLink
         entityType="event"
         businessId={event.business_id}
         eventId={event.id}
-        href={`/${locale}/lounge/${event.business_id}${source ? `?source=${encodeURIComponent(source)}` : ""}`}
+        href={`/${locale}/lounge/${event.business_id}?eventId=${event.id}&date=${eventDateKey}${source ? `&source=${encodeURIComponent(source)}` : ""}#all-schedules`}
         locale={locale}
         source={source}
         className="mb-4 block w-full text-left"
@@ -100,20 +123,9 @@ export function LoungeEventCard({
           <h4 className="leading-tight text-lg font-bold text-zinc-900 transition-colors dark:text-zinc-100">
             {event.title}
           </h4>
-        </div>
-
-        <div className="mb-3 rounded-lg border border-zinc-100 bg-zinc-50/80 px-3 py-2.5 dark:border-zinc-800 dark:bg-zinc-800/30">
-          <div className="min-w-0 space-y-1">
-            {eventRegion ? (
-              <p className="text-[11px] font-medium text-zinc-400 dark:text-zinc-500">{eventRegion}</p>
-            ) : null}
-            {event.location ? (
-              <div className="flex items-center gap-1.5 text-[12px] text-zinc-500 dark:text-zinc-400">
-                <MapPin className="h-3.5 w-3.5 shrink-0 text-zinc-400" />
-                <span className="truncate">{event.location}</span>
-              </div>
-            ) : null}
-          </div>
+          {compactLocationLabel ? (
+            <p className="mt-1 text-xs font-medium text-zinc-400 dark:text-zinc-500">{compactLocationLabel}</p>
+          ) : null}
         </div>
 
         {event.summary ? (
@@ -133,7 +145,7 @@ export function LoungeEventCard({
         </div>
       ) : null}
 
-      <div className="flex items-end justify-between gap-3 border-t border-zinc-100 pt-3 dark:border-zinc-800/70">
+      <div className="flex min-h-[48px] items-center justify-between gap-3 border-t border-zinc-100 pt-3 dark:border-zinc-800/70">
         <div className="min-w-0">
           {business ? (
             <div className="flex items-center gap-2 overflow-hidden">
@@ -141,13 +153,13 @@ export function LoungeEventCard({
                 <Image
                   src={business.logo_url}
                   alt={business.name || "Business logo"}
-                  width={18}
-                  height={18}
+                  width={22}
+                  height={22}
                   unoptimized
-                  className="h-[18px] w-[18px] rounded object-cover bg-white shadow-sm"
+                  className="h-[22px] w-[22px] rounded object-cover bg-white shadow-sm"
                 />
               ) : null}
-              <span className="truncate text-xs font-semibold text-zinc-500 dark:text-zinc-400">{business.name}</span>
+              <span className="truncate text-sm font-bold text-zinc-600 dark:text-zinc-300">{business.name}</span>
             </div>
           ) : null}
         </div>

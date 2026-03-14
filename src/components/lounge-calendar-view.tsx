@@ -8,9 +8,10 @@ interface LoungeCalendarViewProps {
   events: LoungeEvent[];
   locale: string;
   onDateSelect: (date: string) => void;
+  selectedDate?: string | null;
 }
 
-export function LoungeCalendarView({ events, locale, onDateSelect }: LoungeCalendarViewProps) {
+export function LoungeCalendarView({ events, locale, onDateSelect, selectedDate = null }: LoungeCalendarViewProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -97,14 +98,18 @@ export function LoungeCalendarView({ events, locale, onDateSelect }: LoungeCalen
           const eventCount = eventCountByDay[day] || 0;
           const today = isToday(day);
           const isSunday = index % 7 === 0;
+          const dateString = formatDateString(day);
+          const selected = selectedDate === dateString;
 
           return (
             <button
               key={`${year}-${month}-${day}`}
               type="button"
-              onClick={() => onDateSelect(formatDateString(day))}
+              onClick={() => onDateSelect(dateString)}
               className={`aspect-square flex flex-col items-center justify-center rounded-lg transition-all text-sm relative ${
-                today
+                selected
+                  ? "bg-blue-600 text-white font-bold shadow-lg"
+                  : today
                   ? "bg-amber-500 text-white font-bold"
                   : eventCount > 0
                     ? "bg-amber-50 dark:bg-amber-900/20 hover:bg-amber-100 dark:hover:bg-amber-900/40"
@@ -113,7 +118,7 @@ export function LoungeCalendarView({ events, locale, onDateSelect }: LoungeCalen
             >
               <span>{day}</span>
               {eventCount > 0 && (
-                <span className={`text-xs mt-0.5 ${today ? "text-amber-100" : "text-amber-600 dark:text-amber-400"}`}>
+                <span className={`text-xs mt-0.5 ${selected ? "text-blue-100" : today ? "text-amber-100" : "text-amber-600 dark:text-amber-400"}`}>
                   {eventCount > 1 ? `L${eventCount}` : "L"}
                 </span>
               )}
