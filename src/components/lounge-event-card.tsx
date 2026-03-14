@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, CalendarDays, MapPin } from "lucide-react";
+import { ArrowRight, CalendarDays, Globe, Instagram, MapPin, MessageCircle, Phone } from "lucide-react";
 import type { LoungeBusiness, LoungeEvent } from "@/app/actions/lounge";
 import { extractRegion } from "@/lib/rink-utils";
 import { LoungeDetailLink } from "./lounge-detail-link";
@@ -38,6 +38,32 @@ export function LoungeEventCard({
     promotion: locale === "ko" ? "프로모션" : "Promotion",
   }[event.category];
   const eventRegion = extractRegion(event.location_address ?? event.location ?? undefined);
+  const availableLinks = [
+    {
+      key: "phone",
+      href: business?.phone ? `tel:${business.phone}` : null,
+      icon: <Phone className="h-4 w-4" />,
+      className: "border border-zinc-200 text-zinc-700 dark:border-zinc-700 dark:text-zinc-200",
+    },
+    {
+      key: "kakao",
+      href: business?.kakao_open_chat_url,
+      icon: <MessageCircle className="h-4 w-4" />,
+      className: "bg-[#FEE500] text-[#3B1E1E]",
+    },
+    {
+      key: "instagram",
+      href: business?.instagram_url,
+      icon: <Instagram className="h-4 w-4" />,
+      className: "bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045] text-white",
+    },
+    {
+      key: "website",
+      href: business?.website_url,
+      icon: <Globe className="h-4 w-4" />,
+      className: "border border-zinc-200 text-zinc-700 dark:border-zinc-700 dark:text-zinc-200",
+    },
+  ].filter((item) => item.href);
 
   return (
     <article className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
@@ -104,44 +130,25 @@ export function LoungeEventCard({
         </div>
       ) : null}
 
-      <div className="flex flex-wrap gap-2">
-        <LoungeCtaButton
-          entityType="event"
-          businessId={event.business_id}
-          eventId={event.id}
-          ctaType="kakao"
-          url={business?.kakao_open_chat_url}
-          locale={locale}
-          source={source}
-          className="rounded-xl bg-[#FEE500] px-3 py-2 text-sm font-semibold text-[#3B1E1E] disabled:cursor-not-allowed disabled:opacity-40"
-        >
-          {locale === "ko" ? "카카오 문의" : "Kakao"}
-        </LoungeCtaButton>
-        <LoungeCtaButton
-          entityType="event"
-          businessId={event.business_id}
-          eventId={event.id}
-          ctaType="instagram"
-          url={business?.instagram_url}
-          locale={locale}
-          source={source}
-          className="rounded-xl bg-zinc-900 px-3 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40 dark:bg-zinc-100 dark:text-zinc-900"
-        >
-          Instagram
-        </LoungeCtaButton>
-        <LoungeCtaButton
-          entityType="event"
-          businessId={event.business_id}
-          eventId={event.id}
-          ctaType="website"
-          url={business?.website_url}
-          locale={locale}
-          source={source}
-          className="rounded-xl border border-zinc-200 px-3 py-2 text-sm font-semibold text-zinc-700 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-700 dark:text-zinc-200"
-        >
-          {locale === "ko" ? "자세히 보기" : "Website"}
-        </LoungeCtaButton>
-      </div>
+      {availableLinks.length > 0 ? (
+        <div className="flex items-center gap-2 overflow-x-auto pb-1">
+          {availableLinks.map((item) => (
+            <LoungeCtaButton
+              key={item.key}
+              entityType="event"
+              businessId={event.business_id}
+              eventId={event.id}
+              ctaType={item.key as "phone" | "kakao" | "instagram" | "website"}
+              url={item.href}
+              locale={locale}
+              source={source}
+              className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${item.className} disabled:cursor-not-allowed disabled:opacity-40`}
+            >
+              {item.icon}
+            </LoungeCtaButton>
+          ))}
+        </div>
+      ) : null}
     </article>
   );
 }
