@@ -1,8 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, CalendarDays, Globe, Instagram, List, MessageCircle, Phone, Trophy } from "lucide-react";
+import { CalendarDays, Globe, Instagram, List, MessageCircle, Phone, Trophy } from "lucide-react";
 import type { LoungeBusiness, LoungeEvent } from "@/app/actions/lounge";
 import { DateFilter } from "./date-filter";
 import { LoungeCalendarView } from "./lounge-calendar-view";
@@ -11,6 +10,7 @@ import { LoungeCtaButton } from "./lounge-cta-button";
 import { LoungeEventCard } from "./lounge-event-card";
 import { LoungeImpressionTracker } from "./lounge-impression-tracker";
 import { LoungeLocationMap } from "./lounge-location-map";
+import { LoungeShareButton } from "./lounge-share-button";
 
 interface LoungeBusinessDetailProps {
   business: LoungeBusiness;
@@ -45,16 +45,6 @@ export function LoungeBusinessDetail({
   selectedEventId,
   initialDate,
 }: LoungeBusinessDetailProps) {
-  const formatter = new Intl.DateTimeFormat(locale === "ko" ? "ko-KR" : "en-US", {
-    month: "long",
-    day: "numeric",
-    weekday: "short",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-    timeZone: "Asia/Seoul",
-  });
-
   const categoryLabel = {
     lesson: locale === "ko" ? "하키 레슨" : "Lessons",
     training_center: locale === "ko" ? "훈련장 / 슈팅센터" : "Training Center",
@@ -65,6 +55,7 @@ export function LoungeBusinessDetail({
 
   const [selectedDate, setSelectedDate] = useState<string | null>(initialDate ?? null);
   const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
+  const [highlightedEventId, setHighlightedEventId] = useState<string | null>(selectedEventId ?? null);
   const allSchedulesRef = useRef<HTMLElement | null>(null);
 
   const filteredEvents = useMemo(() => {
@@ -85,26 +76,25 @@ export function LoungeBusinessDetail({
   useEffect(() => {
     if (!selectedEventId || viewMode !== "list") return;
 
-    const highlightTimer = window.setTimeout(() => {
+    const scrollTimer = window.setTimeout(() => {
       document.getElementById(`lounge-event-${selectedEventId}`)?.scrollIntoView({
         behavior: "smooth",
         block: "center",
       });
     }, 420);
 
-    return () => window.clearTimeout(highlightTimer);
+    const clearTimer = window.setTimeout(() => {
+      setHighlightedEventId(null);
+    }, 1000);
+
+    return () => {
+      window.clearTimeout(scrollTimer);
+      window.clearTimeout(clearTimer);
+    };
   }, [selectedDate, selectedEventId, viewMode]);
 
   return (
     <div className="space-y-8">
-      <Link
-        href={`/${locale}/lounge`}
-        className="inline-flex items-center gap-2 text-sm font-semibold text-zinc-600 transition-colors hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-100"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        {locale === "ko" ? "라운지로 돌아가기" : "Back to lounge"}
-      </Link>
-
       <section className="overflow-hidden rounded-[28px] border border-amber-200/60 bg-white shadow-sm dark:border-amber-900/40 dark:bg-zinc-950">
         <LoungeImpressionTracker entityType="business" businessId={business.id} locale={locale} source={source} />
         {business.cover_image_url ? (
@@ -143,7 +133,8 @@ export function LoungeBusinessDetail({
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-2 md:w-[320px]">
+            <div className="flex items-start gap-2 md:w-[372px]">
+              <div className="grid flex-1 grid-cols-2 gap-2">
               <LoungeCtaButton
                 entityType="business"
                 businessId={business.id}
@@ -192,6 +183,8 @@ export function LoungeBusinessDetail({
                 <Globe className="h-4 w-4" />
                 {locale === "ko" ? "웹사이트" : "Website"}
               </LoungeCtaButton>
+              </div>
+              <LoungeShareButton businessName={business.name} />
             </div>
           </div>
 
@@ -204,59 +197,26 @@ export function LoungeBusinessDetail({
             </span>
           </div>
 
-          <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
-            <div className="rounded-2xl border border-zinc-200 bg-zinc-50/70 p-5 dark:border-zinc-800 dark:bg-zinc-900/60">
-              <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
-                {locale === "ko" ? "소개" : "Introduction"}
-              </h2>
-              <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-zinc-600 dark:text-zinc-300">
-                {business.description || (locale === "ko" ? "등록된 소개가 없습니다." : "No introduction yet.")}
+          <div className="rounded-2xl border border-zinc-200 bg-zinc-50/70 p-5 dark:border-zinc-800 dark:bg-zinc-900/60">
+            <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
+              {locale === "ko" ? "소개" : "Introduction"}
+            </h2>
+            <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-zinc-600 dark:text-zinc-300">
+              {business.description || (locale === "ko" ? "등록된 소개가 없습니다." : "No introduction yet.")}
+            </p>
+            {business.address ? (
+              <p className="mt-4 text-sm font-medium text-zinc-700 dark:text-zinc-200">
+                {business.address}
               </p>
-              {business.address ? (
-                <p className="mt-4 text-sm font-medium text-zinc-700 dark:text-zinc-200">
-                  {business.address}
-                </p>
-              ) : null}
-              <div className="mt-4">
-                <LoungeLocationMap
-                  name={business.name}
-                  address={business.address || business.name}
-                  mapUrl={business.map_url}
-                  lat={business.lat}
-                  lng={business.lng}
-                />
-              </div>
-            </div>
-
-            <div className="rounded-2xl border border-zinc-200 bg-zinc-50/70 p-5 dark:border-zinc-800 dark:bg-zinc-900/60">
-              <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
-                {locale === "ko" ? "다가오는 일정" : "Upcoming schedules"}
-              </h2>
-              {events.length === 0 ? (
-                <p className="mt-3 text-sm leading-7 text-zinc-500 dark:text-zinc-400">
-                  {locale === "ko" ? "현재 공개된 예정 일정이 없습니다." : "No upcoming public events yet."}
-                </p>
-              ) : (
-                <div className="mt-3 space-y-3">
-                  {events.slice(0, 3).map((event) => (
-                    <div
-                      key={event.id}
-                      className={`rounded-xl border p-3 transition-colors ${
-                        selectedEventId === event.id
-                          ? "border-amber-300 bg-amber-50/70 dark:border-amber-700 dark:bg-amber-900/10"
-                          : "border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950"
-                      }`}
-                    >
-                      <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-                        {event.title}
-                      </p>
-                      <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
-                        {formatter.format(new Date(event.start_time))}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              )}
+            ) : null}
+            <div className="mt-4">
+              <LoungeLocationMap
+                name={business.name}
+                address={business.address || business.name}
+                mapUrl={business.map_url}
+                lat={business.lat}
+                lng={business.lng}
+              />
             </div>
           </div>
         </div>
@@ -312,7 +272,7 @@ export function LoungeBusinessDetail({
                 locale={locale}
                 source={source}
                 showMap={true}
-                isHighlighted={selectedEventId === event.id}
+                isHighlighted={highlightedEventId === event.id}
               />
             ))}
           </div>
