@@ -25,7 +25,7 @@ export function LoungeCard({
     training_center: locale === "ko" ? "훈련장 / 슈팅센터" : "Training Center",
     tournament: locale === "ko" ? "대회" : "Tournament",
     brand: locale === "ko" ? "브랜드" : "Brand",
-    service: locale === "ko" ? "서비스" : "Service",
+    service: locale === "ko" ? "퍼포먼스 솔루션" : "Performance Solution",
   }[business.category];
   const availableLinks = [
     {
