@@ -8,10 +8,10 @@ export default async function LoungeBusinessDetailPage({
   searchParams,
 }: {
   params: Promise<{ locale: string; businessId: string }>;
-  searchParams: Promise<{ source?: string }>;
+  searchParams: Promise<{ source?: string; eventId?: string; date?: string }>;
 }) {
   const { locale, businessId } = await params;
-  const { source } = await searchParams;
+  const { source, eventId, date } = await searchParams;
   setRequestLocale(locale);
 
   const data = await getPublicLoungeBusinessDetail(businessId);
@@ -27,6 +27,8 @@ export default async function LoungeBusinessDetailPage({
       relatedBusinesses={data.relatedBusinesses}
       locale={locale}
       source={source}
+      selectedEventId={eventId}
+      initialDate={date}
     />
   );
 }
