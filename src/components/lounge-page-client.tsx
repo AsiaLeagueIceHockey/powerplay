@@ -76,7 +76,7 @@ export function LoungePageClient({ businesses, events, locale, source }: LoungeP
       </section>
 
       <section className="border-b border-zinc-200 dark:border-zinc-800">
-        <div className="flex min-w-max gap-6 overflow-x-auto pb-3">
+        <div className="flex">
           {tabs.map((tab) => {
             const active = activeTab === tab.id;
             return (
@@ -84,7 +84,7 @@ export function LoungePageClient({ businesses, events, locale, source }: LoungeP
                 key={tab.id}
                 type="button"
                 onClick={() => setActiveTab(tab.id)}
-                className={`relative pb-3 text-base font-bold transition-colors md:text-lg ${
+                className={`relative flex-1 pb-3 text-base font-bold transition-colors md:text-lg ${
                   active ? "text-zinc-900 dark:text-white" : "text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
                 }`}
               >
@@ -114,12 +114,6 @@ export function LoungePageClient({ businesses, events, locale, source }: LoungeP
           ) : null}
 
           <section className="space-y-4">
-            <div>
-              <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
-                {locale === "ko" ? "원하는 서비스 찾기" : "Find what you need"}
-              </h2>
-            </div>
-
             <div className="flex gap-2 overflow-x-auto pb-1">
               {categoryOptions.map((option) => {
                 const active = selectedCategory === option.value;
@@ -158,11 +152,6 @@ export function LoungePageClient({ businesses, events, locale, source }: LoungeP
       {activeTab === "events" ? (
         <section className="space-y-4">
           <div className="flex items-center justify-between gap-3">
-            <div>
-              <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
-                {locale === "ko" ? "일정 모아보기" : "Schedules"}
-              </h2>
-            </div>
             <div className="flex items-center rounded-lg bg-zinc-100 p-1 dark:bg-zinc-800">
               <button
                 type="button"
