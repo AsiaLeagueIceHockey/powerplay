@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { CalendarDays, Crown, List } from "lucide-react";
+import { CalendarDays, List, ShieldCheck } from "lucide-react";
 import type { LoungeBusiness, LoungeEvent } from "@/app/actions/lounge";
 import { DateFilter } from "./date-filter";
 import { LoungeCalendarView } from "./lounge-calendar-view";
@@ -48,31 +48,16 @@ export function LoungePageClient({ businesses, events, locale, source }: LoungeP
     return `${year}-${month}-${day}` === selectedDate;
   });
 
-  const filteredEventCount = filteredEvents.length;
-
   return (
     <div className="space-y-8">
-      <section className="rounded-2xl border border-amber-200/70 bg-[linear-gradient(135deg,#fff8eb_0%,#ffffff_58%,#fff4ea_100%)] px-4 py-3 shadow-sm dark:border-amber-900/30 dark:bg-[linear-gradient(135deg,#18181b_0%,#111827_55%,#2a1408_100%)]">
-        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div className="min-w-0">
-            <div className="inline-flex items-center gap-2 rounded-full bg-zinc-900 px-2.5 py-1 text-[11px] font-semibold text-white dark:bg-zinc-100 dark:text-zinc-900">
-              <Crown className="h-3.5 w-3.5" />
-              {locale === "ko" ? "PowerPlay Premium" : "PowerPlay Premium"}
-            </div>
-            <p className="mt-2 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-              {locale === "ko"
-                ? "실력 향상, 장비, 훈련, 대회 정보를 한 번에 보고 바로 연결받을 수 있는 공간입니다."
-                : "A curated place to find coaching, gear, training, and tournament opportunities."}
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-2 text-xs text-zinc-600 dark:text-zinc-300">
-            <span className="rounded-full bg-white px-2.5 py-1 dark:bg-zinc-900">
-              {locale === "ko" ? `${businesses.length}개 옵션` : `${businesses.length} options`}
-            </span>
-            <span className="rounded-full bg-white px-2.5 py-1 dark:bg-zinc-900">
-              {locale === "ko" ? `${events.length}개 일정` : `${events.length} schedules`}
-            </span>
-          </div>
+      <section className="rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-2.5 dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="flex items-center gap-2 text-sm text-zinc-700 dark:text-zinc-200">
+          <ShieldCheck className="h-4 w-4 text-amber-600 dark:text-amber-300" />
+          <p className="font-medium">
+            {locale === "ko"
+              ? "실력 향상, 훈련, 장비, 대회 관련 정보를 한 곳에서 확인하고 바로 연결받을 수 있습니다."
+              : "Find coaching, training, gear, and tournament options in one place."}
+          </p>
         </div>
       </section>
 
@@ -83,12 +68,9 @@ export function LoungePageClient({ businesses, events, locale, source }: LoungeP
               {locale === "ko" ? "지금 찾을 수 있는 곳" : "Places that can help right now"}
             </h2>
             <p className="text-sm text-zinc-500 dark:text-zinc-400">
-              {locale === "ko" ? "레슨, 훈련, 장비, 대회까지 지금 필요한 선택지를 골라보세요." : "Find the right option for coaching, training, gear, or tournaments."}
+              {locale === "ko" ? "지금 필요한 도움을 받을 수 있는 곳만 모아봤습니다." : "A focused list of places that can help with what you need now."}
             </p>
           </div>
-          <span className="rounded-full bg-zinc-100 px-3 py-1 text-xs font-semibold text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
-            {businesses.length}
-          </span>
         </div>
 
         <div className="flex gap-2 overflow-x-auto pb-1">
@@ -131,12 +113,9 @@ export function LoungePageClient({ businesses, events, locale, source }: LoungeP
               {locale === "ko" ? "바로 확인할 일정" : "Schedules to check now"}
             </h2>
             <p className="text-sm text-zinc-500 dark:text-zinc-400">
-              {locale === "ko" ? "가까운 날짜의 레슨, 훈련, 대회 모집 정보를 빠르게 훑어볼 수 있습니다." : "Quickly scan upcoming lessons, training sessions, and tournament opportunities."}
+              {locale === "ko" ? "가까운 일정부터 먼저 보고 바로 문의하거나 참여를 검토할 수 있습니다." : "Review the nearest schedules first, then reach out or decide to join."}
             </p>
           </div>
-          <span className="rounded-full bg-zinc-100 px-3 py-1 text-xs font-semibold text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
-            {filteredEventCount}
-          </span>
           <div className="flex items-center bg-zinc-100 dark:bg-zinc-800 p-1 rounded-lg">
             <button
               type="button"

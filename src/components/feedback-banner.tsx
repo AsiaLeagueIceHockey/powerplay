@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { Crown, Instagram } from "lucide-react";
+import { ShieldCheck, Instagram } from "lucide-react";
 
 export function FeedbackBanner() {
   const t = useTranslations();
@@ -18,7 +18,7 @@ export function FeedbackBanner() {
       bgClass: "bg-[linear-gradient(135deg,#111827_0%,#7c2d12_52%,#f59e0b_100%)] hover:opacity-90",
       iconBg: "bg-white/10 backdrop-blur",
       iconColor: "text-amber-200",
-      icon: <Crown className="w-5 h-5" strokeWidth={2.5} />,
+      icon: <ShieldCheck className="w-5 h-5" strokeWidth={2.5} />,
       title: t("common.loungeBanner.title"),
       description: t("common.loungeBanner.description"),
     },
