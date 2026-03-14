@@ -52,8 +52,8 @@ export function LoungeEventForm({ locale, events }: { locale: string; events: Lo
   const isEditing = !!formState.event_id;
 
   return (
-    <div className="space-y-5 rounded-3xl border border-zinc-800 bg-[linear-gradient(180deg,#18181b_0%,#09090b_100%)] p-6 shadow-sm">
-      <div className="flex items-start gap-3 rounded-2xl border border-zinc-800 bg-zinc-900/80 p-4">
+    <div className="space-y-5 rounded-3xl border border-zinc-700 bg-[linear-gradient(180deg,#3f3f46_0%,#27272a_100%)] p-6 shadow-sm">
+      <div className="flex items-start gap-3 rounded-2xl border border-zinc-700/80 bg-zinc-900/50 p-4">
         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-400 text-zinc-950">
           <CalendarRange className="h-5 w-5" />
         </div>
@@ -70,7 +70,7 @@ export function LoungeEventForm({ locale, events }: { locale: string; events: Lo
       </div>
 
       <form
-        className="grid gap-4 rounded-2xl border border-zinc-800 bg-zinc-900/80 p-5 md:grid-cols-2"
+        className="grid gap-4 rounded-2xl border border-zinc-700/80 bg-zinc-900/50 p-5 md:grid-cols-2"
         onSubmit={(event) => {
           event.preventDefault();
           const payload = new FormData();
@@ -155,7 +155,7 @@ export function LoungeEventForm({ locale, events }: { locale: string; events: Lo
             className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100"
           />
         </label>
-        <div className="space-y-3 md:col-span-2 rounded-xl border border-zinc-800 bg-zinc-950 p-4">
+        <div className="space-y-3 md:col-span-2 rounded-xl border border-zinc-700/80 bg-zinc-900/60 p-4">
           <div>
             <p className="text-sm font-semibold text-zinc-100">
               {locale === "ko" ? "이 일정의 위치" : "Event location"}
@@ -295,7 +295,7 @@ export function LoungeEventForm({ locale, events }: { locale: string; events: Lo
         </div>
       </form>
 
-      <div className="space-y-3 border-t border-zinc-800 pt-4">
+      <div className="space-y-3 border-t border-zinc-700 pt-4">
         <h4 className="text-sm font-semibold text-zinc-100">
           {locale === "ko" ? "등록된 일정" : "Published events"}
         </h4>
@@ -306,7 +306,7 @@ export function LoungeEventForm({ locale, events }: { locale: string; events: Lo
         ) : (
           <div className="space-y-3">
             {sortedEvents.map((eventItem) => (
-              <div key={eventItem.id} className="rounded-xl border border-zinc-800 bg-zinc-900/80 px-4 py-3">
+              <div key={eventItem.id} className="rounded-xl border border-zinc-700/80 bg-zinc-900/50 px-4 py-3">
                 <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                   <div>
                     <div className="flex flex-wrap items-center gap-2">

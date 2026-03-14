@@ -32,7 +32,7 @@ export function LoungeFeatureManager({
     business.owner_user_id;
 
   return (
-    <section className="space-y-4 rounded-3xl border border-zinc-800 bg-zinc-950/80 p-5 shadow-sm">
+    <section className="space-y-4 rounded-3xl border border-zinc-700 bg-zinc-800 p-5 shadow-sm">
       <div>
         <h2 className="text-lg font-bold text-zinc-100">
           {locale === "ko" ? "추천 비즈니스 관리" : "Featured business manager"}
@@ -53,7 +53,7 @@ export function LoungeFeatureManager({
           {sortedBusinesses.map((business) => (
             <form
               key={business.id}
-              className="rounded-2xl border border-zinc-800 bg-zinc-900/80 p-4"
+              className="rounded-2xl border border-zinc-700/80 bg-zinc-900/50 p-4"
               onSubmit={(event) => {
                 event.preventDefault();
                 const formData = new FormData(event.currentTarget);
