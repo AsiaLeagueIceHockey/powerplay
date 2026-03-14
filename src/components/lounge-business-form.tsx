@@ -65,7 +65,7 @@ export function LoungeBusinessForm({
 
   return (
     <form
-      className="space-y-5 rounded-3xl border border-zinc-800 bg-[linear-gradient(180deg,#18181b_0%,#09090b_100%)] p-6 shadow-sm"
+      className="space-y-5 rounded-3xl border border-zinc-700 bg-[linear-gradient(180deg,#3f3f46_0%,#27272a_100%)] p-6 shadow-sm"
       onSubmit={(event) => {
         event.preventDefault();
         const formData = new FormData(event.currentTarget);
@@ -86,7 +86,7 @@ export function LoungeBusinessForm({
         });
       }}
     >
-      <div className="flex items-start gap-3 rounded-2xl border border-zinc-800 bg-zinc-900/80 p-4">
+      <div className="flex items-start gap-3 rounded-2xl border border-zinc-700/80 bg-zinc-900/50 p-4">
         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-400 text-zinc-950">
           <Store className="h-5 w-5" />
         </div>
@@ -126,7 +126,7 @@ export function LoungeBusinessForm({
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
-        <div className="space-y-3 rounded-2xl border border-zinc-800 bg-zinc-900/80 p-5">
+        <div className="space-y-3 rounded-2xl border border-zinc-700/80 bg-zinc-900/50 p-5">
           <div>
             <p className="text-sm font-semibold text-zinc-100">
               {locale === "ko" ? "로고 이미지" : "Logo image"}
@@ -178,7 +178,7 @@ export function LoungeBusinessForm({
           </div>
         </div>
 
-        <div className="space-y-3 rounded-2xl border border-zinc-800 bg-zinc-900/80 p-5">
+        <div className="space-y-3 rounded-2xl border border-zinc-700/80 bg-zinc-900/50 p-5">
           <div>
             <p className="text-sm font-semibold text-zinc-100">
               {locale === "ko" ? "커버 이미지" : "Cover image"}
@@ -236,7 +236,7 @@ export function LoungeBusinessForm({
         </div>
       ) : null}
 
-      <div className="space-y-4 rounded-2xl border border-zinc-800 bg-zinc-900/80 p-5">
+      <div className="space-y-4 rounded-2xl border border-zinc-700/80 bg-zinc-900/50 p-5">
         <div>
           <p className="text-sm font-semibold text-zinc-100">
             {locale === "ko" ? "비즈니스 위치" : "Business location"}
