@@ -478,6 +478,12 @@ export async function upsertLoungeBusiness(formData: FormData) {
     return { success: false, error: "Active lounge membership required" };
   }
 
+  const { data: existing } = await supabase
+    .from("lounge_businesses")
+    .select("id, display_priority")
+    .eq("owner_user_id", adminInfo.userId)
+    .maybeSingle();
+
   const payload = {
     owner_user_id: adminInfo.userId,
     category: (formData.get("category") as LoungeBusinessCategory) || "service",
@@ -494,19 +500,15 @@ export async function upsertLoungeBusiness(formData: FormData) {
     kakao_open_chat_url: ((formData.get("kakao_open_chat_url") as string) || "").trim() || null,
     instagram_url: ((formData.get("instagram_url") as string) || "").trim() || null,
     website_url: ((formData.get("website_url") as string) || "").trim() || null,
-    display_priority: Number((formData.get("display_priority") as string) || "0") || 0,
+    display_priority: formData.has("display_priority")
+      ? Number((formData.get("display_priority") as string) || "0") || 0
+      : existing?.display_priority ?? 0,
     is_published: formData.get("is_published") === "true",
   };
 
   if (!payload.name) {
     return { success: false, error: "Business name is required" };
   }
-
-  const { data: existing } = await supabase
-    .from("lounge_businesses")
-    .select("id")
-    .eq("owner_user_id", adminInfo.userId)
-    .maybeSingle();
 
   const result = existing
     ? await supabase.from("lounge_businesses").update(payload).eq("id", existing.id)
@@ -560,6 +562,14 @@ export async function upsertLoungeEvent(formData: FormData) {
   const endTimeInput = formData.get("end_time") as string;
   const priceRaw = (formData.get("price_krw") as string) || "";
   const maxRaw = (formData.get("max_participants") as string) || "";
+  const existingEvent = eventId
+    ? await supabase
+        .from("lounge_events")
+        .select("id, display_priority")
+        .eq("id", eventId)
+        .eq("business_id", business.id)
+        .maybeSingle()
+    : { data: null as Pick<LoungeEvent, "id" | "display_priority"> | null };
 
   const payload = {
     business_id: business.id,
@@ -576,7 +586,9 @@ export async function upsertLoungeEvent(formData: FormData) {
     location_lng: ((formData.get("location_lng") as string) || "").trim() ? Number(formData.get("location_lng")) : null,
     price_krw: priceRaw ? Number(priceRaw.replace(/,/g, "")) : null,
     max_participants: maxRaw ? Number(maxRaw) : null,
-    display_priority: Number((formData.get("display_priority") as string) || "0") || 0,
+    display_priority: formData.has("display_priority")
+      ? Number((formData.get("display_priority") as string) || "0") || 0
+      : existingEvent.data?.display_priority ?? 0,
     is_published: formData.get("is_published") === "true",
   };
 
@@ -679,6 +691,48 @@ export async function upsertLoungeMembership(formData: FormData) {
   revalidatePath("/ko/admin/lounge");
   revalidatePath("/en/admin/lounge");
   return { success: true };
+}
+
+export async function uploadLoungeImage(formData: FormData): Promise<{ url?: string; error?: string }> {
+  const supabase = await createClient();
+  const adminInfo = await getAdminInfo();
+
+  if (!adminInfo.isAdmin || !adminInfo.userId) {
+    return { error: "Unauthorized" };
+  }
+
+  const file = formData.get("file") as File;
+  if (!file || file.size === 0) {
+    return { error: "No file provided" };
+  }
+
+  if (!file.type.startsWith("image/")) {
+    return { error: "Only image files are allowed" };
+  }
+
+  if (file.size > 5 * 1024 * 1024) {
+    return { error: "File size must be 5MB or less" };
+  }
+
+  const fileExt = file.name.split(".").pop() || "jpg";
+  const fileName = `lounge/${adminInfo.userId}/${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from("club-logos")
+    .upload(fileName, file, {
+      cacheControl: "3600",
+      upsert: false,
+    });
+
+  if (uploadError) {
+    return { error: uploadError.message };
+  }
+
+  const {
+    data: { publicUrl },
+  } = supabase.storage.from("club-logos").getPublicUrl(fileName);
+
+  return { url: publicUrl };
 }
 
 export async function trackLoungeImpression(
