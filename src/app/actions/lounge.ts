@@ -51,6 +51,10 @@ export interface LoungeEvent {
   start_time: string;
   end_time: string | null;
   location: string | null;
+  location_address: string | null;
+  location_map_url: string | null;
+  location_lat: number | null;
+  location_lng: number | null;
   price_krw: number | null;
   max_participants: number | null;
   display_priority: number;
@@ -69,6 +73,9 @@ export interface LoungeBusiness {
   logo_url: string | null;
   cover_image_url: string | null;
   address: string | null;
+  map_url: string | null;
+  lat: number | null;
+  lng: number | null;
   phone: string | null;
   kakao_open_chat_url: string | null;
   instagram_url: string | null;
@@ -480,6 +487,9 @@ export async function upsertLoungeBusiness(formData: FormData) {
     logo_url: ((formData.get("logo_url") as string) || "").trim() || null,
     cover_image_url: ((formData.get("cover_image_url") as string) || "").trim() || null,
     address: ((formData.get("address") as string) || "").trim() || null,
+    map_url: ((formData.get("map_url") as string) || "").trim() || null,
+    lat: ((formData.get("lat") as string) || "").trim() ? Number(formData.get("lat")) : null,
+    lng: ((formData.get("lng") as string) || "").trim() ? Number(formData.get("lng")) : null,
     phone: ((formData.get("phone") as string) || "").trim() || null,
     kakao_open_chat_url: ((formData.get("kakao_open_chat_url") as string) || "").trim() || null,
     instagram_url: ((formData.get("instagram_url") as string) || "").trim() || null,
@@ -560,6 +570,10 @@ export async function upsertLoungeEvent(formData: FormData) {
     start_time: new Date(startTimeInput + "+09:00").toISOString(),
     end_time: endTimeInput ? new Date(endTimeInput + "+09:00").toISOString() : null,
     location: ((formData.get("location") as string) || "").trim() || null,
+    location_address: ((formData.get("location_address") as string) || "").trim() || null,
+    location_map_url: ((formData.get("location_map_url") as string) || "").trim() || null,
+    location_lat: ((formData.get("location_lat") as string) || "").trim() ? Number(formData.get("location_lat")) : null,
+    location_lng: ((formData.get("location_lng") as string) || "").trim() ? Number(formData.get("location_lng")) : null,
     price_krw: priceRaw ? Number(priceRaw.replace(/,/g, "")) : null,
     max_participants: maxRaw ? Number(maxRaw) : null,
     display_priority: Number((formData.get("display_priority") as string) || "0") || 0,

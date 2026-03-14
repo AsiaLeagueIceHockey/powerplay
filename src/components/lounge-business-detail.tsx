@@ -7,6 +7,7 @@ import { LoungeCard } from "./lounge-card";
 import { LoungeCtaButton } from "./lounge-cta-button";
 import { LoungeEventCard } from "./lounge-event-card";
 import { LoungeImpressionTracker } from "./lounge-impression-tracker";
+import { LoungeLocationMap } from "./lounge-location-map";
 
 interface LoungeBusinessDetailProps {
   business: LoungeBusiness;
@@ -164,6 +165,20 @@ export function LoungeBusinessDetail({
               <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-zinc-600 dark:text-zinc-300">
                 {business.description || (locale === "ko" ? "등록된 소개가 없습니다." : "No introduction yet.")}
               </p>
+              {business.address ? (
+                <p className="mt-4 text-sm font-medium text-zinc-700 dark:text-zinc-200">
+                  {business.address}
+                </p>
+              ) : null}
+              <div className="mt-4">
+                <LoungeLocationMap
+                  name={business.name}
+                  address={business.address || business.name}
+                  mapUrl={business.map_url}
+                  lat={business.lat}
+                  lng={business.lng}
+                />
+              </div>
             </div>
 
             <div className="rounded-2xl border border-zinc-200 bg-zinc-50/70 p-5 dark:border-zinc-800 dark:bg-zinc-900/60">
@@ -190,6 +205,11 @@ export function LoungeBusinessDetail({
                       {event.location ? (
                         <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
                           {event.location}
+                        </p>
+                      ) : null}
+                      {event.location_address ? (
+                        <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                          {event.location_address}
                         </p>
                       ) : null}
                     </div>
@@ -226,6 +246,7 @@ export function LoungeBusinessDetail({
                 business={business}
                 locale={locale}
                 source={source}
+                showMap={true}
               />
             ))}
           </div>

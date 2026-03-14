@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Store } from "lucide-react";
+import { Loader2, MapPin, Search, Store } from "lucide-react";
 import type { LoungeBusiness } from "@/app/actions/lounge";
+import { parseNaverMapUrl } from "@/app/actions/admin";
 import { upsertLoungeBusiness } from "@/app/actions/lounge";
 
 export function LoungeBusinessForm({
@@ -14,6 +15,14 @@ export function LoungeBusinessForm({
 }) {
   const [isPending, startTransition] = useTransition();
   const [published, setPublished] = useState<boolean>(business?.is_published ?? true);
+  const [parsing, setParsing] = useState(false);
+  const [mapError, setMapError] = useState<string | null>(null);
+  const [locationState, setLocationState] = useState({
+    map_url: business?.map_url ?? "",
+    address: business?.address ?? "",
+    lat: business?.lat?.toString() ?? "",
+    lng: business?.lng?.toString() ?? "",
+  });
 
   return (
     <form
@@ -22,6 +31,10 @@ export function LoungeBusinessForm({
         event.preventDefault();
         const formData = new FormData(event.currentTarget);
         formData.set("is_published", String(published));
+        formData.set("map_url", locationState.map_url);
+        formData.set("address", locationState.address);
+        formData.set("lat", locationState.lat);
+        formData.set("lng", locationState.lng);
         startTransition(async () => {
           const result = await upsertLoungeBusiness(formData);
           if (!result.success) {
@@ -43,6 +56,70 @@ export function LoungeBusinessForm({
           <p className="mt-1 text-sm leading-6 text-zinc-600 dark:text-zinc-300">
           {locale === "ko" ? "구독 계정당 1개의 대표 사업장만 운영합니다." : "One representative business per subscribed admin."}
           </p>
+        </div>
+      </div>
+
+      <div className="space-y-4 rounded-2xl border border-zinc-200/80 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950">
+        <div>
+          <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+            {locale === "ko" ? "사업장 위치" : "Business location"}
+          </p>
+          <p className="mt-1 text-xs leading-5 text-zinc-500 dark:text-zinc-400">
+            {locale === "ko"
+              ? "네이버 지도 URL을 넣으면 주소와 좌표를 자동으로 채웁니다. 목록에는 대략적인 지역이 노출됩니다."
+              : "Paste a Naver Map URL to autofill address and coordinates."}
+          </p>
+        </div>
+        <div className="grid gap-3 md:grid-cols-[1fr_auto]">
+          <input
+            type="url"
+            value={locationState.map_url}
+            onChange={(event) => setLocationState((prev) => ({ ...prev, map_url: event.target.value }))}
+            placeholder="https://naver.me/..."
+            className="w-full rounded-xl border border-zinc-300 bg-white px-3 py-2.5 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+          />
+          <button
+            type="button"
+            onClick={async () => {
+              if (!locationState.map_url) {
+                setMapError(locale === "ko" ? "네이버 지도 URL을 입력하세요." : "Enter a Naver Map URL.");
+                return;
+              }
+              setParsing(true);
+              setMapError(null);
+              const result = await parseNaverMapUrl(locationState.map_url);
+              if (!result.success || !result.data) {
+                setMapError(result.error || (locale === "ko" ? "지도 정보를 가져오지 못했습니다." : "Failed to parse map URL."));
+                setParsing(false);
+                return;
+              }
+              setLocationState({
+                map_url: result.data.mapUrl,
+                address: result.data.address,
+                lat: result.data.lat.toString(),
+                lng: result.data.lng.toString(),
+              });
+              setParsing(false);
+            }}
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-zinc-900 px-4 py-2.5 text-sm font-semibold text-white dark:bg-zinc-100 dark:text-zinc-900"
+          >
+            {parsing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+            {locale === "ko" ? "정보 가져오기" : "Fetch info"}
+          </button>
+        </div>
+        {mapError ? (
+          <p className="text-sm text-red-600 dark:text-red-400">{mapError}</p>
+        ) : null}
+        <div className="rounded-xl bg-zinc-50 p-4 text-sm dark:bg-zinc-900/70">
+          <div className="flex items-start gap-2 text-zinc-700 dark:text-zinc-200">
+            <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
+            <div>
+              <p className="font-medium">{locationState.address || (locale === "ko" ? "주소 미등록" : "No address yet")}</p>
+              <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                {locationState.lat && locationState.lng ? `${locationState.lat}, ${locationState.lng}` : (locale === "ko" ? "좌표 미등록" : "No coordinates yet")}
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -85,10 +162,6 @@ export function LoungeBusinessForm({
         <label className="space-y-2 text-sm">
           <span className="font-semibold text-zinc-900 dark:text-zinc-100">Cover URL</span>
           <input name="cover_image_url" defaultValue={business?.cover_image_url ?? ""} className="w-full rounded-xl border border-zinc-300 bg-white px-3 py-2.5 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />
-        </label>
-        <label className="space-y-2 text-sm md:col-span-2">
-          <span className="font-semibold text-zinc-900 dark:text-zinc-100">{locale === "ko" ? "주소" : "Address"}</span>
-          <input name="address" defaultValue={business?.address ?? ""} className="w-full rounded-xl border border-zinc-300 bg-white px-3 py-2.5 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />
         </label>
         <label className="space-y-2 text-sm">
           <span className="font-semibold text-zinc-900 dark:text-zinc-100">{locale === "ko" ? "전화" : "Phone"}</span>
