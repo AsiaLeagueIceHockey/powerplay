@@ -160,7 +160,7 @@ export function LoungeBusinessDetail({
           <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
             <div className="rounded-2xl border border-zinc-200 bg-zinc-50/70 p-5 dark:border-zinc-800 dark:bg-zinc-900/60">
               <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
-                {locale === "ko" ? "여기서 해결할 수 있는 것" : "What this can help with"}
+                {locale === "ko" ? "소개" : "Introduction"}
               </h2>
               <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-zinc-600 dark:text-zinc-300">
                 {business.description || (locale === "ko" ? "등록된 소개가 없습니다." : "No introduction yet.")}
@@ -183,7 +183,7 @@ export function LoungeBusinessDetail({
 
             <div className="rounded-2xl border border-zinc-200 bg-zinc-50/70 p-5 dark:border-zinc-800 dark:bg-zinc-900/60">
               <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
-                {locale === "ko" ? "가장 먼저 볼 일정" : "What to check first"}
+                {locale === "ko" ? "다가오는 일정" : "Upcoming schedules"}
               </h2>
               {events.length === 0 ? (
                 <p className="mt-3 text-sm leading-7 text-zinc-500 dark:text-zinc-400">
@@ -224,13 +224,8 @@ export function LoungeBusinessDetail({
       <section className="space-y-4">
         <div>
           <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
-            {locale === "ko" ? "지금 확인할 수 있는 일정" : "Available schedules right now"}
+            {locale === "ko" ? "전체 일정" : "All schedules"}
           </h2>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
-            {locale === "ko"
-              ? "바로 문의하거나 참여를 검토할 수 있는 레슨, 훈련, 대회 정보를 모았습니다."
-              : "Browse lessons, training sessions, and tournaments you can inquire about right away."}
-          </p>
         </div>
 
         {events.length === 0 ? (
