@@ -30,7 +30,7 @@ export default async function AdminLoungePage({
   const showGate = data.membershipStatus !== "active";
   return (
     <div className="space-y-6">
-      <section className="rounded-[28px] border border-zinc-800 bg-[radial-gradient(circle_at_top_left,_rgba(251,191,36,0.18),_transparent_38%),linear-gradient(135deg,#18181b_0%,#09090b_72%,#1f0a0a_100%)] px-5 py-4 shadow-sm">
+      <section className="rounded-[28px] border border-zinc-700 bg-[radial-gradient(circle_at_top_left,_rgba(251,191,36,0.14),_transparent_40%),linear-gradient(135deg,#3f3f46_0%,#27272a_48%,#18181b_100%)] px-5 py-4 shadow-sm">
         <div className="max-w-3xl">
           <span className="inline-flex rounded-full bg-zinc-100 px-3 py-1 text-xs font-semibold text-zinc-900">
             {locale === "ko" ? "PowerPlay Lounge Admin" : "PowerPlay Lounge Admin"}
@@ -47,7 +47,7 @@ export default async function AdminLoungePage({
       </section>
 
       {showGate ? (
-        <section className="rounded-3xl border border-zinc-800 bg-zinc-950/80 p-6 shadow-sm">
+        <section className="rounded-3xl border border-zinc-700 bg-zinc-800 p-6 shadow-sm">
           <div className="grid gap-6 lg:grid-cols-[1fr_0.9fr]">
             <div className="max-w-2xl space-y-4">
               <div>
@@ -98,7 +98,7 @@ export default async function AdminLoungePage({
                   body: locale === "ko" ? "좋은 비즈니스는 파워플레이 추천 영역에 우선 노출됩니다." : "Strong businesses can be surfaced in featured placements.",
                 },
               ].map((item) => (
-                <div key={item.title} className="rounded-2xl border border-zinc-800 bg-zinc-900/80 p-4">
+                <div key={item.title} className="rounded-2xl border border-zinc-700/80 bg-zinc-900/50 p-4">
                   <p className="font-semibold text-zinc-100">{item.title}</p>
                   <p className="mt-2 text-sm leading-6 text-zinc-300">{item.body}</p>
                 </div>

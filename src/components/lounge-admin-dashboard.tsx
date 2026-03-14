@@ -73,7 +73,7 @@ export function LoungeAdminDashboard({
   const renderPerformance = () => {
     if (!business) {
       return (
-        <section className="rounded-3xl border border-dashed border-zinc-700 bg-zinc-900/70 p-6 text-center shadow-sm">
+        <section className="rounded-3xl border border-dashed border-zinc-700 bg-zinc-800 p-6 text-center shadow-sm">
           <h2 className="text-lg font-bold text-zinc-100">
             {locale === "ko" ? "먼저 비즈니스 정보를 등록해주세요" : "Create your business profile first"}
           </h2>
@@ -102,7 +102,7 @@ export function LoungeAdminDashboard({
             { label: locale === "ko" ? "일정 노출" : "Event impressions", value: metrics.eventImpressions },
             { label: locale === "ko" ? "일정 클릭" : "Event clicks", value: metrics.eventClicks },
           ].map((item) => (
-            <div key={item.label} className="rounded-3xl border border-zinc-800 bg-zinc-950/80 p-5 shadow-sm">
+            <div key={item.label} className="rounded-3xl border border-zinc-700 bg-zinc-800 p-5 shadow-sm">
               <p className="text-sm text-zinc-400">{item.label}</p>
               <p className="mt-2 text-3xl font-black tracking-tight text-zinc-50">{item.value}</p>
             </div>
@@ -110,13 +110,13 @@ export function LoungeAdminDashboard({
         </section>
 
         <section className="grid gap-4 xl:grid-cols-[0.9fr_1.1fr]">
-          <div className="rounded-3xl border border-zinc-800 bg-zinc-950/80 p-5 shadow-sm">
+          <div className="rounded-3xl border border-zinc-700 bg-zinc-800 p-5 shadow-sm">
             <h2 className="text-lg font-bold text-zinc-100">
               {locale === "ko" ? "연락 경로 클릭 수" : "Contact clicks"}
             </h2>
             <div className="mt-4 space-y-3">
               {pathClicks.map((item) => (
-                <div key={item.key} className="rounded-2xl border border-zinc-800 bg-zinc-900/80 px-4 py-3">
+                <div key={item.key} className="rounded-2xl border border-zinc-700/80 bg-zinc-900/50 px-4 py-3">
                   <div className="flex items-center justify-between gap-3">
                     <p className="text-sm font-semibold text-zinc-200">{item.label}</p>
                     <p className="text-lg font-black text-zinc-50">{metrics.ctaClicks[item.key]}</p>
@@ -126,7 +126,7 @@ export function LoungeAdminDashboard({
             </div>
           </div>
 
-          <div className="rounded-3xl border border-zinc-800 bg-zinc-950/80 p-5 shadow-sm">
+          <div className="rounded-3xl border border-zinc-700 bg-zinc-800 p-5 shadow-sm">
             <h2 className="text-lg font-bold text-zinc-100">
               {locale === "ko" ? "최근 7일 노출/클릭" : "Last 7 days"}
             </h2>
@@ -137,7 +137,7 @@ export function LoungeAdminDashboard({
                 </p>
               ) : (
                 dailyMetrics.map((item) => (
-                  <div key={item.date} className="rounded-2xl border border-zinc-800 bg-zinc-900/80 p-3">
+                  <div key={item.date} className="rounded-2xl border border-zinc-700/80 bg-zinc-900/50 p-3">
                     <div className="flex items-center justify-between gap-3">
                       <p className="text-sm font-semibold text-zinc-200">{item.date}</p>
                       <div className="flex items-center gap-4 text-sm text-zinc-400">
@@ -156,7 +156,7 @@ export function LoungeAdminDashboard({
           </div>
         </section>
 
-        <section className="rounded-3xl border border-zinc-800 bg-zinc-950/80 p-5 shadow-sm">
+        <section className="rounded-3xl border border-zinc-700 bg-zinc-800 p-5 shadow-sm">
           <h2 className="text-lg font-bold text-zinc-100">
             {locale === "ko" ? "일정별 노출/클릭" : "Event performance"}
           </h2>
@@ -167,7 +167,7 @@ export function LoungeAdminDashboard({
               </p>
             ) : (
               eventMetrics.slice(0, 6).map((item) => (
-                <div key={item.eventId} className="rounded-2xl border border-zinc-800 bg-zinc-900/80 p-4">
+                <div key={item.eventId} className="rounded-2xl border border-zinc-700/80 bg-zinc-900/50 p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <p className="font-semibold text-zinc-100">{item.title}</p>

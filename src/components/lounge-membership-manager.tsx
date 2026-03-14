@@ -34,7 +34,7 @@ export function LoungeMembershipManager({
   };
 
   return (
-    <div className="space-y-5 rounded-3xl border border-zinc-800 bg-[radial-gradient(circle_at_top_left,_rgba(251,191,36,0.14),_transparent_28%),linear-gradient(180deg,#18181b_0%,#09090b_100%)] p-6 shadow-sm">
+    <div className="space-y-5 rounded-3xl border border-zinc-700 bg-[radial-gradient(circle_at_top_left,_rgba(251,191,36,0.12),_transparent_28%),linear-gradient(180deg,#3f3f46_0%,#27272a_100%)] p-6 shadow-sm">
       <div>
         <h3 className="text-lg font-bold text-zinc-100">
           {locale === "ko" ? "슈퍼유저 구독 관리" : "Superuser membership manager"}
@@ -45,7 +45,7 @@ export function LoungeMembershipManager({
       </div>
 
       <form
-        className="grid gap-4 rounded-2xl border border-zinc-800 bg-zinc-900/80 p-5 md:grid-cols-2"
+        className="grid gap-4 rounded-2xl border border-zinc-700/80 bg-zinc-900/50 p-5 md:grid-cols-2"
         onSubmit={(event) => {
           event.preventDefault();
           const formData = new FormData(event.currentTarget);
@@ -105,7 +105,7 @@ export function LoungeMembershipManager({
         </button>
       </form>
 
-      <div className="space-y-3 border-t border-zinc-800 pt-4">
+      <div className="space-y-3 border-t border-zinc-700 pt-4">
         <h4 className="text-sm font-semibold text-zinc-100">
           {locale === "ko" ? "최근 등록 내역" : "Recent memberships"}
         </h4>
@@ -115,7 +115,7 @@ export function LoungeMembershipManager({
               {locale === "ko" ? "등록된 구독 내역이 없습니다." : "No memberships yet."}
             </p>
           ) : memberships.map((membership) => (
-            <div key={membership.id} className="rounded-xl border border-zinc-800 bg-zinc-900/80 px-4 py-3 text-sm">
+            <div key={membership.id} className="rounded-xl border border-zinc-700/80 bg-zinc-900/50 px-4 py-3 text-sm">
               <div className="flex items-center justify-between gap-3">
                 <div>
                   <p className="font-semibold text-zinc-100">
