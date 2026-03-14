@@ -48,9 +48,9 @@ export function LoungeContactMenu({
   } as const;
 
   return (
-    <div className="flex flex-col items-end gap-2">
+    <div className="relative flex items-center justify-end">
       {open ? (
-        <div className="flex items-center gap-2 rounded-full bg-zinc-50/90 px-2 py-2 shadow-sm ring-1 ring-zinc-200 dark:bg-zinc-950/80 dark:ring-zinc-700">
+        <div className="absolute bottom-full right-0 z-10 mb-2 flex items-center gap-2 rounded-full bg-white px-2 py-2 shadow-lg ring-1 ring-zinc-200 dark:bg-zinc-950 dark:ring-zinc-700">
           {items.map((item) => (
             <LoungeCtaButton
               key={item.key}
