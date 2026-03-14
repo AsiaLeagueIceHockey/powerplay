@@ -364,21 +364,47 @@ export function SchedulePatternCard({
           </div>
 
           {/* Bank Account */}
-          <div>
-            <label className="block text-xs font-medium mb-2 text-zinc-400">
-              🏦 {t("bankAccount")}
-            </label>
-            <input
-              type="text"
-              value={pattern.bankAccount || ""}
-              onChange={(e) => update({ bankAccount: e.target.value })}
-              className="w-full px-3 py-2.5 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 text-sm"
-              placeholder={t("bankAccountPlaceholder")}
-            />
+          <div className="space-y-4">
+            <h4 className="text-xs font-bold text-zinc-400">🏦 {t("bankAccount")}</h4>
+            
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-[10px] text-zinc-500 mb-1">은행명</label>
+                <input
+                  type="text"
+                  value={pattern.bankName || ""}
+                  onChange={(e) => update({ bankName: e.target.value })}
+                  className="w-full px-3 py-2.5 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  placeholder="예: 카카오뱅크"
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] text-zinc-500 mb-1">예금주</label>
+                <input
+                  type="text"
+                  value={pattern.accountHolder || ""}
+                  onChange={(e) => update({ accountHolder: e.target.value })}
+                  className="w-full px-3 py-2.5 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  placeholder="예: 홍길동"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-[10px] text-zinc-500 mb-1">계좌번호</label>
+              <input
+                type="text"
+                value={pattern.accountNumber || ""}
+                onChange={(e) => update({ accountNumber: e.target.value })}
+                className="w-full px-3 py-2.5 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                placeholder="예: 3333-00-0000000"
+              />
+            </div>
+
             <p className="text-[11px] text-zinc-500 mt-1">
               {locale === "ko"
-                ? "경기 참가비를 정산 받을 계좌를 입력해주세요. (은행명, 계좌번호, 예금주)"
-                : "Enter account to receive entry fee settlements. (Bank, Account #, Name)"}
+                ? "경기 참가비를 정산 받을 계좌를 입력해주세요. (은행명, 예금주, 계좌번호)"
+                : "Enter account for payouts. (Bank, Name, Account #)"}
             </p>
           </div>
 

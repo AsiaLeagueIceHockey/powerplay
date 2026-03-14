@@ -539,7 +539,8 @@ export async function getAllMatchesForSuperuser() {
       status,
       description,
       rink:rink_id(name_ko, name_en),
-      created_by
+      created_by,
+      bank_account
       `
     )
     .order("start_time", { ascending: true });

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createMatch } from "@/app/actions/admin";
 import { useTranslations, useLocale } from "next-intl";
 import type { Club } from "@/app/actions/types";
+import { formatBankAccount } from "@/lib/utils/bank-account";
 
 interface Rink {
   id: string;
@@ -34,7 +35,9 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
   const [maxSkaters, setMaxSkaters] = useState("");
   const [maxGoalies, setMaxGoalies] = useState("");
   const [maxGuests, setMaxGuests] = useState("");
-  const [bankAccount, setBankAccount] = useState("");
+  const [bankName, setBankName] = useState("");
+  const [accountNumber, setAccountNumber] = useState("");
+  const [accountHolder, setAccountHolder] = useState("");
   const [isRentalAvailable, setIsRentalAvailable] = useState(false);
   const [matchType, setMatchType] = useState<"training" | "game" | "team_match">("game");
   const [durationType, setDurationType] = useState<"90" | "120" | "custom">("90");
@@ -50,7 +53,10 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
     ? rinkId !== "" && date !== "" && hour !== "" && minute !== ""
     : isTraining
     ? rinkId !== "" && date !== "" && hour !== "" && minute !== "" &&
-      entryPoints.trim() !== "" && bankAccount.trim() !== ""
+      entryPoints.trim() !== "" && 
+      bankName.trim() !== "" &&
+      accountNumber.trim() !== "" &&
+      accountHolder.trim() !== ""
     : rinkId !== "" &&
       date !== "" &&
       hour !== "" &&
@@ -58,7 +64,9 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
       entryPoints.trim() !== "" &&
       maxSkaters.trim() !== "" &&
       maxGoalies.trim() !== "" &&
-      bankAccount.trim() !== "";
+      bankName.trim() !== "" &&
+      accountNumber.trim() !== "" &&
+      accountHolder.trim() !== "";
 
   // start_time hidden input 업데이트 헬퍼
   const updateStartTime = (
@@ -545,21 +553,54 @@ export function MatchForm({ rinks, clubs = [] }: MatchFormProps) {
           </div>
 
           {/* 정산 계좌번호 */}
-          <div>
-            <label className="block text-sm font-medium mb-2 text-zinc-300">
-              정산 받을 계좌번호
-            </label>
-            <input
-              type="text"
-              name="bank_account"
-              value={bankAccount}
-              onChange={(e) => setBankAccount(e.target.value)}
-              className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-              placeholder="예: 카카오뱅크 3333-00-0000000 홍길동"
-              required
+          <div className="space-y-4">
+            <h3 className="text-sm font-medium text-zinc-300">정산 받을 계좌번호</h3>
+            
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-[10px] text-zinc-500 mb-1">은행명</label>
+                <input
+                  type="text"
+                  value={bankName}
+                  onChange={(e) => setBankName(e.target.value)}
+                  className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  placeholder="예: 카카오뱅크"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] text-zinc-500 mb-1">예금주</label>
+                <input
+                  type="text"
+                  value={accountHolder}
+                  onChange={(e) => setAccountHolder(e.target.value)}
+                  className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  placeholder="예: 홍길동"
+                  required
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-[10px] text-zinc-500 mb-1">계좌번호</label>
+              <input
+                type="text"
+                value={accountNumber}
+                onChange={(e) => setAccountNumber(e.target.value)}
+                className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                placeholder="예: 3333-00-0000000"
+                required
+              />
+            </div>
+
+            <input 
+              type="hidden" 
+              name="bank_account" 
+              value={formatBankAccount({ bankName, accountHolder, accountNumber })} 
             />
+            
             <p className="text-xs text-zinc-500 mt-1 mb-3">
-              경기 참가비를 정산 받을 계좌를 입력해주세요. (은행명, 계좌번호, 예금주)
+              경기 참가비를 정산 받을 계좌를 입력해주세요. (은행명, 예금주, 계좌번호)
             </p>
           </div>
         </>

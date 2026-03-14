@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl";
 import { AdminParticipantList } from "./admin-participant-list";
 import { deleteMatch, cancelMatchByAdmin } from "@/app/actions/admin";
 import { AdminNewBadge, markMatchAsSeen } from "./admin-new-badge";
+import { CopyButton } from "./copy-button";
 
 interface Match {
   id: string;
@@ -27,6 +28,7 @@ interface Match {
   max_goalies: number;
   match_type?: string;
   fee: number;
+  bank_account?: string | null;
   creator?: {
     full_name: string | null;
     email: string;
@@ -215,6 +217,21 @@ export function SuperUserMatchCard({
           </span>
         </div>
       )}
+
+      {/* Settlement Bank Account (SuperUser Only) */}
+      <div className="mb-6 p-3 bg-zinc-900/50 rounded-lg border border-zinc-700/50 space-y-2">
+        <label className="text-[10px] uppercase tracking-wider font-bold text-zinc-500 block">
+          {locale === "ko" ? "정산 계좌번호" : "Settlement Account"}
+        </label>
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-sm font-medium text-zinc-200 truncate">
+            {match.bank_account || (locale === "ko" ? "계좌정보 미입력" : "No account info")}
+          </span>
+          {match.bank_account && (
+            <CopyButton text={match.bank_account} className="flex-shrink-0" />
+          )}
+        </div>
+      </div>
 
       <div className="space-y-3">
         <div className="grid grid-cols-2 gap-3">

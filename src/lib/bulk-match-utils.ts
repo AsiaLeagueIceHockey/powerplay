@@ -4,6 +4,7 @@
  * Provides date generation from schedule patterns and
  * pattern grouping from existing match data.
  */
+import { formatBankAccount, parseBankAccount } from "./utils/bank-account";
 
 // ─── Types ───────────────────────────────────────────────
 
@@ -22,7 +23,10 @@ export interface SchedulePattern {
   matchType: MatchType;
   // game fields
   entryPoints?: number;
-  bankAccount?: string;
+  bankName?: string;
+  accountNumber?: string;
+  accountHolder?: string;
+  bankAccount?: string; // Kept for legacy if needed, but we'll use the split fields
   maxSkaters?: number;
   maxGoalies?: number;
   goalieFree?: boolean;
@@ -166,7 +170,15 @@ function buildGeneratedMatch(
   const entryPoints = isTeamMatch ? 0 : (pattern.entryPoints ?? 0);
   const rentalFee = isTeamMatch ? 0 : (pattern.rentalFee ?? 0);
   const rentalAvailable = isTeamMatch ? false : (pattern.rentalAvailable ?? false);
-  const bankAccount = isTeamMatch ? null : (pattern.bankAccount ?? null);
+  
+  const bankAccount = isTeamMatch 
+    ? null 
+    : formatBankAccount({ 
+        bankName: pattern.bankName || "", 
+        accountHolder: pattern.accountHolder || "", 
+        accountNumber: pattern.accountNumber || "" 
+      }) || null;
+
   const goalieFree = (isTeamMatch || isTraining) ? false : (pattern.goalieFree ?? false);
 
   const maxGuests = isTraining ? (pattern.maxGuests ?? null) : null;
@@ -265,6 +277,9 @@ export function groupMatchesByPattern(matches: PreviousMatch[]): SchedulePattern
   for (const [, group] of groups) {
     const sample = group.matches[0];
     const kstDate = group.dates[0];
+    
+    const bankParts = parseBankAccount(sample.bank_account || "");
+
     const hour = String(new Date(kstDate).getUTCHours()).padStart(2, "0");
     const minute = String(new Date(kstDate).getUTCMinutes()).padStart(2, "0");
 
@@ -316,7 +331,9 @@ export function groupMatchesByPattern(matches: PreviousMatch[]): SchedulePattern
       customWeeks,
       matchType: sample.match_type,
       entryPoints: sample.entry_points,
-      bankAccount: sample.bank_account ?? undefined,
+      bankName: bankParts.bankName,
+      accountHolder: bankParts.accountHolder,
+      accountNumber: bankParts.accountNumber,
       maxSkaters: sample.max_skaters,
       maxGoalies: sample.max_goalies,
       maxGuests: sample.max_guests ?? undefined,

@@ -46,7 +46,9 @@ function createEmptyPattern(): SchedulePattern {
     matchType: "game",
     selectedDates: [],
     entryPoints: 0,
-    bankAccount: "",
+    bankName: "",
+    accountNumber: "",
+    accountHolder: "",
     maxSkaters: 20,
     maxGoalies: 2,
     goalieFree: false,
@@ -120,8 +122,8 @@ export function BulkMatchForm({ rinks, clubs = [], initialMonth }: BulkMatchForm
       if (!p.selectedDates || p.selectedDates.length === 0)
         errs.push(`${label}: ${locale === "ko" ? "날짜를 선택해주세요" : "Select at least one date"}`);
       if (p.matchType !== "team_match") {
-        if (!p.bankAccount?.trim())
-          errs.push(`${label}: ${locale === "ko" ? "정산 계좌를 입력해주세요" : "Enter bank account"}`);
+        if (!p.bankName?.trim() || !p.accountNumber?.trim() || !p.accountHolder?.trim())
+          errs.push(`${label}: ${locale === "ko" ? "정산 계좌 정보(은행, 번호, 예금주)를 모두 입력해주세요" : "Enter all bank account info (Bank, #, Holder)"}`);
         if (!p.entryPoints || p.entryPoints <= 0)
           errs.push(`${label}: ${locale === "ko" ? "참가비를 입력해주세요" : "Enter entry fee"}`);
       }

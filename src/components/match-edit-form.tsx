@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { updateMatch } from "@/app/actions/admin";
 import { useTranslations, useLocale } from "next-intl";
+import { formatBankAccount, parseBankAccount } from "@/lib/utils/bank-account";
 
 interface Rink {
   id: string;
@@ -56,6 +57,12 @@ export function MatchEditForm({
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const initialBankParts = parseBankAccount(match.bank_account);
+  const [bankName, setBankName] = useState(initialBankParts.bankName);
+  const [accountNumber, setAccountNumber] = useState(initialBankParts.accountNumber);
+  const [accountHolder, setAccountHolder] = useState(initialBankParts.accountHolder);
+
   const [isRentalAvailable, setIsRentalAvailable] = useState(match.rental_available ?? (match.rental_fee || 0) > 0);
   const isTeamMatch = match.match_type === "team_match";
   const isTraining = match.match_type === "training";
@@ -561,20 +568,54 @@ export function MatchEditForm({
       </div>
 
       {/* 정산 계좌번호 */}
-      <div>
-        <label className="block text-sm font-medium mb-2 text-zinc-300">
-          정산 받을 계좌번호
-        </label>
-        <input
-          type="text"
-          name="bank_account"
-          disabled={isCanceled}
-          defaultValue={match.bank_account || ""}
-          className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
-          placeholder="예: 카카오뱅크 3333-00-0000000 홍길동"
+      <div className="space-y-4">
+        <h3 className="text-sm font-medium text-zinc-300">정산 받을 계좌번호</h3>
+        
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="block text-[10px] text-zinc-500 mb-1">은행명</label>
+            <input
+              type="text"
+              value={bankName}
+              disabled={isCanceled}
+              onChange={(e) => setBankName(e.target.value)}
+              className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
+              placeholder="예: 카카오뱅크"
+            />
+          </div>
+          <div>
+            <label className="block text-[10px] text-zinc-500 mb-1">예금주</label>
+            <input
+              type="text"
+              value={accountHolder}
+              disabled={isCanceled}
+              onChange={(e) => setAccountHolder(e.target.value)}
+              className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
+              placeholder="예: 홍길동"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-[10px] text-zinc-500 mb-1">계좌번호</label>
+          <input
+            type="text"
+            value={accountNumber}
+            disabled={isCanceled}
+            onChange={(e) => setAccountNumber(e.target.value)}
+            className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-100 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
+            placeholder="예: 3333-00-0000000"
+          />
+        </div>
+
+        <input 
+          type="hidden" 
+          name="bank_account" 
+          value={formatBankAccount({ bankName, accountHolder, accountNumber })} 
         />
+        
         <p className="text-xs text-zinc-500 mt-1 mb-3">
-          경기 참가비를 정산 받을 계좌를 입력해주세요. (은행명, 계좌번호, 예금주)
+          경기 참가비를 정산 받을 계좌를 입력해주세요. (은행명, 예금주, 계좌번호)
         </p>
       </div>
         </>
