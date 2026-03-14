@@ -125,12 +125,6 @@ export function LoungeBusinessForm({
         </label>
       </div>
 
-      <div className="rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900/60 dark:text-zinc-300">
-        {locale === "ko"
-          ? "추천 노출 여부는 파워플레이 운영 기준으로 별도 관리됩니다. 비즈니스 정보와 일정에 집중해서 입력하면 됩니다."
-          : "Featured exposure is managed separately by the PowerPlay team. Focus on your business info and schedules here."}
-      </div>
-
       <div className="grid gap-4 md:grid-cols-2">
         <div className="space-y-3 rounded-2xl border border-zinc-200/80 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950">
           <div>

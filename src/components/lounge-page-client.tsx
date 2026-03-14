@@ -95,7 +95,7 @@ export function LoungePageClient({ businesses, events, locale, source }: LoungeP
 
         {filteredBusinesses.length === 0 ? (
           <div className="rounded-xl border border-dashed border-zinc-300 p-8 text-center text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
-            {locale === "ko" ? "선택한 카테고리에 공개된 라운지 사업장이 없습니다." : "No lounge businesses in this category yet."}
+            {locale === "ko" ? "선택한 카테고리에 공개된 비즈니스가 없습니다." : "No lounge businesses in this category yet."}
           </div>
         ) : (
           <div className="grid gap-4 md:grid-cols-2">
