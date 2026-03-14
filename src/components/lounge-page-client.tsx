@@ -151,7 +151,7 @@ export function LoungePageClient({ businesses, events, locale, source }: LoungeP
 
       {activeTab === "events" ? (
         <section className="space-y-4">
-          <div className="flex items-center justify-between gap-3">
+          <div className="flex justify-end">
             <div className="flex items-center rounded-lg bg-zinc-100 p-1 dark:bg-zinc-800">
               <button
                 type="button"
