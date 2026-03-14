@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Share2 } from "lucide-react";
 import { useLocale } from "next-intl";
+import { loungeIceGoldTheme } from "./lounge-theme";
 
 export function LoungeShareButton({ businessName }: { businessName: string }) {
   const locale = useLocale();
@@ -46,7 +47,7 @@ export function LoungeShareButton({ businessName }: { businessName: string }) {
       <button
         type="button"
         onClick={handleShare}
-        className="inline-flex items-center justify-center p-1 text-zinc-500 transition-colors hover:text-blue-600 dark:text-zinc-300 dark:hover:text-blue-400"
+        className={`inline-flex items-center justify-center p-1 text-zinc-500 transition-colors dark:text-zinc-300 ${loungeIceGoldTheme.shareHover}`}
         title={locale === "ko" ? "공유하기" : "Share"}
         aria-label={locale === "ko" ? "공유하기" : "Share"}
       >

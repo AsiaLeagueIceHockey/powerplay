@@ -2,13 +2,15 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useLocale } from "next-intl";
+import { loungeIceGoldTheme } from "./lounge-theme";
 
 interface DateFilterProps {
   selectedDate: string | null;
   onSelect: (date: string | null) => void;
+  tone?: "default" | "ice-gold";
 }
 
-export function DateFilter({ selectedDate, onSelect }: DateFilterProps) {
+export function DateFilter({ selectedDate, onSelect, tone = "default" }: DateFilterProps) {
   const locale = useLocale();
 
   // Generate next 14 days starting from today (KST)
@@ -44,6 +46,13 @@ export function DateFilter({ selectedDate, onSelect }: DateFilterProps) {
   const isSunday = (date: Date) => {
     return date.getDay() === 0;
   };
+
+  const selectedTone =
+    tone === "ice-gold" ? loungeIceGoldTheme.dateFilterSelected : "bg-blue-600 text-white shadow-lg";
+  const selectedSubtextTone =
+    tone === "ice-gold" ? loungeIceGoldTheme.dateFilterSelectedSubtext : "text-blue-100";
+  const todayTextTone =
+    tone === "ice-gold" ? loungeIceGoldTheme.dateFilterTodayText : "text-blue-600 dark:text-blue-400 font-semibold";
 
   const handleDateClick = (date: Date) => {
     const dateStr = formatDateString(date);
@@ -91,19 +100,19 @@ export function DateFilter({ selectedDate, onSelect }: DateFilterProps) {
             key={dateStr}
             onClick={() => handleDateClick(date)}
             className={`flex flex-col items-center min-w-[52px] py-2 px-3 rounded-xl transition-all ${selected
-                ? "bg-blue-600 text-white shadow-lg"
+                ? selectedTone
                 : "bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700"
               }`}
           >
-            <span className={`text-lg font-bold ${selected ? "text-white" : ""}`}>
+            <span className={`text-lg font-bold ${selected ? (tone === "ice-gold" ? "text-[#111827]" : "text-white") : ""}`}>
               {formatDay(date)}
             </span>
             <span className={`text-xs ${selected
-                ? "text-blue-100"
+                ? selectedSubtextTone
                 : sunday
                   ? "text-red-500 dark:text-red-400 font-semibold"
                   : today
-                    ? "text-blue-600 dark:text-blue-400 font-semibold"
+                    ? todayTextTone
                     : ""
               }`}>
               {today ? (locale === 'ko' ? "오늘" : "Today") : formatWeekday(date)}
@@ -114,4 +123,3 @@ export function DateFilter({ selectedDate, onSelect }: DateFilterProps) {
     </div>
   );
 }
-

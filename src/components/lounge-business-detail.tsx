@@ -11,6 +11,7 @@ import { LoungeEventCard } from "./lounge-event-card";
 import { LoungeImpressionTracker } from "./lounge-impression-tracker";
 import { LoungeLocationMap } from "./lounge-location-map";
 import { LoungeShareButton } from "./lounge-share-button";
+import { loungeIceGoldTheme } from "./lounge-theme";
 
 interface LoungeBusinessDetailProps {
   business: LoungeBusiness;
@@ -95,7 +96,7 @@ export function LoungeBusinessDetail({
 
   return (
     <div className="space-y-8">
-      <section className="overflow-hidden rounded-[28px] border border-amber-200/60 bg-white shadow-sm dark:border-amber-900/40 dark:bg-zinc-950">
+      <section className={`overflow-hidden rounded-[28px] border ${loungeIceGoldTheme.detailShell}`}>
         <LoungeImpressionTracker entityType="business" businessId={business.id} locale={locale} source={source} />
         {business.cover_image_url ? (
           <img
@@ -104,7 +105,7 @@ export function LoungeBusinessDetail({
             className="h-64 w-full object-cover md:h-80"
           />
         ) : (
-          <div className="h-52 bg-[radial-gradient(circle_at_top_left,_rgba(251,191,36,0.32),_transparent_36%),linear-gradient(135deg,#fff8eb_0%,#ffffff_52%,#fff2f2_100%)] dark:bg-[radial-gradient(circle_at_top_left,_rgba(251,191,36,0.18),_transparent_35%),linear-gradient(135deg,#18181b_0%,#09090b_70%,#1f0a0a_100%)]" />
+          <div className={`h-52 ${loungeIceGoldTheme.fallbackCover}`} />
         )}
 
         <div className="space-y-6 p-6">
@@ -119,7 +120,9 @@ export function LoungeBusinessDetail({
                   />
                 ) : null}
                 <div>
-                  <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-bold text-amber-700 dark:bg-amber-900/20 dark:text-amber-300">
+                  <span
+                    className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-bold ${loungeIceGoldTheme.badge}`}
+                  >
                     <Trophy className="h-3 w-3" />
                     {categoryLabel}
                   </span>
@@ -138,7 +141,9 @@ export function LoungeBusinessDetail({
           </div>
 
           <div className="flex flex-wrap gap-2 text-sm text-zinc-600 dark:text-zinc-300">
-            <span className="inline-flex items-center gap-2 rounded-full bg-amber-50 px-3 py-1.5 font-semibold text-amber-800 dark:bg-amber-900/20 dark:text-amber-200">
+            <span
+              className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 font-semibold ${loungeIceGoldTheme.subtleBadge}`}
+            >
               <CalendarDays className="h-4 w-4" />
               {locale === "ko"
                 ? `예정 일정 ${events.length}개`
@@ -253,7 +258,7 @@ export function LoungeBusinessDetail({
           </div>
         </div>
 
-        <DateFilter selectedDate={selectedDate} onSelect={setSelectedDate} />
+        <DateFilter selectedDate={selectedDate} onSelect={setSelectedDate} tone="ice-gold" />
 
         {viewMode === "calendar" ? (
           <LoungeCalendarView
