@@ -82,7 +82,9 @@ describe("generateMatchDates", () => {
     weeklyOption: "every",
     matchType: "game",
     entryPoints: 25000,
-    bankAccount: "카카오뱅크 3333-00-1234567",
+    bankName: "카카오뱅크",
+    accountNumber: "3333-00-1234567",
+    accountHolder: "홍길동",
     maxSkaters: 20,
     maxGoalies: 2,
     goalieFree: true,
@@ -125,7 +127,7 @@ describe("generateMatchDates", () => {
     expect(first.goalieFree).toBe(true);
     expect(first.rentalAvailable).toBe(true);
     expect(first.rentalFee).toBe(10000);
-    expect(first.bankAccount).toBe("카카오뱅크 3333-00-1234567");
+    expect(first.bankAccount).toBe("카카오뱅크 3333-00-1234567 홍길동");
     expect(first.maxGuests).toBeNull();
   });
 
@@ -139,7 +141,9 @@ describe("generateMatchDates", () => {
       weeklyOption: "every",
       matchType: "training",
       entryPoints: 15000,
-      bankAccount: "국민은행 1234-5678",
+      bankName: "국민은행",
+      accountNumber: "1234-5678",
+      accountHolder: "김하키",
       maxGuests: 10,
       rentalAvailable: true,
       rentalFee: 5000,
@@ -235,7 +239,9 @@ describe("generateMatchDates", () => {
         weeklyOption: "every",
         matchType: "game",
         entryPoints: 25000,
-      bankAccount: "카뱅 3333",
+        bankName: "카뱅",
+        accountNumber: "3333",
+        accountHolder: "홍길동",
       maxSkaters: 20,
       maxGoalies: 2,
       duration_minutes: 90,
@@ -250,7 +256,9 @@ describe("generateMatchDates", () => {
         weeklyOption: "every",
         matchType: "training",
         entryPoints: 15000,
-        bankAccount: "카뱅 3333",
+        bankName: "카뱅",
+        accountNumber: "3333",
+        accountHolder: "홍길동",
       maxGuests: 10,
       duration_minutes: 120,
       description: undefined,
@@ -264,7 +272,9 @@ describe("generateMatchDates", () => {
         weeklyOption: "week13",
         matchType: "game",
         entryPoints: 25000,
-      bankAccount: "카뱅 3333",
+        bankName: "카뱅",
+        accountNumber: "3333",
+        accountHolder: "홍길동",
       maxSkaters: 20,
       maxGoalies: 2,
       duration_minutes: null,
@@ -279,7 +289,9 @@ describe("generateMatchDates", () => {
         weeklyOption: "week24",
         matchType: "game",
         entryPoints: 20000,
-      bankAccount: "카뱅 3333",
+        bankName: "카뱅",
+        accountNumber: "3333",
+        accountHolder: "홍길동",
       maxSkaters: 20,
       maxGoalies: 2,
       duration_minutes: 120,
