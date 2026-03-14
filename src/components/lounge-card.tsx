@@ -6,6 +6,7 @@ import { extractRegion } from "@/lib/rink-utils";
 import { LoungeContactMenu } from "./lounge-contact-menu";
 import { LoungeDetailLink } from "./lounge-detail-link";
 import { LoungeImpressionTracker } from "./lounge-impression-tracker";
+import { loungeIceGoldTheme } from "./lounge-theme";
 
 export function LoungeCard({
   business,
@@ -47,9 +48,11 @@ export function LoungeCard({
   ].filter((item): item is { key: "phone" | "kakao" | "instagram" | "website"; url: string } => Boolean(item.url));
 
   return (
-    <article className="relative rounded-xl border border-zinc-200 bg-white p-5 shadow-sm transition-all duration-300 hover:border-amber-500 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900">
+    <article
+      className={`relative rounded-xl border border-zinc-200 bg-white p-5 shadow-sm transition-all duration-300 ${loungeIceGoldTheme.hoverBorder} hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900`}
+    >
       <LoungeImpressionTracker entityType="business" businessId={business.id} locale={locale} source={source} />
-      <div className="absolute inset-x-0 top-0 h-1 rounded-t-xl bg-gradient-to-r from-amber-400 via-orange-500 to-red-500" />
+      <div className={`absolute inset-x-0 top-0 h-1 rounded-t-xl ${loungeIceGoldTheme.accentLine}`} />
       <LoungeDetailLink
         entityType="business"
         businessId={business.id}
@@ -61,7 +64,9 @@ export function LoungeCard({
         <div className="flex items-start justify-between gap-3 rounded-xl">
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-bold text-amber-700 dark:bg-amber-900/20 dark:text-amber-300">
+              <span
+                className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-bold ${loungeIceGoldTheme.badge}`}
+              >
                 <Trophy className="h-3 w-3" />
                 {categoryLabel}
               </span>

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { LoungeEvent } from "@/app/actions/lounge";
+import { loungeIceGoldTheme } from "./lounge-theme";
 
 interface LoungeCalendarViewProps {
   events: LoungeEvent[];
@@ -108,17 +109,19 @@ export function LoungeCalendarView({ events, locale, onDateSelect, selectedDate 
               onClick={() => onDateSelect(dateString)}
               className={`aspect-square flex flex-col items-center justify-center rounded-lg transition-all text-sm relative ${
                 selected
-                  ? "bg-blue-600 text-white font-bold shadow-lg"
+                  ? loungeIceGoldTheme.calendarSelected
                   : today
-                  ? "bg-amber-500 text-white font-bold"
+                  ? loungeIceGoldTheme.calendarToday
                   : eventCount > 0
-                    ? "bg-amber-50 dark:bg-amber-900/20 hover:bg-amber-100 dark:hover:bg-amber-900/40"
+                    ? loungeIceGoldTheme.calendarHasEvent
                     : "hover:bg-zinc-100 dark:hover:bg-zinc-800"
               } ${isSunday && !today ? "text-red-500" : ""}`}
             >
               <span>{day}</span>
               {eventCount > 0 && (
-                <span className={`text-xs mt-0.5 ${selected ? "text-blue-100" : today ? "text-amber-100" : "text-amber-600 dark:text-amber-400"}`}>
+                <span
+                  className={`mt-0.5 text-xs ${selected ? loungeIceGoldTheme.dateFilterSelectedSubtext : today ? "text-white/80" : loungeIceGoldTheme.calendarEventCount}`}
+                >
                   {eventCount > 1 ? `L${eventCount}` : "L"}
                 </span>
               )}

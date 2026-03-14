@@ -7,6 +7,7 @@ import { DateFilter } from "./date-filter";
 import { LoungeCalendarView } from "./lounge-calendar-view";
 import { LoungeCard } from "./lounge-card";
 import { LoungeEventCard } from "./lounge-event-card";
+import { loungeIceGoldTheme } from "./lounge-theme";
 
 type LoungePublicTab = "services" | "events";
 
@@ -65,15 +66,15 @@ export function LoungePageClient({ businesses, events, locale, source }: LoungeP
           display: none;
         }
       `}</style>
-      <section className="overflow-hidden rounded-2xl border border-zinc-200 bg-[linear-gradient(135deg,#fff6dd_0%,#ffffff_45%,#f5f1ff_100%)] px-4 py-3 shadow-sm dark:border-zinc-800 dark:bg-[linear-gradient(135deg,#27272a_0%,#18181b_45%,#111827_100%)]">
+      <section className={loungeIceGoldTheme.bannerContainer}>
         <div className="flex items-center gap-3">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-zinc-950 text-amber-300 dark:bg-zinc-100 dark:text-amber-500">
+          <span className={loungeIceGoldTheme.bannerIcon}>
             <Trophy className="h-4 w-4" />
           </span>
           <div className="min-w-0">
-            <p className="text-[13px] font-semibold leading-5 text-zinc-800 dark:text-zinc-100">
+            <p className="whitespace-pre-line text-sm font-semibold leading-tight text-white">
               {locale === "ko"
-                ? "지금 필요한 하키 레슨, 훈련장, 대회 정보를 라운지에서 확인해보세요."
+                ? "지금 필요한 하키 레슨, 훈련장, 대회 정보를\nPowerPlay 라운지에서 확인해보세요."
                 : "Find the hockey lessons, training centers, and tournament info you need in Lounge."}
             </p>
           </div>
@@ -180,7 +181,7 @@ export function LoungePageClient({ businesses, events, locale, source }: LoungeP
             </div>
           </div>
 
-          <DateFilter selectedDate={selectedDate} onSelect={setSelectedDate} />
+          <DateFilter selectedDate={selectedDate} onSelect={setSelectedDate} tone="ice-gold" />
 
           {viewMode === "calendar" ? (
             <LoungeCalendarView events={events} locale={locale} onDateSelect={setSelectedDate} />
