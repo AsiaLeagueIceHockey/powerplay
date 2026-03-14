@@ -60,6 +60,11 @@ export function LoungePageClient({ businesses, events, locale, source }: LoungeP
 
   return (
     <div className="space-y-8">
+      <style jsx>{`
+        .hide-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
       <section className="overflow-hidden rounded-2xl border border-zinc-200 bg-[linear-gradient(135deg,#fff6dd_0%,#ffffff_45%,#f5f1ff_100%)] px-4 py-3 shadow-sm dark:border-zinc-800 dark:bg-[linear-gradient(135deg,#27272a_0%,#18181b_45%,#111827_100%)]">
         <div className="flex items-center gap-3">
           <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-zinc-950 text-amber-300 dark:bg-zinc-100 dark:text-amber-500">
@@ -114,7 +119,10 @@ export function LoungePageClient({ businesses, events, locale, source }: LoungeP
           ) : null}
 
           <section className="space-y-4">
-            <div className="flex gap-2 overflow-x-auto pb-1">
+            <div
+              className="hide-scrollbar flex gap-2 overflow-x-auto pb-1"
+              style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+            >
               {categoryOptions.map((option) => {
                 const active = selectedCategory === option.value;
                 return (
