@@ -54,7 +54,7 @@ export function LoungePageClient({ businesses, events, locale, source }: LoungeP
   });
 
   const tabs = [
-    { id: "services" as const, label: locale === "ko" ? "서비스" : "Services" },
+    { id: "services" as const, label: locale === "ko" ? "하키 정보" : "Hockey Info" },
     { id: "events" as const, label: locale === "ko" ? "일정" : "Schedules" },
   ];
 
