@@ -7,6 +7,7 @@ import { LoungeContactMenu } from "./lounge-contact-menu";
 import { LoungeDetailLink } from "./lounge-detail-link";
 import { LoungeImpressionTracker } from "./lounge-impression-tracker";
 import { LoungeLocationMap } from "./lounge-location-map";
+import { loungeIceGoldTheme } from "./lounge-theme";
 
 export function LoungeEventCard({
   event,
@@ -86,12 +87,12 @@ export function LoungeEventCard({
       id={`lounge-event-${event.id}`}
       className={`relative overflow-hidden rounded-xl border bg-white p-4 shadow-sm transition-all duration-300 dark:bg-zinc-900 ${
         isHighlighted
-          ? "border-amber-400 ring-2 ring-amber-300/70 shadow-lg shadow-amber-100 animate-[pulse_1.8s_ease-in-out_3] dark:border-amber-400 dark:ring-amber-500/40"
-          : "border-zinc-200 hover:border-amber-500 hover:shadow-lg dark:border-zinc-800 dark:hover:border-amber-400"
+          ? loungeIceGoldTheme.highlightState
+          : `border-zinc-200 ${loungeIceGoldTheme.hoverBorder} hover:shadow-lg dark:border-zinc-800`
       }`}
     >
       <LoungeImpressionTracker entityType="event" businessId={event.business_id} eventId={event.id} locale={locale} source={source} />
-      <div className="absolute inset-x-0 top-0 h-1 w-full bg-gradient-to-r from-amber-400 via-orange-500 to-red-500" />
+      <div className={`absolute inset-x-0 top-0 h-1 w-full ${loungeIceGoldTheme.accentLine}`} />
       <LoungeDetailLink
         entityType="event"
         businessId={event.business_id}
@@ -105,10 +106,12 @@ export function LoungeEventCard({
           <div className="flex items-center gap-1.5 text-[13px] font-bold">
             <span className="whitespace-nowrap text-zinc-400 dark:text-zinc-500">{formattedDate}</span>
             <span className="font-normal text-zinc-200 dark:text-zinc-700">|</span>
-            <span className="whitespace-nowrap text-amber-700 dark:text-amber-300">{formattedTime}</span>
+            <span className={`whitespace-nowrap ${loungeIceGoldTheme.timeText}`}>{formattedTime}</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="rounded-lg border border-orange-100 bg-orange-50 px-1.5 py-0.5 text-[10px] font-bold text-orange-700 dark:border-orange-800 dark:bg-orange-900/20 dark:text-orange-300">
+            <span
+              className={`rounded-lg border px-1.5 py-0.5 text-[10px] font-bold ${loungeIceGoldTheme.categoryChip}`}
+            >
               {categoryLabel}
             </span>
             {event.price_krw ? (
