@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, Globe, Instagram, MessageCircle, Phone, Sparkles } from "lucide-react";
+import { ArrowRight, Crown, Globe, Instagram, MessageCircle, Phone } from "lucide-react";
 import type { LoungeBusiness } from "@/app/actions/lounge";
 import { LoungeCtaButton } from "./lounge-cta-button";
 import { LoungeDetailLink } from "./lounge-detail-link";
@@ -34,7 +34,7 @@ export function LoungeCard({
         <div>
           <div className="flex flex-wrap items-center gap-2">
             <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-bold text-amber-700 dark:bg-amber-900/20 dark:text-amber-300">
-              <Sparkles className="h-3 w-3" />
+              <Crown className="h-3 w-3" />
               {categoryLabel}
             </span>
             {isFeatured ? (

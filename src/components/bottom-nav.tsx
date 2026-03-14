@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { Home, User, MessageCircle, Sparkles } from "lucide-react";
+import { Crown, Home, User, MessageCircle } from "lucide-react";
 
 export function BottomNav({ locale }: { locale: string }) {
   const pathname = usePathname();
@@ -11,11 +11,12 @@ export function BottomNav({ locale }: { locale: string }) {
 
   // Determine if a path is active
   const isActive = (path: string) => {
+    const normalizedPath = path.split("?")[0];
     if (path === `/${locale}`) {
       // Exact match for home page
       return pathname === `/${locale}`;
     }
-    return pathname.startsWith(path);
+    return pathname.startsWith(normalizedPath);
   };
 
   const tabs = [
@@ -27,7 +28,7 @@ export function BottomNav({ locale }: { locale: string }) {
     {
       name: t("lounge"),
       href: `/${locale}/lounge?source=bottom-nav`,
-      icon: Sparkles,
+      icon: Crown,
     },
     {
       name: t("chat"),
