@@ -21,6 +21,11 @@ export function LoungeMembershipManager({
   memberships: LoungeMembership[];
 }) {
   const [isPending, startTransition] = useTransition();
+  const sortedAdmins = [...admins].sort((a, b) => {
+    const aLabel = a.full_name || a.email || a.phone || a.id;
+    const bLabel = b.full_name || b.email || b.phone || b.id;
+    return aLabel.localeCompare(bLabel, locale === "ko" ? "ko" : "en", { sensitivity: "base" });
+  });
 
   const formatAdminLabel = (admin: AdminOption) => {
     const primary = admin.full_name || (locale === "ko" ? "이름 없음" : "No name");
@@ -59,7 +64,7 @@ export function LoungeMembershipManager({
           <span className="font-medium text-zinc-900 dark:text-zinc-100">{locale === "ko" ? "대상 관리자" : "Target admin"}</span>
           <select name="user_id" required className="w-full rounded-xl border border-zinc-300 bg-white px-3 py-2.5 text-sm text-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100">
             <option value="">{locale === "ko" ? "관리자를 선택하세요" : "Select an admin"}</option>
-            {admins.map((admin) => (
+            {sortedAdmins.map((admin) => (
               <option key={admin.id} value={admin.id}>
                 {formatAdminLabel(admin)}
               </option>
