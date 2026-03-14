@@ -1,12 +1,14 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { CalendarDays, List } from "lucide-react";
+import { CalendarDays, List, Trophy } from "lucide-react";
 import type { LoungeBusiness, LoungeEvent } from "@/app/actions/lounge";
 import { DateFilter } from "./date-filter";
 import { LoungeCalendarView } from "./lounge-calendar-view";
 import { LoungeCard } from "./lounge-card";
 import { LoungeEventCard } from "./lounge-event-card";
+
+type LoungePublicTab = "services" | "events";
 
 interface LoungePageClientProps {
   businesses: LoungeBusiness[];
@@ -16,6 +18,7 @@ interface LoungePageClientProps {
 }
 
 export function LoungePageClient({ businesses, events, locale, source }: LoungePageClientProps) {
+  const [activeTab, setActiveTab] = useState<LoungePublicTab>("services");
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
   const [selectedCategory, setSelectedCategory] = useState<"all" | LoungeBusiness["category"]>("all");
@@ -50,114 +53,153 @@ export function LoungePageClient({ businesses, events, locale, source }: LoungeP
     return `${year}-${month}-${day}` === selectedDate;
   });
 
+  const tabs = [
+    { id: "services" as const, label: locale === "ko" ? "서비스" : "Services" },
+    { id: "events" as const, label: locale === "ko" ? "일정" : "Schedules" },
+  ];
+
   return (
     <div className="space-y-8">
-      <section className="rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm font-medium text-zinc-700 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200">
-        {locale === "ko"
-          ? "PowerPlay Lounge에서 프리미엄 하키 레슨, 대회 정보, 하키인을 위한 서비스를 만나보세요."
-          : "Meet premium hockey lessons, tournaments, and services on PowerPlay Lounge."}
-      </section>
-
-      {featuredBusinesses.length > 0 ? (
-        <section className="space-y-4">
-          <div>
-            <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
-              {locale === "ko" ? "파워플레이 추천" : "PowerPlay featured"}
-            </h2>
-          </div>
-          <div className="grid gap-4 md:grid-cols-2">
-            {featuredBusinesses.slice(0, 2).map((business) => (
-              <LoungeCard key={business.id} business={business} locale={locale} source={source} />
-            ))}
-          </div>
-        </section>
-      ) : null}
-
-      <section className="space-y-4">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
-              {locale === "ko" ? "원하는 서비스 찾기" : "Find what you need"}
-            </h2>
+      <section className="overflow-hidden rounded-2xl border border-zinc-200 bg-[linear-gradient(135deg,#fff6dd_0%,#ffffff_45%,#f5f1ff_100%)] px-4 py-3 shadow-sm dark:border-zinc-800 dark:bg-[linear-gradient(135deg,#27272a_0%,#18181b_45%,#111827_100%)]">
+        <div className="flex items-center gap-3">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-zinc-950 text-amber-300 dark:bg-zinc-100 dark:text-amber-500">
+            <Trophy className="h-4 w-4" />
+          </span>
+          <div className="min-w-0">
+            <p className="text-[13px] font-semibold leading-5 text-zinc-800 dark:text-zinc-100">
+              {locale === "ko"
+                ? "PowerPlay Lounge에서 프리미엄 하키 레슨, 대회 정보, 하키인을 위한 서비스를 만나보세요."
+                : "Discover premium hockey lessons, tournaments, and services on PowerPlay Lounge."}
+            </p>
           </div>
         </div>
+      </section>
 
-        <div className="flex gap-2 overflow-x-auto pb-1">
-          {categoryOptions.map((option) => {
-            const active = selectedCategory === option.value;
+      <section className="border-b border-zinc-200 dark:border-zinc-800">
+        <div className="flex min-w-max gap-6 overflow-x-auto pb-3">
+          {tabs.map((tab) => {
+            const active = activeTab === tab.id;
             return (
               <button
-                key={option.value}
+                key={tab.id}
                 type="button"
-                onClick={() => setSelectedCategory(option.value)}
-                className={`whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
-                  active
-                    ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900"
-                    : "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300"
+                onClick={() => setActiveTab(tab.id)}
+                className={`relative pb-3 text-base font-bold transition-colors md:text-lg ${
+                  active ? "text-zinc-900 dark:text-white" : "text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
                 }`}
               >
-                {option.label}
+                {tab.label}
+                {active ? <span className="absolute bottom-0 left-0 h-0.5 w-full bg-zinc-900 dark:bg-white" /> : null}
               </button>
             );
           })}
         </div>
-
-        {filteredBusinesses.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-zinc-300 p-8 text-center text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
-            {locale === "ko" ? "선택한 카테고리에 공개된 항목이 없습니다." : "No items in this category yet."}
-          </div>
-        ) : (
-          <div className="grid gap-4 md:grid-cols-2">
-            {filteredBusinesses.map((business) => (
-              <LoungeCard key={business.id} business={business} locale={locale} source={source} />
-            ))}
-          </div>
-        )}
       </section>
 
-      <section className="space-y-4">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
-              {locale === "ko" ? "일정 모아보기" : "Schedules"}
-            </h2>
-          </div>
-          <div className="flex items-center rounded-lg bg-zinc-100 p-1 dark:bg-zinc-800">
-            <button
-              type="button"
-              onClick={() => setViewMode("list")}
-              className={`flex items-center gap-2 rounded-md px-4 py-2 text-sm font-bold transition-colors ${viewMode === "list" ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-700 dark:text-white" : "text-zinc-500 dark:text-zinc-400"}`}
-            >
-              <List className="h-4 w-4" />
-              {locale === "ko" ? "목록" : "List"}
-            </button>
-            <button
-              type="button"
-              onClick={() => setViewMode("calendar")}
-              className={`flex items-center gap-2 rounded-md px-4 py-2 text-sm font-bold transition-colors ${viewMode === "calendar" ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-700 dark:text-white" : "text-zinc-500 dark:text-zinc-400"}`}
-            >
-              <CalendarDays className="h-4 w-4" />
-              {locale === "ko" ? "캘린더" : "Calendar"}
-            </button>
-          </div>
+      {activeTab === "services" ? (
+        <div className="space-y-6">
+          {featuredBusinesses.length > 0 ? (
+            <section className="space-y-4">
+              <div>
+                <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
+                  {locale === "ko" ? "파워플레이 추천" : "PowerPlay featured"}
+                </h2>
+              </div>
+              <div className="grid gap-4 md:grid-cols-2">
+                {featuredBusinesses.slice(0, 2).map((business) => (
+                  <LoungeCard key={business.id} business={business} locale={locale} source={source} />
+                ))}
+              </div>
+            </section>
+          ) : null}
+
+          <section className="space-y-4">
+            <div>
+              <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
+                {locale === "ko" ? "원하는 서비스 찾기" : "Find what you need"}
+              </h2>
+            </div>
+
+            <div className="flex gap-2 overflow-x-auto pb-1">
+              {categoryOptions.map((option) => {
+                const active = selectedCategory === option.value;
+                return (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => setSelectedCategory(option.value)}
+                    className={`whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
+                      active
+                        ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900"
+                        : "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300"
+                    }`}
+                  >
+                    {option.label}
+                  </button>
+                );
+              })}
+            </div>
+
+            {filteredBusinesses.length === 0 ? (
+              <div className="rounded-xl border border-dashed border-zinc-300 p-8 text-center text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
+                {locale === "ko" ? "선택한 카테고리에 공개된 항목이 없습니다." : "No items in this category yet."}
+              </div>
+            ) : (
+              <div className="grid gap-4 md:grid-cols-2">
+                {filteredBusinesses.map((business) => (
+                  <LoungeCard key={business.id} business={business} locale={locale} source={source} />
+                ))}
+              </div>
+            )}
+          </section>
         </div>
+      ) : null}
 
-        <DateFilter selectedDate={selectedDate} onSelect={setSelectedDate} />
+      {activeTab === "events" ? (
+        <section className="space-y-4">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
+                {locale === "ko" ? "일정 모아보기" : "Schedules"}
+              </h2>
+            </div>
+            <div className="flex items-center rounded-lg bg-zinc-100 p-1 dark:bg-zinc-800">
+              <button
+                type="button"
+                onClick={() => setViewMode("list")}
+                className={`flex items-center gap-2 rounded-md px-4 py-2 text-sm font-bold transition-colors ${viewMode === "list" ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-700 dark:text-white" : "text-zinc-500 dark:text-zinc-400"}`}
+              >
+                <List className="h-4 w-4" />
+                {locale === "ko" ? "목록" : "List"}
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode("calendar")}
+                className={`flex items-center gap-2 rounded-md px-4 py-2 text-sm font-bold transition-colors ${viewMode === "calendar" ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-700 dark:text-white" : "text-zinc-500 dark:text-zinc-400"}`}
+              >
+                <CalendarDays className="h-4 w-4" />
+                {locale === "ko" ? "캘린더" : "Calendar"}
+              </button>
+            </div>
+          </div>
 
-        {viewMode === "calendar" ? (
-          <LoungeCalendarView events={events} locale={locale} onDateSelect={setSelectedDate} />
-        ) : filteredEvents.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-zinc-300 p-8 text-center text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
-            {locale === "ko" ? "선택한 날짜에 등록된 일정이 없습니다." : "No events for the selected date."}
-          </div>
-        ) : (
-          <div className="grid gap-4 md:grid-cols-2">
-            {filteredEvents.map((event) => (
-              <LoungeEventCard key={event.id} event={event} business={businessMap.get(event.business_id)} locale={locale} source={source} />
-            ))}
-          </div>
-        )}
-      </section>
+          <DateFilter selectedDate={selectedDate} onSelect={setSelectedDate} />
+
+          {viewMode === "calendar" ? (
+            <LoungeCalendarView events={events} locale={locale} onDateSelect={setSelectedDate} />
+          ) : filteredEvents.length === 0 ? (
+            <div className="rounded-xl border border-dashed border-zinc-300 p-8 text-center text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
+              {locale === "ko" ? "선택한 날짜에 등록된 일정이 없습니다." : "No events for the selected date."}
+            </div>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2">
+              {filteredEvents.map((event) => (
+                <LoungeEventCard key={event.id} event={event} business={businessMap.get(event.business_id)} locale={locale} source={source} />
+              ))}
+            </div>
+          )}
+        </section>
+      ) : null}
     </div>
   );
 }
