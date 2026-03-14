@@ -108,33 +108,32 @@ export function LoungeBusinessDetail({
         )}
 
         <div className="space-y-6 p-6">
-          <div className="flex justify-end">
-            <LoungeShareButton businessName={business.name} />
-          </div>
-
           <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
-            <div className="flex items-start gap-4">
-              {business.logo_url ? (
-                <img
-                  src={business.logo_url}
-                  alt={business.name}
-                  className="h-16 w-16 rounded-2xl border border-zinc-200 object-cover dark:border-zinc-700"
-                />
-              ) : null}
-              <div>
-                <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-bold text-amber-700 dark:bg-amber-900/20 dark:text-amber-300">
-                  <Trophy className="h-3 w-3" />
-                  {categoryLabel}
-                </span>
-                <h1 className="mt-3 text-3xl font-black tracking-tight text-zinc-900 dark:text-zinc-100">
-                  {business.name}
-                </h1>
-                {business.tagline ? (
-                  <p className="mt-2 text-base font-medium text-zinc-600 dark:text-zinc-300">
-                    {business.tagline}
-                  </p>
+            <div className="flex w-full items-start justify-between gap-4">
+              <div className="flex items-start gap-4">
+                {business.logo_url ? (
+                  <img
+                    src={business.logo_url}
+                    alt={business.name}
+                    className="h-16 w-16 rounded-2xl border border-zinc-200 object-cover dark:border-zinc-700"
+                  />
                 ) : null}
+                <div>
+                  <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-bold text-amber-700 dark:bg-amber-900/20 dark:text-amber-300">
+                    <Trophy className="h-3 w-3" />
+                    {categoryLabel}
+                  </span>
+                  <h1 className="mt-3 text-3xl font-black tracking-tight text-zinc-900 dark:text-zinc-100">
+                    {business.name}
+                  </h1>
+                  {business.tagline ? (
+                    <p className="mt-2 text-base font-medium text-zinc-600 dark:text-zinc-300">
+                      {business.tagline}
+                    </p>
+                  ) : null}
+                </div>
               </div>
+              <LoungeShareButton businessName={business.name} />
             </div>
           </div>
 
@@ -227,7 +226,7 @@ export function LoungeBusinessDetail({
         </div>
       </section>
 
-      <section id="all-schedules" ref={allSchedulesRef} className="space-y-4">
+      <section id="all-schedules" ref={allSchedulesRef} className="space-y-4 pt-8">
         <div className="flex items-center justify-between gap-3">
           <div>
             <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
