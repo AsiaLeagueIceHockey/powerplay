@@ -37,7 +37,6 @@ export function LoungeEventCard({
     tournament: locale === "ko" ? "대회 일정" : "Tournament",
     promotion: locale === "ko" ? "프로모션" : "Promotion",
   }[event.category];
-  const isFeatured = event.display_priority > 0;
   const eventRegion = extractRegion(event.location_address ?? event.location ?? undefined);
 
   return (
@@ -49,11 +48,6 @@ export function LoungeEventCard({
             <span className="rounded-full bg-orange-50 px-2.5 py-1 text-[11px] font-bold text-orange-700 dark:bg-orange-900/20 dark:text-orange-300">
               {categoryLabel}
             </span>
-            {isFeatured ? (
-              <span className="rounded-full bg-zinc-900 px-2.5 py-1 text-[11px] font-bold text-white dark:bg-zinc-100 dark:text-zinc-900">
-                {locale === "ko" ? "추천 일정" : "Featured"}
-              </span>
-            ) : null}
           </div>
           <h4 className="mt-2 text-lg font-bold text-zinc-900 dark:text-zinc-100">{event.title}</h4>
           <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">{business?.name}</p>

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getLoungeAdminPageData } from "@/app/actions/lounge";
 import { LoungeBusinessForm } from "@/components/lounge-business-form";
 import { LoungeEventForm } from "@/components/lounge-event-form";
+import { LoungeFeatureManager } from "@/components/lounge-feature-manager";
 import { LoungeMembershipManager } from "@/components/lounge-membership-manager";
 
 const inquiryLinks = {
@@ -316,7 +317,10 @@ export default async function AdminLoungePage({
       )}
 
       {data.isSuperUser ? (
-        <LoungeMembershipManager locale={locale} admins={data.admins} memberships={data.memberships} />
+        <div className="space-y-6">
+          <LoungeFeatureManager locale={locale} businesses={data.featuredBusinesses} />
+          <LoungeMembershipManager locale={locale} admins={data.admins} memberships={data.memberships} />
+        </div>
       ) : null}
     </div>
   );

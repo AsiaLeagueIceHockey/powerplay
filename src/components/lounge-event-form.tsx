@@ -44,9 +44,6 @@ export function LoungeEventForm({ locale, events }: { locale: string; events: Lo
   const sortedEvents = useMemo(
     () =>
       [...events].sort((a, b) => {
-        if (b.display_priority !== a.display_priority) {
-          return b.display_priority - a.display_priority;
-        }
         return new Date(a.start_time).getTime() - new Date(b.start_time).getTime();
       }),
     [events]
