@@ -78,11 +78,11 @@ export default async function AdminLoungePage({
             {locale === "ko" ? "PowerPlay Lounge Admin" : "PowerPlay Lounge Admin"}
           </span>
           <h1 className="mt-3 text-3xl font-black tracking-tight text-zinc-900 dark:text-zinc-100">
-            {locale === "ko" ? "라운지에서 당신의 사업을 노출하세요" : "Promote your business in Lounge"}
+            {locale === "ko" ? "라운지에서 당신의 비즈니스를 노출하세요" : "Promote your business in Lounge"}
           </h1>
           <p className="mt-3 text-sm leading-7 text-zinc-600 dark:text-zinc-300">
             {locale === "ko"
-              ? "월 구독 파트너는 대표 사업장 1개와 여러 개의 레슨/행사 일정을 올릴 수 있습니다. 전화, 카카오, 인스타그램, 웹사이트 유입도 추적합니다."
+              ? "월 구독 파트너는 대표 비즈니스 1개와 여러 개의 레슨/행사 일정을 올릴 수 있습니다. 전화, 카카오, 인스타그램, 웹사이트 유입도 추적합니다."
               : "Monthly subscribers can manage one representative business and multiple lesson or promo schedules with tracked CTA clicks."}
           </p>
         </div>
@@ -124,11 +124,11 @@ export default async function AdminLoungePage({
         <>
           <section className="grid gap-4 md:grid-cols-4">
             <div className="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
-              <p className="text-sm text-zinc-500 dark:text-zinc-400">{locale === "ko" ? "사업장 노출" : "Business impressions"}</p>
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">{locale === "ko" ? "비즈니스 노출" : "Business impressions"}</p>
               <p className="mt-2 text-2xl font-black text-zinc-900 dark:text-zinc-100">{metrics.businessImpressions}</p>
             </div>
             <div className="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
-              <p className="text-sm text-zinc-500 dark:text-zinc-400">{locale === "ko" ? "사업장 클릭" : "Business clicks"}</p>
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">{locale === "ko" ? "비즈니스 클릭" : "Business clicks"}</p>
               <p className="mt-2 text-2xl font-black text-zinc-900 dark:text-zinc-100">{metrics.businessClicks}</p>
             </div>
             <div className="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
