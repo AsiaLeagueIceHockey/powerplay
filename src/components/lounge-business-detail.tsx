@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, CalendarDays, Globe, Instagram, MapPin, MessageCircle, Phone, Sparkles } from "lucide-react";
+import { ArrowLeft, CalendarDays, Crown, Globe, Instagram, MapPin, MessageCircle, Phone } from "lucide-react";
 import type { LoungeBusiness, LoungeEvent } from "@/app/actions/lounge";
 import { LoungeCard } from "./lounge-card";
 import { LoungeCtaButton } from "./lounge-cta-button";
@@ -75,7 +75,7 @@ export function LoungeBusinessDetail({
               ) : null}
               <div>
                 <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-bold text-amber-700 dark:bg-amber-900/20 dark:text-amber-300">
-                  <Sparkles className="h-3 w-3" />
+                  <Crown className="h-3 w-3" />
                   {categoryLabel}
                 </span>
                 <h1 className="mt-3 text-3xl font-black tracking-tight text-zinc-900 dark:text-zinc-100">
@@ -159,7 +159,7 @@ export function LoungeBusinessDetail({
           <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
             <div className="rounded-2xl border border-zinc-200 bg-zinc-50/70 p-5 dark:border-zinc-800 dark:bg-zinc-900/60">
               <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
-                {locale === "ko" ? "사업장 소개" : "About this business"}
+                {locale === "ko" ? "여기서 해결할 수 있는 것" : "What this can help with"}
               </h2>
               <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-zinc-600 dark:text-zinc-300">
                 {business.description || (locale === "ko" ? "등록된 소개가 없습니다." : "No introduction yet.")}
@@ -168,7 +168,7 @@ export function LoungeBusinessDetail({
 
             <div className="rounded-2xl border border-zinc-200 bg-zinc-50/70 p-5 dark:border-zinc-800 dark:bg-zinc-900/60">
               <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
-                {locale === "ko" ? "빠른 일정 요약" : "Schedule snapshot"}
+                {locale === "ko" ? "가장 먼저 볼 일정" : "What to check first"}
               </h2>
               {events.length === 0 ? (
                 <p className="mt-3 text-sm leading-7 text-zinc-500 dark:text-zinc-400">
@@ -204,12 +204,12 @@ export function LoungeBusinessDetail({
       <section className="space-y-4">
         <div>
           <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
-            {locale === "ko" ? "예정된 라운지 일정" : "Upcoming lounge events"}
+            {locale === "ko" ? "지금 확인할 수 있는 일정" : "Available schedules right now"}
           </h2>
           <p className="text-sm text-zinc-500 dark:text-zinc-400">
             {locale === "ko"
-              ? "레슨, 훈련, 대회 모집 일정을 보고 바로 문의할 수 있습니다."
-              : "Browse upcoming schedules and reach out directly."}
+              ? "바로 문의하거나 참여를 검토할 수 있는 레슨, 훈련, 대회 정보를 모았습니다."
+              : "Browse lessons, training sessions, and tournaments you can inquire about right away."}
           </p>
         </div>
 
@@ -236,10 +236,10 @@ export function LoungeBusinessDetail({
         <section className="space-y-4">
           <div>
             <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
-              {locale === "ko" ? "다른 라운지 사업장" : "More lounge businesses"}
+              {locale === "ko" ? "비슷한 다른 선택지" : "Other relevant options"}
             </h2>
             <p className="text-sm text-zinc-500 dark:text-zinc-400">
-              {locale === "ko" ? "다른 프리미엄 파트너도 함께 둘러보세요." : "Explore other premium partners."}
+              {locale === "ko" ? "지금 찾는 니즈에 맞는 다른 선택지도 함께 볼 수 있습니다." : "Explore other options that may fit the same need."}
             </p>
           </div>
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
