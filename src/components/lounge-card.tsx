@@ -27,6 +27,32 @@ export function LoungeCard({
     brand: locale === "ko" ? "브랜드" : "Brand",
     service: locale === "ko" ? "서비스" : "Service",
   }[business.category];
+  const availableLinks = [
+    {
+      key: "phone",
+      href: business.phone ? `tel:${business.phone}` : null,
+      icon: <Phone className="h-4 w-4" />,
+      className: "border border-zinc-200 text-zinc-700 dark:border-zinc-700 dark:text-zinc-200",
+    },
+    {
+      key: "kakao",
+      href: business.kakao_open_chat_url,
+      icon: <MessageCircle className="h-4 w-4" />,
+      className: "bg-[#FEE500] text-[#3B1E1E]",
+    },
+    {
+      key: "instagram",
+      href: business.instagram_url,
+      icon: <Instagram className="h-4 w-4" />,
+      className: "bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045] text-white",
+    },
+    {
+      key: "website",
+      href: business.website_url,
+      icon: <Globe className="h-4 w-4" />,
+      className: "border border-zinc-200 text-zinc-700 dark:border-zinc-700 dark:text-zinc-200",
+    },
+  ].filter((item) => item.href);
 
   return (
     <article className="relative rounded-xl border border-zinc-200 bg-white p-5 shadow-sm transition-all duration-300 hover:border-amber-500 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900">
@@ -49,7 +75,7 @@ export function LoungeCard({
               </span>
               {isFeatured ? (
                 <span className="inline-flex items-center gap-1 rounded-full bg-zinc-900 px-2.5 py-1 text-[11px] font-bold text-white dark:bg-zinc-100 dark:text-zinc-900">
-                  {locale === "ko" ? "추천 비즈니스" : "Featured"}
+                  {locale === "ko" ? "파워플레이 추천" : "Featured"}
                 </span>
               ) : null}
               {region ? <span className="rounded-full bg-zinc-100 px-2.5 py-1 text-[11px] font-medium text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">{region}</span> : null}
@@ -78,56 +104,24 @@ export function LoungeCard({
         </div>
       </LoungeDetailLink>
 
-      <div className="grid grid-cols-2 gap-2">
-        <LoungeCtaButton
-          entityType="business"
-          businessId={business.id}
-          ctaType="phone"
-          url={business.phone ? `tel:${business.phone}` : null}
-          locale={locale}
-          source={source}
-          className="flex items-center justify-center gap-2 rounded-xl bg-zinc-900 px-3 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40 dark:bg-zinc-100 dark:text-zinc-900"
-        >
-          <Phone className="h-4 w-4" />
-          {locale === "ko" ? "전화" : "Call"}
-        </LoungeCtaButton>
-        <LoungeCtaButton
-          entityType="business"
-          businessId={business.id}
-          ctaType="kakao"
-          url={business.kakao_open_chat_url}
-          locale={locale}
-          source={source}
-          className="flex items-center justify-center gap-2 rounded-xl bg-[#FEE500] px-3 py-2.5 text-sm font-semibold text-[#3B1E1E] disabled:cursor-not-allowed disabled:opacity-40"
-        >
-          <MessageCircle className="h-4 w-4" />
-          Kakao
-        </LoungeCtaButton>
-        <LoungeCtaButton
-          entityType="business"
-          businessId={business.id}
-          ctaType="instagram"
-          url={business.instagram_url}
-          locale={locale}
-          source={source}
-          className="flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045] px-3 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40"
-        >
-          <Instagram className="h-4 w-4" />
-          Instagram
-        </LoungeCtaButton>
-        <LoungeCtaButton
-          entityType="business"
-          businessId={business.id}
-          ctaType="website"
-          url={business.website_url}
-          locale={locale}
-          source={source}
-          className="flex items-center justify-center gap-2 rounded-xl border border-zinc-200 px-3 py-2.5 text-sm font-semibold text-zinc-700 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-700 dark:text-zinc-200"
-        >
-          <Globe className="h-4 w-4" />
-          {locale === "ko" ? "웹사이트" : "Website"}
-        </LoungeCtaButton>
-      </div>
+      {availableLinks.length > 0 ? (
+        <div className="flex items-center gap-2 overflow-x-auto pb-1">
+          {availableLinks.map((item) => (
+            <LoungeCtaButton
+              key={item.key}
+              entityType="business"
+              businessId={business.id}
+              ctaType={item.key as "phone" | "kakao" | "instagram" | "website"}
+              url={item.href}
+              locale={locale}
+              source={source}
+              className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${item.className} disabled:cursor-not-allowed disabled:opacity-40`}
+            >
+              {item.icon}
+            </LoungeCtaButton>
+          ))}
+        </div>
+      ) : null}
     </article>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { CalendarDays, List, Trophy } from "lucide-react";
+import { CalendarDays, List } from "lucide-react";
 import type { LoungeBusiness, LoungeEvent } from "@/app/actions/lounge";
 import { DateFilter } from "./date-filter";
 import { LoungeCalendarView } from "./lounge-calendar-view";
@@ -34,6 +34,8 @@ export function LoungePageClient({ businesses, events, locale, source }: LoungeP
     { value: "service", label: locale === "ko" ? "서비스" : "Service" },
   ];
 
+  const featuredBusinesses = businesses.filter((business) => business.is_featured);
+
   const filteredBusinesses = businesses.filter((business) => {
     if (selectedCategory === "all") return true;
     return business.category === selectedCategory;
@@ -48,65 +50,20 @@ export function LoungePageClient({ businesses, events, locale, source }: LoungeP
     return `${year}-${month}-${day}` === selectedDate;
   });
 
-  const featuredBusinesses = businesses.filter((business) => business.is_featured);
-  const upcomingThisWeek = events.filter((event) => {
-    const now = new Date();
-    const target = new Date(event.start_time);
-    const diff = target.getTime() - now.getTime();
-    return diff >= 0 && diff <= 7 * 24 * 60 * 60 * 1000;
-  }).length;
-
   return (
     <div className="space-y-8">
-      <section className="overflow-hidden rounded-[28px] border border-amber-200/60 bg-[radial-gradient(circle_at_top_left,_rgba(251,191,36,0.22),_transparent_32%),linear-gradient(135deg,#fff9ef_0%,#ffffff_48%,#f5f5f4_100%)] p-6 shadow-sm dark:border-amber-900/40 dark:bg-[radial-gradient(circle_at_top_left,_rgba(251,191,36,0.16),_transparent_35%),linear-gradient(135deg,#18181b_0%,#09090b_70%,#1f1720_100%)]">
-        <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
-          <div>
-            <div className="inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-1 text-xs font-semibold text-zinc-700 ring-1 ring-zinc-200 dark:bg-zinc-950/70 dark:text-zinc-200 dark:ring-zinc-800">
-              <Trophy className="h-3.5 w-3.5 text-amber-600 dark:text-amber-300" />
-              {locale === "ko" ? "PowerPlay Lounge" : "PowerPlay Lounge"}
-            </div>
-            <h1 className="mt-4 text-3xl font-black tracking-tight text-zinc-900 dark:text-zinc-100 md:text-4xl">
-              {locale === "ko" ? "하키를 더 잘하고 더 잘 준비하는 곳을 모았습니다." : "One place for hockey growth, prep, and trusted options."}
-            </h1>
-            <p className="mt-3 max-w-2xl text-sm leading-7 text-zinc-600 dark:text-zinc-300">
-              {locale === "ko"
-                ? "레슨, 훈련, 대회, 장비와 서비스를 한 번에 비교하고 바로 연결할 수 있습니다. 파워플레이가 계속 공개하는 비즈니스와 일정만 모아봤습니다."
-                : "Browse lessons, training, tournaments, gear, and services in one place, then connect right away."}
-            </p>
-          </div>
-
-          <div className="grid gap-3 sm:grid-cols-3">
-            <div className="rounded-2xl border border-white/70 bg-white/80 p-4 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/70">
-              <p className="text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-                {locale === "ko" ? "추천 비즈니스" : "Featured"}
-              </p>
-              <p className="mt-2 text-2xl font-black text-zinc-900 dark:text-zinc-100">{featuredBusinesses.length}</p>
-            </div>
-            <div className="rounded-2xl border border-white/70 bg-white/80 p-4 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/70">
-              <p className="text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-                {locale === "ko" ? "공개 일정" : "Open schedules"}
-              </p>
-              <p className="mt-2 text-2xl font-black text-zinc-900 dark:text-zinc-100">{events.length}</p>
-            </div>
-            <div className="rounded-2xl border border-white/70 bg-white/80 p-4 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/70">
-              <p className="text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-                {locale === "ko" ? "이번 주 일정" : "This week"}
-              </p>
-              <p className="mt-2 text-2xl font-black text-zinc-900 dark:text-zinc-100">{upcomingThisWeek}</p>
-            </div>
-          </div>
-        </div>
+      <section className="rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm font-medium text-zinc-700 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200">
+        {locale === "ko"
+          ? "PowerPlay Lounge에서 프리미엄 하키 레슨, 대회 정보, 하키인을 위한 서비스를 만나보세요."
+          : "Meet premium hockey lessons, tournaments, and services on PowerPlay Lounge."}
       </section>
 
       {featuredBusinesses.length > 0 ? (
         <section className="space-y-4">
           <div>
             <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
-              {locale === "ko" ? "파워플레이 추천 비즈니스" : "PowerPlay featured businesses"}
+              {locale === "ko" ? "파워플레이 추천" : "PowerPlay featured"}
             </h2>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">
-              {locale === "ko" ? "지금 가장 먼저 둘러볼 만한 비즈니스를 앞쪽에 모아뒀습니다." : "Start with the businesses we want users to notice first."}
-            </p>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
             {featuredBusinesses.slice(0, 2).map((business) => (
@@ -120,11 +77,8 @@ export function LoungePageClient({ businesses, events, locale, source }: LoungeP
         <div className="flex items-center justify-between gap-3">
           <div>
             <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
-              {locale === "ko" ? "지금 둘러볼 비즈니스" : "Businesses to explore now"}
+              {locale === "ko" ? "원하는 서비스 찾기" : "Find what you need"}
             </h2>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">
-              {locale === "ko" ? "내게 맞는 레슨, 훈련, 대회, 장비와 서비스를 한 번에 비교할 수 있습니다." : "Compare lessons, training, tournaments, gear, and services in one pass."}
-            </p>
           </div>
         </div>
 
@@ -150,7 +104,7 @@ export function LoungePageClient({ businesses, events, locale, source }: LoungeP
 
         {filteredBusinesses.length === 0 ? (
           <div className="rounded-xl border border-dashed border-zinc-300 p-8 text-center text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
-            {locale === "ko" ? "선택한 카테고리에 공개된 비즈니스가 없습니다." : "No lounge businesses in this category yet."}
+            {locale === "ko" ? "선택한 카테고리에 공개된 항목이 없습니다." : "No items in this category yet."}
           </div>
         ) : (
           <div className="grid gap-4 md:grid-cols-2">
@@ -165,27 +119,24 @@ export function LoungePageClient({ businesses, events, locale, source }: LoungeP
         <div className="flex items-center justify-between gap-3">
           <div>
             <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
-              {locale === "ko" ? "바로 확인할 일정" : "Schedules to check now"}
+              {locale === "ko" ? "일정 모아보기" : "Schedules"}
             </h2>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">
-              {locale === "ko" ? "가까운 날짜의 레슨, 훈련, 대회 일정을 모아봤습니다." : "See the nearest lessons, training sessions, and tournaments first."}
-            </p>
           </div>
-          <div className="flex items-center bg-zinc-100 dark:bg-zinc-800 p-1 rounded-lg">
+          <div className="flex items-center rounded-lg bg-zinc-100 p-1 dark:bg-zinc-800">
             <button
               type="button"
               onClick={() => setViewMode("list")}
-              className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-bold transition-colors ${viewMode === "list" ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-700 dark:text-white" : "text-zinc-500 dark:text-zinc-400"}`}
+              className={`flex items-center gap-2 rounded-md px-4 py-2 text-sm font-bold transition-colors ${viewMode === "list" ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-700 dark:text-white" : "text-zinc-500 dark:text-zinc-400"}`}
             >
-              <List className="w-4 h-4" />
+              <List className="h-4 w-4" />
               {locale === "ko" ? "목록" : "List"}
             </button>
             <button
               type="button"
               onClick={() => setViewMode("calendar")}
-              className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-bold transition-colors ${viewMode === "calendar" ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-700 dark:text-white" : "text-zinc-500 dark:text-zinc-400"}`}
+              className={`flex items-center gap-2 rounded-md px-4 py-2 text-sm font-bold transition-colors ${viewMode === "calendar" ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-700 dark:text-white" : "text-zinc-500 dark:text-zinc-400"}`}
             >
-              <CalendarDays className="w-4 h-4" />
+              <CalendarDays className="h-4 w-4" />
               {locale === "ko" ? "캘린더" : "Calendar"}
             </button>
           </div>
