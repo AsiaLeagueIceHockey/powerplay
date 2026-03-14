@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { ShieldCheck, Home, User, MessageCircle } from "lucide-react";
+import { Trophy, Home, User, MessageCircle } from "lucide-react";
 
 export function BottomNav({ locale }: { locale: string }) {
   const pathname = usePathname();
@@ -28,7 +28,7 @@ export function BottomNav({ locale }: { locale: string }) {
     {
       name: t("lounge"),
       href: `/${locale}/lounge?source=bottom-nav`,
-      icon: ShieldCheck,
+      icon: Trophy,
     },
     {
       name: t("chat"),

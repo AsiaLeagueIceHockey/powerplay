@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { CalendarDays, List, ShieldCheck } from "lucide-react";
+import { CalendarDays, List, Trophy } from "lucide-react";
 import type { LoungeBusiness, LoungeEvent } from "@/app/actions/lounge";
 import { DateFilter } from "./date-filter";
 import { LoungeCalendarView } from "./lounge-calendar-view";
@@ -52,7 +52,7 @@ export function LoungePageClient({ businesses, events, locale, source }: LoungeP
     <div className="space-y-8">
       <section className="rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-2.5 dark:border-zinc-800 dark:bg-zinc-900">
         <div className="flex items-center gap-2 text-sm text-zinc-700 dark:text-zinc-200">
-          <ShieldCheck className="h-4 w-4 text-amber-600 dark:text-amber-300" />
+          <Trophy className="h-4 w-4 text-amber-600 dark:text-amber-300" />
           <p className="font-medium">
             {locale === "ko"
               ? "실력 향상, 훈련, 장비, 대회 관련 정보를 한 곳에서 확인하고 바로 연결받을 수 있습니다."
