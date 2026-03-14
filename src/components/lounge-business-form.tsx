@@ -66,7 +66,7 @@ export function LoungeBusinessForm({
           </p>
           <p className="mt-1 text-xs leading-5 text-zinc-500 dark:text-zinc-400">
             {locale === "ko"
-              ? "네이버 지도 URL을 넣으면 주소와 좌표를 자동으로 채웁니다. 목록에는 대략적인 지역이 노출됩니다."
+              ? "네이버 지도 URL을 넣으면 주소와 좌표를 자동으로 채웁니다. 목록에는 시/구 정도의 지역이 먼저 노출됩니다."
               : "Paste a Naver Map URL to autofill address and coordinates."}
           </p>
         </div>
@@ -139,13 +139,18 @@ export function LoungeBusinessForm({
           </select>
         </label>
         <label className="space-y-2 text-sm">
-          <span className="font-semibold text-zinc-900 dark:text-zinc-100">{locale === "ko" ? "노출 우선순위" : "Display priority"}</span>
+          <span className="font-semibold text-zinc-900 dark:text-zinc-100">{locale === "ko" ? "추천 노출 순서" : "Featured order"}</span>
           <input
             name="display_priority"
             inputMode="numeric"
             defaultValue={business?.display_priority ?? 0}
             className="w-full rounded-xl border border-zinc-300 bg-white px-3 py-2.5 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
           />
+          <p className="text-xs leading-5 text-zinc-500 dark:text-zinc-400">
+            {locale === "ko"
+              ? "숫자가 높을수록 공개 라운지 상단에 먼저 보입니다. 기본값은 0입니다."
+              : "Higher numbers appear closer to the top of the public lounge. Default is 0."}
+          </p>
         </label>
         <label className="space-y-2 text-sm md:col-span-2">
           <span className="font-semibold text-zinc-900 dark:text-zinc-100">{locale === "ko" ? "한 줄 소개" : "Tagline"}</span>
