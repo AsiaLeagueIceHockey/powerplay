@@ -65,7 +65,7 @@ export function LoungeBusinessForm({
 
   return (
     <form
-      className="space-y-5 rounded-2xl border border-zinc-200 bg-[linear-gradient(180deg,#f5f5f4_0%,#ffffff_100%)] p-6 shadow-sm dark:border-zinc-800 dark:bg-[linear-gradient(180deg,#18181b_0%,#0f172a_100%)]"
+      className="space-y-5 rounded-3xl border border-zinc-800 bg-[linear-gradient(180deg,#18181b_0%,#09090b_100%)] p-6 shadow-sm"
       onSubmit={(event) => {
         event.preventDefault();
         const formData = new FormData(event.currentTarget);
@@ -86,15 +86,15 @@ export function LoungeBusinessForm({
         });
       }}
     >
-      <div className="flex items-start gap-3 rounded-2xl border border-zinc-200/80 bg-white/80 p-4 dark:border-zinc-800 dark:bg-zinc-950/70">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900">
+      <div className="flex items-start gap-3 rounded-2xl border border-zinc-800 bg-zinc-900/80 p-4">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-400 text-zinc-950">
           <Store className="h-5 w-5" />
         </div>
         <div>
-          <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
+          <h3 className="text-lg font-bold text-zinc-100">
             {locale === "ko" ? "대표 비즈니스 정보" : "Representative business"}
           </h3>
-          <p className="mt-1 text-sm leading-6 text-zinc-600 dark:text-zinc-300">
+          <p className="mt-1 text-sm leading-6 text-zinc-400">
             {locale === "ko" ? "구독 계정당 1개의 대표 비즈니스만 운영합니다." : "One representative business per subscribed admin."}
           </p>
         </div>
@@ -102,12 +102,12 @@ export function LoungeBusinessForm({
 
       <div className="grid gap-4 md:grid-cols-2">
         <label className="space-y-2 text-sm">
-          <span className="font-semibold text-zinc-900 dark:text-zinc-100">{locale === "ko" ? "비즈니스명" : "Business name"}</span>
-          <input name="name" required defaultValue={business?.name ?? ""} className="w-full rounded-xl border border-zinc-300 bg-white px-3 py-2.5 text-zinc-900 placeholder:text-zinc-400 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:placeholder:text-zinc-500" />
+          <span className="font-semibold text-zinc-100">{locale === "ko" ? "비즈니스명" : "Business name"}</span>
+          <input name="name" required defaultValue={business?.name ?? ""} className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100 placeholder:text-zinc-500" />
         </label>
         <label className="space-y-2 text-sm">
-          <span className="font-semibold text-zinc-900 dark:text-zinc-100">{locale === "ko" ? "카테고리" : "Category"}</span>
-          <select name="category" defaultValue={business?.category ?? "lesson"} className="w-full rounded-xl border border-zinc-300 bg-white px-3 py-2.5 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100">
+          <span className="font-semibold text-zinc-100">{locale === "ko" ? "카테고리" : "Category"}</span>
+          <select name="category" defaultValue={business?.category ?? "lesson"} className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100">
             <option value="lesson">{locale === "ko" ? "하키 레슨" : "Lesson"}</option>
             <option value="training_center">{locale === "ko" ? "훈련장 / 슈팅센터" : "Training Center"}</option>
             <option value="tournament">{locale === "ko" ? "대회" : "Tournament"}</option>
@@ -116,27 +116,27 @@ export function LoungeBusinessForm({
           </select>
         </label>
         <label className="space-y-2 text-sm md:col-span-2">
-          <span className="font-semibold text-zinc-900 dark:text-zinc-100">{locale === "ko" ? "한 줄 소개" : "Tagline"}</span>
-          <input name="tagline" defaultValue={business?.tagline ?? ""} className="w-full rounded-xl border border-zinc-300 bg-white px-3 py-2.5 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />
+          <span className="font-semibold text-zinc-100">{locale === "ko" ? "한 줄 소개" : "Tagline"}</span>
+          <input name="tagline" defaultValue={business?.tagline ?? ""} className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100" />
         </label>
         <label className="space-y-2 text-sm md:col-span-2">
-          <span className="font-semibold text-zinc-900 dark:text-zinc-100">{locale === "ko" ? "설명" : "Description"}</span>
-          <textarea name="description" defaultValue={business?.description ?? ""} rows={5} className="w-full rounded-xl border border-zinc-300 bg-white px-3 py-2.5 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />
+          <span className="font-semibold text-zinc-100">{locale === "ko" ? "설명" : "Description"}</span>
+          <textarea name="description" defaultValue={business?.description ?? ""} rows={5} className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100" />
         </label>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
-        <div className="space-y-3 rounded-2xl border border-zinc-200/80 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950">
+        <div className="space-y-3 rounded-2xl border border-zinc-800 bg-zinc-900/80 p-5">
           <div>
-            <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+            <p className="text-sm font-semibold text-zinc-100">
               {locale === "ko" ? "로고 이미지" : "Logo image"}
             </p>
-            <p className="mt-1 text-xs leading-5 text-zinc-500 dark:text-zinc-400">
+            <p className="mt-1 text-xs leading-5 text-zinc-400">
               {locale === "ko" ? "프로필처럼 작게 보이는 대표 이미지입니다." : "Small representative image shown like a profile."}
             </p>
           </div>
           <div className="flex items-start gap-4">
-            <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-zinc-300 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
+            <div className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-zinc-700 bg-zinc-950">
               {logoUrl ? (
                 <img src={logoUrl} alt="Business logo" className="h-full w-full object-cover" />
               ) : (
@@ -158,7 +158,7 @@ export function LoungeBusinessForm({
                 type="button"
                 onClick={() => logoInputRef.current?.click()}
                 disabled={uploadingTarget === "logo"}
-                className="inline-flex items-center gap-2 rounded-xl bg-zinc-900 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900"
+                className="inline-flex items-center gap-2 rounded-xl bg-amber-400 px-4 py-2.5 text-sm font-semibold text-zinc-950 disabled:opacity-50"
               >
                 {uploadingTarget === "logo" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
                 {locale === "ko" ? "로고 업로드" : "Upload logo"}
@@ -173,22 +173,22 @@ export function LoungeBusinessForm({
                   {locale === "ko" ? "로고 삭제" : "Remove logo"}
                 </button>
               ) : null}
-              <p className="text-xs text-zinc-500 dark:text-zinc-400">PNG, JPG, WEBP, GIF / 5MB max</p>
+              <p className="text-xs text-zinc-400">PNG, JPG, WEBP, GIF / 5MB max</p>
             </div>
           </div>
         </div>
 
-        <div className="space-y-3 rounded-2xl border border-zinc-200/80 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950">
+        <div className="space-y-3 rounded-2xl border border-zinc-800 bg-zinc-900/80 p-5">
           <div>
-            <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+            <p className="text-sm font-semibold text-zinc-100">
               {locale === "ko" ? "커버 이미지" : "Cover image"}
             </p>
-            <p className="mt-1 text-xs leading-5 text-zinc-500 dark:text-zinc-400">
+            <p className="mt-1 text-xs leading-5 text-zinc-400">
               {locale === "ko" ? "목록 카드와 상세 상단에 크게 보이는 이미지입니다." : "Large visual used on cards and the detail header."}
             </p>
           </div>
           <div className="space-y-3">
-            <div className="flex h-32 w-full items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-zinc-300 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
+            <div className="flex h-32 w-full items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-zinc-700 bg-zinc-950">
               {coverImageUrl ? (
                 <img src={coverImageUrl} alt="Business cover" className="h-full w-full object-cover" />
               ) : (
@@ -210,7 +210,7 @@ export function LoungeBusinessForm({
                 type="button"
                 onClick={() => coverInputRef.current?.click()}
                 disabled={uploadingTarget === "cover"}
-                className="inline-flex items-center gap-2 rounded-xl bg-zinc-900 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900"
+                className="inline-flex items-center gap-2 rounded-xl bg-amber-400 px-4 py-2.5 text-sm font-semibold text-zinc-950 disabled:opacity-50"
               >
                 {uploadingTarget === "cover" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
                 {locale === "ko" ? "커버 업로드" : "Upload cover"}
@@ -236,12 +236,12 @@ export function LoungeBusinessForm({
         </div>
       ) : null}
 
-      <div className="space-y-4 rounded-2xl border border-zinc-200/80 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950">
+      <div className="space-y-4 rounded-2xl border border-zinc-800 bg-zinc-900/80 p-5">
         <div>
-          <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+          <p className="text-sm font-semibold text-zinc-100">
             {locale === "ko" ? "비즈니스 위치" : "Business location"}
           </p>
-          <p className="mt-1 text-xs leading-5 text-zinc-500 dark:text-zinc-400">
+          <p className="mt-1 text-xs leading-5 text-zinc-400">
             {locale === "ko"
               ? "네이버 지도 URL을 넣으면 주소와 좌표를 자동으로 채웁니다. 목록에는 시/구 정도의 지역이 먼저 노출됩니다."
               : "Paste a Naver Map URL to autofill address and coordinates."}
@@ -253,7 +253,7 @@ export function LoungeBusinessForm({
             value={locationState.map_url}
             onChange={(event) => setLocationState((prev) => ({ ...prev, map_url: event.target.value }))}
             placeholder="https://naver.me/..."
-            className="w-full rounded-xl border border-zinc-300 bg-white px-3 py-2.5 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+            className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100"
           />
           <button
             type="button"
@@ -278,19 +278,19 @@ export function LoungeBusinessForm({
               });
               setParsing(false);
             }}
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-zinc-900 px-4 py-2.5 text-sm font-semibold text-white dark:bg-zinc-100 dark:text-zinc-900"
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-amber-400 px-4 py-2.5 text-sm font-semibold text-zinc-950"
           >
             {parsing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
             {locale === "ko" ? "정보 가져오기" : "Fetch info"}
           </button>
         </div>
         {mapError ? <p className="text-sm text-red-600 dark:text-red-400">{mapError}</p> : null}
-        <div className="rounded-xl bg-zinc-50 p-4 text-sm dark:bg-zinc-900/70">
-          <div className="flex items-start gap-2 text-zinc-700 dark:text-zinc-200">
+        <div className="rounded-xl bg-zinc-950 p-4 text-sm">
+          <div className="flex items-start gap-2 text-zinc-200">
             <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
             <div>
               <p className="font-medium">{locationState.address || (locale === "ko" ? "주소 미등록" : "No address yet")}</p>
-              <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+              <p className="mt-1 text-xs text-zinc-400">
                 {locationState.lat && locationState.lng ? `${locationState.lat}, ${locationState.lng}` : (locale === "ko" ? "좌표 미등록" : "No coordinates yet")}
               </p>
             </div>
@@ -300,29 +300,29 @@ export function LoungeBusinessForm({
 
       <div className="grid gap-4 md:grid-cols-2">
         <label className="space-y-2 text-sm">
-          <span className="font-semibold text-zinc-900 dark:text-zinc-100">{locale === "ko" ? "전화" : "Phone"}</span>
-          <input name="phone" defaultValue={business?.phone ?? ""} className="w-full rounded-xl border border-zinc-300 bg-white px-3 py-2.5 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />
+          <span className="font-semibold text-zinc-100">{locale === "ko" ? "전화" : "Phone"}</span>
+          <input name="phone" defaultValue={business?.phone ?? ""} className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100" />
         </label>
         <label className="space-y-2 text-sm">
-          <span className="font-semibold text-zinc-900 dark:text-zinc-100">Kakao URL</span>
-          <input name="kakao_open_chat_url" defaultValue={business?.kakao_open_chat_url ?? ""} className="w-full rounded-xl border border-zinc-300 bg-white px-3 py-2.5 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />
+          <span className="font-semibold text-zinc-100">Kakao URL</span>
+          <input name="kakao_open_chat_url" defaultValue={business?.kakao_open_chat_url ?? ""} className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100" />
         </label>
         <label className="space-y-2 text-sm">
-          <span className="font-semibold text-zinc-900 dark:text-zinc-100">Instagram URL</span>
-          <input name="instagram_url" defaultValue={business?.instagram_url ?? ""} className="w-full rounded-xl border border-zinc-300 bg-white px-3 py-2.5 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />
+          <span className="font-semibold text-zinc-100">Instagram URL</span>
+          <input name="instagram_url" defaultValue={business?.instagram_url ?? ""} className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100" />
         </label>
         <label className="space-y-2 text-sm">
-          <span className="font-semibold text-zinc-900 dark:text-zinc-100">Website URL</span>
-          <input name="website_url" defaultValue={business?.website_url ?? ""} className="w-full rounded-xl border border-zinc-300 bg-white px-3 py-2.5 text-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100" />
+          <span className="font-semibold text-zinc-100">Website URL</span>
+          <input name="website_url" defaultValue={business?.website_url ?? ""} className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100" />
         </label>
       </div>
 
-      <label className="flex items-center gap-2 text-sm font-medium text-zinc-800 dark:text-zinc-200">
+      <label className="flex items-center gap-2 text-sm font-medium text-zinc-200">
         <input type="checkbox" checked={published} onChange={(event) => setPublished(event.target.checked)} />
         {locale === "ko" ? "즉시 공개" : "Publish now"}
       </label>
 
-      <button type="submit" disabled={isPending} className="rounded-xl bg-zinc-900 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900">
+      <button type="submit" disabled={isPending} className="rounded-xl bg-amber-400 px-4 py-2.5 text-sm font-semibold text-zinc-950 disabled:opacity-50">
         {isPending ? (locale === "ko" ? "저장 중..." : "Saving...") : (locale === "ko" ? "비즈니스 저장" : "Save business")}
       </button>
     </form>
