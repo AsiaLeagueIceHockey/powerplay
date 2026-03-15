@@ -113,7 +113,7 @@ export function LoungeMembershipManager({
             name="starts_at"
             required
             defaultValue={initialMembership?.starts_at.slice(0, 10) ?? ""}
-            className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100"
+            className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100 appearance-none [-webkit-appearance:none]"
           />
         </label>
         <label className="space-y-2 text-sm">
@@ -123,7 +123,7 @@ export function LoungeMembershipManager({
             name="ends_at"
             required
             defaultValue={initialMembership?.ends_at.slice(0, 10) ?? ""}
-            className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100"
+            className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100 appearance-none [-webkit-appearance:none]"
           />
         </label>
         <label className="space-y-2 text-sm">
