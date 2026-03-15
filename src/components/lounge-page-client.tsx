@@ -69,13 +69,16 @@ export function LoungePageClient({ businesses, events, locale, source }: LoungeP
       <section className={loungeIceGoldTheme.bannerContainer}>
         <div className="flex items-center gap-3">
           <span className={loungeIceGoldTheme.bannerIcon}>
-            <Trophy className="h-4 w-4" />
+            <Trophy className="h-5 w-5" strokeWidth={2.5} />
           </span>
           <div className="min-w-0">
-            <p className="whitespace-pre-line text-sm font-semibold leading-tight text-white">
+            <p className="font-bold text-sm leading-tight text-white">
+              {locale === "ko" ? "PowerPlay 라운지" : "PowerPlay Lounge"}
+            </p>
+            <p className="mt-0.5 text-xs leading-tight text-zinc-200">
               {locale === "ko"
-                ? "지금 필요한 하키 레슨, 훈련장, 대회 정보를\nPowerPlay 라운지에서 확인해보세요."
-                : "Find the hockey lessons, training centers, and tournament info you need in Lounge."}
+                ? "레슨, 훈련장, 대회, 브랜드를 만나보세요"
+                : "Discover lessons, training centers, tournaments, and brands."}
             </p>
           </div>
         </div>
