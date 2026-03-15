@@ -41,6 +41,13 @@ const emptyBulkForm = {
   is_published: true,
 };
 
+const emptyBulkTimeParts = {
+  startHour: "",
+  startMinute: "",
+  endHour: "",
+  endMinute: "",
+};
+
 const DAY_HEADERS_KO = ["일", "월", "화", "수", "목", "금", "토"];
 const DAY_HEADERS_EN = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -57,6 +64,7 @@ export function LoungeBulkEventForm({
   const [mapError, setMapError] = useState<string | null>(null);
   const [selectedDates, setSelectedDates] = useState<string[]>([]);
   const [formState, setFormState] = useState(emptyBulkForm);
+  const [timeParts, setTimeParts] = useState(emptyBulkTimeParts);
 
   const membershipStart = useMemo(() => new Date(membership.starts_at), [membership.starts_at]);
   const membershipEnd = useMemo(() => new Date(membership.ends_at), [membership.ends_at]);
@@ -144,8 +152,20 @@ export function LoungeBulkEventForm({
     }));
   };
 
-  const getHourPart = (value: string) => (value ? value.split(":")[0] || "" : "");
-  const getMinutePart = (value: string) => (value ? value.split(":")[1] || "" : "");
+  const updateBulkTimeParts = (
+    field: "start" | "end",
+    values: Partial<typeof emptyBulkTimeParts>
+  ) => {
+    setTimeParts((prev) => {
+      const next = { ...prev, ...values };
+      if (field === "start") {
+        updateTimeField("start_time_of_day", next.startHour, next.startMinute);
+      } else {
+        updateTimeField("end_time_of_day", next.endHour, next.endMinute);
+      }
+      return next;
+    });
+  };
 
   return (
     <div className="space-y-5">
@@ -163,9 +183,15 @@ export function LoungeBulkEventForm({
         onSubmit={(event) => {
           event.preventDefault();
           const payload = new FormData();
+          const computedStartTime =
+            timeParts.startHour && timeParts.startMinute ? `${timeParts.startHour}:${timeParts.startMinute}` : "";
+          const computedEndTime =
+            timeParts.endHour && timeParts.endMinute ? `${timeParts.endHour}:${timeParts.endMinute}` : "";
           Object.entries(formState).forEach(([key, value]) => {
             payload.set(key, typeof value === "boolean" ? String(value) : value);
           });
+          payload.set("start_time_of_day", computedStartTime);
+          payload.set("end_time_of_day", computedEndTime);
           payload.set("selected_dates", JSON.stringify(selectedDates));
 
           startTransition(async () => {
@@ -181,6 +207,7 @@ export function LoungeBulkEventForm({
                 : `${result.count ?? selectedDates.length} events created.`
             );
             setFormState(emptyBulkForm);
+            setTimeParts(emptyBulkTimeParts);
             setSelectedDates([]);
             router.refresh();
           });
@@ -201,9 +228,9 @@ export function LoungeBulkEventForm({
             <div className="relative flex-1">
               <select
                 required
-                value={getHourPart(formState.start_time_of_day)}
+                value={timeParts.startHour}
                 onChange={(event) =>
-                  updateTimeField("start_time_of_day", event.target.value, getMinutePart(formState.start_time_of_day))
+                  updateBulkTimeParts("start", { startHour: event.target.value })
                 }
                 className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-zinc-100 appearance-none"
               >
@@ -225,9 +252,9 @@ export function LoungeBulkEventForm({
             <div className="relative flex-1">
               <select
                 required
-                value={getMinutePart(formState.start_time_of_day)}
+                value={timeParts.startMinute}
                 onChange={(event) =>
-                  updateTimeField("start_time_of_day", getHourPart(formState.start_time_of_day), event.target.value)
+                  updateBulkTimeParts("start", { startMinute: event.target.value })
                 }
                 className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-zinc-100 appearance-none"
               >
@@ -253,9 +280,9 @@ export function LoungeBulkEventForm({
           <div className="flex gap-2">
             <div className="relative flex-1">
               <select
-                value={getHourPart(formState.end_time_of_day)}
+                value={timeParts.endHour}
                 onChange={(event) =>
-                  updateTimeField("end_time_of_day", event.target.value, getMinutePart(formState.end_time_of_day))
+                  updateBulkTimeParts("end", { endHour: event.target.value })
                 }
                 className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-zinc-100 appearance-none"
               >
@@ -274,9 +301,9 @@ export function LoungeBulkEventForm({
             </div>
             <div className="relative flex-1">
               <select
-                value={getMinutePart(formState.end_time_of_day)}
+                value={timeParts.endMinute}
                 onChange={(event) =>
-                  updateTimeField("end_time_of_day", getHourPart(formState.end_time_of_day), event.target.value)
+                  updateBulkTimeParts("end", { endMinute: event.target.value })
                 }
                 className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-zinc-100 appearance-none"
               >
@@ -523,6 +550,7 @@ export function LoungeBulkEventForm({
             type="button"
             onClick={() => {
               setFormState(emptyBulkForm);
+              setTimeParts(emptyBulkTimeParts);
               setSelectedDates([]);
             }}
             className="rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-2.5 text-sm font-semibold text-zinc-100"
