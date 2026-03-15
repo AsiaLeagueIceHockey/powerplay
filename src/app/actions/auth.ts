@@ -6,10 +6,29 @@ import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { logAndNotify } from "@/lib/audit";
 
+function resolveOriginFromHeaders(headersList: Headers) {
+  const origin = headersList.get("origin");
+  if (origin) return origin;
+
+  const forwardedProto = headersList.get("x-forwarded-proto");
+  const forwardedHost = headersList.get("x-forwarded-host");
+  if (forwardedProto && forwardedHost) {
+    return `${forwardedProto}://${forwardedHost}`;
+  }
+
+  const host = headersList.get("host");
+  if (host) {
+    const protocol = host.includes("localhost") ? "http" : "https";
+    return `${protocol}://${host}`;
+  }
+
+  return process.env.SITE_URL || "https://powerplay.kr";
+}
+
 export async function signUp(formData: FormData) {
   const supabase = await createClient();
   const headersList = await headers();
-  const origin = headersList.get("origin") || "https://pphockey.vercel.app";
+  const origin = resolveOriginFromHeaders(headersList);
 
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
@@ -320,4 +339,3 @@ export async function deleteAccount() {
   revalidatePath("/", "layout");
   redirect("/");
 }
-
