@@ -114,6 +114,7 @@ export default async function AdminLoungePage({
           metrics={metrics}
           dailyMetrics={data.dailyMetrics}
           eventMetrics={data.eventMetrics}
+          membership={data.membership}
           isSuperUser={data.isSuperUser}
           featuredBusinesses={data.featuredBusinesses}
         />

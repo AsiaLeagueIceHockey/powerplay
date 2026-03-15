@@ -77,8 +77,8 @@ export function LoungePageClient({ businesses, events, locale, source }: LoungeP
             </p>
             <p className="mt-0.5 text-xs leading-tight text-zinc-200">
               {locale === "ko"
-                ? "레슨, 훈련장, 대회, 브랜드를 만나보세요"
-                : "Discover lessons, training centers, tournaments, and brands."}
+                ? "레슨, 훈련장, 대회, 브랜드 정보를 만나보세요!"
+                : "Discover lessons, training centers, tournaments, and brand info."}
             </p>
           </div>
         </div>

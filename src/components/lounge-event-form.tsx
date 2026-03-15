@@ -1,10 +1,12 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { CalendarRange, Loader2, MapPin, Search } from "lucide-react";
 import { parseNaverMapUrl } from "@/app/actions/admin";
-import type { LoungeEvent } from "@/app/actions/lounge";
+import type { LoungeEvent, LoungeMembership } from "@/app/actions/lounge";
 import { deleteLoungeEvent, upsertLoungeEvent } from "@/app/actions/lounge";
+import { LoungeBulkEventForm } from "./lounge-bulk-event-form";
 
 function toLocalInputValue(isoString: string) {
   const date = new Date(isoString);
@@ -35,11 +37,23 @@ const emptyForm = {
   is_published: true,
 };
 
-export function LoungeEventForm({ locale, events }: { locale: string; events: LoungeEvent[] }) {
+type LoungeEventMode = "single" | "bulk";
+
+export function LoungeEventForm({
+  locale,
+  events,
+  membership,
+}: {
+  locale: string;
+  events: LoungeEvent[];
+  membership: LoungeMembership | null;
+}) {
   const [isPending, startTransition] = useTransition();
+  const router = useRouter();
   const [formState, setFormState] = useState(emptyForm);
   const [parsing, setParsing] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
+  const [mode, setMode] = useState<LoungeEventMode>("single");
 
   const sortedEvents = useMemo(
     () =>
@@ -69,6 +83,34 @@ export function LoungeEventForm({ locale, events }: { locale: string; events: Lo
         </div>
       </div>
 
+      <section className="border-b border-zinc-800">
+        <div className="flex min-w-max gap-6 overflow-x-auto pb-3">
+          <button
+            type="button"
+            onClick={() => setMode("single")}
+            className={`relative pb-3 text-base font-bold transition-colors ${
+              mode === "single" ? "text-zinc-50" : "text-zinc-500 hover:text-zinc-300"
+            }`}
+          >
+            {locale === "ko" ? "개별 등록" : "Single"}
+            {mode === "single" ? <span className="absolute bottom-0 left-0 h-0.5 w-full bg-amber-400" /> : null}
+          </button>
+          {membership ? (
+            <button
+              type="button"
+              onClick={() => setMode("bulk")}
+              className={`relative pb-3 text-base font-bold transition-colors ${
+                mode === "bulk" ? "text-zinc-50" : "text-zinc-500 hover:text-zinc-300"
+              }`}
+            >
+              {locale === "ko" ? "반복 등록" : "Bulk"}
+              {mode === "bulk" ? <span className="absolute bottom-0 left-0 h-0.5 w-full bg-amber-400" /> : null}
+            </button>
+          ) : null}
+        </div>
+      </section>
+
+      {mode === "single" ? (
       <form
         className="grid gap-4 rounded-2xl border border-zinc-700/80 bg-zinc-900/50 p-5 md:grid-cols-2"
         onSubmit={(event) => {
@@ -96,6 +138,7 @@ export function LoungeEventForm({ locale, events }: { locale: string; events: Lo
                   : "Event created."
             );
             setFormState(emptyForm);
+            router.refresh();
           });
         }}
       >
@@ -294,6 +337,9 @@ export function LoungeEventForm({ locale, events }: { locale: string; events: Lo
           ) : null}
         </div>
       </form>
+      ) : membership ? (
+        <LoungeBulkEventForm locale={locale} membership={membership} />
+      ) : null}
 
       <div className="space-y-3 border-t border-zinc-700 pt-4">
         <h4 className="text-sm font-semibold text-zinc-100">
@@ -365,6 +411,7 @@ export function LoungeEventForm({ locale, events }: { locale: string; events: Lo
                             setFormState(emptyForm);
                           }
                           alert(locale === "ko" ? "일정이 삭제되었습니다." : "Event removed.");
+                          router.refresh();
                         });
                       }}
                       className="rounded-xl border border-red-200 px-3 py-2 text-sm font-semibold text-red-600 dark:border-red-900/30 dark:text-red-400"

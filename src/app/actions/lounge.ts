@@ -144,6 +144,25 @@ export interface LoungeSourceMetricRow {
   ctr: number;
 }
 
+interface LoungeEventPayload {
+  business_id: string;
+  category: LoungeEventCategory;
+  title: string;
+  summary: string | null;
+  description: string | null;
+  start_time: string;
+  end_time: string | null;
+  location: string | null;
+  location_address: string | null;
+  location_map_url: string | null;
+  location_lat: number | null;
+  location_lng: number | null;
+  price_krw: number | null;
+  max_participants: number | null;
+  display_priority: number;
+  is_published: boolean;
+}
+
 function toKstDateKey(input: string | Date) {
   const parts = new Intl.DateTimeFormat("en-CA", {
     year: "numeric",
@@ -156,6 +175,36 @@ function toKstDateKey(input: string | Date) {
   const month = parts.find((part) => part.type === "month")?.value ?? "";
   const day = parts.find((part) => part.type === "day")?.value ?? "";
   return `${year}-${month}-${day}`;
+}
+
+function buildLoungeEventPayload(
+  businessId: string,
+  formData: FormData,
+  startTimeIso: string,
+  endTimeIso: string | null,
+  displayPriority = 0
+): LoungeEventPayload {
+  const priceRaw = (formData.get("price_krw") as string) || "";
+  const maxRaw = (formData.get("max_participants") as string) || "";
+
+  return {
+    business_id: businessId,
+    category: (formData.get("category") as LoungeEventCategory) || "promotion",
+    title: ((formData.get("title") as string) || "").trim(),
+    summary: ((formData.get("summary") as string) || "").trim() || null,
+    description: ((formData.get("description") as string) || "").trim() || null,
+    start_time: startTimeIso,
+    end_time: endTimeIso,
+    location: ((formData.get("location") as string) || "").trim() || null,
+    location_address: ((formData.get("location_address") as string) || "").trim() || null,
+    location_map_url: ((formData.get("location_map_url") as string) || "").trim() || null,
+    location_lat: ((formData.get("location_lat") as string) || "").trim() ? Number(formData.get("location_lat")) : null,
+    location_lng: ((formData.get("location_lng") as string) || "").trim() ? Number(formData.get("location_lng")) : null,
+    price_krw: priceRaw ? Number(priceRaw.replace(/,/g, "")) : null,
+    max_participants: maxRaw ? Number(maxRaw) : null,
+    display_priority: displayPriority,
+    is_published: formData.get("is_published") === "true",
+  };
 }
 
 function isMembershipActive(membership: LoungeMembership | null) {
@@ -654,8 +703,6 @@ export async function upsertLoungeEvent(formData: FormData) {
   }
 
   const endTimeInput = formData.get("end_time") as string;
-  const priceRaw = (formData.get("price_krw") as string) || "";
-  const maxRaw = (formData.get("max_participants") as string) || "";
   const existingEvent = eventId
     ? await supabase
         .from("lounge_events")
@@ -665,26 +712,15 @@ export async function upsertLoungeEvent(formData: FormData) {
         .maybeSingle()
     : { data: null as Pick<LoungeEvent, "id" | "display_priority"> | null };
 
-  const payload = {
-    business_id: business.id,
-    category: (formData.get("category") as LoungeEventCategory) || "promotion",
-    title,
-    summary: ((formData.get("summary") as string) || "").trim() || null,
-    description: ((formData.get("description") as string) || "").trim() || null,
-    start_time: new Date(startTimeInput + "+09:00").toISOString(),
-    end_time: endTimeInput ? new Date(endTimeInput + "+09:00").toISOString() : null,
-    location: ((formData.get("location") as string) || "").trim() || null,
-    location_address: ((formData.get("location_address") as string) || "").trim() || null,
-    location_map_url: ((formData.get("location_map_url") as string) || "").trim() || null,
-    location_lat: ((formData.get("location_lat") as string) || "").trim() ? Number(formData.get("location_lat")) : null,
-    location_lng: ((formData.get("location_lng") as string) || "").trim() ? Number(formData.get("location_lng")) : null,
-    price_krw: priceRaw ? Number(priceRaw.replace(/,/g, "")) : null,
-    max_participants: maxRaw ? Number(maxRaw) : null,
-    display_priority: formData.has("display_priority")
+  const payload = buildLoungeEventPayload(
+    business.id,
+    formData,
+    new Date(startTimeInput + "+09:00").toISOString(),
+    endTimeInput ? new Date(endTimeInput + "+09:00").toISOString() : null,
+    formData.has("display_priority")
       ? Number((formData.get("display_priority") as string) || "0") || 0
-      : existingEvent.data?.display_priority ?? 0,
-    is_published: formData.get("is_published") === "true",
-  };
+      : existingEvent.data?.display_priority ?? 0
+  );
 
   const { error } = eventId
     ? await supabase
@@ -705,6 +741,98 @@ export async function upsertLoungeEvent(formData: FormData) {
   revalidatePath(`/ko/lounge/${business.id}`);
   revalidatePath(`/en/lounge/${business.id}`);
   return { success: true };
+}
+
+export async function createBulkLoungeEvents(formData: FormData) {
+  const supabase = await createClient();
+  const adminInfo = await getAdminInfo();
+
+  if (!adminInfo.isAdmin || !adminInfo.userId) {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  const membership = await getLatestMembership(adminInfo.userId);
+  if (!isMembershipActive(membership)) {
+    return { success: false, error: "Active lounge membership required" };
+  }
+
+  const { data: business } = await supabase
+    .from("lounge_businesses")
+    .select("id")
+    .eq("owner_user_id", adminInfo.userId)
+    .maybeSingle();
+
+  if (!business) {
+    return { success: false, error: "Create your lounge business first" };
+  }
+
+  const title = ((formData.get("title") as string) || "").trim();
+  const startTimeOfDay = ((formData.get("start_time_of_day") as string) || "").trim();
+  const endTimeOfDay = ((formData.get("end_time_of_day") as string) || "").trim();
+  const selectedDatesRaw = ((formData.get("selected_dates") as string) || "").trim();
+
+  if (!title || !startTimeOfDay || !selectedDatesRaw) {
+    return { success: false, error: "Title, time, and selected dates are required" };
+  }
+
+  let selectedDates: string[] = [];
+  try {
+    const parsed = JSON.parse(selectedDatesRaw);
+    if (!Array.isArray(parsed)) {
+      return { success: false, error: "Invalid selected dates payload" };
+    }
+    selectedDates = parsed.filter((value): value is string => typeof value === "string").sort();
+  } catch {
+    return { success: false, error: "Invalid selected dates payload" };
+  }
+
+  if (selectedDates.length === 0) {
+    return { success: false, error: "No dates selected" };
+  }
+
+  const membershipStartKey = toKstDateKey(membership!.starts_at);
+  const membershipEndKey = toKstDateKey(membership!.ends_at);
+  const invalidDate = selectedDates.find((dateKey) => dateKey < membershipStartKey || dateKey > membershipEndKey);
+  if (invalidDate) {
+    return { success: false, error: "Selected dates must stay within the membership period" };
+  }
+
+  const { data: existingEvents } = await supabase
+    .from("lounge_events")
+    .select("display_priority")
+    .eq("business_id", business.id)
+    .order("display_priority", { ascending: false })
+    .limit(1);
+
+  const basePriority = existingEvents?.[0]?.display_priority ?? 0;
+
+  const rows = selectedDates.map((dateKey, index) => {
+    const startTimeIso = new Date(`${dateKey}T${startTimeOfDay}+09:00`).toISOString();
+    const endTimeIso = endTimeOfDay
+      ? new Date(`${dateKey}T${endTimeOfDay}+09:00`).toISOString()
+      : null;
+
+    return buildLoungeEventPayload(
+      business.id,
+      formData,
+      startTimeIso,
+      endTimeIso,
+      basePriority + index + 1
+    );
+  });
+
+  const { error } = await supabase.from("lounge_events").insert(rows);
+  if (error) {
+    return { success: false, error: error.message };
+  }
+
+  revalidatePath("/ko/lounge");
+  revalidatePath("/en/lounge");
+  revalidatePath("/ko/admin/lounge");
+  revalidatePath("/en/admin/lounge");
+  revalidatePath(`/ko/lounge/${business.id}`);
+  revalidatePath(`/en/lounge/${business.id}`);
+  return { success: true, count: rows.length };
 }
 
 export async function deleteLoungeEvent(eventId: string) {

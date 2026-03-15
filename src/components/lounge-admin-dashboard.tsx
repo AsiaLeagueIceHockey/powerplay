@@ -6,6 +6,7 @@ import type {
   LoungeDailyMetricPoint,
   LoungeEvent,
   LoungeEventMetricRow,
+  LoungeMembership,
   LoungeMetricsSummary,
 } from "@/app/actions/lounge";
 import { LoungeBusinessForm } from "./lounge-business-form";
@@ -21,6 +22,7 @@ export function LoungeAdminDashboard({
   metrics,
   dailyMetrics,
   eventMetrics,
+  membership,
   isSuperUser,
   featuredBusinesses,
 }: {
@@ -30,6 +32,7 @@ export function LoungeAdminDashboard({
   metrics: LoungeMetricsSummary;
   dailyMetrics: LoungeDailyMetricPoint[];
   eventMetrics: LoungeEventMetricRow[];
+  membership: LoungeMembership | null;
   isSuperUser: boolean;
   featuredBusinesses: LoungeBusiness[];
 }) {
@@ -199,7 +202,7 @@ export function LoungeAdminDashboard({
 
       {activeTab === "performance" ? renderPerformance() : null}
       {activeTab === "business" ? <LoungeBusinessForm locale={locale} business={business} /> : null}
-      {activeTab === "events" ? <LoungeEventForm locale={locale} events={events} /> : null}
+      {activeTab === "events" ? <LoungeEventForm locale={locale} events={events} membership={membership} /> : null}
       {activeTab === "operations" && isSuperUser ? (
         <div className="space-y-6">
           <LoungeFeatureManager locale={locale} businesses={featuredBusinesses} />
