@@ -358,28 +358,11 @@ async function getActivePublishedBusinesses(supabase: SupabaseServerClient) {
     .eq("is_published", true)
     .order("created_at", { ascending: false });
 
-  const businessRows = (businesses as LoungeBusiness[] | null) ?? [];
-  if (businessRows.length === 0) {
-    return [];
-  }
-
-  const ownerIds = businessRows.map((business) => business.owner_user_id);
-  const { data: memberships } = await supabase
-    .from("lounge_memberships")
-    .select("user_id, starts_at, ends_at, status")
-    .in("user_id", ownerIds);
-
-  const activeOwnerIds = new Set(
-    ((memberships as Array<Pick<LoungeMembership, "user_id" | "starts_at" | "ends_at" | "status">> | null) ?? [])
-      .filter((membership) => {
-        if (membership.status !== "active") return false;
-        const now = new Date();
-        return new Date(membership.starts_at) <= now && new Date(membership.ends_at) >= now;
-      })
-      .map((membership) => membership.user_id)
-  );
-
-  return businessRows.filter((business) => activeOwnerIds.has(business.owner_user_id));
+  // Public SELECT on lounge_businesses is already protected by RLS:
+  // only published businesses owned by users with an active lounge membership
+  // are visible here. Public clients cannot read lounge_memberships directly,
+  // so re-checking membership rows would incorrectly hide all data.
+  return (businesses as LoungeBusiness[] | null) ?? [];
 }
 
 async function getUpcomingPublishedEvents(
