@@ -17,7 +17,13 @@ export default async function LoungePage({
 
   return (
     <div className="flex flex-col gap-6 -mt-2">
-      <LoungePageClient businesses={data.businesses} events={data.events} locale={locale} source={source} />
+      <LoungePageClient
+        businesses={data.businesses}
+        events={data.events}
+        locale={locale}
+        source={source}
+        debug={data.debug}
+      />
     </div>
   );
 }
