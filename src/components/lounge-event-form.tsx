@@ -49,6 +49,15 @@ const emptyForm = {
   is_published: true,
 };
 
+const emptyTimeParts = {
+  startDate: "",
+  startHour: "",
+  startMinute: "",
+  endDate: "",
+  endHour: "",
+  endMinute: "",
+};
+
 type LoungeEventMode = "single" | "bulk";
 
 export function LoungeEventForm({
@@ -63,6 +72,7 @@ export function LoungeEventForm({
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
   const [formState, setFormState] = useState(emptyForm);
+  const [timeParts, setTimeParts] = useState(emptyTimeParts);
   const [parsing, setParsing] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
   const [mode, setMode] = useState<LoungeEventMode>("single");
@@ -87,6 +97,21 @@ export function LoungeEventForm({
       ...prev,
       [field]: nextDate && nextHour && nextMinute ? `${nextDate}T${nextHour}:${nextMinute}` : "",
     }));
+  };
+
+  const updateSingleTimeParts = (
+    field: "start" | "end",
+    values: Partial<typeof emptyTimeParts>
+  ) => {
+    setTimeParts((prev) => {
+      const next = { ...prev, ...values };
+      if (field === "start") {
+        updateDateTimeField("start_time", next.startDate, next.startHour, next.startMinute);
+      } else {
+        updateDateTimeField("end_time", next.endDate, next.endHour, next.endMinute);
+      }
+      return next;
+    });
   };
 
   return (
@@ -140,10 +165,20 @@ export function LoungeEventForm({
         onSubmit={(event) => {
           event.preventDefault();
           const payload = new FormData();
+          const computedStartTime =
+            timeParts.startDate && timeParts.startHour && timeParts.startMinute
+              ? `${timeParts.startDate}T${timeParts.startHour}:${timeParts.startMinute}`
+              : "";
+          const computedEndTime =
+            timeParts.endDate && timeParts.endHour && timeParts.endMinute
+              ? `${timeParts.endDate}T${timeParts.endHour}:${timeParts.endMinute}`
+              : "";
 
           Object.entries(formState).forEach(([key, value]) => {
             payload.set(key, typeof value === "boolean" ? String(value) : value);
           });
+          payload.set("start_time", computedStartTime);
+          payload.set("end_time", computedEndTime);
 
           startTransition(async () => {
             const result = await upsertLoungeEvent(payload);
@@ -162,6 +197,7 @@ export function LoungeEventForm({
                   : "Event created."
             );
             setFormState(emptyForm);
+            setTimeParts(emptyTimeParts);
             router.refresh();
           });
         }}
@@ -185,14 +221,9 @@ export function LoungeEventForm({
             <input
               type="date"
               required
-              value={getDatePart(formState.start_time)}
+              value={timeParts.startDate}
               onChange={(event) =>
-                updateDateTimeField(
-                  "start_time",
-                  event.target.value,
-                  getHourPart(formState.start_time),
-                  getMinutePart(formState.start_time)
-                )
+                updateSingleTimeParts("start", { startDate: event.target.value })
               }
               className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-zinc-100 appearance-none [-webkit-appearance:none]"
             />
@@ -200,14 +231,9 @@ export function LoungeEventForm({
               <div className="relative flex-1">
                 <select
                   required
-                  value={getHourPart(formState.start_time)}
+                  value={timeParts.startHour}
                   onChange={(event) =>
-                    updateDateTimeField(
-                      "start_time",
-                      getDatePart(formState.start_time),
-                      event.target.value,
-                      getMinutePart(formState.start_time)
-                    )
+                    updateSingleTimeParts("start", { startHour: event.target.value })
                   }
                   className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-zinc-100 appearance-none"
                 >
@@ -229,14 +255,9 @@ export function LoungeEventForm({
               <div className="relative flex-1">
                 <select
                   required
-                  value={getMinutePart(formState.start_time)}
+                  value={timeParts.startMinute}
                   onChange={(event) =>
-                    updateDateTimeField(
-                      "start_time",
-                      getDatePart(formState.start_time),
-                      getHourPart(formState.start_time),
-                      event.target.value
-                    )
+                    updateSingleTimeParts("start", { startMinute: event.target.value })
                   }
                   className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-zinc-100 appearance-none"
                 >
@@ -264,28 +285,18 @@ export function LoungeEventForm({
           <div className="space-y-2">
             <input
               type="date"
-              value={getDatePart(formState.end_time)}
+              value={timeParts.endDate}
               onChange={(event) =>
-                updateDateTimeField(
-                  "end_time",
-                  event.target.value,
-                  getHourPart(formState.end_time),
-                  getMinutePart(formState.end_time)
-                )
+                updateSingleTimeParts("end", { endDate: event.target.value })
               }
               className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-zinc-100 appearance-none [-webkit-appearance:none]"
             />
             <div className="flex gap-2">
               <div className="relative flex-1">
                 <select
-                  value={getHourPart(formState.end_time)}
+                  value={timeParts.endHour}
                   onChange={(event) =>
-                    updateDateTimeField(
-                      "end_time",
-                      getDatePart(formState.end_time),
-                      event.target.value,
-                      getMinutePart(formState.end_time)
-                    )
+                    updateSingleTimeParts("end", { endHour: event.target.value })
                   }
                   className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-zinc-100 appearance-none"
                 >
@@ -304,14 +315,9 @@ export function LoungeEventForm({
               </div>
               <div className="relative flex-1">
                 <select
-                  value={getMinutePart(formState.end_time)}
+                  value={timeParts.endMinute}
                   onChange={(event) =>
-                    updateDateTimeField(
-                      "end_time",
-                      getDatePart(formState.end_time),
-                      getHourPart(formState.end_time),
-                      event.target.value
-                    )
+                    updateSingleTimeParts("end", { endMinute: event.target.value })
                   }
                   className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-zinc-100 appearance-none"
                 >
@@ -485,7 +491,10 @@ export function LoungeEventForm({
           {isEditing ? (
             <button
               type="button"
-              onClick={() => setFormState(emptyForm)}
+              onClick={() => {
+                setFormState(emptyForm);
+                setTimeParts(emptyTimeParts);
+              }}
               className="rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-2.5 text-sm font-semibold text-zinc-100"
             >
               {locale === "ko" ? "새 일정으로 초기화" : "Reset to new"}
@@ -531,24 +540,37 @@ export function LoungeEventForm({
                     <button
                       type="button"
                       onClick={() =>
-                        setFormState({
-                          event_id: eventItem.id,
-                          title: eventItem.title,
-                          category: eventItem.category,
-                          start_time: toLocalInputValue(eventItem.start_time),
-                          end_time: eventItem.end_time ? toLocalInputValue(eventItem.end_time) : "",
-                          location: eventItem.location ?? "",
-                          location_address: eventItem.location_address ?? "",
-                          location_map_url: eventItem.location_map_url ?? "",
-                          location_lat: eventItem.location_lat?.toString() ?? "",
-                          location_lng: eventItem.location_lng?.toString() ?? "",
-                          summary: eventItem.summary ?? "",
-                          price_krw: eventItem.price_krw?.toString() ?? "",
-                          max_participants: eventItem.max_participants?.toString() ?? "",
-                          description: eventItem.description ?? "",
-                          display_priority: eventItem.display_priority.toString(),
-                          is_published: eventItem.is_published,
-                        })
+                        (() => {
+                          const startInputValue = toLocalInputValue(eventItem.start_time);
+                          const endInputValue = eventItem.end_time ? toLocalInputValue(eventItem.end_time) : "";
+
+                          setFormState({
+                            event_id: eventItem.id,
+                            title: eventItem.title,
+                            category: eventItem.category,
+                            start_time: startInputValue,
+                            end_time: endInputValue,
+                            location: eventItem.location ?? "",
+                            location_address: eventItem.location_address ?? "",
+                            location_map_url: eventItem.location_map_url ?? "",
+                            location_lat: eventItem.location_lat?.toString() ?? "",
+                            location_lng: eventItem.location_lng?.toString() ?? "",
+                            summary: eventItem.summary ?? "",
+                            price_krw: eventItem.price_krw?.toString() ?? "",
+                            max_participants: eventItem.max_participants?.toString() ?? "",
+                            description: eventItem.description ?? "",
+                            display_priority: eventItem.display_priority.toString(),
+                            is_published: eventItem.is_published,
+                          });
+                          setTimeParts({
+                            startDate: getDatePart(startInputValue),
+                            startHour: getHourPart(startInputValue),
+                            startMinute: getMinutePart(startInputValue),
+                            endDate: getDatePart(endInputValue),
+                            endHour: getHourPart(endInputValue),
+                            endMinute: getMinutePart(endInputValue),
+                          });
+                        })()
                       }
                       className="rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm font-semibold text-zinc-100"
                     >
@@ -565,6 +587,7 @@ export function LoungeEventForm({
                           }
                           if (formState.event_id === eventItem.id) {
                             setFormState(emptyForm);
+                            setTimeParts(emptyTimeParts);
                           }
                           alert(locale === "ko" ? "일정이 삭제되었습니다." : "Event removed.");
                           router.refresh();
