@@ -15,5 +15,9 @@ export default async function LoungePage({
 
   const data = await getPublicLoungeData();
 
-  return <LoungePageClient businesses={data.businesses} events={data.events} locale={locale} source={source} />;
+  return (
+    <div className="flex flex-col gap-6 -mt-2">
+      <LoungePageClient businesses={data.businesses} events={data.events} locale={locale} source={source} />
+    </div>
+  );
 }
