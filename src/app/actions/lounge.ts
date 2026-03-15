@@ -144,6 +144,20 @@ export interface LoungeSourceMetricRow {
   ctr: number;
 }
 
+function toKstDateKey(input: string | Date) {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    timeZone: "Asia/Seoul",
+  }).formatToParts(typeof input === "string" ? new Date(input) : input);
+
+  const year = parts.find((part) => part.type === "year")?.value ?? "";
+  const month = parts.find((part) => part.type === "month")?.value ?? "";
+  const day = parts.find((part) => part.type === "day")?.value ?? "";
+  return `${year}-${month}-${day}`;
+}
+
 function isMembershipActive(membership: LoungeMembership | null) {
   if (!membership || membership.status === "canceled") return false;
   const now = new Date();
@@ -334,8 +348,10 @@ async function getUpcomingPublishedEvents(
     .eq("is_published", true)
     .order("start_time", { ascending: true });
 
+  const todayKeyKst = toKstDateKey(new Date());
+
   return ((events as LoungeEvent[] | null) ?? []).filter(
-    (event) => new Date(event.start_time) >= new Date()
+    (event) => toKstDateKey(event.start_time) >= todayKeyKst
   );
 }
 

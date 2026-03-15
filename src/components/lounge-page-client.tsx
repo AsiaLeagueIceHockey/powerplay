@@ -60,7 +60,7 @@ export function LoungePageClient({ businesses, events, locale, source }: LoungeP
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <style jsx>{`
         .hide-scrollbar::-webkit-scrollbar {
           display: none;
