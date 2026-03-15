@@ -18,6 +18,18 @@ function formatEventTime(isoString: string) {
   return toLocalInputValue(isoString).replace("T", " ");
 }
 
+function getDatePart(value: string) {
+  return value ? value.split("T")[0] : "";
+}
+
+function getHourPart(value: string) {
+  return value ? value.split("T")[1]?.split(":")[0] || "" : "";
+}
+
+function getMinutePart(value: string) {
+  return value ? value.split("T")[1]?.split(":")[1]?.slice(0, 2) || "" : "";
+}
+
 const emptyForm = {
   event_id: "",
   title: "",
@@ -65,6 +77,18 @@ export function LoungeEventForm({
 
   const isEditing = !!formState.event_id;
 
+  const updateDateTimeField = (
+    field: "start_time" | "end_time",
+    nextDate: string,
+    nextHour: string,
+    nextMinute: string
+  ) => {
+    setFormState((prev) => ({
+      ...prev,
+      [field]: nextDate && nextHour && nextMinute ? `${nextDate}T${nextHour}:${nextMinute}` : "",
+    }));
+  };
+
   return (
     <div className="space-y-5 rounded-3xl border border-zinc-700 bg-[linear-gradient(180deg,#3f3f46_0%,#27272a_100%)] p-6 shadow-sm">
       <div className="flex items-start gap-3 rounded-2xl border border-zinc-700/80 bg-zinc-900/50 p-4">
@@ -92,7 +116,7 @@ export function LoungeEventForm({
               mode === "single" ? "text-zinc-50" : "text-zinc-500 hover:text-zinc-300"
             }`}
           >
-            {locale === "ko" ? "개별 등록" : "Single"}
+            {locale === "ko" ? "개별 일정 등록" : "Single event"}
             {mode === "single" ? <span className="absolute bottom-0 left-0 h-0.5 w-full bg-amber-400" /> : null}
           </button>
           {membership ? (
@@ -103,7 +127,7 @@ export function LoungeEventForm({
                 mode === "bulk" ? "text-zinc-50" : "text-zinc-500 hover:text-zinc-300"
               }`}
             >
-              {locale === "ko" ? "반복 등록" : "Bulk"}
+              {locale === "ko" ? "반복 일정 등록" : "Recurring events"}
               {mode === "bulk" ? <span className="absolute bottom-0 left-0 h-0.5 w-full bg-amber-400" /> : null}
             </button>
           ) : null}
@@ -154,27 +178,159 @@ export function LoungeEventForm({
             className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100"
           />
         </label>
-        <label className="space-y-2 text-sm">
+        <div className="space-y-2 text-sm">
           <span className="font-semibold text-zinc-100">{locale === "ko" ? "시작 시간" : "Start time"}</span>
-          <input
-            type="datetime-local"
-            name="start_time"
-            required
-            value={formState.start_time}
-            onChange={(event) => setFormState((prev) => ({ ...prev, start_time: event.target.value }))}
-            className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100"
-          />
-        </label>
-        <label className="space-y-2 text-sm">
+          <input type="hidden" name="start_time" value={formState.start_time} />
+          <div className="space-y-2">
+            <input
+              type="date"
+              required
+              value={getDatePart(formState.start_time)}
+              onChange={(event) =>
+                updateDateTimeField(
+                  "start_time",
+                  event.target.value,
+                  getHourPart(formState.start_time),
+                  getMinutePart(formState.start_time)
+                )
+              }
+              className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-zinc-100 appearance-none [-webkit-appearance:none]"
+            />
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <select
+                  required
+                  value={getHourPart(formState.start_time)}
+                  onChange={(event) =>
+                    updateDateTimeField(
+                      "start_time",
+                      getDatePart(formState.start_time),
+                      event.target.value,
+                      getMinutePart(formState.start_time)
+                    )
+                  }
+                  className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-zinc-100 appearance-none"
+                >
+                  <option value="" disabled>
+                    {locale === "ko" ? "시" : "Hour"}
+                  </option>
+                  {Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, "0")).map((hour) => (
+                    <option key={hour} value={hour}>
+                      {locale === "ko" ? `${hour}시` : hour}
+                    </option>
+                  ))}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-zinc-400">
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
+              <div className="relative flex-1">
+                <select
+                  required
+                  value={getMinutePart(formState.start_time)}
+                  onChange={(event) =>
+                    updateDateTimeField(
+                      "start_time",
+                      getDatePart(formState.start_time),
+                      getHourPart(formState.start_time),
+                      event.target.value
+                    )
+                  }
+                  className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-zinc-100 appearance-none"
+                >
+                  <option value="" disabled>
+                    {locale === "ko" ? "분" : "Minute"}
+                  </option>
+                  {["00", "10", "20", "30", "40", "50"].map((minute) => (
+                    <option key={minute} value={minute}>
+                      {locale === "ko" ? `${minute}분` : minute}
+                    </option>
+                  ))}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-zinc-400">
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="space-y-2 text-sm">
           <span className="font-semibold text-zinc-100">{locale === "ko" ? "종료 시간" : "End time"}</span>
-          <input
-            type="datetime-local"
-            name="end_time"
-            value={formState.end_time}
-            onChange={(event) => setFormState((prev) => ({ ...prev, end_time: event.target.value }))}
-            className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100"
-          />
-        </label>
+          <input type="hidden" name="end_time" value={formState.end_time} />
+          <div className="space-y-2">
+            <input
+              type="date"
+              value={getDatePart(formState.end_time)}
+              onChange={(event) =>
+                updateDateTimeField(
+                  "end_time",
+                  event.target.value,
+                  getHourPart(formState.end_time),
+                  getMinutePart(formState.end_time)
+                )
+              }
+              className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-zinc-100 appearance-none [-webkit-appearance:none]"
+            />
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <select
+                  value={getHourPart(formState.end_time)}
+                  onChange={(event) =>
+                    updateDateTimeField(
+                      "end_time",
+                      getDatePart(formState.end_time),
+                      event.target.value,
+                      getMinutePart(formState.end_time)
+                    )
+                  }
+                  className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-zinc-100 appearance-none"
+                >
+                  <option value="">{locale === "ko" ? "시" : "Hour"}</option>
+                  {Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, "0")).map((hour) => (
+                    <option key={hour} value={hour}>
+                      {locale === "ko" ? `${hour}시` : hour}
+                    </option>
+                  ))}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-zinc-400">
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
+              <div className="relative flex-1">
+                <select
+                  value={getMinutePart(formState.end_time)}
+                  onChange={(event) =>
+                    updateDateTimeField(
+                      "end_time",
+                      getDatePart(formState.end_time),
+                      getHourPart(formState.end_time),
+                      event.target.value
+                    )
+                  }
+                  className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-zinc-100 appearance-none"
+                >
+                  <option value="">{locale === "ko" ? "분" : "Minute"}</option>
+                  {["00", "10", "20", "30", "40", "50"].map((minute) => (
+                    <option key={minute} value={minute}>
+                      {locale === "ko" ? `${minute}분` : minute}
+                    </option>
+                  ))}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-zinc-400">
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
         <label className="space-y-2 text-sm">
           <span className="font-semibold text-zinc-100">{locale === "ko" ? "일정 유형" : "Type"}</span>
           <select
