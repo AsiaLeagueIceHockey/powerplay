@@ -155,6 +155,27 @@ export function LoungeEventForm({
           />
         </label>
         <label className="space-y-2 text-sm">
+          <span className="font-semibold text-zinc-100">{locale === "ko" ? "시작 시간" : "Start time"}</span>
+          <input
+            type="datetime-local"
+            name="start_time"
+            required
+            value={formState.start_time}
+            onChange={(event) => setFormState((prev) => ({ ...prev, start_time: event.target.value }))}
+            className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100"
+          />
+        </label>
+        <label className="space-y-2 text-sm">
+          <span className="font-semibold text-zinc-100">{locale === "ko" ? "종료 시간" : "End time"}</span>
+          <input
+            type="datetime-local"
+            name="end_time"
+            value={formState.end_time}
+            onChange={(event) => setFormState((prev) => ({ ...prev, end_time: event.target.value }))}
+            className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100"
+          />
+        </label>
+        <label className="space-y-2 text-sm">
           <span className="font-semibold text-zinc-100">{locale === "ko" ? "일정 유형" : "Type"}</span>
           <select
             name="category"
@@ -167,27 +188,6 @@ export function LoungeEventForm({
             <option value="tournament">{locale === "ko" ? "대회" : "Tournament"}</option>
             <option value="promotion">{locale === "ko" ? "프로모션" : "Promotion"}</option>
           </select>
-        </label>
-        <label className="space-y-2 text-sm">
-          <span className="font-semibold text-zinc-100">{locale === "ko" ? "시작 일시" : "Start time"}</span>
-          <input
-            type="datetime-local"
-            name="start_time"
-            required
-            value={formState.start_time}
-            onChange={(event) => setFormState((prev) => ({ ...prev, start_time: event.target.value }))}
-            className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100"
-          />
-        </label>
-        <label className="space-y-2 text-sm">
-          <span className="font-semibold text-zinc-100">{locale === "ko" ? "종료 일시" : "End time"}</span>
-          <input
-            type="datetime-local"
-            name="end_time"
-            value={formState.end_time}
-            onChange={(event) => setFormState((prev) => ({ ...prev, end_time: event.target.value }))}
-            className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100"
-          />
         </label>
         <label className="space-y-2 text-sm">
           <span className="font-semibold text-zinc-100">{locale === "ko" ? "장소" : "Location"}</span>

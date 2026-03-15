@@ -134,8 +134,8 @@ export function LoungeBulkEventForm({
   ).length;
 
   return (
-    <div className="space-y-5 rounded-3xl border border-zinc-700 bg-[linear-gradient(180deg,#3f3f46_0%,#27272a_100%)] p-6 shadow-sm">
-      <div className="flex items-start gap-3 rounded-2xl border border-zinc-700/80 bg-zinc-900/50 p-4">
+    <div className="space-y-5">
+      <div className="flex items-start gap-3 rounded-2xl border border-zinc-700/80 bg-zinc-900/40 p-4">
         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-400 text-zinc-950">
           <CalendarRange className="h-5 w-5" />
         </div>
@@ -151,7 +151,7 @@ export function LoungeBulkEventForm({
         </div>
       </div>
 
-      <div className="rounded-2xl border border-zinc-700/80 bg-zinc-900/50 p-4 text-sm text-zinc-300">
+      <div className="rounded-2xl border border-zinc-700/80 bg-zinc-900/40 p-4 text-sm text-zinc-300">
         <p className="font-semibold text-zinc-100">
           {locale === "ko" ? "등록 가능 기간" : "Available range"}
         </p>
@@ -161,7 +161,7 @@ export function LoungeBulkEventForm({
       </div>
 
       <form
-        className="grid gap-4 rounded-2xl border border-zinc-700/80 bg-zinc-900/50 p-5 md:grid-cols-2"
+        className="grid gap-4 md:grid-cols-2"
         onSubmit={(event) => {
           event.preventDefault();
           const payload = new FormData();
@@ -198,19 +198,6 @@ export function LoungeBulkEventForm({
           />
         </label>
         <label className="space-y-2 text-sm">
-          <span className="font-semibold text-zinc-100">{locale === "ko" ? "일정 유형" : "Type"}</span>
-          <select
-            value={formState.category}
-            onChange={(event) => setFormState((prev) => ({ ...prev, category: event.target.value }))}
-            className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100"
-          >
-            <option value="lesson">{locale === "ko" ? "레슨" : "Lesson"}</option>
-            <option value="training">{locale === "ko" ? "훈련" : "Training"}</option>
-            <option value="tournament">{locale === "ko" ? "대회" : "Tournament"}</option>
-            <option value="promotion">{locale === "ko" ? "프로모션" : "Promotion"}</option>
-          </select>
-        </label>
-        <label className="space-y-2 text-sm">
           <span className="font-semibold text-zinc-100">{locale === "ko" ? "시작 시간" : "Start time"}</span>
           <input
             type="time"
@@ -228,6 +215,19 @@ export function LoungeBulkEventForm({
             onChange={(event) => setFormState((prev) => ({ ...prev, end_time_of_day: event.target.value }))}
             className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100"
           />
+        </label>
+        <label className="space-y-2 text-sm">
+          <span className="font-semibold text-zinc-100">{locale === "ko" ? "일정 유형" : "Type"}</span>
+          <select
+            value={formState.category}
+            onChange={(event) => setFormState((prev) => ({ ...prev, category: event.target.value }))}
+            className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100"
+          >
+            <option value="lesson">{locale === "ko" ? "레슨" : "Lesson"}</option>
+            <option value="training">{locale === "ko" ? "훈련" : "Training"}</option>
+            <option value="tournament">{locale === "ko" ? "대회" : "Tournament"}</option>
+            <option value="promotion">{locale === "ko" ? "프로모션" : "Promotion"}</option>
+          </select>
         </label>
         <label className="space-y-2 text-sm">
           <span className="font-semibold text-zinc-100">{locale === "ko" ? "장소" : "Location"}</span>
@@ -340,7 +340,7 @@ export function LoungeBulkEventForm({
           />
         </label>
 
-        <div className="md:col-span-2 space-y-3 rounded-xl border border-zinc-700 bg-zinc-950/80 p-4">
+        <div className="space-y-3 rounded-2xl border border-zinc-700/80 bg-zinc-900/50 p-4 md:col-span-2">
           <div className="flex items-center justify-between gap-3">
             <p className="text-sm font-semibold text-zinc-100">
               {locale === "ko" ? "날짜 선택" : "Pick dates"}
