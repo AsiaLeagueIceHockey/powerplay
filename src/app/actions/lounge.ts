@@ -174,6 +174,14 @@ function normalizeLoungeSlug(input: string) {
     .replace(/^-|-$/g, "");
 }
 
+function decodeLoungeSlugParam(input: string) {
+  try {
+    return decodeURIComponent(input);
+  } catch {
+    return input;
+  }
+}
+
 async function ensureUniqueLoungeSlug(
   supabase: SupabaseServerClient,
   slug: string,
@@ -597,7 +605,9 @@ export async function getPublicLoungeBusinessDetail(businessSlug: string): Promi
 }> {
   const supabase = await createClient();
   const activeBusinesses = await getActivePublishedBusinesses(supabase);
-  const business = activeBusinesses.find((item) => item.slug === businessSlug) ?? null;
+  const requestedSlug = normalizeLoungeSlug(decodeLoungeSlugParam(businessSlug));
+  const business =
+    activeBusinesses.find((item) => item.slug === requestedSlug || item.slug === businessSlug) ?? null;
 
   if (!business) {
     return {
