@@ -20,7 +20,17 @@ export default async function AdminDetailPage({
         notFound();
     }
 
-    const { profile, clubs, matches } = data;
+    const { profile, clubs, matches, loungeBusiness } = data;
+
+    const loungeCategoryLabel = loungeBusiness
+      ? {
+          lesson: "하키 레슨",
+          training_center: "훈련장 / 슈팅센터",
+          tournament: "대회",
+          brand: "브랜드",
+          service: "퍼포먼스 솔루션",
+        }[loungeBusiness.category]
+      : null;
 
     return (
         <div className="max-w-5xl mx-auto space-y-8">
@@ -68,6 +78,55 @@ export default async function AdminDetailPage({
                             </span>
                         </div>
                     </div>
+            </div>
+        </div>
+
+            <div className="space-y-4">
+                <h2 className="text-xl font-bold flex items-center gap-2">
+                    <span className="text-2xl">🏆</span>
+                    라운지 비즈니스
+                </h2>
+
+                <div className="bg-zinc-950 border border-zinc-800 rounded-xl overflow-hidden">
+                    {!loungeBusiness ? (
+                        <div className="flex flex-col items-center justify-center py-12 text-zinc-500">
+                            <span className="mb-2 text-2xl opacity-30">🏆</span>
+                            <p>등록된 라운지 비즈니스가 없습니다.</p>
+                        </div>
+                    ) : (
+                        <div className="p-6 space-y-4">
+                            <div className="flex flex-wrap items-center gap-2">
+                                <span className="rounded-full bg-amber-500/10 px-3 py-1 text-xs font-bold text-amber-400 border border-amber-500/20">
+                                    {loungeCategoryLabel}
+                                </span>
+                                <span className={`rounded-full px-3 py-1 text-xs font-bold border ${
+                                    loungeBusiness.is_published
+                                      ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                                      : "bg-zinc-800 text-zinc-400 border-zinc-700"
+                                }`}>
+                                    {loungeBusiness.is_published ? "공개 중" : "비공개"}
+                                </span>
+                            </div>
+                            <div>
+                                <h3 className="text-2xl font-bold text-white">{loungeBusiness.name}</h3>
+                                {loungeBusiness.tagline ? (
+                                    <p className="mt-2 text-sm font-medium text-zinc-400">{loungeBusiness.tagline}</p>
+                                ) : null}
+                            </div>
+                            <p className="text-sm leading-7 text-zinc-300 whitespace-pre-wrap">
+                                {loungeBusiness.description || "등록된 소개가 없습니다."}
+                            </p>
+                            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-800 pt-4 text-sm text-zinc-400">
+                                <span>등록일: {new Date(loungeBusiness.created_at).toLocaleDateString("ko-KR")}</span>
+                                <Link
+                                    href={`/${locale}/admin/lounge`}
+                                    className="inline-flex items-center gap-2 rounded-lg bg-zinc-100 px-3 py-2 text-xs font-semibold text-zinc-900 hover:bg-white"
+                                >
+                                    라운지 관리로 이동
+                                </Link>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
 

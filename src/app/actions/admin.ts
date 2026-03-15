@@ -1260,11 +1260,22 @@ interface AdminMatch {
   } | null;
 }
 
+interface AdminLoungeBusiness {
+  id: string;
+  category: "lesson" | "training_center" | "tournament" | "brand" | "service";
+  name: string;
+  tagline: string | null;
+  description: string | null;
+  is_published: boolean;
+  created_at: string;
+}
+
 // Get admin detail (clubs and matches)
 export async function getAdminDetail(targetUserId: string): Promise<{
   profile: any;
   clubs: AdminClub[];
   matches: AdminMatch[];
+  loungeBusiness: AdminLoungeBusiness | null;
 } | null> {
   const supabase = await createClient();
 
@@ -1320,16 +1331,26 @@ export async function getAdminDetail(targetUserId: string): Promise<{
   }
 
   // 3. Get Matches they created
-  const { data: hostedMatches, error: matchError } = await supabase
-    .from("matches")
-    .select(`
-      id,
-      start_time,
-      status,
-      rink:rinks (name_ko)
-    `)
-    .eq("created_by", targetUserId)
-    .order("start_time", { ascending: false });
+  const [hostedMatchesResult, loungeBusinessResult] = await Promise.all([
+    supabase
+      .from("matches")
+      .select(`
+        id,
+        start_time,
+        status,
+        rink:rinks (name_ko)
+      `)
+      .eq("created_by", targetUserId)
+      .order("start_time", { ascending: false }),
+    supabase
+      .from("lounge_businesses")
+      .select("id, category, name, tagline, description, is_published, created_at")
+      .eq("owner_user_id", targetUserId)
+      .maybeSingle(),
+  ]);
+
+  const hostedMatches = hostedMatchesResult.data;
+  const matchError = hostedMatchesResult.error;
 
   if (matchError) {
     console.error("Error fetching admin matches:", matchError);
@@ -1353,6 +1374,7 @@ export async function getAdminDetail(targetUserId: string): Promise<{
       ...match,
       rink: Array.isArray(match.rink) ? match.rink[0] : match.rink,
     })) as AdminMatch[],
+    loungeBusiness: (loungeBusinessResult.data as AdminLoungeBusiness | null) ?? null,
   };
 }
 
