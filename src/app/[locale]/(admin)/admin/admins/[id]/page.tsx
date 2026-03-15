@@ -2,7 +2,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { getAdminDetail } from "@/app/actions/admin";
 import Link from "next/link";
-import { ChevronLeft, User, Mail, Calendar, Users, Trophy, ExternalLink } from "lucide-react";
+import { ChevronLeft, User, Mail, Calendar, Users, Trophy, ExternalLink, Phone } from "lucide-react";
 import { notFound } from "next/navigation";
 
 export default async function AdminDetailPage({
@@ -47,10 +47,20 @@ export default async function AdminDetailPage({
                                 ADMIN
                             </span>
                         </h1>
-                        <div className="flex items-center gap-4 text-zinc-400">
+                        <div className="flex flex-wrap items-center gap-4 text-zinc-400">
                             <span className="flex items-center gap-1.5">
                                 <Mail className="w-4 h-4" />
-                                {profile.id} {/* Using ID as Email fallback representation based on list view */}
+                                {profile.email || "이메일 없음"}
+                            </span>
+                            <span className="flex items-center gap-1.5">
+                                <Phone className="w-4 h-4" />
+                                {profile.phone ? (
+                                  <a href={`tel:${profile.phone}`} className="hover:text-blue-400 transition-colors">
+                                    {profile.phone}
+                                  </a>
+                                ) : (
+                                  "전화번호 없음"
+                                )}
                             </span>
                             <span className="flex items-center gap-1.5">
                                 <Calendar className="w-4 h-4" />

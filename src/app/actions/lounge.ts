@@ -38,6 +38,16 @@ export interface LoungeMembership {
     id: string;
     email: string | null;
     full_name: string | null;
+    phone: string | null;
+  } | null;
+}
+
+export interface LoungeManagedMembership extends LoungeMembership {
+  business?: {
+    id: string;
+    name: string;
+    category: LoungeBusinessCategory;
+    is_published: boolean;
   } | null;
 }
 
@@ -372,25 +382,14 @@ export async function getLoungeAdminPageData() {
 
   const membershipStatus = !membership ? "none" : isMembershipActive(membership) ? "active" : "expired";
 
-  const superuserData = isSuperUser
-    ? await Promise.all([
-        supabase
-          .from("lounge_memberships")
-          .select(`
-            *,
-            user:user_id(id, email, full_name)
-          `)
-          .order("created_at", { ascending: false })
-          .limit(30),
-        supabase
-          .from("lounge_businesses")
-          .select(`
-            *,
-            owner:owner_user_id(id, email, full_name, phone)
-          `)
-          .order("created_at", { ascending: false }),
-        getAdmins(),
-      ])
+  const featuredBusinesses = isSuperUser
+    ? await supabase
+        .from("lounge_businesses")
+        .select(`
+          *,
+          owner:owner_user_id(id, email, full_name, phone)
+        `)
+        .order("created_at", { ascending: false })
     : null;
 
   return {
@@ -405,9 +404,57 @@ export async function getLoungeAdminPageData() {
     eventMetrics: buildEventMetricRows((events.data as LoungeEvent[]) ?? [], metricRows),
     sourceMetrics: buildSourceMetricRows(metricRows),
     isSuperUser,
-    memberships: (superuserData?.[0].data as LoungeMembership[]) ?? [],
-    featuredBusinesses: (superuserData?.[1].data as LoungeBusiness[]) ?? [],
-    admins: superuserData?.[2] ?? [],
+    featuredBusinesses: (featuredBusinesses?.data as LoungeBusiness[]) ?? [],
+  };
+}
+
+export async function getLoungeManagementPageData(): Promise<{
+  ok: boolean;
+  reason?: "unauthorized";
+  memberships?: LoungeManagedMembership[];
+  admins?: Awaited<ReturnType<typeof getAdmins>>;
+}> {
+  const supabase = await createClient();
+  const isSuperUser = await checkIsSuperUser();
+
+  if (!isSuperUser) {
+    return { ok: false, reason: "unauthorized" };
+  }
+
+  const [membershipsResult, businessesResult, admins] = await Promise.all([
+    supabase
+      .from("lounge_memberships")
+      .select(`
+        *,
+        user:user_id(id, email, full_name, phone)
+      `)
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("lounge_businesses")
+      .select("id, owner_user_id, name, category, is_published")
+      .order("created_at", { ascending: false }),
+    getAdmins(),
+  ]);
+
+  const businessByOwner = new Map(
+    (((businessesResult.data as Array<{
+      id: string;
+      owner_user_id: string;
+      name: string;
+      category: LoungeBusinessCategory;
+      is_published: boolean;
+    }> | null) ?? [])).map((business) => [business.owner_user_id, business])
+  );
+
+  const memberships = (((membershipsResult.data as LoungeMembership[] | null) ?? [])).map((membership) => ({
+    ...membership,
+    business: businessByOwner.get(membership.user_id) ?? null,
+  }));
+
+  return {
+    ok: true,
+    memberships,
+    admins,
   };
 }
 
@@ -685,6 +732,7 @@ export async function upsertLoungeMembership(formData: FormData) {
     return { success: false, error: "Unauthorized" };
   }
 
+  const membershipId = (formData.get("membership_id") as string) || "";
   const userId = formData.get("user_id") as string;
   const startsAt = formData.get("starts_at") as string;
   const endsAt = formData.get("ends_at") as string;
@@ -704,7 +752,7 @@ export async function upsertLoungeMembership(formData: FormData) {
   const startsAtDate = new Date(startsAt + "T00:00:00+09:00");
   const status = endsAtDate >= new Date() ? "active" : "expired";
 
-  const { error } = await supabase.from("lounge_memberships").insert({
+  const payload = {
     user_id: userId,
     starts_at: startsAtDate.toISOString(),
     ends_at: endsAtDate.toISOString(),
@@ -712,8 +760,20 @@ export async function upsertLoungeMembership(formData: FormData) {
     inquiry_channel: inquiryChannel,
     note,
     status,
-    created_by: user?.id ?? null,
-  });
+  };
+
+  const { error } = membershipId
+    ? await supabase
+        .from("lounge_memberships")
+        .update({
+          ...payload,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", membershipId)
+    : await supabase.from("lounge_memberships").insert({
+        ...payload,
+        created_by: user?.id ?? null,
+      });
 
   if (error) {
     return { success: false, error: error.message };
@@ -721,6 +781,8 @@ export async function upsertLoungeMembership(formData: FormData) {
 
   revalidatePath("/ko/admin/lounge");
   revalidatePath("/en/admin/lounge");
+  revalidatePath("/ko/admin/lounge-management");
+  revalidatePath("/en/admin/lounge-management");
   return { success: true };
 }
 
