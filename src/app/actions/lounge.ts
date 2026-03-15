@@ -144,6 +144,16 @@ export interface LoungeSourceMetricRow {
   ctr: number;
 }
 
+export interface LoungePublicDebugInfo {
+  requestTimeKst: string;
+  businessesQueryCount: number;
+  businessesQueryError: string | null;
+  activeBusinessesCount: number;
+  eventsQueryCount: number;
+  eventsQueryError: string | null;
+  filteredEventsCount: number;
+}
+
 interface LoungeEventPayload {
   business_id: string;
   category: LoungeEventCategory;
@@ -352,17 +362,32 @@ async function getLatestMembership(userId: string) {
 }
 
 async function getActivePublishedBusinesses(supabase: SupabaseServerClient) {
-  const { data: businesses } = await supabase
+  const { data: businesses, error } = await supabase
     .from("lounge_businesses")
     .select("*")
     .eq("is_published", true)
     .order("created_at", { ascending: false });
 
+  if (error) {
+    console.error("[lounge] getActivePublishedBusinesses query failed", {
+      code: error.code,
+      message: error.message,
+      details: error.details,
+      hint: error.hint,
+    });
+  }
+
   // Public SELECT on lounge_businesses is already protected by RLS:
   // only published businesses owned by users with an active lounge membership
   // are visible here. Public clients cannot read lounge_memberships directly,
   // so re-checking membership rows would incorrectly hide all data.
-  return (businesses as LoungeBusiness[] | null) ?? [];
+  const rows = (businesses as LoungeBusiness[] | null) ?? [];
+  console.log("[lounge] getActivePublishedBusinesses", {
+    count: rows.length,
+    ownerIds: rows.map((business) => business.owner_user_id),
+  });
+
+  return rows;
 }
 
 async function getUpcomingPublishedEvents(
@@ -373,18 +398,36 @@ async function getUpcomingPublishedEvents(
     return [];
   }
 
-  const { data: events } = await supabase
+  const { data: events, error } = await supabase
     .from("lounge_events")
     .select("*")
     .in("business_id", businessIds)
     .eq("is_published", true)
     .order("start_time", { ascending: true });
 
-  const todayKeyKst = toKstDateKey(new Date());
+  if (error) {
+    console.error("[lounge] getUpcomingPublishedEvents query failed", {
+      code: error.code,
+      message: error.message,
+      details: error.details,
+      hint: error.hint,
+      businessIds,
+    });
+  }
 
-  return ((events as LoungeEvent[] | null) ?? []).filter(
+  const todayKeyKst = toKstDateKey(new Date());
+  const rows = ((events as LoungeEvent[] | null) ?? []).filter(
     (event) => toKstDateKey(event.start_time) >= todayKeyKst
   );
+
+  console.log("[lounge] getUpcomingPublishedEvents", {
+    businessIds,
+    rawCount: ((events as LoungeEvent[] | null) ?? []).length,
+    filteredCount: rows.length,
+    todayKeyKst,
+  });
+
+  return rows;
 }
 
 export async function getLoungeAdminPageData() {
@@ -509,11 +552,63 @@ export async function getLoungeManagementPageData(): Promise<{
 export async function getPublicLoungeData(): Promise<{
   businesses: LoungeBusiness[];
   events: LoungeEvent[];
+  debug: LoungePublicDebugInfo;
 }> {
   const supabase = await createClient();
+  const requestTimeKst = new Intl.DateTimeFormat("sv-SE", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  }).format(new Date());
+
+  const { data: businessesProbe, error: businessesProbeError } = await supabase
+    .from("lounge_businesses")
+    .select("id, owner_user_id, is_published", { count: "exact" })
+    .eq("is_published", true);
+
+  if (businessesProbeError) {
+    console.error("[lounge] public businesses probe failed", {
+      code: businessesProbeError.code,
+      message: businessesProbeError.message,
+      details: businessesProbeError.details,
+      hint: businessesProbeError.hint,
+    });
+  }
+
   const activeBusinesses = await getActivePublishedBusinesses(supabase);
   if (activeBusinesses.length === 0) {
-    return { businesses: [], events: [] };
+    const debug = {
+      requestTimeKst,
+      businessesQueryCount: (businessesProbe ?? []).length,
+      businessesQueryError: businessesProbeError?.message ?? null,
+      activeBusinessesCount: 0,
+      eventsQueryCount: 0,
+      eventsQueryError: null,
+      filteredEventsCount: 0,
+    };
+
+    console.log("[lounge] getPublicLoungeData empty", debug);
+    return { businesses: [], events: [], debug };
+  }
+
+  const { data: eventsProbe, error: eventsProbeError } = await supabase
+    .from("lounge_events")
+    .select("id, business_id, start_time, is_published", { count: "exact" })
+    .in("business_id", activeBusinesses.map((business) => business.id))
+    .eq("is_published", true);
+
+  if (eventsProbeError) {
+    console.error("[lounge] public events probe failed", {
+      code: eventsProbeError.code,
+      message: eventsProbeError.message,
+      details: eventsProbeError.details,
+      hint: eventsProbeError.hint,
+    });
   }
 
   const upcomingEvents = await getUpcomingPublishedEvents(
@@ -527,6 +622,18 @@ export async function getPublicLoungeData(): Promise<{
     existing.push(event);
     eventsByBusiness.set(event.business_id, existing);
   });
+
+  const debug = {
+    requestTimeKst,
+    businessesQueryCount: (businessesProbe ?? []).length,
+    businessesQueryError: businessesProbeError?.message ?? null,
+    activeBusinessesCount: activeBusinesses.length,
+    eventsQueryCount: (eventsProbe ?? []).length,
+    eventsQueryError: eventsProbeError?.message ?? null,
+    filteredEventsCount: upcomingEvents.length,
+  };
+
+  console.log("[lounge] getPublicLoungeData success", debug);
 
   return {
     businesses: activeBusinesses
@@ -548,6 +655,7 @@ export async function getPublicLoungeData(): Promise<{
         return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
       }),
     events: upcomingEvents,
+    debug,
   };
 }
 
