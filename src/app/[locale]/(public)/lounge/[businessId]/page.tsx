@@ -10,11 +10,11 @@ export default async function LoungeBusinessDetailPage({
   params: Promise<{ locale: string; businessId: string }>;
   searchParams: Promise<{ source?: string; eventId?: string; date?: string }>;
 }) {
-  const { locale, businessId } = await params;
+  const { locale, businessId: businessSlug } = await params;
   const { source, eventId, date } = await searchParams;
   setRequestLocale(locale);
 
-  const data = await getPublicLoungeBusinessDetail(businessId);
+  const data = await getPublicLoungeBusinessDetail(businessSlug);
 
   if (!data.business) {
     notFound();

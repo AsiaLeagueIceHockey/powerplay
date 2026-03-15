@@ -76,6 +76,7 @@ export interface LoungeEvent {
 export interface LoungeBusiness {
   id: string;
   owner_user_id: string;
+  slug: string;
   category: LoungeBusinessCategory;
   name: string;
   tagline: string | null;
@@ -161,6 +162,45 @@ interface LoungeEventPayload {
   max_participants: number | null;
   display_priority: number;
   is_published: boolean;
+}
+
+function normalizeLoungeSlug(input: string) {
+  return input
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9가-힣\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
+async function ensureUniqueLoungeSlug(
+  supabase: SupabaseServerClient,
+  slug: string,
+  existingBusinessId?: string | null
+) {
+  const query = supabase
+    .from("lounge_businesses")
+    .select("id")
+    .eq("slug", slug);
+
+  const result = existingBusinessId
+    ? await query.neq("id", existingBusinessId).maybeSingle()
+    : await query.maybeSingle();
+
+  return !result.data;
+}
+
+function revalidateLoungePaths(slug?: string | null) {
+  revalidatePath("/ko/lounge");
+  revalidatePath("/en/lounge");
+  revalidatePath("/ko/admin/lounge");
+  revalidatePath("/en/admin/lounge");
+
+  if (slug) {
+    revalidatePath(`/ko/lounge/${slug}`);
+    revalidatePath(`/en/lounge/${slug}`);
+  }
 }
 
 function toKstDateKey(input: string | Date) {
@@ -550,14 +590,14 @@ export async function getPublicLoungeData(): Promise<{
   };
 }
 
-export async function getPublicLoungeBusinessDetail(businessId: string): Promise<{
+export async function getPublicLoungeBusinessDetail(businessSlug: string): Promise<{
   business: LoungeBusiness | null;
   events: LoungeEvent[];
   relatedBusinesses: LoungeBusiness[];
 }> {
   const supabase = await createClient();
   const activeBusinesses = await getActivePublishedBusinesses(supabase);
-  const business = activeBusinesses.find((item) => item.id === businessId) ?? null;
+  const business = activeBusinesses.find((item) => item.slug === businessSlug) ?? null;
 
   if (!business) {
     return {
@@ -605,14 +645,19 @@ export async function upsertLoungeBusiness(formData: FormData) {
 
   const { data: existing } = await supabase
     .from("lounge_businesses")
-    .select("id, display_priority")
+    .select("id, slug, display_priority")
     .eq("owner_user_id", adminInfo.userId)
     .maybeSingle();
 
+  const name = (formData.get("name") as string)?.trim();
+  const slugInput = ((formData.get("slug") as string) || "").trim();
+  const slug = normalizeLoungeSlug(slugInput || name || "");
+
   const payload = {
     owner_user_id: adminInfo.userId,
+    slug,
     category: (formData.get("category") as LoungeBusinessCategory) || "service",
-    name: (formData.get("name") as string)?.trim(),
+    name,
     tagline: ((formData.get("tagline") as string) || "").trim() || null,
     description: ((formData.get("description") as string) || "").trim() || null,
     logo_url: ((formData.get("logo_url") as string) || "").trim() || null,
@@ -635,6 +680,15 @@ export async function upsertLoungeBusiness(formData: FormData) {
     return { success: false, error: "Business name is required" };
   }
 
+  if (!slug) {
+    return { success: false, error: "Business slug is required" };
+  }
+
+  const slugAvailable = await ensureUniqueLoungeSlug(supabase, slug, existing?.id ?? null);
+  if (!slugAvailable) {
+    return { success: false, error: "이미 사용 중인 공유 URL입니다. 다른 이름을 입력해주세요." };
+  }
+
   const result = existing
     ? await supabase.from("lounge_businesses").update(payload).eq("id", existing.id)
     : await supabase.from("lounge_businesses").insert(payload);
@@ -643,14 +697,8 @@ export async function upsertLoungeBusiness(formData: FormData) {
     return { success: false, error: result.error.message };
   }
 
-  revalidatePath("/ko/lounge");
-  revalidatePath("/en/lounge");
-  revalidatePath("/ko/admin/lounge");
-  revalidatePath("/en/admin/lounge");
-  if (existing?.id) {
-    revalidatePath(`/ko/lounge/${existing.id}`);
-    revalidatePath(`/en/lounge/${existing.id}`);
-  }
+  revalidateLoungePaths(existing?.slug ?? null);
+  revalidateLoungePaths(slug);
   return { success: true };
 }
 
@@ -669,7 +717,7 @@ export async function upsertLoungeEvent(formData: FormData) {
 
   const { data: business } = await supabase
     .from("lounge_businesses")
-    .select("id")
+    .select("id, slug")
     .eq("owner_user_id", adminInfo.userId)
     .maybeSingle();
 
@@ -716,12 +764,7 @@ export async function upsertLoungeEvent(formData: FormData) {
     return { success: false, error: error.message };
   }
 
-  revalidatePath("/ko/lounge");
-  revalidatePath("/en/lounge");
-  revalidatePath("/ko/admin/lounge");
-  revalidatePath("/en/admin/lounge");
-  revalidatePath(`/ko/lounge/${business.id}`);
-  revalidatePath(`/en/lounge/${business.id}`);
+  revalidateLoungePaths(business.slug);
   return { success: true };
 }
 
@@ -740,7 +783,7 @@ export async function createBulkLoungeEvents(formData: FormData) {
 
   const { data: business } = await supabase
     .from("lounge_businesses")
-    .select("id")
+    .select("id, slug")
     .eq("owner_user_id", adminInfo.userId)
     .maybeSingle();
 
@@ -808,12 +851,7 @@ export async function createBulkLoungeEvents(formData: FormData) {
     return { success: false, error: error.message };
   }
 
-  revalidatePath("/ko/lounge");
-  revalidatePath("/en/lounge");
-  revalidatePath("/ko/admin/lounge");
-  revalidatePath("/en/admin/lounge");
-  revalidatePath(`/ko/lounge/${business.id}`);
-  revalidatePath(`/en/lounge/${business.id}`);
+  revalidateLoungePaths(business.slug);
   return { success: true, count: rows.length };
 }
 
@@ -827,7 +865,7 @@ export async function deleteLoungeEvent(eventId: string) {
 
   const { data: existingEvent } = await supabase
     .from("lounge_events")
-    .select("id, business_id, lounge_businesses!inner(owner_user_id)")
+    .select("id, business_id, lounge_businesses!inner(owner_user_id, slug)")
     .eq("id", eventId)
     .eq("lounge_businesses.owner_user_id", adminInfo.userId)
     .maybeSingle();
@@ -841,12 +879,9 @@ export async function deleteLoungeEvent(eventId: string) {
     return { success: false, error: error.message };
   }
 
-  revalidatePath("/ko/lounge");
-  revalidatePath("/en/lounge");
-  revalidatePath("/ko/admin/lounge");
-  revalidatePath("/en/admin/lounge");
-  revalidatePath(`/ko/lounge/${existingEvent.business_id}`);
-  revalidatePath(`/en/lounge/${existingEvent.business_id}`);
+  const businessSlug = (existingEvent as { lounge_businesses?: { slug?: string | null }[] | { slug?: string | null } | null }).lounge_businesses;
+  const resolvedSlug = Array.isArray(businessSlug) ? businessSlug[0]?.slug : businessSlug?.slug;
+  revalidateLoungePaths(resolvedSlug ?? null);
   return { success: true };
 }
 
@@ -983,12 +1018,13 @@ export async function updateLoungeBusinessFeature(formData: FormData) {
     return { success: false, error: error.message };
   }
 
-  revalidatePath("/ko/lounge");
-  revalidatePath("/en/lounge");
-  revalidatePath("/ko/admin/lounge");
-  revalidatePath("/en/admin/lounge");
-  revalidatePath(`/ko/lounge/${businessId}`);
-  revalidatePath(`/en/lounge/${businessId}`);
+  const { data: business } = await supabase
+    .from("lounge_businesses")
+    .select("slug")
+    .eq("id", businessId)
+    .maybeSingle();
+
+  revalidateLoungePaths(business?.slug ?? null);
   return { success: true };
 }
 

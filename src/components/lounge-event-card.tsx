@@ -97,7 +97,7 @@ export function LoungeEventCard({
         entityType="event"
         businessId={event.business_id}
         eventId={event.id}
-        href={`/${locale}/lounge/${event.business_id}?eventId=${event.id}&date=${eventDateKey}${source ? `&source=${encodeURIComponent(source)}` : ""}#all-schedules`}
+        href={`/${locale}/lounge/${business?.slug ?? event.business_id}?eventId=${event.id}&date=${eventDateKey}${source ? `&source=${encodeURIComponent(source)}` : ""}#all-schedules`}
         locale={locale}
         source={source}
         className="mb-4 block w-full text-left"

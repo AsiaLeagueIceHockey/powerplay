@@ -58,8 +58,8 @@ export default async function AdminLoungePage({
                 </h2>
                 <p className="mt-2 text-sm leading-7 text-zinc-300">
                   {locale === "ko"
-                    ? "예상 월 구독료는 약 100,000원입니다. 문의 후 계좌이체 확인이 완료되면 슈퍼유저가 라운지 관리에서 구독 기간을 등록합니다."
-                    : "Expected monthly subscription is around 100,000 KRW. After inquiry and manual transfer confirmation, a superuser assigns your contract period."}
+                    ? "예상 월 구독료는 약 100,000원입니다. 문의 후 계좌이체 확인이 완료되면 운영진이 구독 기간을 등록합니다."
+                    : "Expected monthly subscription is around 100,000 KRW. After inquiry and transfer confirmation, the team assigns your contract period."}
                 </p>
               </div>
               <div className="flex flex-wrap gap-3">
@@ -83,7 +83,9 @@ export default async function AdminLoungePage({
               {[
                 {
                   title: locale === "ko" ? "대표 비즈니스 1개 운영" : "One business profile",
-                  body: locale === "ko" ? "브랜드 소개, 이미지, 지역, 연락 채널까지 한 번에 노출합니다." : "Show your brand, media, area, and contact channels together.",
+                  body: locale === "ko"
+                    ? "공유하기 좋은 URL로 대표 비즈니스 1개를 운영하고, 나만의 비즈니스 페이지처럼 소개와 연락 채널을 관리할 수 있습니다."
+                    : "Run one representative business with a shareable URL and manage it like your own business landing page.",
                 },
                 {
                   title: locale === "ko" ? "여러 일정 등록" : "Multiple schedules",
@@ -92,10 +94,6 @@ export default async function AdminLoungePage({
                 {
                   title: locale === "ko" ? "클릭/노출 추적" : "Track engagement",
                   body: locale === "ko" ? "카카오, 전화, 인스타, 웹사이트 클릭과 유입을 확인합니다." : "Monitor clicks and traffic to Kakao, phone, Instagram, and website links.",
-                },
-                {
-                  title: locale === "ko" ? "운영진 추천 노출" : "Editorial featuring",
-                  body: locale === "ko" ? "좋은 비즈니스는 파워플레이 추천 영역에 우선 노출됩니다." : "Strong businesses can be surfaced in featured placements.",
                 },
               ].map((item) => (
                 <div key={item.title} className="rounded-2xl border border-zinc-700/80 bg-zinc-900/50 p-4">
