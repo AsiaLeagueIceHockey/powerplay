@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { CalendarRange, ChevronLeft, ChevronRight, Loader2, MapPin, Search } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2, MapPin, Search } from "lucide-react";
 import { parseNaverMapUrl } from "@/app/actions/admin";
 import { createBulkLoungeEvents, type LoungeMembership } from "@/app/actions/lounge";
 
@@ -133,24 +133,22 @@ export function LoungeBulkEventForm({
     dateKey.startsWith(`${currentMonth.getFullYear()}-${String(currentMonth.getMonth() + 1).padStart(2, "0")}`)
   ).length;
 
+  const updateTimeField = (
+    field: "start_time_of_day" | "end_time_of_day",
+    nextHour: string,
+    nextMinute: string
+  ) => {
+    setFormState((prev) => ({
+      ...prev,
+      [field]: nextHour && nextMinute ? `${nextHour}:${nextMinute}` : "",
+    }));
+  };
+
+  const getHourPart = (value: string) => (value ? value.split(":")[0] || "" : "");
+  const getMinutePart = (value: string) => (value ? value.split(":")[1] || "" : "");
+
   return (
     <div className="space-y-5">
-      <div className="flex items-start gap-3 rounded-2xl border border-zinc-700/80 bg-zinc-900/40 p-4">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-400 text-zinc-950">
-          <CalendarRange className="h-5 w-5" />
-        </div>
-        <div>
-          <h3 className="text-lg font-bold text-zinc-100">
-            {locale === "ko" ? "반복 일정 등록" : "Bulk event creation"}
-          </h3>
-          <p className="mt-1 text-sm leading-6 text-zinc-400">
-            {locale === "ko"
-              ? "레슨처럼 반복되는 일정을 구독 기간 안에서 날짜 선택 후 한 번에 등록합니다."
-              : "Pick multiple dates within the contract period and create recurring events at once."}
-          </p>
-        </div>
-      </div>
-
       <div className="rounded-2xl border border-zinc-700/80 bg-zinc-900/40 p-4 text-sm text-zinc-300">
         <p className="font-semibold text-zinc-100">
           {locale === "ko" ? "등록 가능 기간" : "Available range"}
@@ -199,22 +197,103 @@ export function LoungeBulkEventForm({
         </label>
         <label className="space-y-2 text-sm">
           <span className="font-semibold text-zinc-100">{locale === "ko" ? "시작 시간" : "Start time"}</span>
-          <input
-            type="time"
-            required
-            value={formState.start_time_of_day}
-            onChange={(event) => setFormState((prev) => ({ ...prev, start_time_of_day: event.target.value }))}
-            className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100"
-          />
+          <div className="flex gap-2">
+            <div className="relative flex-1">
+              <select
+                required
+                value={getHourPart(formState.start_time_of_day)}
+                onChange={(event) =>
+                  updateTimeField("start_time_of_day", event.target.value, getMinutePart(formState.start_time_of_day))
+                }
+                className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-zinc-100 appearance-none"
+              >
+                <option value="" disabled>
+                  {locale === "ko" ? "시" : "Hour"}
+                </option>
+                {Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, "0")).map((hour) => (
+                  <option key={hour} value={hour}>
+                    {locale === "ko" ? `${hour}시` : hour}
+                  </option>
+                ))}
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-zinc-400">
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+            <div className="relative flex-1">
+              <select
+                required
+                value={getMinutePart(formState.start_time_of_day)}
+                onChange={(event) =>
+                  updateTimeField("start_time_of_day", getHourPart(formState.start_time_of_day), event.target.value)
+                }
+                className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-zinc-100 appearance-none"
+              >
+                <option value="" disabled>
+                  {locale === "ko" ? "분" : "Minute"}
+                </option>
+                {["00", "10", "20", "30", "40", "50"].map((minute) => (
+                  <option key={minute} value={minute}>
+                    {locale === "ko" ? `${minute}분` : minute}
+                  </option>
+                ))}
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-zinc-400">
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+          </div>
         </label>
         <label className="space-y-2 text-sm">
           <span className="font-semibold text-zinc-100">{locale === "ko" ? "종료 시간" : "End time"}</span>
-          <input
-            type="time"
-            value={formState.end_time_of_day}
-            onChange={(event) => setFormState((prev) => ({ ...prev, end_time_of_day: event.target.value }))}
-            className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100"
-          />
+          <div className="flex gap-2">
+            <div className="relative flex-1">
+              <select
+                value={getHourPart(formState.end_time_of_day)}
+                onChange={(event) =>
+                  updateTimeField("end_time_of_day", event.target.value, getMinutePart(formState.end_time_of_day))
+                }
+                className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-zinc-100 appearance-none"
+              >
+                <option value="">{locale === "ko" ? "시" : "Hour"}</option>
+                {Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, "0")).map((hour) => (
+                  <option key={hour} value={hour}>
+                    {locale === "ko" ? `${hour}시` : hour}
+                  </option>
+                ))}
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-zinc-400">
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+            <div className="relative flex-1">
+              <select
+                value={getMinutePart(formState.end_time_of_day)}
+                onChange={(event) =>
+                  updateTimeField("end_time_of_day", getHourPart(formState.end_time_of_day), event.target.value)
+                }
+                className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-zinc-100 appearance-none"
+              >
+                <option value="">{locale === "ko" ? "분" : "Minute"}</option>
+                {["00", "10", "20", "30", "40", "50"].map((minute) => (
+                  <option key={minute} value={minute}>
+                    {locale === "ko" ? `${minute}분` : minute}
+                  </option>
+                ))}
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-zinc-400">
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+          </div>
         </label>
         <label className="space-y-2 text-sm">
           <span className="font-semibold text-zinc-100">{locale === "ko" ? "일정 유형" : "Type"}</span>
