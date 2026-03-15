@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { CalendarDays, List, Trophy } from "lucide-react";
-import type { LoungeBusiness, LoungeEvent, LoungePublicDebugInfo } from "@/app/actions/lounge";
+import type { LoungeBusiness, LoungeEvent } from "@/app/actions/lounge";
 import { DateFilter } from "./date-filter";
 import { LoungeCalendarView } from "./lounge-calendar-view";
 import { LoungeCard } from "./lounge-card";
@@ -16,10 +16,9 @@ interface LoungePageClientProps {
   events: LoungeEvent[];
   locale: string;
   source?: string;
-  debug?: LoungePublicDebugInfo;
 }
 
-export function LoungePageClient({ businesses, events, locale, source, debug }: LoungePageClientProps) {
+export function LoungePageClient({ businesses, events, locale, source }: LoungePageClientProps) {
   const [activeTab, setActiveTab] = useState<LoungePublicTab>("services");
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
@@ -59,15 +58,6 @@ export function LoungePageClient({ businesses, events, locale, source, debug }: 
     { id: "services" as const, label: locale === "ko" ? "하키 정보" : "Hockey Info" },
     { id: "events" as const, label: locale === "ko" ? "일정" : "Schedules" },
   ];
-
-  useEffect(() => {
-    console.log("[lounge-page-client]", {
-      source,
-      businessesCount: businesses.length,
-      eventsCount: events.length,
-      debug,
-    });
-  }, [businesses.length, debug, events.length, source]);
 
   return (
     <div className="space-y-6">
