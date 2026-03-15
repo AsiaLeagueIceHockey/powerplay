@@ -137,9 +137,7 @@ export function LoungeBulkEventForm({
     });
   };
 
-  const selectedCountInMonth = selectedDates.filter((dateKey) =>
-    dateKey.startsWith(`${currentMonth.getFullYear()}-${String(currentMonth.getMonth() + 1).padStart(2, "0")}`)
-  ).length;
+  const selectedCount = selectedDates.length;
 
   const updateTimeField = (
     field: "start_time_of_day" | "end_time_of_day",
@@ -452,7 +450,7 @@ export function LoungeBulkEventForm({
               {locale === "ko" ? "날짜 선택" : "Pick dates"}
             </p>
             <p className="text-xs text-amber-300">
-              {locale === "ko" ? `${selectedCountInMonth}일 선택` : `${selectedCountInMonth} selected`}
+              {locale === "ko" ? `${selectedCount}일 선택` : `${selectedCount} selected`}
             </p>
           </div>
 
