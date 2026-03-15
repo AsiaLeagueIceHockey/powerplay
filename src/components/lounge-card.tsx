@@ -18,7 +18,7 @@ export function LoungeCard({
   source?: string;
 }) {
   const upcomingCount = business.upcoming_events?.length ?? 0;
-  const detailHref = `/${locale}/lounge/${business.id}${source ? `?source=${encodeURIComponent(source)}` : ""}`;
+  const detailHref = `/${locale}/lounge/${business.slug}${source ? `?source=${encodeURIComponent(source)}` : ""}`;
   const isFeatured = business.is_featured;
   const region = extractRegion(business.address ?? undefined);
   const categoryLabel = {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useTransition } from "react";
+import { useMemo, useRef, useState, useTransition } from "react";
 import { Image as ImageIcon, Loader2, MapPin, Search, Store, Upload, X } from "lucide-react";
 import type { LoungeBusiness } from "@/app/actions/lounge";
 import { parseNaverMapUrl } from "@/app/actions/admin";
@@ -15,12 +15,14 @@ export function LoungeBusinessForm({
 }) {
   const [isPending, startTransition] = useTransition();
   const [published, setPublished] = useState<boolean>(business?.is_published ?? true);
+  const [nameInput, setNameInput] = useState(business?.name ?? "");
   const [parsing, setParsing] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [uploadingTarget, setUploadingTarget] = useState<"logo" | "cover" | null>(null);
   const [logoUrl, setLogoUrl] = useState(business?.logo_url ?? "");
   const [coverImageUrl, setCoverImageUrl] = useState(business?.cover_image_url ?? "");
+  const [slugInput, setSlugInput] = useState(business?.slug ?? "");
   const logoInputRef = useRef<HTMLInputElement>(null);
   const coverInputRef = useRef<HTMLInputElement>(null);
   const [locationState, setLocationState] = useState({
@@ -29,6 +31,25 @@ export function LoungeBusinessForm({
     lat: business?.lat?.toString() ?? "",
     lng: business?.lng?.toString() ?? "",
   });
+
+  const normalizedBusinessSlug = useMemo(() => {
+    return (business?.slug ?? "")
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9가-힣\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "");
+  }, [business?.slug]);
+
+  const buildSlugPreview = (value: string) =>
+    value
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9가-힣\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "");
 
   const uploadImage = async (target: "logo" | "cover", file: File) => {
     if (!file.type.startsWith("image/")) {
@@ -76,6 +97,7 @@ export function LoungeBusinessForm({
         formData.set("lng", locationState.lng);
         formData.set("logo_url", logoUrl);
         formData.set("cover_image_url", coverImageUrl);
+        formData.set("slug", slugInput);
         startTransition(async () => {
           const result = await upsertLoungeBusiness(formData);
           if (!result.success) {
@@ -103,7 +125,40 @@ export function LoungeBusinessForm({
       <div className="grid gap-4 md:grid-cols-2">
         <label className="space-y-2 text-sm">
           <span className="font-semibold text-zinc-100">{locale === "ko" ? "비즈니스명" : "Business name"}</span>
-          <input name="name" required defaultValue={business?.name ?? ""} className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100 placeholder:text-zinc-500" />
+          <input
+            name="name"
+            required
+            value={nameInput}
+            onChange={(event) => {
+              const nextName = event.target.value;
+              setNameInput(nextName);
+
+              const shouldSyncSlug =
+                !slugInput.trim() ||
+                (business?.name && slugInput === business.slug) ||
+                slugInput === buildSlugPreview(nameInput) ||
+                slugInput === normalizedBusinessSlug;
+
+              if (shouldSyncSlug) {
+                setSlugInput(nextName);
+              }
+            }}
+            className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100 placeholder:text-zinc-500"
+          />
+        </label>
+        <label className="space-y-2 text-sm">
+          <span className="font-semibold text-zinc-100">{locale === "ko" ? "공유 URL 이름" : "Shareable URL"}</span>
+          <input
+            value={slugInput}
+            onChange={(event) => setSlugInput(event.target.value)}
+            placeholder={locale === "ko" ? "파워플레이" : "powerplay"}
+            className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100"
+          />
+          <p className="text-xs leading-5 text-zinc-400">
+            {locale === "ko"
+              ? `https://powerplay.kr/${locale}/lounge/${buildSlugPreview(slugInput) || "파워플레이"}`
+              : `https://powerplay.kr/${locale}/lounge/${buildSlugPreview(slugInput) || "powerplay"}`}
+          </p>
         </label>
         <label className="space-y-2 text-sm">
           <span className="font-semibold text-zinc-100">{locale === "ko" ? "카테고리" : "Category"}</span>
