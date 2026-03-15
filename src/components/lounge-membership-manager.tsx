@@ -1,7 +1,8 @@
 "use client";
 
 import { useTransition } from "react";
-import type { LoungeMembership } from "@/app/actions/lounge";
+import { useRouter } from "next/navigation";
+import type { LoungeManagedMembership, LoungeMembership } from "@/app/actions/lounge";
 import { upsertLoungeMembership } from "@/app/actions/lounge";
 
 interface AdminOption {
@@ -14,18 +15,30 @@ interface AdminOption {
 export function LoungeMembershipManager({
   locale,
   admins,
-  memberships,
+  memberships = [],
+  initialMembership = null,
+  showRecentList = true,
+  title,
+  description,
+  onCancel,
 }: {
   locale: string;
   admins: AdminOption[];
-  memberships: LoungeMembership[];
+  memberships?: LoungeMembership[];
+  initialMembership?: LoungeManagedMembership | null;
+  showRecentList?: boolean;
+  title?: string;
+  description?: string;
+  onCancel?: () => void;
 }) {
   const [isPending, startTransition] = useTransition();
+  const router = useRouter();
   const sortedAdmins = [...admins].sort((a, b) => {
     const aLabel = a.full_name || a.email || a.phone || a.id;
     const bLabel = b.full_name || b.email || b.phone || b.id;
     return aLabel.localeCompare(bLabel, locale === "ko" ? "ko" : "en", { sensitivity: "base" });
   });
+  const isEditMode = Boolean(initialMembership);
 
   const formatAdminLabel = (admin: AdminOption) => {
     const primary = admin.full_name || (locale === "ko" ? "이름 없음" : "No name");
@@ -37,10 +50,10 @@ export function LoungeMembershipManager({
     <div className="space-y-5 rounded-3xl border border-zinc-700 bg-[radial-gradient(circle_at_top_left,_rgba(251,191,36,0.12),_transparent_28%),linear-gradient(180deg,#3f3f46_0%,#27272a_100%)] p-6 shadow-sm">
       <div>
         <h3 className="text-lg font-bold text-zinc-100">
-          {locale === "ko" ? "슈퍼유저 구독 관리" : "Superuser membership manager"}
+          {title || (locale === "ko" ? "슈퍼유저 구독 관리" : "Superuser membership manager")}
         </h3>
         <p className="mt-1 text-sm text-zinc-400">
-          {locale === "ko" ? "관리자 계정에 라운지 구독 기간을 수기 등록합니다." : "Manually assign lounge contract periods to admin accounts."}
+          {description || (locale === "ko" ? "관리자 계정에 라운지 구독 기간을 수기 등록합니다." : "Manually assign lounge contract periods to admin accounts.")}
         </p>
       </div>
 
@@ -48,21 +61,38 @@ export function LoungeMembershipManager({
         className="grid gap-4 rounded-2xl border border-zinc-700/80 bg-zinc-900/50 p-5 md:grid-cols-2"
         onSubmit={(event) => {
           event.preventDefault();
-          const formData = new FormData(event.currentTarget);
+          const form = event.currentTarget;
+          const formData = new FormData(form);
           startTransition(async () => {
             const result = await upsertLoungeMembership(formData);
             if (!result.success) {
               alert(result.error || (locale === "ko" ? "등록 실패" : "Save failed"));
               return;
             }
-            alert(locale === "ko" ? "구독 기간이 등록되었습니다." : "Membership saved.");
-            event.currentTarget.reset();
+            alert(
+              isEditMode
+                ? locale === "ko" ? "구독 정보가 수정되었습니다." : "Membership updated."
+                : locale === "ko" ? "구독 기간이 등록되었습니다." : "Membership saved."
+            );
+            if (!isEditMode) {
+              form.reset();
+            }
+            onCancel?.();
+            router.refresh();
           });
         }}
       >
+        {initialMembership ? <input type="hidden" name="membership_id" value={initialMembership.id} /> : null}
+        {initialMembership ? <input type="hidden" name="user_id" value={initialMembership.user_id} /> : null}
         <label className="space-y-2 text-sm md:col-span-2">
           <span className="font-medium text-zinc-100">{locale === "ko" ? "대상 관리자" : "Target admin"}</span>
-          <select name="user_id" required className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-sm text-zinc-100">
+          <select
+            name="user_id"
+            required
+            defaultValue={initialMembership?.user_id ?? ""}
+            disabled={isEditMode}
+            className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-sm text-zinc-100 disabled:cursor-not-allowed disabled:opacity-70"
+          >
             <option value="">{locale === "ko" ? "관리자를 선택하세요" : "Select an admin"}</option>
             {sortedAdmins.map((admin) => (
               <option key={admin.id} value={admin.id}>
@@ -78,19 +108,40 @@ export function LoungeMembershipManager({
         </label>
         <label className="space-y-2 text-sm">
           <span className="font-medium text-zinc-100">{locale === "ko" ? "시작일" : "Start date"}</span>
-          <input type="date" name="starts_at" required className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100" />
+          <input
+            type="date"
+            name="starts_at"
+            required
+            defaultValue={initialMembership?.starts_at.slice(0, 10) ?? ""}
+            className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100"
+          />
         </label>
         <label className="space-y-2 text-sm">
           <span className="font-medium text-zinc-100">{locale === "ko" ? "종료일" : "End date"}</span>
-          <input type="date" name="ends_at" required className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100" />
+          <input
+            type="date"
+            name="ends_at"
+            required
+            defaultValue={initialMembership?.ends_at.slice(0, 10) ?? ""}
+            className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100"
+          />
         </label>
         <label className="space-y-2 text-sm">
           <span className="font-medium text-zinc-100">{locale === "ko" ? "월 구독료" : "Price"}</span>
-          <input name="price_krw" inputMode="numeric" defaultValue="100000" className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100" />
+          <input
+            name="price_krw"
+            inputMode="numeric"
+            defaultValue={initialMembership?.price_krw ?? "100000"}
+            className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100"
+          />
         </label>
         <label className="space-y-2 text-sm">
           <span className="font-medium text-zinc-100">{locale === "ko" ? "문의 채널" : "Inquiry channel"}</span>
-          <select name="inquiry_channel" defaultValue="manual" className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100">
+          <select
+            name="inquiry_channel"
+            defaultValue={initialMembership?.inquiry_channel ?? "manual"}
+            className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100"
+          >
             <option value="manual">Manual</option>
             <option value="kakao">Kakao</option>
             <option value="instagram">Instagram</option>
@@ -98,14 +149,35 @@ export function LoungeMembershipManager({
         </label>
         <label className="space-y-2 text-sm md:col-span-2">
           <span className="font-medium text-zinc-100">{locale === "ko" ? "메모" : "Note"}</span>
-          <textarea name="note" rows={3} className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100" />
+          <textarea
+            name="note"
+            rows={3}
+            defaultValue={initialMembership?.note ?? ""}
+            className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100"
+          />
         </label>
-        <button type="submit" disabled={isPending} className="rounded-xl bg-amber-400 px-4 py-2.5 text-sm font-semibold text-zinc-950 disabled:opacity-50 md:col-span-2">
-          {isPending ? (locale === "ko" ? "저장 중..." : "Saving...") : (locale === "ko" ? "구독 기간 등록" : "Save membership")}
-        </button>
+        <div className="flex flex-wrap gap-3 md:col-span-2">
+          <button type="submit" disabled={isPending} className="rounded-xl bg-amber-400 px-4 py-2.5 text-sm font-semibold text-zinc-950 disabled:opacity-50">
+            {isPending
+              ? locale === "ko" ? "저장 중..." : "Saving..."
+              : isEditMode
+                ? locale === "ko" ? "구독 정보 수정" : "Update membership"
+                : locale === "ko" ? "구독 기간 등록" : "Save membership"}
+          </button>
+          {isEditMode && onCancel ? (
+            <button
+              type="button"
+              onClick={onCancel}
+              className="rounded-xl border border-zinc-700 px-4 py-2.5 text-sm font-semibold text-zinc-200"
+            >
+              {locale === "ko" ? "수정 닫기" : "Close edit"}
+            </button>
+          ) : null}
+        </div>
       </form>
 
-      <div className="space-y-3 border-t border-zinc-700 pt-4">
+      {showRecentList ? (
+        <div className="space-y-3 border-t border-zinc-700 pt-4">
         <h4 className="text-sm font-semibold text-zinc-100">
           {locale === "ko" ? "최근 등록 내역" : "Recent memberships"}
         </h4>
@@ -132,7 +204,8 @@ export function LoungeMembershipManager({
             </div>
           ))}
         </div>
-      </div>
+        </div>
+      ) : null}
     </div>
   );
 }

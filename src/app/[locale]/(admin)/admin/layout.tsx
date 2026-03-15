@@ -2,6 +2,7 @@ import { setRequestLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
+import { AdminSuperuserMenu } from "@/components/admin-superuser-menu";
 import { AdminUserMenu } from "@/components/admin-user-menu";
 
 export default async function AdminLayout({
@@ -115,6 +116,12 @@ export default async function AdminLayout({
                   🌎 {t("menu.allMatches")}
                 </Link>
                 <Link
+                  href={`/${locale}/admin/lounge-management`}
+                  className="block rounded-lg px-4 py-2.5 text-sm font-medium text-zinc-300 hover:bg-zinc-800 hover:text-white"
+                >
+                  🏆 {locale === "ko" ? "라운지 관리" : "Lounge admin"}
+                </Link>
+                <Link
                   href={`/${locale}/admin/push-test`}
                   className="block rounded-lg px-4 py-2.5 text-sm font-medium text-zinc-300 hover:bg-zinc-800 hover:text-white"
                 >
@@ -172,38 +179,7 @@ export default async function AdminLayout({
           <span className="text-xl">🏆</span>
           <span className="text-xs">{locale === "ko" ? "라운지" : "Lounge"}</span>
         </Link>
-        {isSuperUser && (
-          <>
-            <Link
-              href={`/${locale}/admin/admins`}
-              className="flex flex-col items-center gap-1 px-3 py-2 text-amber-400 hover:text-amber-300"
-            >
-              <span className="text-xl">👥</span>
-              <span className="text-xs">{t("menu.userManagementShort")}</span>
-            </Link>
-            <Link
-              href={`/${locale}/admin/points`}
-              className="flex flex-col items-center gap-1 px-3 py-2 text-amber-400 hover:text-amber-300"
-            >
-              <span className="text-xl">💰</span>
-              <span className="text-xs">{t("menu.pointManagementShort")}</span>
-            </Link>
-            <Link
-              href={`/${locale}/admin/all-matches`}
-              className="flex flex-col items-center gap-1 px-3 py-2 text-amber-400 hover:text-amber-300"
-            >
-              <span className="text-xl">🌎</span>
-              <span className="text-xs">{t("menu.allMatchesShort")}</span>
-            </Link>
-            <Link
-              href={`/${locale}/admin/audit-logs`}
-              className="flex flex-col items-center gap-1 px-3 py-2 text-amber-400 hover:text-amber-300"
-            >
-              <span className="text-xl">📜</span>
-              <span className="text-xs">운영 로그</span>
-            </Link>
-          </>
-        )}
+        {isSuperUser ? <AdminSuperuserMenu locale={locale} /> : null}
       </nav>
     </div>
   );

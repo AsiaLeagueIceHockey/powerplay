@@ -58,7 +58,7 @@ export default async function AdminLoungePage({
                 </h2>
                 <p className="mt-2 text-sm leading-7 text-zinc-300">
                   {locale === "ko"
-                    ? "예상 월 구독료는 약 100,000원입니다. 문의 후 계좌이체 확인이 완료되면 슈퍼유저가 구독 기간을 등록합니다."
+                    ? "예상 월 구독료는 약 100,000원입니다. 문의 후 계좌이체 확인이 완료되면 슈퍼유저가 라운지 관리에서 구독 기간을 등록합니다."
                     : "Expected monthly subscription is around 100,000 KRW. After inquiry and manual transfer confirmation, a superuser assigns your contract period."}
                 </p>
               </div>
@@ -116,8 +116,6 @@ export default async function AdminLoungePage({
           eventMetrics={data.eventMetrics}
           isSuperUser={data.isSuperUser}
           featuredBusinesses={data.featuredBusinesses}
-          admins={data.admins}
-          memberships={data.memberships}
         />
       )}
     </div>
