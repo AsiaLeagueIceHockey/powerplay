@@ -5,7 +5,7 @@ import { LoungeAdminDashboard } from "@/components/lounge-admin-dashboard";
 
 const inquiryLinks = {
   instagram: "https://www.instagram.com/powerplay.kr/",
-  kakao: "https://open.kakao.com/o/gsvw6tei",
+  kakao: "https://open.kakao.com/o/sMyvIIli",
 };
 
 export default async function AdminLoungePage({
@@ -66,7 +66,7 @@ export default async function AdminLoungePage({
                 <Link href={inquiryLinks.kakao} target="_blank" className="rounded-xl bg-[#FEE500] px-4 py-2.5 text-sm font-semibold text-[#3B1E1E]">
                   {locale === "ko" ? "카카오로 문의하기" : "Contact via Kakao"}
                 </Link>
-                <Link href={inquiryLinks.instagram} target="_blank" className="rounded-xl bg-zinc-900 px-4 py-2.5 text-sm font-semibold text-white dark:bg-zinc-100 dark:text-zinc-900">
+                <Link href={inquiryLinks.instagram} target="_blank" className="rounded-xl bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045] px-4 py-2.5 text-sm font-semibold text-white">
                   {locale === "ko" ? "인스타 DM 문의" : "Contact via Instagram DM"}
                 </Link>
               </div>

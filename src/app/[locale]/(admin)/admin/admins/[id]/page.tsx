@@ -29,6 +29,7 @@ export default async function AdminDetailPage({
           tournament: "대회",
           brand: "브랜드",
           service: "퍼포먼스 솔루션",
+          other: "기타",
         }[loungeBusiness.category]
       : null;
 
