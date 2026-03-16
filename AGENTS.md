@@ -111,6 +111,7 @@ export function ExampleComponent() {
 - Use `"use server";` at the top of the file.
 - Server actions should be defined in `src/app/actions/`.
 - Always handle authentication and authorization within the action.
+- In `src/app/actions/*.ts`, only export `async` server action functions. Keep sync helpers non-exported or move them to `src/lib/` to avoid Next.js build errors.
 
 ```typescript
 "use server";

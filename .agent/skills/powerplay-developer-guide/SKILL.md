@@ -82,6 +82,7 @@ export function ExampleComponent() {
 ### 3. Server Actions
 - Use `"use server";` at the top.
 - Handle authentication and authorization within the action.
+- In `src/app/actions/*.ts`, only export `async` server action functions. Keep sync helpers local or move them to `src/lib/`.
 ```typescript
 "use server";
 import { createClient } from "@/lib/supabase/server";
@@ -232,4 +233,3 @@ Before compiling your work, verify:
   - 대기 → 승격 시 비용 처리
   - 취소 시 환불 금액 = 실제 차감 금액 일치 여부
 - **임의 판단 금지, 소통 필수**: 자금 관련 로직은 **절대 임의로 판단하지 말 것**. 프롬프트를 입력하는 사용자는 4년차 개발자이므로 충분히 소통 가능하다. 불확실한 사항은 반드시 질문하고 확인받은 후 진행할 것.
-
