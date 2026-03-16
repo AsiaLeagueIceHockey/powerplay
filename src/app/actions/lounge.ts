@@ -214,7 +214,7 @@ function revalidateLoungePaths(slug?: string | null) {
   }
 }
 
-export function toKstDateKey(input: string | Date) {
+function toKstDateKey(input: string | Date) {
   const parts = new Intl.DateTimeFormat("en-CA", {
     year: "numeric",
     month: "2-digit",
@@ -262,7 +262,7 @@ function isMembershipActive(membership: LoungeMembership | null) {
   return getLoungeMembershipPhase(membership) === "active";
 }
 
-export function getLoungeMembershipPhase(membership: LoungeMembership | null): LoungeMembershipPhase {
+function getLoungeMembershipPhase(membership: LoungeMembership | null): LoungeMembershipPhase {
   if (!membership || membership.status === "canceled") return "none";
 
   const todayKey = toKstDateKey(new Date());
