@@ -116,6 +116,8 @@ export interface LoungeMetricsSummary {
   sourceBreakdown: Record<string, number>;
 }
 
+export type LoungeMembershipPhase = "none" | "upcoming" | "active" | "expired";
+
 interface LoungeMetricRow {
   metric_type: "impression" | "click";
   cta_type: LoungeCtaType | null;
@@ -212,7 +214,7 @@ function revalidateLoungePaths(slug?: string | null) {
   }
 }
 
-function toKstDateKey(input: string | Date) {
+export function toKstDateKey(input: string | Date) {
   const parts = new Intl.DateTimeFormat("en-CA", {
     year: "numeric",
     month: "2-digit",
@@ -257,9 +259,25 @@ function buildLoungeEventPayload(
 }
 
 function isMembershipActive(membership: LoungeMembership | null) {
-  if (!membership || membership.status === "canceled") return false;
-  const now = new Date();
-  return new Date(membership.starts_at) <= now && new Date(membership.ends_at) >= now;
+  return getLoungeMembershipPhase(membership) === "active";
+}
+
+export function getLoungeMembershipPhase(membership: LoungeMembership | null): LoungeMembershipPhase {
+  if (!membership || membership.status === "canceled") return "none";
+
+  const todayKey = toKstDateKey(new Date());
+  const membershipStartKey = toKstDateKey(membership.starts_at);
+  const membershipEndKey = toKstDateKey(membership.ends_at);
+
+  if (todayKey < membershipStartKey) {
+    return "upcoming";
+  }
+
+  if (todayKey > membershipEndKey) {
+    return "expired";
+  }
+
+  return "active";
 }
 
 function buildMetricsSummary(rows: LoungeMetricRow[]): LoungeMetricsSummary {
@@ -476,7 +494,7 @@ export async function getLoungeAdminPageData() {
 
   const metricRows = (metrics.data as LoungeMetricRow[] | null) ?? [];
 
-  const membershipStatus = !membership ? "none" : isMembershipActive(membership) ? "active" : "expired";
+  const membershipStatus = getLoungeMembershipPhase(membership);
 
   const featuredBusinesses = isSuperUser
     ? await supabase

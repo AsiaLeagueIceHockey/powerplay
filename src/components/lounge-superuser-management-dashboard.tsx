@@ -15,17 +15,67 @@ interface AdminOption {
 
 type LoungeManagementTab = "overview" | "register";
 
+type LoungeMembershipPhase = "upcoming" | "active" | "expired" | "canceled";
+
 function formatDateRange(locale: string, startsAt: string, endsAt: string) {
-  return `${startsAt.slice(0, 10)} ~ ${endsAt.slice(0, 10)}`;
+  const formatKstDate = (input: string) => {
+    const parts = new Intl.DateTimeFormat("en-CA", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      timeZone: "Asia/Seoul",
+    }).formatToParts(new Date(input));
+
+    const year = parts.find((part) => part.type === "year")?.value ?? "";
+    const month = parts.find((part) => part.type === "month")?.value ?? "";
+    const day = parts.find((part) => part.type === "day")?.value ?? "";
+    return `${year}-${month}-${day}`;
+  };
+
+  return `${formatKstDate(startsAt)} ~ ${formatKstDate(endsAt)}`;
 }
 
-function getMembershipStatusLabel(locale: string, status: LoungeManagedMembership["status"]) {
-  if (status === "active") {
-    return locale === "ko" ? "운영 중" : "Active";
+function getMembershipPhase(membership: LoungeManagedMembership): LoungeMembershipPhase {
+  if (membership.status === "canceled") {
+    return "canceled";
   }
-  if (status === "expired") {
-    return locale === "ko" ? "만료" : "Expired";
+
+  const today = new Intl.DateTimeFormat("en-CA", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    timeZone: "Asia/Seoul",
+  }).format(new Date());
+
+  const startsAt = new Intl.DateTimeFormat("en-CA", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    timeZone: "Asia/Seoul",
+  }).format(new Date(membership.starts_at));
+
+  const endsAt = new Intl.DateTimeFormat("en-CA", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    timeZone: "Asia/Seoul",
+  }).format(new Date(membership.ends_at));
+
+  if (today < startsAt) {
+    return "upcoming";
   }
+
+  if (today > endsAt) {
+    return "expired";
+  }
+
+  return "active";
+}
+
+function getMembershipPhaseLabel(locale: string, phase: LoungeMembershipPhase) {
+  if (phase === "active") return locale === "ko" ? "운영 중" : "Active";
+  if (phase === "upcoming") return locale === "ko" ? "시작 전" : "Upcoming";
+  if (phase === "expired") return locale === "ko" ? "만료" : "Expired";
   return locale === "ko" ? "해지" : "Canceled";
 }
 
@@ -56,13 +106,14 @@ export function LoungeSuperuserManagementDashboard({
 
   const sortedMemberships = useMemo(() => {
     return [...memberships].sort((a, b) => {
-      const activeOrder = (status: LoungeManagedMembership["status"]) => {
-        if (status === "active") return 0;
-        if (status === "expired") return 1;
-        return 2;
+      const activeOrder = (phase: LoungeMembershipPhase) => {
+        if (phase === "active") return 0;
+        if (phase === "upcoming") return 1;
+        if (phase === "expired") return 2;
+        return 3;
       };
 
-      const statusDiff = activeOrder(a.status) - activeOrder(b.status);
+      const statusDiff = activeOrder(getMembershipPhase(a)) - activeOrder(getMembershipPhase(b));
       if (statusDiff !== 0) return statusDiff;
 
       return new Date(b.ends_at).getTime() - new Date(a.ends_at).getTime();
@@ -144,7 +195,7 @@ export function LoungeSuperuserManagementDashboard({
               </div>
             ) : (
               sortedMemberships.map((membership) => {
-                const statusLabel = getMembershipStatusLabel(locale, membership.status);
+                const statusLabel = getMembershipPhaseLabel(locale, getMembershipPhase(membership));
                 const categoryLabel = getCategoryLabel(locale, membership.business?.category);
 
                 return (

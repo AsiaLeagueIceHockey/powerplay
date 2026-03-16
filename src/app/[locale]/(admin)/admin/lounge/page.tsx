@@ -8,6 +8,20 @@ const inquiryLinks = {
   kakao: "https://open.kakao.com/o/sMyvIIli",
 };
 
+function formatKstDate(input: string) {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    timeZone: "Asia/Seoul",
+  }).formatToParts(new Date(input));
+
+  const year = parts.find((part) => part.type === "year")?.value ?? "";
+  const month = parts.find((part) => part.type === "month")?.value ?? "";
+  const day = parts.find((part) => part.type === "day")?.value ?? "";
+  return `${year}-${month}-${day}`;
+}
+
 export default async function AdminLoungePage({
   params,
 }: {
@@ -54,12 +68,18 @@ export default async function AdminLoungePage({
                 <h2 className="text-xl font-bold text-zinc-100">
                   {data.membershipStatus === "expired"
                     ? (locale === "ko" ? "라운지 구독이 만료되었습니다" : "Your lounge membership has expired")
-                    : (locale === "ko" ? "라운지 프리미엄 멤버십이 필요합니다" : "Lounge premium membership required")}
+                    : data.membershipStatus === "upcoming"
+                      ? (locale === "ko" ? "라운지 구독 시작 전입니다" : "Your lounge membership has not started yet")
+                      : (locale === "ko" ? "라운지 프리미엄 멤버십이 필요합니다" : "Lounge premium membership required")}
                 </h2>
                 <p className="mt-2 text-sm leading-7 text-zinc-300">
-                  {locale === "ko"
-                    ? "예상 월 구독료는 약 100,000원입니다. 문의 후 계좌이체 확인이 완료되면 운영진이 구독 기간을 등록합니다."
-                    : "Expected monthly subscription is around 100,000 KRW. After inquiry and transfer confirmation, the team assigns your contract period."}
+                  {data.membershipStatus === "upcoming"
+                    ? locale === "ko"
+                      ? "등록된 계약 기간이 아직 시작되지 않았습니다. 시작일이 되면 라운지 비즈니스와 일정 관리 기능을 바로 사용할 수 있습니다."
+                      : "Your contract period is registered but has not started yet. Lounge business and schedule management will unlock on the start date."
+                    : locale === "ko"
+                      ? "예상 월 구독료는 약 100,000원입니다. 문의 후 계좌이체 확인이 완료되면 운영진이 구독 기간을 등록합니다."
+                      : "Expected monthly subscription is around 100,000 KRW. After inquiry and transfer confirmation, the team assigns your contract period."}
                 </p>
               </div>
               <div className="flex flex-wrap gap-3">
@@ -73,8 +93,8 @@ export default async function AdminLoungePage({
               {data.membership && (
                 <p className="text-sm text-zinc-400">
                   {locale === "ko"
-                    ? `최근 계약 기간: ${data.membership.starts_at.slice(0, 10)} ~ ${data.membership.ends_at.slice(0, 10)}`
-                    : `Latest contract: ${data.membership.starts_at.slice(0, 10)} ~ ${data.membership.ends_at.slice(0, 10)}`}
+                    ? `최근 계약 기간: ${formatKstDate(data.membership.starts_at)} ~ ${formatKstDate(data.membership.ends_at)}`
+                    : `Latest contract: ${formatKstDate(data.membership.starts_at)} ~ ${formatKstDate(data.membership.ends_at)}`}
                 </p>
               )}
             </div>

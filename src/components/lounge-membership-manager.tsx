@@ -5,6 +5,20 @@ import { useRouter } from "next/navigation";
 import type { LoungeManagedMembership, LoungeMembership } from "@/app/actions/lounge";
 import { upsertLoungeMembership } from "@/app/actions/lounge";
 
+function formatKstDate(input: string) {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    timeZone: "Asia/Seoul",
+  }).formatToParts(new Date(input));
+
+  const year = parts.find((part) => part.type === "year")?.value ?? "";
+  const month = parts.find((part) => part.type === "month")?.value ?? "";
+  const day = parts.find((part) => part.type === "day")?.value ?? "";
+  return `${year}-${month}-${day}`;
+}
+
 interface AdminOption {
   id: string;
   email?: string | null;
@@ -112,7 +126,7 @@ export function LoungeMembershipManager({
             type="date"
             name="starts_at"
             required
-            defaultValue={initialMembership?.starts_at.slice(0, 10) ?? ""}
+            defaultValue={initialMembership ? formatKstDate(initialMembership.starts_at) : ""}
             className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100 appearance-none [-webkit-appearance:none]"
           />
         </label>
@@ -122,7 +136,7 @@ export function LoungeMembershipManager({
             type="date"
             name="ends_at"
             required
-            defaultValue={initialMembership?.ends_at.slice(0, 10) ?? ""}
+            defaultValue={initialMembership ? formatKstDate(initialMembership.ends_at) : ""}
             className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100 appearance-none [-webkit-appearance:none]"
           />
         </label>
@@ -194,7 +208,7 @@ export function LoungeMembershipManager({
                     {[membership.user?.full_name, membership.user?.email].filter(Boolean).join(" / ") || membership.user_id}
                   </p>
                   <p className="text-zinc-400">
-                    {membership.starts_at.slice(0, 10)} ~ {membership.ends_at.slice(0, 10)}
+                    {formatKstDate(membership.starts_at)} ~ {formatKstDate(membership.ends_at)}
                   </p>
                 </div>
                 <span className="rounded-full bg-zinc-950 px-2.5 py-1 text-xs font-semibold text-zinc-200">
