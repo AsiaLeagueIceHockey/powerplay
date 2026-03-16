@@ -36,6 +36,7 @@ export function LoungePageClient({ businesses, events, locale, source }: LoungeP
     { value: "tournament", label: locale === "ko" ? "대회" : "Tournament" },
     { value: "brand", label: locale === "ko" ? "브랜드" : "Brand" },
     { value: "service", label: locale === "ko" ? "퍼포먼스 솔루션" : "Performance Solution" },
+    { value: "other", label: locale === "ko" ? "기타" : "Other" },
   ];
 
   const featuredBusinesses = businesses.filter((business) => business.is_featured);

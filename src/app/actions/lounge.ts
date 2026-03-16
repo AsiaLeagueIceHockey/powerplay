@@ -13,7 +13,8 @@ export type LoungeBusinessCategory =
   | "training_center"
   | "tournament"
   | "brand"
-  | "service";
+  | "service"
+  | "other";
 
 export type LoungeEventCategory =
   | "lesson"
