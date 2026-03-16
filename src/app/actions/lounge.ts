@@ -723,6 +723,16 @@ export async function upsertLoungeBusiness(formData: FormData) {
     : await supabase.from("lounge_businesses").insert(payload);
 
   if (result.error) {
+    if (
+      payload.category === "other" &&
+      (result.error.message.includes("lounge_businesses_category_check") ||
+        result.error.message.includes("violates check constraint"))
+    ) {
+      return {
+        success: false,
+        error: "DB에 v39_lounge_business_category_other.sql 이 아직 적용되지 않았습니다. 적용 후 다시 저장해주세요.",
+      };
+    }
     return { success: false, error: result.error.message };
   }
 
