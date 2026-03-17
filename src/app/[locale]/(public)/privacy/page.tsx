@@ -12,22 +12,22 @@ export async function generateMetadata({
   const isKo = locale === "ko";
 
   return {
-    title: isKo ? "이용약관" : "Terms of Service",
+    title: isKo ? "개인정보 처리방침" : "Privacy Policy",
     description: isKo
-      ? "파워플레이 이용약관"
-      : "PowerPlay Terms of Service",
+      ? "파워플레이 개인정보 처리방침"
+      : "PowerPlay Privacy Policy",
     alternates: {
-      canonical: `${siteUrl}/${locale}/terms`,
+      canonical: `${siteUrl}/${locale}/privacy`,
       languages: {
-        ko: `${siteUrl}/ko/terms`,
-        en: `${siteUrl}/en/terms`,
+        ko: `${siteUrl}/ko/privacy`,
+        en: `${siteUrl}/en/privacy`,
       },
     },
     robots: { index: true, follow: true },
   };
 }
 
-export default async function TermsPage({
+export default async function PrivacyPage({
   params,
 }: {
   params: Promise<{ locale: string }>;
@@ -42,19 +42,19 @@ export default async function TermsPage({
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold mb-3 text-zinc-900 dark:text-zinc-100">
-            {isKo ? "이용약관" : "Terms of Service"}
+            {isKo ? "개인정보 처리방침" : "Privacy Policy"}
           </h1>
           <p className="text-sm text-zinc-500 dark:text-zinc-400">
             {isKo
-              ? "파워플레이 서비스 이용에 필요한 기본 약관을 안내합니다."
-              : "This page explains the terms that apply to the use of PowerPlay."}
+              ? "파워플레이 서비스 이용 과정에서 수집되는 개인정보의 처리 방침을 안내합니다."
+              : "This page explains how PowerPlay collects, uses, and retains personal information."}
           </p>
         </div>
 
         <div className="bg-white dark:bg-zinc-900 shadow rounded-lg p-6 sm:p-8 border border-zinc-200 dark:border-zinc-800">
           <div className="prose dark:prose-invert max-w-none">
             <p className="whitespace-pre-wrap text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
-              {t("termsFullText")}
+              {t("privacyPolicySummary")}
             </p>
           </div>
         </div>
