@@ -20,7 +20,7 @@ vi.mock('@/lib/audit', () => ({
 }));
 
 vi.mock('../points', async (importOriginal) => {
-  const actual = await importOriginal();
+  const actual = await importOriginal<typeof import('../points')>();
   return {
     ...actual,
     calculateRefundPercent: vi.fn(), 
@@ -30,6 +30,7 @@ import { calculateRefundPercent } from '../points';
 
 vi.mock('next/cache', () => ({
   revalidatePath: vi.fn(),
+  revalidateTag: vi.fn(),
 }));
 
 describe('Financial Flows', () => {

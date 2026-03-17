@@ -282,7 +282,7 @@ export async function createClub(formData: FormData) {
     metadata: { clubId: club.id, name },
   });
 
-  revalidateTag("clubs");
+  revalidateTag("clubs", "max");
   revalidatePath("/sitemap.xml");
 
   return { success: true, club };
@@ -336,7 +336,7 @@ export async function updateClub(id: string, formData: FormData) {
     await supabase.from("club_rinks").insert(clubRinks);
   }
 
-  revalidateTag("clubs");
+  revalidateTag("clubs", "max");
   revalidatePath("/sitemap.xml");
 
   return { success: true };
@@ -414,7 +414,7 @@ export async function joinClub(clubId: string) {
     return { error: error.message };
   }
 
-  revalidateTag("clubs");
+  revalidateTag("clubs", "max");
   revalidatePath("/sitemap.xml");
 
   return { success: true };
@@ -441,7 +441,7 @@ export async function leaveClub(clubId: string) {
     return { error: error.message };
   }
 
-  revalidateTag("clubs");
+  revalidateTag("clubs", "max");
 
   return { success: true };
 }
@@ -532,7 +532,7 @@ export async function createClubNotice(clubId: string, title: string, content: s
     return { error: error.message };
   }
 
-  revalidateTag("clubs");
+  revalidateTag("clubs", "max");
 
   return { success: true };
 }

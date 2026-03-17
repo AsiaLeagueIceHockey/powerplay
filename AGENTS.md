@@ -69,6 +69,7 @@ Use `npm run <command>` to execute the following scripts:
 ### 2. TypeScript
 - **Strict Mode**: The project enforces `strict: true`. Avoid `any` and provide explicit types wherever possible. Do not use `@ts-ignore`.
 - **Path Aliases**: Use the `@/*` alias for imports from the `src` directory (e.g., `import { createClient } from '@/lib/supabase/server'`).
+- **Pre-commit Verification**: Before committing, run `npm run typecheck`. This repo also includes `.githooks/pre-commit` to block commits when TypeScript/Next signatures (e.g. `revalidateTag`) are invalid.
 
 ### 3. Imports
 - Follow the standard set by `eslint-config-next`. While not explicitly defined, a good practice is:
@@ -560,6 +561,15 @@ UPDATE profiles SET role = 'superuser' WHERE email = 'your-email@example.com';
 - **Notes**:
   - Search Console reindex should focus on `/sitemap.xml`, `/ko/clubs`, `/en/clubs`, representative `/clubs/[id]`, and a few `open` match pages first.
   - This work is primarily SEO/indexing infrastructure; user-facing behavior change is limited to club links becoming clickable from match surfaces.
+
+### [2026-03-18] Commit Harness Hardening for Next 16 Cache APIs
+- **Summary**: Added lightweight pre-commit verification after a production build failure caused by `revalidateTag` argument mismatch.
+- **Changes**:
+  - Added `typecheck` and `verify` scripts to `package.json`.
+  - Added `.githooks/pre-commit` to run `npm run typecheck` before commits.
+  - Updated `AGENTS.md` guidance so agents treat `typecheck` as mandatory before commit when touching typed server code.
+- **Notes**:
+  - `npm run build` can still fail in sandbox if Google Fonts fetch is blocked; `typecheck` is the minimum required gate for catching Next.js API signature regressions.
 
 ### [2026-02-02] Setup Agent Handover Workflow
 - **Summary**: Established the Agent Handover Protocol to ensure context continuity between sessions.
