@@ -1,8 +1,7 @@
-import { getClub, getClubNotices, isClubMember, joinClub } from "@/app/actions/clubs";
+import { getPublicClubById, getPublicClubIds, getPublicClubNotices } from "@/lib/public-clubs";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { MessageCircle, Users, Calendar, Building2, MapPin, CreditCard } from "lucide-react";
-import { JoinClubButton } from "@/components/join-club-button";
 import { ClubShareButton } from "@/components/club-share-button";
 import { SportsTeamJsonLd } from "@/components/json-ld";
 import Link from "next/link";
@@ -11,6 +10,13 @@ import { extractRegion } from "@/lib/rink-utils";
 import { Metadata } from "next";
 
 const siteUrl = "https://powerplay.kr";
+export const revalidate = 900;
+export const dynamicParams = true;
+
+export async function generateStaticParams() {
+  const ids = await getPublicClubIds();
+  return ids.map((id) => ({ id }));
+}
 
 export async function generateMetadata({
   params,
@@ -18,7 +24,7 @@ export async function generateMetadata({
   params: Promise<{ locale: string; id: string }>;
 }): Promise<Metadata> {
   const { locale, id } = await params;
-  const club = await getClub(id);
+  const club = await getPublicClubById(id);
   if (!club) return {};
 
   const isKo = locale === "ko";
@@ -39,6 +45,8 @@ export async function generateMetadata({
       ...(club.logo_url && {
         images: [{ url: club.logo_url, width: 256, height: 256, alt: club.name }],
       }),
+      siteName: "PowerPlay",
+      locale: isKo ? "ko_KR" : "en_US",
       type: "profile",
     },
     twitter: {
@@ -65,10 +73,9 @@ export default async function ClubDetailPage({
   setRequestLocale(locale);
   const t = await getTranslations("club");
 
-  const [club, notices, isMember] = await Promise.all([
-    getClub(id),
-    getClubNotices(id),
-    isClubMember(id),
+  const [club, notices] = await Promise.all([
+    getPublicClubById(id),
+    getPublicClubNotices(id),
   ]);
 
   if (!club) {

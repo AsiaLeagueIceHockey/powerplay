@@ -24,3 +24,14 @@
 
 ### Phase 4: Verification
 - [x] `npm run build` 성공
+
+## 2026-03-18 Indexing Strategy Update
+
+- `clubs/[id]` 상세는 public Supabase fetch + `revalidate = 900` 기반 ISR로 전환
+- `src/lib/public-clubs.ts` 추가: club ids / club detail / notices public cache helper
+- `/[locale]/clubs` 디렉토리 페이지 추가: 검색엔진용 허브 페이지 역할
+- 홈 화면에는 동호회 허브 섹션을 노출하지 않음. 기존 탭 UX 유지
+- 대신 경기 카드 하단 동호회 배지, 경기 상세 상단/주최팀 영역에서 동호회 상세로 직접 이동 가능하게 내부 링크 강화
+- `sitemap.xml` 은 경기 URL을 `open + future` 만 제출하도록 축소
+- `match/[id]` 는 past/closed/canceled 페이지를 `robots.index = false` 처리
+- 클럽 생성/수정/공지/가입/탈퇴 후 `revalidateTag("clubs")` 로 클럽 상세/디렉토리 캐시 무효화

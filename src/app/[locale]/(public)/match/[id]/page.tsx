@@ -10,6 +10,9 @@ import { DynamicRinkMap } from "@/components/dynamic-rink-map";
 import { StartChatButton } from "@/components/start-chat-button";
 import { SportsEventJsonLd } from "@/components/json-ld";
 import { Metadata } from "next";
+import { Link } from "@/i18n/navigation";
+import Image from "next/image";
+import { Building2 } from "lucide-react";
 
 const siteUrl = "https://powerplay.kr";
 
@@ -50,6 +53,7 @@ export async function generateMetadata({
   const description = isKo
     ? `${dateStr} ${timeStr} | ${rinkName} | ${matchTypeLabel} | ${(match.entry_points || match.fee).toLocaleString()}원 | 파워플레이에서 아이스하키 경기에 참가하세요`
     : `${dateStr} ${timeStr} | ${rinkName} | ${matchTypeLabel} | ${(match.entry_points || match.fee).toLocaleString()} KRW | Join ice hockey matches on PowerPlay`;
+  const isIndexable = match.status === "open" && date >= new Date();
 
   return {
     title,
@@ -58,6 +62,8 @@ export async function generateMetadata({
       title,
       description,
       url: `${siteUrl}/${locale}/match/${id}`,
+      siteName: "PowerPlay",
+      locale: isKo ? "ko_KR" : "en_US",
       type: "article",
       images: [{ url: `${siteUrl}/og-new.png`, width: 1200, height: 630 }],
     },
@@ -72,6 +78,10 @@ export async function generateMetadata({
         ko: `${siteUrl}/ko/match/${id}`,
         en: `${siteUrl}/en/match/${id}`,
       },
+    },
+    robots: {
+      index: isIndexable,
+      follow: true,
     },
   };
 }
@@ -216,9 +226,24 @@ export default async function MatchPage({
               {t(`match.types.${match.match_type || 'training'}`)}
             </span>
             {match.club && (
-              <span className="px-2.5 py-1 rounded-md text-xs font-bold bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 flex items-center gap-1 whitespace-nowrap">
-                👥 {match.club.name}
-              </span>
+              <Link
+                href={`/clubs/${match.club.id}`}
+                className="px-2.5 py-1 rounded-md text-xs font-bold bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 flex items-center gap-1.5 whitespace-nowrap hover:bg-blue-200 dark:hover:bg-blue-900/50"
+              >
+                {match.club.logo_url ? (
+                  <Image
+                    src={match.club.logo_url}
+                    alt={match.club.name}
+                    width={16}
+                    height={16}
+                    unoptimized
+                    className="h-4 w-4 rounded object-cover bg-white"
+                  />
+                ) : (
+                  <Building2 className="h-3.5 w-3.5" />
+                )}
+                <span>{match.club.name}</span>
+              </Link>
             )}
           </div>
 
@@ -470,9 +495,30 @@ export default async function MatchPage({
                 <div className="w-6 h-6 bg-teal-200 dark:bg-teal-700 rounded-full flex items-center justify-center text-xs font-bold text-teal-700 dark:text-teal-200">
                   1
                 </div>
-                <span className="font-medium">
-                  {match.club?.name || (creatorName ? (locale === "ko" ? `개인 주최 (${creatorName})` : `Personal (${creatorName})`) : (locale === "ko" ? "주최자" : "Host"))}
-                </span>
+                {match.club ? (
+                  <Link
+                    href={`/clubs/${match.club.id}`}
+                    className="flex items-center gap-2 font-medium hover:text-blue-600 dark:hover:text-blue-400"
+                  >
+                    {match.club.logo_url ? (
+                      <Image
+                        src={match.club.logo_url}
+                        alt={match.club.name}
+                        width={20}
+                        height={20}
+                        unoptimized
+                        className="h-5 w-5 rounded object-cover bg-white"
+                      />
+                    ) : (
+                      <Building2 className="h-4 w-4" />
+                    )}
+                    <span>{match.club.name}</span>
+                  </Link>
+                ) : (
+                  <span className="font-medium">
+                    {creatorName ? (locale === "ko" ? `개인 주최 (${creatorName})` : `Personal (${creatorName})`) : (locale === "ko" ? "주최자" : "Host")}
+                  </span>
+                )}
               </div>
             </div>
 

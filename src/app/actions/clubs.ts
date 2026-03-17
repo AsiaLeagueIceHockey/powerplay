@@ -1,8 +1,41 @@
 "use server";
 
+import { revalidatePath, revalidateTag } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { Club, ClubMembership, ClubPost } from "./types";
+import { Club, ClubMembership, ClubPost, Rink } from "./types";
 import { logAndNotify } from "@/lib/audit";
+
+type ClubWithRinksRow = Club & {
+  club_rinks?: Array<{ rink: Rink | null }> | null;
+};
+
+type ClubMembershipUserRow = {
+  user:
+    | {
+        full_name: string | null;
+        email: string | null;
+      }
+    | Array<{
+        full_name: string | null;
+        email: string | null;
+      }>
+    | null;
+};
+
+function extractClubRinks(club: ClubWithRinksRow): Rink[] {
+  return club.club_rinks?.map((clubRink) => clubRink.rink).filter((rink): rink is Rink => Boolean(rink)) || [];
+}
+
+function extractClubMembers(membersData: ClubMembershipUserRow[] | null | undefined) {
+  return (membersData || []).map((member) => {
+    const user = Array.isArray(member.user) ? member.user[0] : member.user;
+
+    return {
+      full_name: user?.full_name || null,
+      email: user?.email || "",
+    };
+  });
+}
 
 // ============================================
 // Club Logo Upload
@@ -71,15 +104,8 @@ export async function getClubs(): Promise<Club[]> {
         .select("user:profiles(full_name, email)")
         .eq("club_id", club.id);
 
-      // Transform club_rinks to rinks
-      // @ts-ignore
-      const rinks = club.club_rinks?.map((cr) => cr.rink).filter(Boolean) || [];
-
-      // Transform members data
-      const members = membersData?.map((m: any) => ({
-        full_name: m.user?.full_name || null,
-        email: m.user?.email || "",
-      })) || [];
+      const rinks = extractClubRinks(club as ClubWithRinksRow);
+      const members = extractClubMembers(membersData as ClubMembershipUserRow[] | null);
 
       return {
         ...club,
@@ -142,15 +168,8 @@ export async function getAdminClubs(): Promise<Club[]> {
         .select("user:profiles(full_name, email)")
         .eq("club_id", club.id);
 
-      // Transform club_rinks to rinks
-      // @ts-ignore
-      const rinks = club.club_rinks?.map((cr) => cr.rink).filter(Boolean) || [];
-
-      // Transform members data
-      const members = membersData?.map((m) => ({
-        full_name: (m.user as any)?.full_name || null,
-        email: (m.user as any)?.email || "",
-      })) || [];
+      const rinks = extractClubRinks(club as ClubWithRinksRow);
+      const members = extractClubMembers(membersData as ClubMembershipUserRow[] | null);
 
       return {
         ...club,
@@ -178,9 +197,7 @@ export async function getClub(id: string): Promise<Club | null> {
     return null;
   }
 
-  // Transform club_rinks to rinks
-  // @ts-ignore
-  const rinks = club.club_rinks?.map((cr) => cr.rink).filter(Boolean) || [];
+  const rinks = extractClubRinks(club as ClubWithRinksRow);
 
   return {
       ...club,
@@ -265,6 +282,9 @@ export async function createClub(formData: FormData) {
     metadata: { clubId: club.id, name },
   });
 
+  revalidateTag("clubs");
+  revalidatePath("/sitemap.xml");
+
   return { success: true, club };
 }
 
@@ -315,6 +335,9 @@ export async function updateClub(id: string, formData: FormData) {
     }));
     await supabase.from("club_rinks").insert(clubRinks);
   }
+
+  revalidateTag("clubs");
+  revalidatePath("/sitemap.xml");
 
   return { success: true };
 }
@@ -391,6 +414,9 @@ export async function joinClub(clubId: string) {
     return { error: error.message };
   }
 
+  revalidateTag("clubs");
+  revalidatePath("/sitemap.xml");
+
   return { success: true };
 }
 
@@ -414,6 +440,8 @@ export async function leaveClub(clubId: string) {
   if (error) {
     return { error: error.message };
   }
+
+  revalidateTag("clubs");
 
   return { success: true };
 }
@@ -503,6 +531,8 @@ export async function createClubNotice(clubId: string, title: string, content: s
   if (error) {
     return { error: error.message };
   }
+
+  revalidateTag("clubs");
 
   return { success: true };
 }

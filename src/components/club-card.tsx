@@ -4,6 +4,7 @@ import { Club } from "@/app/actions/types";
 import { useState } from "react";
 import Image from "next/image";
 import { useLocale } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { useRouter } from "next/navigation";
 import { MessageCircle, Users, Building2, ChevronDown, ChevronUp, MapPin } from "lucide-react";
 import { extractRegion } from "@/lib/rink-utils";
@@ -117,11 +118,13 @@ export function ClubCard({ club }: ClubCardProps) {
 
       <div className="flex gap-2 mt-auto">
         {/* View Details Button */}
-        <button
-          className="flex-1 py-2.5 rounded-lg text-sm font-bold transition-colors bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white hover:bg-zinc-200 dark:hover:bg-zinc-700"
+        <Link
+          href={`/clubs/${club.id}`}
+          onClick={(e) => e.stopPropagation()}
+          className="flex-1 py-2.5 rounded-lg text-center text-sm font-bold transition-colors bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white hover:bg-zinc-200 dark:hover:bg-zinc-700"
         >
           {locale === "ko" ? "자세히 보기" : "View Details"}
-        </button>
+        </Link>
 
         {/* Kakao Link */}
         {club.kakao_open_chat_url && (
