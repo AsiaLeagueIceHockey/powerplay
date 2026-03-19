@@ -24,7 +24,6 @@ export default async function LoungeBusinessDetailPage({
     <LoungeBusinessDetail
       business={data.business}
       events={data.events}
-      relatedBusinesses={data.relatedBusinesses}
       locale={locale}
       source={source}
       selectedEventId={eventId}
