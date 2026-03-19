@@ -5,7 +5,6 @@ import { CalendarDays, Globe, Instagram, List, MessageCircle, Phone, Trophy } fr
 import type { LoungeBusiness, LoungeEvent } from "@/app/actions/lounge";
 import { DateFilter } from "./date-filter";
 import { LoungeCalendarView } from "./lounge-calendar-view";
-import { LoungeCard } from "./lounge-card";
 import { LoungeCtaButton } from "./lounge-cta-button";
 import { LoungeEventCard } from "./lounge-event-card";
 import { LoungeImpressionTracker } from "./lounge-impression-tracker";
@@ -40,7 +39,6 @@ function toDateKeyKst(isoString: string) {
 export function LoungeBusinessDetail({
   business,
   events,
-  relatedBusinesses,
   locale,
   source,
   selectedEventId,
@@ -289,20 +287,6 @@ export function LoungeBusinessDetail({
         )}
       </section>
 
-      {relatedBusinesses.length > 0 ? (
-        <section className="space-y-4">
-          <div>
-            <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
-              {locale === "ko" ? "비슷한 다른 선택지" : "Other relevant options"}
-            </h2>
-          </div>
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {relatedBusinesses.map((item) => (
-              <LoungeCard key={item.id} business={item} locale={locale} source={source} />
-            ))}
-          </div>
-        </section>
-      ) : null}
     </div>
   );
 }
