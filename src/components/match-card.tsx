@@ -5,10 +5,12 @@ import { useTranslations, useLocale } from "next-intl";
 import type { Match } from "@/app/actions/match";
 import { Building2 } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 export function MatchCard({ match }: { match: Match }) {
   const t = useTranslations("match");
   const locale = useLocale();
+  const router = useRouter();
 
   const rinkName = locale === "ko" ? match.rink?.name_ko : match.rink?.name_en;
   const dateFormatter = new Intl.DateTimeFormat(locale, {
@@ -48,9 +50,9 @@ export function MatchCard({ match }: { match: Match }) {
   const remainingGoalies = Math.max(0, match.max_goalies - counts.g);
 
   return (
-    <Link
-      href={`/match/${match.id}`}
-      className="group relative block flex flex-col rounded-xl border border-zinc-200 bg-white p-4 transition-all duration-300 hover:border-blue-500 hover:shadow-lg dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-blue-400 overflow-hidden"
+    <div
+      onClick={() => router.push(`/${locale}/match/${match.id}`)}
+      className="group relative block flex cursor-pointer flex-col rounded-xl border border-zinc-200 bg-white p-4 transition-all duration-300 hover:border-blue-500 hover:shadow-lg dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-blue-400 overflow-hidden"
     >
       {/* Top Accent Line */}
       <div className="absolute top-0 left-0 h-1 w-full bg-[#172554] dark:bg-blue-600" />
@@ -158,7 +160,11 @@ export function MatchCard({ match }: { match: Match }) {
         {/* Club Info */}
         <div className="flex items-center gap-2 overflow-hidden mr-2">
           {match.club ? (
-            <div className="flex items-center gap-1.5 text-xs font-bold text-[#172554] dark:text-blue-400 bg-blue-50/50 dark:bg-blue-900/10 px-2 py-0.5 rounded-lg border border-blue-100/50 dark:border-blue-900/20 truncate">
+            <Link
+              href={`/clubs/${match.club.id}`}
+              className="relative z-10 flex items-center gap-1.5 text-xs font-bold text-[#172554] dark:text-blue-400 bg-blue-50/50 dark:bg-blue-900/10 px-2 py-0.5 rounded-lg border border-blue-100/50 dark:border-blue-900/20 truncate hover:border-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+              onClick={(e) => e.stopPropagation()}
+            >
               {match.club.logo_url ? (
                 <Image 
                   src={match.club.logo_url} 
@@ -172,7 +178,7 @@ export function MatchCard({ match }: { match: Match }) {
                 <Building2 className="h-3 w-3 shrink-0 opacity-80" />
               )}
               <span className="truncate">{match.club.name}</span>
-            </div>
+            </Link>
           ) : (
             <div className="h-6" /> /* Spacer */
           )}
@@ -196,6 +202,6 @@ export function MatchCard({ match }: { match: Match }) {
           )}
         </div>
       </div>
-    </Link>
+    </div>
   );
 }

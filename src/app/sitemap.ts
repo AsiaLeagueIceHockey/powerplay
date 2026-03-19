@@ -20,6 +20,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // --- Static Pages ---
   const staticPages = [
     { path: "", changeFrequency: "daily" as const, priority: 1.0 },
+    { path: "/clubs", changeFrequency: "weekly" as const, priority: 0.7 },
+    { path: "/privacy", changeFrequency: "monthly" as const, priority: 0.3 },
     { path: "/terms", changeFrequency: "monthly" as const, priority: 0.3 },
     { path: "/login", changeFrequency: "monthly" as const, priority: 0.4 },
     { path: "/signup", changeFrequency: "monthly" as const, priority: 0.4 },
@@ -58,20 +60,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // --- Dynamic: Matches ---
   let matchEntries: MetadataRoute.Sitemap = [];
   try {
+    const nowIso = new Date().toISOString();
     const { data: matches } = await supabase
       .from("matches")
-      .select("id, start_time, status")
-      .neq("status", "canceled")
-      .order("start_time", { ascending: false });
+      .select("id, start_time, status, updated_at")
+      .eq("status", "open")
+      .gte("start_time", nowIso)
+      .order("start_time", { ascending: true });
 
     if (matches) {
       matchEntries = matches.flatMap((match) =>
         locales.map((locale) => ({
           url: `${baseUrl}/${locale}/match/${match.id}`,
-          lastModified: match.start_time ? new Date(match.start_time) : new Date(),
+          lastModified: match.updated_at
+            ? new Date(match.updated_at)
+            : match.start_time
+            ? new Date(match.start_time)
+            : new Date(),
           changeFrequency: "daily" as const,
-          // Open matches get higher priority, closed/completed get lower
-          priority: match.status === "open" ? 0.9 : 0.5,
+          priority: 0.9,
         }))
       );
     }

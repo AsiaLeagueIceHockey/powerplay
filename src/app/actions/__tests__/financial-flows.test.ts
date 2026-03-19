@@ -30,6 +30,7 @@ import { calculateRefundPercent } from '../points';
 
 vi.mock('next/cache', () => ({
   revalidatePath: vi.fn(),
+  revalidateTag: vi.fn(),
 }));
 
 describe('Financial Flows', () => {

@@ -84,6 +84,7 @@ When starting work, treat these as the fastest reliable context sources:
 ### 2. TypeScript
 - **Strict Mode**: The project enforces `strict: true`. Avoid `any` and provide explicit types wherever possible. Do not use `@ts-ignore`.
 - **Path Aliases**: Use the `@/*` alias for imports from the `src` directory (e.g., `import { createClient } from '@/lib/supabase/server'`).
+- **Pre-commit Verification**: Before committing, run `npm run typecheck`. This repo also includes `.githooks/pre-commit` to block commits when TypeScript/Next signatures (e.g. `revalidateTag`) are invalid.
 
 ### 3. Imports
 - Follow the standard set by `eslint-config-next`. While not explicitly defined, a good practice is:
@@ -562,6 +563,29 @@ UPDATE profiles SET role = 'superuser' WHERE email = 'your-email@example.com';
 > **Latest work log for the next agent.**
 
 <!-- Add new logs below this line -->
+
+### [2026-03-18] Search Indexing Hardening for Clubs and Matches
+- **Summary**: Reduced crawl-budget waste on match detail pages and strengthened internal linking to club detail pages without changing the main home-tab UX.
+- **Changes**:
+  - Added public cached club fetch helpers in `src/lib/public-clubs.ts` and moved `clubs/[id]` detail to ISR-style rendering with `revalidate = 900`.
+  - Added `src/app/[locale]/(public)/clubs/page.tsx` as a crawlable club directory hub page.
+  - Updated `src/app/sitemap.ts` so match URLs submitted to search engines are limited to `open + future` matches instead of all non-canceled matches.
+  - Updated `src/app/[locale]/(public)/match/[id]/page.tsx` so past/closed/canceled matches return `robots.index = false`.
+  - Strengthened internal links from `src/components/match-card.tsx` and match detail so club badges/logo-name blocks link directly to club detail pages.
+  - Kept the home screen tab UX unchanged; removed temporary home-level club discovery section.
+  - Added `revalidateTag("clubs")` invalidation in `src/app/actions/clubs.ts` for club create/update/notice/member changes.
+- **Notes**:
+  - Search Console reindex should focus on `/sitemap.xml`, `/ko/clubs`, `/en/clubs`, representative `/clubs/[id]`, and a few `open` match pages first.
+  - This work is primarily SEO/indexing infrastructure; user-facing behavior change is limited to club links becoming clickable from match surfaces.
+
+### [2026-03-18] Commit Harness Hardening for Next 16 Cache APIs
+- **Summary**: Added lightweight pre-commit verification after a production build failure caused by `revalidateTag` argument mismatch.
+- **Changes**:
+  - Added `typecheck` and `verify` scripts to `package.json`.
+  - Added `.githooks/pre-commit` to run `npm run typecheck` before commits.
+  - Updated `AGENTS.md` guidance so agents treat `typecheck` as mandatory before commit when touching typed server code.
+- **Notes**:
+  - `npm run build` can still fail in sandbox if Google Fonts fetch is blocked; `typecheck` is the minimum required gate for catching Next.js API signature regressions.
 
 ### [2026-02-02] Setup Agent Handover Workflow
 - **Summary**: Established the Agent Handover Protocol to ensure context continuity between sessions.

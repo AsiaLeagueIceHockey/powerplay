@@ -1,4 +1,4 @@
-import { getTranslations, setRequestLocale } from "next-intl/server";
+import { setRequestLocale } from "next-intl/server";
 import { getMyClubs } from "@/app/actions/clubs";
 import { getCachedMatches, getCachedRinks, getCachedClubs } from "@/app/actions/cache";
 import { getProfile } from "@/app/actions/auth";
@@ -7,6 +7,7 @@ import { HomeClient } from "@/components/home-client";
 import { Suspense } from "react";
 import { HomePageSkeleton } from "@/components/skeletons";
 import { Metadata } from "next";
+import Link from "next/link";
 
 const siteUrl = "https://powerplay.kr";
 
@@ -42,7 +43,7 @@ export async function generateMetadata({
 }
 
 // Separate async component for data fetching (enables streaming)
-async function HomeContent({ locale, selectedDate }: { locale: string; selectedDate?: string }) {
+async function HomeContent({ selectedDate }: { selectedDate?: string }) {
   // 병렬 데이터 페칭 (캐싱 적용)
   const [allMatches, rinks, clubs, myClubs, profile] = await Promise.all([
     getCachedMatches(),  // Cached (15s)
@@ -76,6 +77,7 @@ export default async function HomePage({
   const { locale } = await params;
   const { date: selectedDate } = await searchParams;
   setRequestLocale(locale);
+  const isKo = locale === "ko";
 
   return (
     <div className="flex flex-col gap-6 -mt-2">
@@ -84,8 +86,20 @@ export default async function HomePage({
 
       {/* Main Content - streamed with Suspense */}
       <Suspense fallback={<HomePageSkeleton />}>
-        <HomeContent locale={locale} selectedDate={selectedDate} />
+        <HomeContent selectedDate={selectedDate} />
       </Suspense>
+
+      <div className="border-t border-zinc-200 pt-3 text-center text-[11px] text-zinc-400 dark:border-zinc-800 dark:text-zinc-500">
+        <div className="flex items-center justify-center gap-3">
+          <Link href={`/${locale}/privacy`} className="transition-colors hover:text-zinc-600 dark:hover:text-zinc-300">
+            {isKo ? "개인정보처리방침" : "Privacy Policy"}
+          </Link>
+          <span aria-hidden="true">|</span>
+          <Link href={`/${locale}/terms`} className="transition-colors hover:text-zinc-600 dark:hover:text-zinc-300">
+            {isKo ? "이용약관" : "Terms of Service"}
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }

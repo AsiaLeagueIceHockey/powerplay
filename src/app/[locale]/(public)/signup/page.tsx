@@ -148,6 +148,18 @@ export default function SignupPage() {
             {t("login")}
           </Link>
         </p>
+
+        <div className="mt-4 text-center text-[11px] text-zinc-400 dark:text-zinc-500">
+          <div className="flex items-center justify-center gap-3">
+            <Link href="/privacy" className="underline underline-offset-2 hover:text-zinc-600 dark:hover:text-zinc-300">
+              Privacy Policy
+            </Link>
+            <span aria-hidden="true">|</span>
+            <Link href="/terms" className="underline underline-offset-2 hover:text-zinc-600 dark:hover:text-zinc-300">
+              Terms of Service
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
   );

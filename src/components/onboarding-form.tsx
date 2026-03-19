@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { updateProfile } from "@/app/actions/auth";
 import { Check, Loader2, X } from "lucide-react";
 import { BirthDatePicker } from "@/components/birth-date-picker";
@@ -319,6 +320,14 @@ export function OnboardingForm({ profile, locale }: OnboardingFormProps) {
                     </button>
                   </div>
                   <p className="text-zinc-500 text-xs mt-1 leading-snug">{t("terms.agree")}</p>
+                  <div className="mt-2 flex items-center gap-3 text-[11px] text-zinc-400 dark:text-zinc-500">
+                    <Link href="/privacy" className="underline underline-offset-2 hover:text-zinc-600 dark:hover:text-zinc-300">
+                      {locale === "ko" ? "개인정보처리방침" : "Privacy Policy"}
+                    </Link>
+                    <Link href="/terms" className="underline underline-offset-2 hover:text-zinc-600 dark:hover:text-zinc-300">
+                      {locale === "ko" ? "이용약관" : "Terms of Service"}
+                    </Link>
+                  </div>
                 </div>
               </label>
             </div>
