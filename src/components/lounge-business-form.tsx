@@ -313,18 +313,6 @@ export function LoungeBusinessForm({
         </div>
       ) : null}
 
-      {submitNotice ? (
-        <div
-          className={`rounded-xl border px-4 py-3 text-sm ${
-            submitNotice.type === "success"
-              ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-300"
-              : "border-red-500/20 bg-red-500/10 text-red-300"
-          }`}
-        >
-          {submitNotice.message}
-        </div>
-      ) : null}
-
       <div className="space-y-4 rounded-2xl border border-zinc-700/80 bg-zinc-900/50 p-5">
         <div>
           <p className="text-sm font-semibold text-zinc-100">
@@ -414,6 +402,18 @@ export function LoungeBusinessForm({
         <input type="checkbox" checked={published} onChange={(event) => setPublished(event.target.checked)} />
         {locale === "ko" ? "즉시 공개" : "Publish now"}
       </label>
+
+      {submitNotice ? (
+        <div
+          className={`rounded-xl border px-4 py-3 text-sm ${
+            submitNotice.type === "success"
+              ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-300"
+              : "border-red-500/20 bg-red-500/10 text-red-300"
+          }`}
+        >
+          {submitNotice.message}
+        </div>
+      ) : null}
 
       <button type="submit" disabled={isPending} className="rounded-xl bg-amber-400 px-4 py-2.5 text-sm font-semibold text-zinc-950 disabled:opacity-50">
         {isPending ? (locale === "ko" ? "저장 중..." : "Saving...") : (locale === "ko" ? "비즈니스 저장" : "Save business")}

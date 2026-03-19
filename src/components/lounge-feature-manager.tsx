@@ -39,8 +39,8 @@ export function LoungeFeatureManager({
         </h2>
         <p className="mt-1 text-sm text-zinc-400">
           {locale === "ko"
-            ? "추천 노출은 슈퍼유저만 관리합니다. 추천된 비즈니스끼리는 작은 숫자가 먼저 보입니다."
-            : "Only superusers manage featured exposure. Among featured businesses, lower numbers appear first."}
+            ? "추천 노출은 슈퍼유저만 관리합니다. 라운지의 하키 정보 목록 상단에 먼저 노출되며, 추천 순서는 1이 가장 먼저 보입니다."
+            : "Only superusers manage featured exposure. Featured businesses appear first in the Lounge info list, and order 1 appears before order 2."}
         </p>
       </div>
 
@@ -97,6 +97,9 @@ export function LoungeFeatureManager({
                       defaultValue={business.featured_order}
                       className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100"
                     />
+                    <p className="text-xs text-zinc-500">
+                      {locale === "ko" ? "숫자가 작을수록 먼저 보입니다. 예: 1, 2, 3" : "Lower numbers appear first. Example: 1, 2, 3."}
+                    </p>
                   </label>
                   <button
                     type="submit"
