@@ -23,6 +23,7 @@ export default async function LoungeManagementPage({
         locale={locale}
         memberships={data.memberships ?? []}
         admins={data.admins ?? []}
+        businesses={data.businesses ?? []}
       />
     </div>
   );
