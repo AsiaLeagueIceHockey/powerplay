@@ -342,7 +342,7 @@ function buildDailyMetricPoints(rows: LoungeMetricRow[]): LoungeDailyMetricPoint
   const map = new Map<string, LoungeDailyMetricPoint>();
 
   rows.forEach((row) => {
-    const dateKey = row.created_at.slice(0, 10);
+    const dateKey = toKstDateKey(row.created_at);
     const current = map.get(dateKey) ?? {
       date: dateKey,
       impressions: 0,
@@ -991,7 +991,9 @@ export async function upsertLoungeMembership(formData: FormData) {
 
   const endsAtDate = new Date(endsAt + "T23:59:59+09:00");
   const startsAtDate = new Date(startsAt + "T00:00:00+09:00");
-  const status = endsAtDate >= new Date() ? "active" : "expired";
+  const todayKey = toKstDateKey(new Date());
+  const endsAtKey = toKstDateKey(endsAtDate);
+  const status = todayKey > endsAtKey ? "expired" : "active";
 
   const payload = {
     user_id: userId,
