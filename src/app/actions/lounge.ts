@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { sanitizeLoungeExternalUrl } from "@/lib/lounge-link-utils";
 import { getAdminInfo } from "./admin-check";
 import { getAdmins } from "./admin";
 import { checkIsSuperUser } from "./superuser";
@@ -696,9 +697,9 @@ export async function upsertLoungeBusiness(formData: FormData) {
     lat: ((formData.get("lat") as string) || "").trim() ? Number(formData.get("lat")) : null,
     lng: ((formData.get("lng") as string) || "").trim() ? Number(formData.get("lng")) : null,
     phone: ((formData.get("phone") as string) || "").trim() || null,
-    kakao_open_chat_url: ((formData.get("kakao_open_chat_url") as string) || "").trim() || null,
-    instagram_url: ((formData.get("instagram_url") as string) || "").trim() || null,
-    website_url: ((formData.get("website_url") as string) || "").trim() || null,
+    kakao_open_chat_url: null as string | null,
+    instagram_url: null as string | null,
+    website_url: null as string | null,
     display_priority: formData.has("display_priority")
       ? Number((formData.get("display_priority") as string) || "0") || 0
       : existing?.display_priority ?? 0,
@@ -712,6 +713,25 @@ export async function upsertLoungeBusiness(formData: FormData) {
   if (!slug) {
     return { success: false, error: "Business slug is required" };
   }
+
+  const kakaoUrl = sanitizeLoungeExternalUrl(formData.get("kakao_open_chat_url") as string | null, "kakao");
+  if (kakaoUrl.error) {
+    return { success: false, error: "카카오 링크는 https://open.kakao.com 또는 pf.kakao.com 형식이어야 합니다." };
+  }
+
+  const instagramUrl = sanitizeLoungeExternalUrl(formData.get("instagram_url") as string | null, "instagram");
+  if (instagramUrl.error) {
+    return { success: false, error: "인스타그램 링크는 https://instagram.com 형식이어야 합니다." };
+  }
+
+  const websiteUrl = sanitizeLoungeExternalUrl(formData.get("website_url") as string | null, "website");
+  if (websiteUrl.error) {
+    return { success: false, error: "웹사이트 링크는 https:// 로 시작해야 합니다." };
+  }
+
+  payload.kakao_open_chat_url = kakaoUrl.value;
+  payload.instagram_url = instagramUrl.value;
+  payload.website_url = websiteUrl.value;
 
   const slugAvailable = await ensureUniqueLoungeSlug(supabase, slug, existing?.id ?? null);
   if (!slugAvailable) {
@@ -1041,7 +1061,7 @@ export async function updateLoungeBusinessFeature(formData: FormData) {
     return { success: false, error: "Business is required" };
   }
 
-  const isFeatured = formData.get("is_featured") === "true";
+  const isFeatured = formData.has("is_featured");
   const featuredOrderRaw = (formData.get("featured_order") as string) || "0";
   const featuredOrder = Math.max(0, Number(featuredOrderRaw) || 0);
 
@@ -1079,7 +1099,7 @@ export async function trackLoungeImpression(
     data: { user },
   } = await supabase.auth.getUser();
 
-  await supabase.from("lounge_metrics").insert({
+  const { error } = await supabase.from("lounge_metrics").insert({
     business_id: businessId,
     event_id: eventId ?? null,
     user_id: user?.id ?? null,
@@ -1088,6 +1108,18 @@ export async function trackLoungeImpression(
     locale: locale ?? null,
     source: source ?? null,
   });
+
+  if (error) {
+    console.error("Failed to track lounge impression", {
+      businessId,
+      eventId,
+      entityType,
+      locale,
+      source,
+      error: error.message,
+    });
+    return { success: false, error: error.message };
+  }
 
   return { success: true };
 }
@@ -1105,7 +1137,7 @@ export async function trackLoungeClick(
     data: { user },
   } = await supabase.auth.getUser();
 
-  await supabase.from("lounge_metrics").insert({
+  const { error } = await supabase.from("lounge_metrics").insert({
     business_id: businessId,
     event_id: eventId ?? null,
     user_id: user?.id ?? null,
@@ -1115,6 +1147,19 @@ export async function trackLoungeClick(
     locale: locale ?? null,
     source: source ?? null,
   });
+
+  if (error) {
+    console.error("Failed to track lounge click", {
+      businessId,
+      eventId,
+      entityType,
+      ctaType,
+      locale,
+      source,
+      error: error.message,
+    });
+    return { success: false, error: error.message };
+  }
 
   return { success: true };
 }

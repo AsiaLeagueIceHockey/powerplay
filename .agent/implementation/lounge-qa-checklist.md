@@ -10,6 +10,11 @@ Manual QA checklist for the `라운지 / Lounge` feature before preview review a
 - Required SQL:
   - [x] `sql/v33_lounge_memberships.sql`
   - [x] `sql/v34_lounge_priority_and_sources.sql`
+  - [x] `sql/v35_lounge_location_maps.sql`
+  - [x] `sql/v36_lounge_featured_businesses.sql`
+  - [x] `sql/v37_fix_lounge_public_membership_rls.sql`
+  - [x] `sql/v38_lounge_business_slugs.sql`
+  - [x] `sql/v39_lounge_business_category_other.sql`
 - Key routes:
   - public lounge: `/{locale}/lounge`
   - public lounge detail: `/{locale}/lounge/{businessId}`

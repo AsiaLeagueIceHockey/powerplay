@@ -47,6 +47,13 @@ export function LoungeContactMenu({
     },
   } as const;
 
+  const ctaLabelMap = {
+    phone: locale === "ko" ? "전화하기" : "Call",
+    kakao: locale === "ko" ? "카카오톡 열기" : "Open KakaoTalk",
+    instagram: locale === "ko" ? "인스타그램 열기" : "Open Instagram",
+    website: locale === "ko" ? "웹사이트 열기" : "Open website",
+  } as const;
+
   return (
     <div className="relative flex items-center justify-end">
       {open ? (
@@ -61,6 +68,7 @@ export function LoungeContactMenu({
               url={item.url}
               locale={locale}
               source={source}
+              ariaLabel={ctaLabelMap[item.key]}
               className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${iconMap[item.key].className} disabled:cursor-not-allowed disabled:opacity-40`}
             >
               {iconMap[item.key].icon}

@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { sendPushNotification } from "@/app/actions/push";
 import { logAndNotify } from "@/lib/audit";
+import { isAllowedNaverMapUrl } from "@/lib/lounge-link-utils";
 
 // Get all rinks for dropdown
 export async function getRinks() {
@@ -830,6 +831,13 @@ export async function parseNaverMapUrl(url: string): Promise<{
   error?: string;
 }> {
   try {
+    if (!isAllowedNaverMapUrl(url)) {
+      return {
+        success: false,
+        error: "naver.me 또는 map.naver.com URL만 허용됩니다.",
+      };
+    }
+
     // Follow redirects to get the full URL
     const response = await fetch(url, {
       method: "HEAD",
@@ -837,6 +845,12 @@ export async function parseNaverMapUrl(url: string): Promise<{
     });
 
     const finalUrl = response.url;
+    if (!isAllowedNaverMapUrl(finalUrl)) {
+      return {
+        success: false,
+        error: "허용되지 않은 지도 URL입니다.",
+      };
+    }
     const urlObj = new URL(finalUrl);
 
     // Try to extract lat and lng from URL params first
@@ -1262,8 +1276,9 @@ interface AdminMatch {
 
 interface AdminLoungeBusiness {
   id: string;
-  category: "lesson" | "training_center" | "tournament" | "brand" | "service";
+  category: "lesson" | "training_center" | "tournament" | "brand" | "service" | "other";
   name: string;
+  slug: string | null;
   tagline: string | null;
   description: string | null;
   is_published: boolean;
@@ -1344,16 +1359,21 @@ export async function getAdminDetail(targetUserId: string): Promise<{
       .order("start_time", { ascending: false }),
     supabase
       .from("lounge_businesses")
-      .select("id, category, name, tagline, description, is_published, created_at")
+      .select("id, category, name, slug, tagline, description, is_published, created_at")
       .eq("owner_user_id", targetUserId)
       .maybeSingle(),
   ]);
 
   const hostedMatches = hostedMatchesResult.data;
   const matchError = hostedMatchesResult.error;
+  const loungeBusinessError = loungeBusinessResult.error;
 
   if (matchError) {
     console.error("Error fetching admin matches:", matchError);
+  }
+
+  if (loungeBusinessError) {
+    console.error("Error fetching admin lounge business:", loungeBusinessError);
   }
 
   return {

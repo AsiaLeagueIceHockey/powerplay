@@ -119,12 +119,14 @@ export default async function AdminDetailPage({
                             </p>
                             <div className="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-800 pt-4 text-sm text-zinc-400">
                                 <span>등록일: {new Date(loungeBusiness.created_at).toLocaleDateString("ko-KR")}</span>
-                                <Link
-                                    href={`/${locale}/admin/lounge`}
-                                    className="inline-flex items-center gap-2 rounded-lg bg-zinc-100 px-3 py-2 text-xs font-semibold text-zinc-900 hover:bg-white"
-                                >
-                                    라운지 관리로 이동
-                                </Link>
+                                {loungeBusiness.is_published && loungeBusiness.slug ? (
+                                    <Link
+                                        href={`/${locale}/lounge/${encodeURIComponent(loungeBusiness.slug)}`}
+                                        className="inline-flex items-center gap-2 rounded-lg bg-zinc-100 px-3 py-2 text-xs font-semibold text-zinc-900 hover:bg-white"
+                                    >
+                                        공개 페이지 보기
+                                    </Link>
+                                ) : null}
                             </div>
                         </div>
                     )}

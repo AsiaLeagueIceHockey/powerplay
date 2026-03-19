@@ -1,10 +1,11 @@
 "use client";
 
-import { useMemo, useRef, useState, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
 import { Image as ImageIcon, Loader2, MapPin, Search, Store, Upload, X } from "lucide-react";
 import type { LoungeBusiness } from "@/app/actions/lounge";
 import { parseNaverMapUrl } from "@/app/actions/admin";
 import { uploadLoungeImage, upsertLoungeBusiness } from "@/app/actions/lounge";
+import { isAllowedNaverMapUrl, sanitizeLoungeExternalUrl } from "@/lib/lounge-link-utils";
 
 export function LoungeBusinessForm({
   locale,
@@ -32,16 +33,6 @@ export function LoungeBusinessForm({
     lng: business?.lng?.toString() ?? "",
   });
 
-  const normalizedBusinessSlug = useMemo(() => {
-    return (business?.slug ?? "")
-      .trim()
-      .toLowerCase()
-      .replace(/[^a-z0-9가-힣\s-]/g, "")
-      .replace(/\s+/g, "-")
-      .replace(/-+/g, "-")
-      .replace(/^-|-$/g, "");
-  }, [business?.slug]);
-
   const buildSlugPreview = (value: string) =>
     value
       .trim()
@@ -50,6 +41,25 @@ export function LoungeBusinessForm({
       .replace(/\s+/g, "-")
       .replace(/-+/g, "-")
       .replace(/^-|-$/g, "");
+
+  const validateBusinessLinks = (formData: FormData) => {
+    const kakaoResult = sanitizeLoungeExternalUrl(formData.get("kakao_open_chat_url") as string | null, "kakao");
+    if (kakaoResult.error) {
+      return locale === "ko" ? "카카오 링크는 https://open.kakao.com 또는 pf.kakao.com 형식이어야 합니다." : "Kakao URL must use https://open.kakao.com or pf.kakao.com.";
+    }
+
+    const instagramResult = sanitizeLoungeExternalUrl(formData.get("instagram_url") as string | null, "instagram");
+    if (instagramResult.error) {
+      return locale === "ko" ? "인스타그램 링크는 https://instagram.com 형식이어야 합니다." : "Instagram URL must use https://instagram.com.";
+    }
+
+    const websiteResult = sanitizeLoungeExternalUrl(formData.get("website_url") as string | null, "website");
+    if (websiteResult.error) {
+      return locale === "ko" ? "웹사이트 링크는 https:// 로 시작해야 합니다." : "Website URL must start with https://.";
+    }
+
+    return null;
+  };
 
   const uploadImage = async (target: "logo" | "cover", file: File) => {
     if (!file.type.startsWith("image/")) {
@@ -98,6 +108,11 @@ export function LoungeBusinessForm({
         formData.set("logo_url", logoUrl);
         formData.set("cover_image_url", coverImageUrl);
         formData.set("slug", slugInput);
+        const linkError = validateBusinessLinks(formData);
+        if (linkError) {
+          alert(linkError);
+          return;
+        }
         startTransition(async () => {
           const result = await upsertLoungeBusiness(formData);
           if (!result.success) {
@@ -135,9 +150,7 @@ export function LoungeBusinessForm({
 
               const shouldSyncSlug =
                 !slugInput.trim() ||
-                (business?.name && slugInput === business.slug) ||
-                slugInput === buildSlugPreview(nameInput) ||
-                slugInput === normalizedBusinessSlug;
+                slugInput === buildSlugPreview(nameInput);
 
               if (shouldSyncSlug) {
                 setSlugInput(nextName);
@@ -316,6 +329,10 @@ export function LoungeBusinessForm({
             onClick={async () => {
               if (!locationState.map_url) {
                 setMapError(locale === "ko" ? "네이버 지도 URL을 입력하세요." : "Enter a Naver Map URL.");
+                return;
+              }
+              if (!isAllowedNaverMapUrl(locationState.map_url)) {
+                setMapError(locale === "ko" ? "naver.me 또는 map.naver.com URL만 사용할 수 있습니다." : "Only naver.me or map.naver.com URLs are allowed.");
                 return;
               }
               setParsing(true);
