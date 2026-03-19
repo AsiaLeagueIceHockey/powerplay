@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useRef, useState, useTransition } from "react";
 import { Image as ImageIcon, Loader2, MapPin, Search, Store, Upload, X } from "lucide-react";
 import type { LoungeBusiness } from "@/app/actions/lounge";
@@ -14,9 +15,11 @@ export function LoungeBusinessForm({
   locale: string;
   business: LoungeBusiness | null;
 }) {
+  const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [published, setPublished] = useState<boolean>(business?.is_published ?? true);
   const [nameInput, setNameInput] = useState(business?.name ?? "");
+  const [submitNotice, setSubmitNotice] = useState<{ type: "success" | "error"; message: string } | null>(null);
   const [parsing, setParsing] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
@@ -37,10 +40,10 @@ export function LoungeBusinessForm({
     value
       .trim()
       .toLowerCase()
-      .replace(/[^a-z0-9가-힣\s-]/g, "")
+      .replace(/[^a-z0-9가-힣_\s-]/g, "")
       .replace(/\s+/g, "-")
       .replace(/-+/g, "-")
-      .replace(/^-|-$/g, "");
+      .replace(/^-+|-+$/g, "");
 
   const validateBusinessLinks = (formData: FormData) => {
     const kakaoResult = sanitizeLoungeExternalUrl(formData.get("kakao_open_chat_url") as string | null, "kakao");
@@ -55,7 +58,7 @@ export function LoungeBusinessForm({
 
     const websiteResult = sanitizeLoungeExternalUrl(formData.get("website_url") as string | null, "website");
     if (websiteResult.error) {
-      return locale === "ko" ? "웹사이트 링크는 https:// 로 시작해야 합니다." : "Website URL must start with https://.";
+      return locale === "ko" ? "웹사이트 링크는 http:// 또는 https:// 로 시작해야 합니다." : "Website URL must start with http:// or https://.";
     }
 
     return null;
@@ -110,16 +113,23 @@ export function LoungeBusinessForm({
         formData.set("slug", slugInput);
         const linkError = validateBusinessLinks(formData);
         if (linkError) {
-          alert(linkError);
+          setSubmitNotice({ type: "error", message: linkError });
           return;
         }
         startTransition(async () => {
           const result = await upsertLoungeBusiness(formData);
           if (!result.success) {
-            alert(result.error || (locale === "ko" ? "저장에 실패했습니다." : "Save failed."));
+            setSubmitNotice({
+              type: "error",
+              message: result.error || (locale === "ko" ? "저장에 실패했습니다." : "Save failed."),
+            });
             return;
           }
-          alert(locale === "ko" ? "비즈니스 정보가 저장되었습니다." : "Business saved.");
+          setSubmitNotice({
+            type: "success",
+            message: locale === "ko" ? "비즈니스 정보가 저장되었습니다." : "Business saved.",
+          });
+          router.refresh();
         });
       }}
     >
@@ -147,14 +157,7 @@ export function LoungeBusinessForm({
             onChange={(event) => {
               const nextName = event.target.value;
               setNameInput(nextName);
-
-              const shouldSyncSlug =
-                !slugInput.trim() ||
-                slugInput === buildSlugPreview(nameInput);
-
-              if (shouldSyncSlug) {
-                setSlugInput(nextName);
-              }
+              setSlugInput(nextName);
             }}
             className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100 placeholder:text-zinc-500"
           />
@@ -171,6 +174,11 @@ export function LoungeBusinessForm({
             {locale === "ko"
               ? `https://powerplay.kr/${locale}/lounge/${buildSlugPreview(slugInput) || "파워플레이"}`
               : `https://powerplay.kr/${locale}/lounge/${buildSlugPreview(slugInput) || "powerplay"}`}
+          </p>
+          <p className="text-xs leading-5 text-zinc-500">
+            {locale === "ko"
+              ? "비즈니스명을 바꾸면 공유 URL도 함께 바뀝니다. 필요하면 직접 수정할 수 있습니다."
+              : "Changing the business name also updates the shareable URL. You can still edit it manually if needed."}
           </p>
         </label>
         <label className="space-y-2 text-sm">
@@ -302,6 +310,18 @@ export function LoungeBusinessForm({
       {uploadError ? (
         <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/30 dark:bg-red-900/10 dark:text-red-300">
           {uploadError}
+        </div>
+      ) : null}
+
+      {submitNotice ? (
+        <div
+          className={`rounded-xl border px-4 py-3 text-sm ${
+            submitNotice.type === "success"
+              ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-300"
+              : "border-red-500/20 bg-red-500/10 text-red-300"
+          }`}
+        >
+          {submitNotice.message}
         </div>
       ) : null}
 

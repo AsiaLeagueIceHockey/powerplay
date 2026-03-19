@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { CalendarDays, PencilLine, Phone, UserRound } from "lucide-react";
-import type { LoungeManagedMembership, LoungeBusinessCategory } from "@/app/actions/lounge";
+import type { LoungeManagedMembership, LoungeBusiness, LoungeBusinessCategory } from "@/app/actions/lounge";
+import { LoungeFeatureManager } from "./lounge-feature-manager";
 import { LoungeMembershipManager } from "./lounge-membership-manager";
 
 interface AdminOption {
@@ -13,7 +14,7 @@ interface AdminOption {
   phone?: string | null;
 }
 
-type LoungeManagementTab = "overview" | "register";
+type LoungeManagementTab = "overview" | "register" | "featured";
 
 type LoungeMembershipPhase = "upcoming" | "active" | "expired" | "canceled";
 
@@ -96,10 +97,12 @@ export function LoungeSuperuserManagementDashboard({
   locale,
   memberships,
   admins,
+  businesses,
 }: {
   locale: string;
   memberships: LoungeManagedMembership[];
   admins: AdminOption[];
+  businesses: LoungeBusiness[];
 }) {
   const [activeTab, setActiveTab] = useState<LoungeManagementTab>("overview");
   const [editingMembership, setEditingMembership] = useState<LoungeManagedMembership | null>(null);
@@ -123,6 +126,7 @@ export function LoungeSuperuserManagementDashboard({
   const tabs = [
     { id: "overview" as const, label: locale === "ko" ? "구독 관리" : "Memberships" },
     { id: "register" as const, label: locale === "ko" ? "구독 등록" : "Register" },
+    { id: "featured" as const, label: locale === "ko" ? "추천 비즈니스" : "Featured" },
   ];
 
   return (
@@ -317,6 +321,10 @@ export function LoungeSuperuserManagementDashboard({
             )}
           </section>
         </div>
+      ) : null}
+
+      {activeTab === "featured" ? (
+        <LoungeFeatureManager locale={locale} businesses={businesses} />
       ) : null}
 
       {activeTab === "register" ? (

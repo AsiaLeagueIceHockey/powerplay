@@ -172,10 +172,10 @@ function normalizeLoungeSlug(input: string) {
   return input
     .trim()
     .toLowerCase()
-    .replace(/[^a-z0-9가-힣\s-]/g, "")
+    .replace(/[^a-z0-9가-힣_\s-]/g, "")
     .replace(/\s+/g, "-")
     .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "");
+    .replace(/^-+|-+$/g, "");
 }
 
 function decodeLoungeSlugParam(input: string) {
@@ -195,6 +195,23 @@ async function ensureUniqueLoungeSlug(
     .from("lounge_businesses")
     .select("id")
     .eq("slug", slug);
+
+  const result = existingBusinessId
+    ? await query.neq("id", existingBusinessId).maybeSingle()
+    : await query.maybeSingle();
+
+  return !result.data;
+}
+
+async function ensureUniqueLoungeBusinessName(
+  supabase: SupabaseServerClient,
+  name: string,
+  existingBusinessId?: string | null
+) {
+  const query = supabase
+    .from("lounge_businesses")
+    .select("id")
+    .eq("name", name);
 
   const result = existingBusinessId
     ? await query.neq("id", existingBusinessId).maybeSingle()
@@ -528,6 +545,7 @@ export async function getLoungeManagementPageData(): Promise<{
   reason?: "unauthorized";
   memberships?: LoungeManagedMembership[];
   admins?: Awaited<ReturnType<typeof getAdmins>>;
+  businesses?: LoungeBusiness[];
 }> {
   const supabase = await createClient();
   const isSuperUser = await checkIsSuperUser();
@@ -546,19 +564,16 @@ export async function getLoungeManagementPageData(): Promise<{
       .order("created_at", { ascending: false }),
     supabase
       .from("lounge_businesses")
-      .select("id, owner_user_id, name, category, is_published")
+      .select(`
+        *,
+        owner:owner_user_id(id, email, full_name, phone)
+      `)
       .order("created_at", { ascending: false }),
     getAdmins(),
   ]);
 
   const businessByOwner = new Map(
-    (((businessesResult.data as Array<{
-      id: string;
-      owner_user_id: string;
-      name: string;
-      category: LoungeBusinessCategory;
-      is_published: boolean;
-    }> | null) ?? [])).map((business) => [business.owner_user_id, business])
+    (((businessesResult.data as LoungeBusiness[] | null) ?? [])).map((business) => [business.owner_user_id, business])
   );
 
   const memberships = (((membershipsResult.data as LoungeMembership[] | null) ?? [])).map((membership) => ({
@@ -570,6 +585,7 @@ export async function getLoungeManagementPageData(): Promise<{
     ok: true,
     memberships,
     admins,
+    businesses: (businessesResult.data as LoungeBusiness[] | null) ?? [],
   };
 }
 
@@ -714,6 +730,11 @@ export async function upsertLoungeBusiness(formData: FormData) {
     return { success: false, error: "Business slug is required" };
   }
 
+  const nameAvailable = await ensureUniqueLoungeBusinessName(supabase, payload.name, existing?.id ?? null);
+  if (!nameAvailable) {
+    return { success: false, error: "이미 사용 중인 비즈니스명입니다. 다른 이름을 입력해주세요." };
+  }
+
   const kakaoUrl = sanitizeLoungeExternalUrl(formData.get("kakao_open_chat_url") as string | null, "kakao");
   if (kakaoUrl.error) {
     return { success: false, error: "카카오 링크는 https://open.kakao.com 또는 pf.kakao.com 형식이어야 합니다." };
@@ -726,7 +747,7 @@ export async function upsertLoungeBusiness(formData: FormData) {
 
   const websiteUrl = sanitizeLoungeExternalUrl(formData.get("website_url") as string | null, "website");
   if (websiteUrl.error) {
-    return { success: false, error: "웹사이트 링크는 https:// 로 시작해야 합니다." };
+    return { success: false, error: "웹사이트 링크는 http:// 또는 https:// 로 시작해야 합니다." };
   }
 
   payload.kakao_open_chat_url = kakaoUrl.value;

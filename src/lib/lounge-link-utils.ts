@@ -28,7 +28,15 @@ export function sanitizeLoungeExternalUrl(
   }
 
   const parsed = parseUrl(trimmed);
-  if (!parsed || parsed.protocol !== "https:") {
+  if (!parsed) {
+    return { value: null, error: "URL must be valid" };
+  }
+
+  if (type === "website") {
+    if (parsed.protocol !== "https:" && parsed.protocol !== "http:") {
+      return { value: null, error: "Website URL must use http:// or https://" };
+    }
+  } else if (parsed.protocol !== "https:") {
     return { value: null, error: "URL must use https://" };
   }
 
