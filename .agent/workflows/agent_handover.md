@@ -23,6 +23,7 @@ At the beginning of every new thread or task, you MUST read `AGENTS.md` to under
 
 - Follow the coding standards and conventions defined in `AGENTS.md`.
 - If you make architectural changes or add new features, keep notes to update `AGENTS.md` later.
+- If the task includes an open PR or AI review comments, also follow `.agent/workflows/pr_review_loop.md`.
 
 ## 3. User Context & Escalation
 
@@ -55,3 +56,17 @@ Before finishing your session or task, you MUST update `AGENTS.md` to record you
 
 3. **Verify**
    - Ensure the markdown syntax is correct and the file is saved.
+
+## 5. PR Review State (When Applicable)
+
+If the task ends with an open PR or active AI review:
+
+1. record the PR number
+2. record the latest feature branch commit
+3. record whether `sandbox` was synced
+4. summarize which review comments were:
+   - applied
+   - intentionally rejected
+   - still pending
+
+This keeps the next agent from re-triaging the same review thread from scratch.

@@ -123,6 +123,7 @@ export async function createItem(formData: FormData) {
 6.  **Implement**: Code components and server actions, checking off TODOs.
 7.  **Verify**: Test and check off verification TODOs.
 8.  **PR**: Submit a Pull Request to the `main` branch.
+9.  **Review Loop**: If the branch goes through PR review, follow `.agent/workflows/pr_review_loop.md` for verification, AI review triage, bilingual replies, and preview sync.
 
 ### Implementation Tracking (Standard Workflow)
 Every non-trivial feature **MUST** have a tracking file at `.agent/implementation/{feature-name}.md`.
@@ -167,6 +168,7 @@ When developing or modifying "Game" or "Match" related features, ALWAYS address 
 
 ### Agent Handover
 - Check `.agent/workflows/agent_handover.md` if starting/ending a major task.
+- If a PR already exists or CodeRabbit comments are active, also check `.agent/workflows/pr_review_loop.md`.
 
 ---
 

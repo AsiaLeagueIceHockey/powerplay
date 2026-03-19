@@ -48,6 +48,26 @@ When starting work, treat these as the fastest reliable context sources:
 
 **Important:** `README.md` contains some earlier planning-era context. If it conflicts with code, trust `AGENTS.md`, `.agent`, and the current `src/` + `sql/` tree.
 
+## 🔁 Standard PR Flow
+
+For any non-trivial branch that will go through PR review, follow:
+
+1. `.agent/workflows/pr_review_loop.md`
+
+This is the canonical workflow for:
+- pre-commit verification
+- PR body structure
+- CodeRabbit / AI review triage
+- bilingual review replies
+- preview branch sync (`sandbox`)
+- handover after review
+
+Rules:
+- Do not blindly apply AI review comments. Classify them into `apply / reject / defer`.
+- Security, data integrity, RLS/auth, form serialization, and analytics correctness come before style/refactor comments.
+- If PR review comments are answered by the agent, replies must be written in both Korean and English.
+- If preview depends on `sandbox`, do not say preview is current unless `sandbox` has been merged/pushed after the latest feature fixes.
+
 ---
 
 ## ⚠️ Critical Development Guidelines
@@ -85,6 +105,7 @@ When starting work, treat these as the fastest reliable context sources:
 - **Strict Mode**: The project enforces `strict: true`. Avoid `any` and provide explicit types wherever possible. Do not use `@ts-ignore`.
 - **Path Aliases**: Use the `@/*` alias for imports from the `src` directory (e.g., `import { createClient } from '@/lib/supabase/server'`).
 - **Pre-commit Verification**: Before committing, run `npm run typecheck`. This repo also includes `.githooks/pre-commit` to block commits when TypeScript/Next signatures (e.g. `revalidateTag`) are invalid.
+- **Review Fix Verification**: After applying PR review comments that touch server actions, forms, URL handling, auth, or analytics, rerun `npm run typecheck` and the smallest relevant test set before committing.
 
 ### 3. Imports
 - Follow the standard set by `eslint-config-next`. While not explicitly defined, a good practice is:
@@ -757,3 +778,11 @@ UPDATE profiles SET role = 'superuser' WHERE email = 'your-email@example.com';
   - Updated public Lounge cards/detail components to show region text and embed compact maps in detail views
   - Updated `.agent/implementation/premium-showcase-hub.md` with the new SQL dependency and location scope
 - **Next Steps**: Apply `sql/v35_lounge_location_maps.sql`, then tune public location UX density and consider nearby/location-based filtering.
+### [2026-03-19] Standardize AI PR Review Loop
+- **Summary**: Added a canonical PR review workflow so future agents handle implementation, verification, CodeRabbit triage, bilingual replies, and sandbox preview sync in a consistent way.
+- **Changes**:
+  - Added `.agent/workflows/pr_review_loop.md`
+  - Updated `AGENTS.md` with the standard PR flow and review-fix verification rule
+  - Updated `.agent/skills/powerplay-developer-guide/SKILL.md` to require the PR review workflow when PRs are active
+  - Updated `.agent/workflows/agent_handover.md` so open PR review state is preserved across sessions
+- **Next Steps**: Use the PR review loop for all non-trivial feature branches and record PR number / applied-vs-rejected AI comments in handovers whenever review is active.
