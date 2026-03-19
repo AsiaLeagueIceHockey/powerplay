@@ -295,9 +295,6 @@ export function LoungeBusinessDetail({
             <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
               {locale === "ko" ? "비슷한 다른 선택지" : "Other relevant options"}
             </h2>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">
-              {locale === "ko" ? "지금 찾는 니즈에 맞는 다른 선택지도 함께 볼 수 있습니다." : "Explore other options that may fit the same need."}
-            </p>
           </div>
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {relatedBusinesses.map((item) => (

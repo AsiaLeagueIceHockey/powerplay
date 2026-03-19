@@ -46,7 +46,7 @@ export function LoungeAdminDashboard({
     ];
 
     if (isSuperUser) {
-      base.push({ id: "operations" as const, label: locale === "ko" ? "운영" : "Operations" });
+      base.push({ id: "operations" as const, label: locale === "ko" ? "추천 관리" : "Featured" });
     }
 
     return base;
