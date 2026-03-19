@@ -188,7 +188,7 @@ export function LoungePageClient({ businesses, events, locale, source }: LoungeP
           <DateFilter selectedDate={selectedDate} onSelect={setSelectedDate} tone="ice-gold" />
 
           {viewMode === "calendar" ? (
-            <LoungeCalendarView events={events} locale={locale} onDateSelect={setSelectedDate} />
+            <LoungeCalendarView events={events} locale={locale} onDateSelect={setSelectedDate} selectedDate={selectedDate} />
           ) : filteredEvents.length === 0 ? (
             <div className="rounded-xl border border-dashed border-zinc-300 p-8 text-center text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
               {locale === "ko" ? "선택한 날짜에 등록된 일정이 없습니다." : "No events for the selected date."}

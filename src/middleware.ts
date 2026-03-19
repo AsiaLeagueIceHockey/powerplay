@@ -7,17 +7,7 @@ const intlMiddleware = createMiddleware(routing);
 
 export async function middleware(request: NextRequest) {
   if (request.method === "OPTIONS") {
-    const origin = request.headers.get("origin") ?? "*";
-
-    return new NextResponse(null, {
-      status: 204,
-      headers: {
-        "Access-Control-Allow-Origin": origin,
-        "Access-Control-Allow-Methods": "GET,HEAD,POST,PUT,PATCH,DELETE,OPTIONS",
-        "Access-Control-Allow-Headers": request.headers.get("access-control-request-headers") ?? "*",
-        Vary: "Origin, Access-Control-Request-Headers",
-      },
-    });
+    return new NextResponse(null, { status: 204 });
   }
 
   // First, update Supabase session and get user data

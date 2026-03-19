@@ -86,8 +86,7 @@ export function LoungeFeatureManager({
 
                 <div className="grid gap-3 md:grid-cols-[auto_110px_auto] md:items-end">
                   <label className="flex items-center gap-2 text-sm font-medium text-zinc-200">
-                    <input type="hidden" name="is_featured" value="false" />
-                    <input type="checkbox" name="is_featured" value="true" defaultChecked={business.is_featured} />
+                    <input type="checkbox" name="is_featured" defaultChecked={business.is_featured} />
                     {locale === "ko" ? "추천으로 노출" : "Mark as featured"}
                   </label>
                   <label className="space-y-2 text-sm">

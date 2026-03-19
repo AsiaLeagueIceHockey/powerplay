@@ -19,10 +19,20 @@ export function LoungeImpressionTracker({
   source,
 }: LoungeImpressionTrackerProps) {
   useEffect(() => {
-    const key = `lounge-impression:${entityType}:${businessId}:${eventId || "none"}:${source || "direct"}`;
+    const key = `lounge-impression:${locale}:${entityType}:${businessId}:${eventId || "none"}:${source || "direct"}`;
     if (sessionStorage.getItem(key)) return;
-    sessionStorage.setItem(key, "1");
-    void trackLoungeImpression(entityType, businessId, eventId, locale, source);
+    sessionStorage.setItem(key, "pending");
+    void trackLoungeImpression(entityType, businessId, eventId, locale, source)
+      .then((result) => {
+        if (result.success) {
+          sessionStorage.setItem(key, "1");
+          return;
+        }
+        sessionStorage.removeItem(key);
+      })
+      .catch(() => {
+        sessionStorage.removeItem(key);
+      });
   }, [businessId, entityType, eventId, locale, source]);
 
   return null;

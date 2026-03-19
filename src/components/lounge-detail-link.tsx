@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { ReactNode, useTransition } from "react";
+import { ReactNode } from "react";
 import { trackLoungeClick } from "@/app/actions/lounge";
 
 interface LoungeDetailLinkProps {
@@ -26,20 +26,16 @@ export function LoungeDetailLink({
   children,
 }: LoungeDetailLinkProps) {
   const router = useRouter();
-  const [isPending, startTransition] = useTransition();
 
   const handleClick = () => {
-    startTransition(async () => {
-      await trackLoungeClick(entityType, businessId, "detail", eventId, locale, source);
-      router.push(href);
-    });
+    void trackLoungeClick(entityType, businessId, "detail", eventId, locale, source).catch(() => {});
+    router.push(href);
   };
 
   return (
     <button
       type="button"
       onClick={handleClick}
-      disabled={isPending}
       className={className}
     >
       {children}
