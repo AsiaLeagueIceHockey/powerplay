@@ -15,7 +15,6 @@ import { loungeIceGoldTheme } from "./lounge-theme";
 interface LoungeBusinessDetailProps {
   business: LoungeBusiness;
   events: LoungeEvent[];
-  relatedBusinesses: LoungeBusiness[];
   locale: string;
   source?: string;
   selectedEventId?: string;
@@ -91,7 +90,7 @@ export function LoungeBusinessDetail({
       window.clearTimeout(scrollTimer);
       window.clearTimeout(clearTimer);
     };
-  }, [selectedDate, selectedEventId, viewMode]);
+  }, [selectedEventId, viewMode]);
 
   return (
     <div className="space-y-8">
