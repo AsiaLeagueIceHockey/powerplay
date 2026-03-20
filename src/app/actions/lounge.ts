@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { sanitizeLoungeExternalUrl } from "@/lib/lounge-link-utils";
+import { logAndNotify } from "@/lib/audit";
 import { getAdminInfo } from "./admin-check";
 import { getAdmins } from "./admin";
 import { checkIsSuperUser } from "./superuser";
@@ -254,6 +255,18 @@ function extractJoinedSlug(
     | undefined
 ) {
   return Array.isArray(joined) ? joined[0]?.slug ?? null : joined?.slug ?? null;
+}
+
+function formatLoungeDateTimeKst(input: string) {
+  return new Intl.DateTimeFormat("ko-KR", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+    timeZone: "Asia/Seoul",
+  }).format(new Date(input));
 }
 
 function buildLoungeEventPayload(
@@ -705,7 +718,7 @@ export async function upsertLoungeBusiness(formData: FormData) {
 
   const { data: existing } = await supabase
     .from("lounge_businesses")
-    .select("id, slug, display_priority")
+    .select("id, slug, name, is_published, display_priority")
     .eq("owner_user_id", adminInfo.userId)
     .maybeSingle();
 
@@ -791,6 +804,33 @@ export async function upsertLoungeBusiness(formData: FormData) {
     return { success: false, error: result.error.message };
   }
 
+  const isCreate = !existing;
+  const publishChanged = existing ? existing.is_published !== payload.is_published : payload.is_published;
+  const action = isCreate
+    ? "LOUNGE_BUSINESS_CREATE"
+    : publishChanged
+      ? "LOUNGE_BUSINESS_PUBLISH"
+      : "LOUNGE_BUSINESS_UPDATE";
+
+  await logAndNotify({
+    userId: adminInfo.userId,
+    action,
+    description: isCreate
+      ? `라운지 비즈니스 '${payload.name}'를 등록했습니다.`
+      : publishChanged
+        ? `라운지 비즈니스 '${payload.name}' 공개 상태를 ${payload.is_published ? "공개" : "비공개"}로 변경했습니다.`
+        : `라운지 비즈니스 '${payload.name}' 정보를 수정했습니다.`,
+    metadata: {
+      businessId: existing?.id ?? null,
+      businessName: payload.name,
+      businessSlug: slug,
+      category: payload.category,
+      isPublished: payload.is_published,
+    },
+    skipPush: !(isCreate || publishChanged),
+    url: `/ko/admin/lounge`,
+  });
+
   revalidateLoungePaths(existing?.slug ?? null);
   revalidateLoungePaths(slug);
   return { success: true };
@@ -811,7 +851,7 @@ export async function upsertLoungeEvent(formData: FormData) {
 
   const { data: business } = await supabase
     .from("lounge_businesses")
-    .select("id, slug")
+    .select("id, slug, name")
     .eq("owner_user_id", adminInfo.userId)
     .maybeSingle();
 
@@ -830,7 +870,7 @@ export async function upsertLoungeEvent(formData: FormData) {
   const existingEvent = eventId
     ? await supabase
         .from("lounge_events")
-        .select("id, display_priority")
+        .select("id, title, start_time, is_published, display_priority")
         .eq("id", eventId)
         .eq("business_id", business.id)
         .maybeSingle()
@@ -858,6 +898,27 @@ export async function upsertLoungeEvent(formData: FormData) {
     return { success: false, error: error.message };
   }
 
+  const isCreate = !eventId;
+  await logAndNotify({
+    userId: adminInfo.userId,
+    action: isCreate ? "LOUNGE_EVENT_CREATE" : "LOUNGE_EVENT_UPDATE",
+    description: isCreate
+      ? `라운지 일정 '${payload.title}'를 등록했습니다. (${business.name}, ${formatLoungeDateTimeKst(payload.start_time)})`
+      : `라운지 일정 '${payload.title}'를 수정했습니다. (${business.name}, ${formatLoungeDateTimeKst(payload.start_time)})`,
+    metadata: {
+      businessId: business.id,
+      businessName: business.name,
+      businessSlug: business.slug,
+      eventId: eventId || null,
+      eventTitle: payload.title,
+      category: payload.category,
+      isPublished: payload.is_published,
+      startTime: payload.start_time,
+    },
+    skipPush: !isCreate,
+    url: `/ko/admin/lounge`,
+  });
+
   revalidateLoungePaths(business.slug);
   return { success: true };
 }
@@ -877,7 +938,7 @@ export async function createBulkLoungeEvents(formData: FormData) {
 
   const { data: business } = await supabase
     .from("lounge_businesses")
-    .select("id, slug")
+    .select("id, slug, name")
     .eq("owner_user_id", adminInfo.userId)
     .maybeSingle();
 
@@ -945,6 +1006,23 @@ export async function createBulkLoungeEvents(formData: FormData) {
     return { success: false, error: error.message };
   }
 
+  await logAndNotify({
+    userId: adminInfo.userId,
+    action: "LOUNGE_EVENT_BULK_CREATE",
+    description: `라운지 반복 일정 ${rows.length}건을 등록했습니다. (${business.name}, ${selectedDates[0]} ~ ${selectedDates[selectedDates.length - 1]})`,
+    metadata: {
+      businessId: business.id,
+      businessName: business.name,
+      businessSlug: business.slug,
+      count: rows.length,
+      title,
+      startDate: selectedDates[0],
+      endDate: selectedDates[selectedDates.length - 1],
+      category: rows[0]?.category ?? null,
+    },
+    url: `/ko/admin/lounge`,
+  });
+
   revalidateLoungePaths(business.slug);
   return { success: true, count: rows.length };
 }
@@ -959,7 +1037,7 @@ export async function deleteLoungeEvent(eventId: string) {
 
   const { data: existingEvent } = await supabase
     .from("lounge_events")
-    .select("id, business_id, lounge_businesses!inner(owner_user_id, slug)")
+    .select("id, title, start_time, business_id, lounge_businesses!inner(owner_user_id, slug, name)")
     .eq("id", eventId)
     .eq("lounge_businesses.owner_user_id", adminInfo.userId)
     .maybeSingle();
@@ -974,9 +1052,32 @@ export async function deleteLoungeEvent(eventId: string) {
   }
 
   const businessSlug = (existingEvent as {
-    lounge_businesses?: { slug?: string | null }[] | { slug?: string | null } | null;
+    lounge_businesses?:
+      | { slug?: string | null; name?: string | null }[]
+      | { slug?: string | null; name?: string | null }
+      | null;
   }).lounge_businesses;
   const resolvedSlug = extractJoinedSlug(businessSlug);
+  const resolvedBusinessName = Array.isArray(businessSlug)
+    ? businessSlug[0]?.name ?? null
+    : businessSlug?.name ?? null;
+
+  await logAndNotify({
+    userId: adminInfo.userId,
+    action: "LOUNGE_EVENT_DELETE",
+    description: `라운지 일정 '${(existingEvent as { title?: string | null }).title ?? "이름 없는 일정"}'를 삭제했습니다.${resolvedBusinessName ? ` (${resolvedBusinessName})` : ""}${(existingEvent as { start_time?: string | null }).start_time ? ` (${formatLoungeDateTimeKst((existingEvent as { start_time?: string | null }).start_time as string)})` : ""}`,
+    metadata: {
+      businessId: (existingEvent as { business_id: string }).business_id,
+      businessName: resolvedBusinessName,
+      businessSlug: resolvedSlug,
+      eventId,
+      eventTitle: (existingEvent as { title?: string | null }).title ?? null,
+      startTime: (existingEvent as { start_time?: string | null }).start_time ?? null,
+    },
+    skipPush: true,
+    url: `/ko/admin/lounge`,
+  });
+
   revalidateLoungePaths(resolvedSlug ?? null);
   return { success: true };
 }
@@ -1037,6 +1138,25 @@ export async function upsertLoungeMembership(formData: FormData) {
   if (error) {
     return { success: false, error: error.message };
   }
+
+  await logAndNotify({
+    userId: user?.id ?? userId,
+    action: "LOUNGE_MEMBERSHIP_SAVE",
+    description: membershipId
+      ? `라운지 구독 계약을 수정했습니다. (${startsAt} ~ ${endsAt})`
+      : `라운지 구독 계약을 등록했습니다. (${startsAt} ~ ${endsAt})`,
+    metadata: {
+      membershipId: membershipId || null,
+      targetUserId: userId,
+      startsAt,
+      endsAt,
+      priceKrw: payload.price_krw,
+      inquiryChannel: inquiryChannel || null,
+      status: payload.status,
+    },
+    skipPush: true,
+    url: `/ko/admin/lounge-management`,
+  });
 
   revalidatePath("/ko/admin/lounge");
   revalidatePath("/en/admin/lounge");
@@ -1100,6 +1220,10 @@ export async function updateLoungeBusinessFeature(formData: FormData) {
     return { success: false, error: "Business is required" };
   }
 
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   const isFeatured = formData.has("is_featured");
   const featuredOrderRaw = (formData.get("featured_order") as string) || "0";
   const featuredOrder = Math.max(0, Number(featuredOrderRaw) || 0);
@@ -1118,9 +1242,26 @@ export async function updateLoungeBusinessFeature(formData: FormData) {
 
   const { data: business } = await supabase
     .from("lounge_businesses")
-    .select("slug")
+    .select("slug, name, owner_user_id")
     .eq("id", businessId)
     .maybeSingle();
+
+  await logAndNotify({
+    userId: user?.id ?? business?.owner_user_id ?? businessId,
+    action: "LOUNGE_FEATURE_UPDATE",
+    description: business?.name
+      ? `추천 비즈니스 노출 설정을 변경했습니다. (${business.name})`
+      : "추천 비즈니스 노출 설정을 변경했습니다.",
+    metadata: {
+      businessId,
+      businessName: business?.name ?? null,
+      businessSlug: business?.slug ?? null,
+      isFeatured,
+      featuredOrder: isFeatured ? featuredOrder : 0,
+    },
+    skipPush: true,
+    url: `/ko/admin/lounge-management`,
+  });
 
   revalidateLoungePaths(business?.slug ?? null);
   return { success: true };
