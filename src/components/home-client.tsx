@@ -302,25 +302,6 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
                   <button
                     onClick={() => {
                       const newFilters = new Set(activeFilters);
-                      if (newFilters.has("rental_available")) {
-                        newFilters.delete("rental_available");
-                      } else {
-                        newFilters.add("rental_available");
-                      }
-                      setActiveFilters(newFilters);
-                    }}
-                    className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors whitespace-nowrap ${
-                      activeFilters.has("rental_available")
-                        ? "bg-blue-600 text-white border-blue-600 shadow-sm"
-                        : "bg-white text-zinc-600 border-zinc-200 hover:bg-zinc-50 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700 dark:hover:bg-zinc-700"
-                    }`}
-                  >
-                    {t("filter.rentalAvailable")}
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      const newFilters = new Set(activeFilters);
                       if (newFilters.has("goalie_spots")) {
                         newFilters.delete("goalie_spots");
                       } else {
@@ -335,6 +316,24 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
                     }`}
                   >
                     {t("filter.goalieSpots")}
+                  </button>
+                  <button
+                    onClick={() => {
+                      const newFilters = new Set(activeFilters);
+                      if (newFilters.has("rental_available")) {
+                        newFilters.delete("rental_available");
+                      } else {
+                        newFilters.add("rental_available");
+                      }
+                      setActiveFilters(newFilters);
+                    }}
+                    className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors whitespace-nowrap ${
+                      activeFilters.has("rental_available")
+                        ? "bg-blue-600 text-white border-blue-600 shadow-sm"
+                        : "bg-white text-zinc-600 border-zinc-200 hover:bg-zinc-50 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700 dark:hover:bg-zinc-700"
+                    }`}
+                  >
+                    {t("filter.rentalAvailable")}
                   </button>
                   <button
                     onClick={() => {
@@ -521,4 +520,3 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
     </div>
   );
 }
-
