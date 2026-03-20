@@ -255,6 +255,10 @@ function buildLoungeEventPayload(
 ): LoungeEventPayload {
   const priceRaw = (formData.get("price_krw") as string) || "";
   const maxRaw = (formData.get("max_participants") as string) || "";
+  const locationLatRaw = ((formData.get("location_lat") as string) || "").trim();
+  const locationLngRaw = ((formData.get("location_lng") as string) || "").trim();
+  const parsedLat = locationLatRaw ? Number(locationLatRaw) : null;
+  const parsedLng = locationLngRaw ? Number(locationLngRaw) : null;
 
   return {
     business_id: businessId,
@@ -267,8 +271,8 @@ function buildLoungeEventPayload(
     location: ((formData.get("location") as string) || "").trim() || null,
     location_address: ((formData.get("location_address") as string) || "").trim() || null,
     location_map_url: ((formData.get("location_map_url") as string) || "").trim() || null,
-    location_lat: ((formData.get("location_lat") as string) || "").trim() ? Number(formData.get("location_lat")) : null,
-    location_lng: ((formData.get("location_lng") as string) || "").trim() ? Number(formData.get("location_lng")) : null,
+    location_lat: parsedLat !== null && Number.isFinite(parsedLat) ? parsedLat : null,
+    location_lng: parsedLng !== null && Number.isFinite(parsedLng) ? parsedLng : null,
     price_krw: priceRaw ? Number(priceRaw.replace(/,/g, "")) : null,
     max_participants: maxRaw ? Number(maxRaw) : null,
     display_priority: displayPriority,
