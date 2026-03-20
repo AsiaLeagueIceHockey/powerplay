@@ -856,7 +856,7 @@ export interface AuditLog {
   user_id: string;
   action_type: string;
   description: string;
-  metadata: any;
+  metadata: Record<string, unknown> | null;
   user: {
     id: string;
     email: string;

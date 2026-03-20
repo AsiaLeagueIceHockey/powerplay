@@ -10,16 +10,18 @@ export default function AuditLogsPage() {
   const [loading, setLoading] = useState(true);
   const format = useFormatter();
 
-  useEffect(() => {
-    fetchLogs();
-  }, []);
-
-  const fetchLogs = async () => {
+  async function fetchLogs() {
     setLoading(true);
     const data = await getAuditLogs(100);
     setLogs(data);
     setLoading(false);
-  };
+  }
+
+  useEffect(() => {
+    void (async () => {
+      await fetchLogs();
+    })();
+  }, []);
 
   return (
     <div className="space-y-6 text-zinc-100">
@@ -104,10 +106,10 @@ export default function AuditLogsPage() {
   );
 }
 
-function MetadataRenderer({ metadata }: { metadata: any }) {
+function MetadataRenderer({ metadata }: { metadata: Record<string, unknown> | null }) {
   if (!metadata) return <span>null</span>;
 
-  const renderValue = (key: string, value: any) => {
+  const renderValue = (key: string, value: unknown) => {
     if (typeof value === "string") {
       if (key === "matchId" || key === "match_id") {
         return (
@@ -116,7 +118,7 @@ function MetadataRenderer({ metadata }: { metadata: any }) {
             target="_blank"
             className="text-blue-400 underline hover:text-blue-300"
           >
-            "{value}"
+            &quot;{value}&quot;
           </Link>
         );
       }
@@ -127,11 +129,22 @@ function MetadataRenderer({ metadata }: { metadata: any }) {
             target="_blank"
             className="text-blue-400 underline hover:text-blue-300"
           >
-            "{value}"
+            &quot;{value}&quot;
           </Link>
         );
       }
-      return `"${value}"`;
+      if (key === "businessSlug" || key === "loungeBusinessSlug") {
+        return (
+          <Link
+            href={`/lounge/${value}`}
+            target="_blank"
+            className="text-blue-400 underline hover:text-blue-300"
+          >
+            &quot;{value}&quot;
+          </Link>
+        );
+      }
+      return <span>&quot;{value}&quot;</span>;
     }
 
     if (Array.isArray(value) && (key === "matchIds" || key === "match_ids")) {
@@ -145,7 +158,7 @@ function MetadataRenderer({ metadata }: { metadata: any }) {
                 target="_blank"
                 className="text-blue-400 underline hover:text-blue-300"
               >
-                "{id}"
+                &quot;{id}&quot;
               </Link>
               {index < value.length - 1 ? ", " : ""}
             </span>
@@ -163,7 +176,7 @@ function MetadataRenderer({ metadata }: { metadata: any }) {
       {"{"}
       {Object.entries(metadata).map(([key, value], index, array) => (
         <div key={key} className="pl-4">
-          <span className="text-zinc-400">"{key}"</span>: {renderValue(key, value)}
+          <span className="text-zinc-400">&quot;{key}&quot;</span>: {renderValue(key, value)}
           {index < array.length - 1 ? "," : ""}
         </div>
       ))}
@@ -173,6 +186,7 @@ function MetadataRenderer({ metadata }: { metadata: any }) {
 }
 
 function getActionColor(action: string) {
+  if (action.includes("LOUNGE")) return "bg-amber-500/10 text-amber-400";
   if (action.includes("CREATE")) return "bg-green-500/10 text-green-500";
   if (action.includes("CANCEL")) return "bg-red-500/10 text-red-500";
   if (action.includes("CHARGE")) return "bg-amber-500/10 text-amber-500";
