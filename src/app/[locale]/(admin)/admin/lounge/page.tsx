@@ -23,6 +23,13 @@ function formatKstDate(input: string) {
   return `${year}-${month}-${day}`;
 }
 
+function getApplicationStatusLabel(locale: string, status: "pending" | "contacted" | "converted" | "closed") {
+  if (status === "pending") return locale === "ko" ? "대기 중" : "Pending";
+  if (status === "contacted") return locale === "ko" ? "연락 진행 중" : "Contacted";
+  if (status === "converted") return locale === "ko" ? "구독 등록 완료" : "Converted";
+  return locale === "ko" ? "종료" : "Closed";
+}
+
 export default async function AdminLoungePage({
   params,
 }: {
@@ -98,7 +105,7 @@ export default async function AdminLoungePage({
                       ? "등록된 계약 기간이 아직 시작되지 않았습니다. 시작일이 되면 라운지 비즈니스와 일정 관리 기능을 바로 사용할 수 있습니다."
                       : "Your contract period is registered but has not started yet. Lounge business and schedule management will unlock on the start date."
                     : locale === "ko"
-                      ? "문의 또는 신청 후 확인이 완료되면 운영진이 구독 기간을 등록합니다.\n최초 등록비는 200,000원(첫 달), 월 구독료는 100,000원(둘째 달부터)입니다."
+                      ? "문의 또는 신청 후 확인이 완료되면 운영진이 구독 기간을 등록합니다.\n\n최초 등록비는 200,000원(첫 달), 월 구독료는 100,000원(둘째 달부터)입니다."
                       : "Pricing is fixed at 200,000 KRW for the first month and 100,000 KRW monthly from the second month. After inquiry or application, the team registers your contract period."}
                 </p>
               </div>
@@ -106,6 +113,11 @@ export default async function AdminLoungePage({
                 <div className="space-y-2">
                   <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
                     {locale === "ko" ? "신청하기" : "Apply"}
+                  </p>
+                  <p className="text-sm text-zinc-400">
+                    {latestApplication?.status === "contacted"
+                      ? "운영진이 연락을 시작한 상태입니다. 프로필 연락처를 최신 상태로 유지해주세요."
+                      : "운영진이 신청 내역을 확인하고 등록하신 연락처로 안내드릴 예정입니다."}
                   </p>
                   <form action={submitApplicationAction}>
                     <button
@@ -136,13 +148,6 @@ export default async function AdminLoungePage({
                   </div>
                 </div>
               </div>
-              <p className="text-sm text-zinc-400">
-                {latestApplication?.status === "pending"
-                  ? "운영진이 신청 내역을 확인하고 등록하신 연락처로 안내드릴 예정입니다."
-                  : latestApplication?.status === "contacted"
-                    ? "운영진이 연락을 시작한 상태입니다. 프로필 연락처를 최신 상태로 유지해주세요."
-                    : "카카오톡/인스타로 바로 문의하거나, 멤버십 신청을 남기면 운영진이 직접 연락드립니다."}
-              </p>
               {data.membership && (
                 <p className="text-sm text-zinc-400">
                   {locale === "ko"
@@ -152,7 +157,9 @@ export default async function AdminLoungePage({
               )}
               {latestApplication ? (
                 <p className="text-xs text-zinc-500">
-                  최근 신청 상태: {latestApplication.status}
+                  {locale === "ko"
+                    ? `최근 신청 상태: ${getApplicationStatusLabel(locale, latestApplication.status)}`
+                    : `Latest application status: ${getApplicationStatusLabel(locale, latestApplication.status)}`}
                 </p>
               ) : null}
             </div>
