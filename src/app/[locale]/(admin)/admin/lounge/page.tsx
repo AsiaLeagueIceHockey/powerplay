@@ -98,7 +98,7 @@ export default async function AdminLoungePage({
                       ? "등록된 계약 기간이 아직 시작되지 않았습니다. 시작일이 되면 라운지 비즈니스와 일정 관리 기능을 바로 사용할 수 있습니다."
                       : "Your contract period is registered but has not started yet. Lounge business and schedule management will unlock on the start date."
                     : locale === "ko"
-                      ? "문의 또는 신청 후 확인이 완료되면 운영진이 구독 기간을 등록합니다.\n\n최초 등록비는 200,000원(첫 달), 월 구독료는 100,000원(둘째 달부터)입니다."
+                      ? "문의 또는 신청 후 확인이 완료되면 운영진이 구독 기간을 등록합니다.\n최초 등록비는 200,000원(첫 달), 월 구독료는 100,000원(둘째 달부터)입니다."
                       : "Pricing is fixed at 200,000 KRW for the first month and 100,000 KRW monthly from the second month. After inquiry or application, the team registers your contract period."}
                 </p>
               </div>
