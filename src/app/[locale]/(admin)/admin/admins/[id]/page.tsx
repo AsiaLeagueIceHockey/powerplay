@@ -28,7 +28,7 @@ export default async function AdminDetailPage({
           training_center: "훈련장 / 슈팅센터",
           tournament: "대회",
           brand: "브랜드",
-          service: "퍼포먼스 솔루션",
+          service: "치료/재활",
           other: "기타",
         }[loungeBusiness.category]
       : null;
