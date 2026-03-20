@@ -219,7 +219,7 @@ export function LoungeBusinessDetail({
             <div className="mt-4">
               <LoungeLocationMap
                 name={business.name}
-                address={business.address || business.name}
+                address={business.address || ""}
                 mapUrl={business.map_url}
                 lat={business.lat}
                 lng={business.lng}
@@ -240,6 +240,7 @@ export function LoungeBusinessDetail({
             <button
               type="button"
               onClick={() => setViewMode("list")}
+              aria-pressed={viewMode === "list"}
               className={`flex items-center gap-2 rounded-md px-4 py-2 text-sm font-bold transition-colors ${viewMode === "list" ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-700 dark:text-white" : "text-zinc-500 dark:text-zinc-400"}`}
             >
               <List className="h-4 w-4" />
@@ -248,6 +249,7 @@ export function LoungeBusinessDetail({
             <button
               type="button"
               onClick={() => setViewMode("calendar")}
+              aria-pressed={viewMode === "calendar"}
               className={`flex items-center gap-2 rounded-md px-4 py-2 text-sm font-bold transition-colors ${viewMode === "calendar" ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-700 dark:text-white" : "text-zinc-500 dark:text-zinc-400"}`}
             >
               <CalendarDays className="h-4 w-4" />
