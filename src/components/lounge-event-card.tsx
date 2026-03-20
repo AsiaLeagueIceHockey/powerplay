@@ -7,7 +7,7 @@ import { LoungeContactMenu } from "./lounge-contact-menu";
 import { LoungeDetailLink } from "./lounge-detail-link";
 import { LoungeImpressionTracker } from "./lounge-impression-tracker";
 import { LoungeLocationMap } from "./lounge-location-map";
-import { loungeIceGoldTheme } from "./lounge-theme";
+import { getLoungeEventCategoryTheme, loungeIceGoldTheme } from "./lounge-theme";
 
 export function LoungeEventCard({
   event,
@@ -59,6 +59,7 @@ export function LoungeEventCard({
     tournament: locale === "ko" ? "대회 일정" : "Tournament",
     promotion: locale === "ko" ? "프로모션" : "Promotion",
   }[event.category];
+  const categoryTheme = getLoungeEventCategoryTheme(event.category);
   const regionLabel = extractRegion(event.location_address ?? event.location ?? undefined);
   const compactLocationLabel =
     regionLabel ||
@@ -88,11 +89,11 @@ export function LoungeEventCard({
       className={`relative overflow-hidden rounded-xl border bg-white p-4 shadow-sm transition-all duration-300 dark:bg-zinc-900 ${
         isHighlighted
           ? loungeIceGoldTheme.highlightState
-          : `border-zinc-200 ${loungeIceGoldTheme.hoverBorder} hover:shadow-lg dark:border-zinc-800`
+          : `border-zinc-200 ${categoryTheme.hoverBorder} hover:shadow-lg dark:border-zinc-800`
       }`}
     >
       <LoungeImpressionTracker entityType="event" businessId={event.business_id} eventId={event.id} locale={locale} source={source} />
-      <div className={`absolute inset-x-0 top-0 h-1 w-full ${loungeIceGoldTheme.accentLine}`} />
+      <div className={`absolute inset-x-0 top-0 h-1 w-full ${categoryTheme.accentLine}`} />
       <LoungeDetailLink
         entityType="event"
         businessId={event.business_id}
@@ -106,11 +107,11 @@ export function LoungeEventCard({
           <div className="flex items-center gap-1.5 text-[13px] font-bold">
             <span className="whitespace-nowrap text-zinc-400 dark:text-zinc-500">{formattedDate}</span>
             <span className="font-normal text-zinc-200 dark:text-zinc-700">|</span>
-            <span className={`whitespace-nowrap ${loungeIceGoldTheme.timeText}`}>{formattedTime}</span>
+            <span className={`whitespace-nowrap ${categoryTheme.timeText}`}>{formattedTime}</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span
-              className={`rounded-lg border px-1.5 py-0.5 text-[10px] font-bold ${loungeIceGoldTheme.categoryChip}`}
+              className={`rounded-lg border px-1.5 py-0.5 text-[10px] font-bold ${categoryTheme.categoryChip}`}
             >
               {categoryLabel}
             </span>

@@ -11,7 +11,7 @@ import { LoungeEventCard } from "./lounge-event-card";
 import { LoungeImpressionTracker } from "./lounge-impression-tracker";
 import { LoungeLocationMap } from "./lounge-location-map";
 import { LoungeShareButton } from "./lounge-share-button";
-import { loungeIceGoldTheme } from "./lounge-theme";
+import { getLoungeBusinessCategoryTheme, loungeIceGoldTheme } from "./lounge-theme";
 
 interface LoungeBusinessDetailProps {
   business: LoungeBusiness;
@@ -56,6 +56,7 @@ export function LoungeBusinessDetail({
     service: locale === "ko" ? "퍼포먼스 솔루션" : "Performance Solution",
     other: locale === "ko" ? "기타" : "Other",
   }[business.category];
+  const categoryTheme = getLoungeBusinessCategoryTheme(business.category);
 
   const [selectedDate, setSelectedDate] = useState<string | null>(initialDate ?? null);
   const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
@@ -133,7 +134,7 @@ export function LoungeBusinessDetail({
                 ) : null}
                 <div>
                   <span
-                    className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-bold ${loungeIceGoldTheme.badge}`}
+                    className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-bold ${categoryTheme.badge}`}
                   >
                     <Trophy className="h-3 w-3" />
                     {categoryLabel}
@@ -154,7 +155,7 @@ export function LoungeBusinessDetail({
 
           <div className="flex flex-wrap gap-2 text-sm text-zinc-600 dark:text-zinc-300">
             <span
-              className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 font-semibold ${loungeIceGoldTheme.subtleBadge}`}
+              className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 font-semibold ${categoryTheme.subtleBadge}`}
             >
               <CalendarDays className="h-4 w-4" />
               {locale === "ko"
