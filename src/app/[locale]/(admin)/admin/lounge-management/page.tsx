@@ -22,6 +22,7 @@ export default async function LoungeManagementPage({
       <LoungeSuperuserManagementDashboard
         locale={locale}
         memberships={data.memberships ?? []}
+        applications={data.applications ?? []}
         admins={data.admins ?? []}
         businesses={data.businesses ?? []}
       />

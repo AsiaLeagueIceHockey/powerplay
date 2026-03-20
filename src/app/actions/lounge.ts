@@ -54,6 +54,34 @@ export interface LoungeManagedMembership extends LoungeMembership {
   } | null;
 }
 
+export interface LoungeMembershipApplication {
+  id: string;
+  user_id: string;
+  status: "pending" | "contacted" | "converted" | "closed";
+  note: string | null;
+  contact_note: string | null;
+  handled_by: string | null;
+  handled_at: string | null;
+  created_at: string;
+  updated_at: string;
+  user?: {
+    id: string;
+    email: string | null;
+    full_name: string | null;
+    phone: string | null;
+  } | null;
+}
+
+export interface LoungeManagedApplication extends LoungeMembershipApplication {
+  business?: {
+    id: string;
+    name: string;
+    slug: string;
+    category: LoungeBusinessCategory;
+    is_published: boolean;
+  } | null;
+}
+
 export interface LoungeEvent {
   id: string;
   business_id: string;
@@ -463,6 +491,19 @@ async function getLatestMembership(userId: string) {
   return (data as LoungeMembership | null) ?? null;
 }
 
+async function getLatestMembershipApplication(userId: string) {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("lounge_membership_applications")
+    .select("*")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  return (data as LoungeMembershipApplication | null) ?? null;
+}
+
 async function getActivePublishedBusinesses(supabase: SupabaseServerClient) {
   const { data: businesses } = await supabase
     .from("lounge_businesses")
@@ -509,8 +550,9 @@ export async function getLoungeAdminPageData() {
     };
   }
 
-  const [membership, business, isSuperUser] = await Promise.all([
+  const [membership, latestApplication, business, isSuperUser] = await Promise.all([
     getLatestMembership(adminInfo.userId),
+    getLatestMembershipApplication(adminInfo.userId),
     supabase
       .from("lounge_businesses")
       .select("*")
@@ -555,6 +597,7 @@ export async function getLoungeAdminPageData() {
     ok: true,
     reason: null,
     membership,
+    latestApplication,
     membershipStatus,
     business: businessData,
     events: (events.data as LoungeEvent[]) ?? [],
@@ -571,6 +614,7 @@ export async function getLoungeManagementPageData(): Promise<{
   ok: boolean;
   reason?: "unauthorized";
   memberships?: LoungeManagedMembership[];
+  applications?: LoungeManagedApplication[];
   admins?: Awaited<ReturnType<typeof getAdmins>>;
   businesses?: LoungeBusiness[];
 }> {
@@ -581,9 +625,16 @@ export async function getLoungeManagementPageData(): Promise<{
     return { ok: false, reason: "unauthorized" };
   }
 
-  const [membershipsResult, businessesResult, admins] = await Promise.all([
+  const [membershipsResult, applicationsResult, businessesResult, admins] = await Promise.all([
     supabase
       .from("lounge_memberships")
+      .select(`
+        *,
+        user:user_id(id, email, full_name, phone)
+      `)
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("lounge_membership_applications")
       .select(`
         *,
         user:user_id(id, email, full_name, phone)
@@ -608,9 +659,23 @@ export async function getLoungeManagementPageData(): Promise<{
     business: businessByOwner.get(membership.user_id) ?? null,
   }));
 
+  const applications = (((applicationsResult.data as LoungeMembershipApplication[] | null) ?? [])).map((application) => ({
+    ...application,
+    business: businessByOwner.get(application.user_id)
+      ? {
+          id: businessByOwner.get(application.user_id)!.id,
+          name: businessByOwner.get(application.user_id)!.name,
+          slug: businessByOwner.get(application.user_id)!.slug,
+          category: businessByOwner.get(application.user_id)!.category,
+          is_published: businessByOwner.get(application.user_id)!.is_published,
+        }
+      : null,
+  }));
+
   return {
     ok: true,
     memberships,
+    applications,
     admins,
     businesses: (businessesResult.data as LoungeBusiness[] | null) ?? [],
   };
@@ -1139,6 +1204,17 @@ export async function upsertLoungeMembership(formData: FormData) {
     return { success: false, error: error.message };
   }
 
+  await supabase
+    .from("lounge_membership_applications")
+    .update({
+      status: "converted",
+      handled_by: user?.id ?? null,
+      handled_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    })
+    .eq("user_id", userId)
+    .in("status", ["pending", "contacted"]);
+
   await logAndNotify({
     userId: user?.id ?? userId,
     action: "LOUNGE_MEMBERSHIP_SAVE",
@@ -1156,6 +1232,127 @@ export async function upsertLoungeMembership(formData: FormData) {
     },
     skipPush: true,
     url: `/ko/admin/lounge-management`,
+  });
+
+  revalidatePath("/ko/admin/lounge");
+  revalidatePath("/en/admin/lounge");
+  revalidatePath("/ko/admin/lounge-management");
+  revalidatePath("/en/admin/lounge-management");
+  return { success: true };
+}
+
+export async function submitLoungeMembershipApplication(formData: FormData) {
+  const supabase = await createClient();
+  const adminInfo = await getAdminInfo();
+
+  if (!adminInfo.isAdmin || !adminInfo.userId) {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  const membership = await getLatestMembership(adminInfo.userId);
+  if (isMembershipActive(membership)) {
+    return { success: false, error: "Already active" };
+  }
+
+  const existingPending = await supabase
+    .from("lounge_membership_applications")
+    .select("id, status")
+    .eq("user_id", adminInfo.userId)
+    .in("status", ["pending", "contacted"])
+    .maybeSingle();
+
+  if (existingPending.data) {
+    return { success: false, error: "이미 처리 중인 멤버십 신청이 있습니다." };
+  }
+
+  const note = ((formData.get("note") as string) || "").trim() || null;
+
+  const { error } = await supabase.from("lounge_membership_applications").insert({
+    user_id: adminInfo.userId,
+    note,
+    status: "pending",
+  });
+
+  if (error) {
+    return { success: false, error: error.message };
+  }
+
+  await logAndNotify({
+    userId: adminInfo.userId,
+    action: "LOUNGE_APPLICATION_CREATE",
+    description: "라운지 프리미엄 멤버십을 신청했습니다.",
+    metadata: {
+      note,
+      applicationStatus: "pending",
+    },
+    url: "/ko/admin/lounge-management",
+  });
+
+  revalidatePath("/ko/admin/lounge");
+  revalidatePath("/en/admin/lounge");
+  revalidatePath("/ko/admin/lounge-management");
+  revalidatePath("/en/admin/lounge-management");
+  return { success: true };
+}
+
+export async function updateLoungeMembershipApplicationStatus(formData: FormData) {
+  const supabase = await createClient();
+  const isSuperUser = await checkIsSuperUser();
+
+  if (!isSuperUser) {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  const applicationId = ((formData.get("application_id") as string) || "").trim();
+  const status = ((formData.get("status") as string) || "").trim() as LoungeMembershipApplication["status"];
+  const contactNote = ((formData.get("contact_note") as string) || "").trim() || null;
+
+  if (!applicationId || !["pending", "contacted", "converted", "closed"].includes(status)) {
+    return { success: false, error: "Invalid application update" };
+  }
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const { data: application, error: applicationError } = await supabase
+    .from("lounge_membership_applications")
+    .select("id, user_id, status")
+    .eq("id", applicationId)
+    .maybeSingle();
+
+  if (applicationError || !application) {
+    return { success: false, error: "Application not found" };
+  }
+
+  const { error } = await supabase
+    .from("lounge_membership_applications")
+    .update({
+      status,
+      contact_note: contactNote,
+      handled_by: user?.id ?? null,
+      handled_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", applicationId);
+
+  if (error) {
+    return { success: false, error: error.message };
+  }
+
+  await logAndNotify({
+    userId: user?.id ?? application.user_id,
+    action: "LOUNGE_APPLICATION_UPDATE",
+    description: `라운지 멤버십 신청 상태를 '${status}'로 변경했습니다.`,
+    metadata: {
+      applicationId,
+      targetUserId: application.user_id,
+      previousStatus: application.status,
+      status,
+      contactNote,
+    },
+    skipPush: true,
+    url: "/ko/admin/lounge-management",
   });
 
   revalidatePath("/ko/admin/lounge");

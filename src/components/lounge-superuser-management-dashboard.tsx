@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { CalendarDays, PencilLine, Phone, UserRound } from "lucide-react";
-import type { LoungeManagedMembership, LoungeBusiness, LoungeBusinessCategory } from "@/app/actions/lounge";
+import type { LoungeManagedMembership, LoungeBusiness, LoungeBusinessCategory, LoungeManagedApplication } from "@/app/actions/lounge";
+import { LoungeApplicationManager } from "./lounge-application-manager";
 import { LoungeFeatureManager } from "./lounge-feature-manager";
 import { LoungeMembershipManager } from "./lounge-membership-manager";
 
@@ -14,7 +15,7 @@ interface AdminOption {
   phone?: string | null;
 }
 
-type LoungeManagementTab = "overview" | "register" | "featured";
+type LoungeManagementTab = "overview" | "register" | "applications" | "featured";
 
 type LoungeMembershipPhase = "upcoming" | "active" | "expired" | "canceled";
 
@@ -96,11 +97,13 @@ function getCategoryLabel(locale: string, category?: LoungeBusinessCategory) {
 export function LoungeSuperuserManagementDashboard({
   locale,
   memberships,
+  applications,
   admins,
   businesses,
 }: {
   locale: string;
   memberships: LoungeManagedMembership[];
+  applications: LoungeManagedApplication[];
   admins: AdminOption[];
   businesses: LoungeBusiness[];
 }) {
@@ -126,6 +129,7 @@ export function LoungeSuperuserManagementDashboard({
   const tabs = [
     { id: "overview" as const, label: locale === "ko" ? "구독 관리" : "Memberships" },
     { id: "register" as const, label: locale === "ko" ? "구독 등록" : "Register" },
+    { id: "applications" as const, label: locale === "ko" ? "신청 문의" : "Applications" },
     { id: "featured" as const, label: locale === "ko" ? "추천 비즈니스" : "Featured" },
   ];
 
@@ -339,6 +343,13 @@ export function LoungeSuperuserManagementDashboard({
               : "Assign a new lounge contract to an admin account."
           }
           showRecentList={false}
+        />
+      ) : null}
+
+      {activeTab === "applications" ? (
+        <LoungeApplicationManager
+          locale={locale}
+          applications={applications}
         />
       ) : null}
     </div>
