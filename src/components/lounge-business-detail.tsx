@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { CalendarDays, Globe, Instagram, List, MessageCircle, Phone, Trophy } from "lucide-react";
 import type { LoungeBusiness, LoungeEvent } from "@/app/actions/lounge";
@@ -20,6 +21,10 @@ interface LoungeBusinessDetailProps {
   selectedEventId?: string;
   initialDate?: string;
 }
+
+const SCROLL_TO_ALL_DELAY = 180;
+const SCROLL_TO_EVENT_DELAY = 420;
+const CLEAR_HIGHLIGHT_DELAY = 1000;
 
 function toDateKeyKst(isoString: string) {
   const parts = new Intl.DateTimeFormat("en-CA", {
@@ -67,7 +72,7 @@ export function LoungeBusinessDetail({
 
     const sectionTimer = window.setTimeout(() => {
       allSchedulesRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 180);
+    }, SCROLL_TO_ALL_DELAY);
 
     return () => window.clearTimeout(sectionTimer);
   }, [initialDate, selectedEventId]);
@@ -80,11 +85,11 @@ export function LoungeBusinessDetail({
         behavior: "smooth",
         block: "center",
       });
-    }, 420);
+    }, SCROLL_TO_EVENT_DELAY);
 
     const clearTimer = window.setTimeout(() => {
       setHighlightedEventId(null);
-    }, 1000);
+    }, CLEAR_HIGHLIGHT_DELAY);
 
     return () => {
       window.clearTimeout(scrollTimer);
@@ -97,11 +102,17 @@ export function LoungeBusinessDetail({
       <section className={`overflow-hidden rounded-[28px] border ${loungeIceGoldTheme.detailShell}`}>
         <LoungeImpressionTracker entityType="business" businessId={business.id} locale={locale} source={source} />
         {business.cover_image_url ? (
-          <img
-            src={business.cover_image_url}
-            alt={business.name}
-            className="h-64 w-full object-cover md:h-80"
-          />
+          <div className="relative h-64 w-full md:h-80">
+            <Image
+              src={business.cover_image_url}
+              alt={business.name}
+              fill
+              priority
+              unoptimized
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 1200px"
+            />
+          </div>
         ) : (
           <div className={`h-52 ${loungeIceGoldTheme.fallbackCover}`} />
         )}
@@ -111,9 +122,12 @@ export function LoungeBusinessDetail({
             <div className="flex w-full items-start justify-between gap-4">
               <div className="flex items-start gap-4">
                 {business.logo_url ? (
-                  <img
+                  <Image
                     src={business.logo_url}
                     alt={business.name}
+                    width={64}
+                    height={64}
+                    unoptimized
                     className="h-16 w-16 rounded-2xl border border-zinc-200 object-cover dark:border-zinc-700"
                   />
                 ) : null}
