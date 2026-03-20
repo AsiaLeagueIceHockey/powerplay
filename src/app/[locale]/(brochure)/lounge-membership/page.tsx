@@ -15,6 +15,10 @@ import {
 } from "lucide-react";
 
 const siteUrl = "https://powerplay.kr";
+const inquiryLinks = {
+  instagram: "https://www.instagram.com/powerplay.kr/",
+  kakao: "https://open.kakao.com/o/sMyvIIli",
+};
 
 export async function generateMetadata({
   params,
@@ -120,7 +124,6 @@ function BrochurePage({ locale }: { locale: string }) {
         heroBody:
           "레슨, 훈련장, 대회, 브랜드, 치료/재활까지. 하키 비즈니스를 위한 전용 홍보 공간을 만나보세요. 더 많은 하키인에게 노출하고, 일정과 성과 추적까지 한 번에 관리할 수 있습니다.",
         primaryCta: "라운지 둘러보기",
-        secondaryCta: "관리 화면 보기",
         eyebrow1: "Why Lounge",
         title1: "파워플레이 라운지의 특장점",
         body1:
@@ -158,7 +161,6 @@ function BrochurePage({ locale }: { locale: string }) {
         heroBody:
           "From lessons and training centers to tournaments, brands, and rehab services. Discover a dedicated promotion space for hockey businesses. Reach more hockey users and manage schedules and performance in one place.",
         primaryCta: "Explore Lounge",
-        secondaryCta: "Open Admin",
         eyebrow1: "Why Lounge",
         title1: "What makes PowerPlay Lounge valuable",
         body1:
@@ -220,13 +222,6 @@ function BrochurePage({ locale }: { locale: string }) {
                 >
                   {strings.primaryCta}
                   <ArrowRight className="h-4 w-4" />
-                </Link>
-                <Link
-                  href={`/${locale}/admin/lounge`}
-                  className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-sm font-bold text-white"
-                >
-                  {strings.secondaryCta}
-                  <ExternalLink className="h-4 w-4" />
                 </Link>
               </div>
             </div>
@@ -466,17 +461,19 @@ function BrochurePage({ locale }: { locale: string }) {
             </div>
             <div className="flex flex-wrap gap-3">
               <Link
-                href={`/${locale}/admin/lounge`}
+                href={inquiryLinks.kakao}
+                target="_blank"
                 className="inline-flex items-center gap-2 rounded-xl bg-zinc-950 px-4 py-3 text-sm font-bold text-white"
               >
-                {isKo ? "멤버십 신청 화면 보기" : "Open membership screen"}
+                {isKo ? "카카오톡 문의" : "KakaoTalk inquiry"}
                 <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
-                href={`/${locale}/lounge`}
-                className="inline-flex items-center gap-2 rounded-xl border border-zinc-200 px-4 py-3 text-sm font-bold text-zinc-700"
+                href={inquiryLinks.instagram}
+                target="_blank"
+                className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045] px-4 py-3 text-sm font-bold text-white"
               >
-                {isKo ? "공개 라운지 보기" : "Open public lounge"}
+                {isKo ? "인스타 DM 문의" : "Instagram DM inquiry"}
                 <ExternalLink className="h-4 w-4" />
               </Link>
             </div>
