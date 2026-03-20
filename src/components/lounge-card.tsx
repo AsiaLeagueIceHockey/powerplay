@@ -6,7 +6,7 @@ import { extractRegion } from "@/lib/rink-utils";
 import { LoungeContactMenu } from "./lounge-contact-menu";
 import { LoungeDetailLink } from "./lounge-detail-link";
 import { LoungeImpressionTracker } from "./lounge-impression-tracker";
-import { loungeIceGoldTheme } from "./lounge-theme";
+import { getLoungeBusinessCategoryTheme } from "./lounge-theme";
 
 export function LoungeCard({
   business,
@@ -29,6 +29,7 @@ export function LoungeCard({
     service: locale === "ko" ? "퍼포먼스 솔루션" : "Performance Solution",
     other: locale === "ko" ? "기타" : "Other",
   }[business.category];
+  const categoryTheme = getLoungeBusinessCategoryTheme(business.category);
   const availableLinks = [
     {
       key: "phone",
@@ -50,10 +51,10 @@ export function LoungeCard({
 
   return (
     <article
-      className={`relative rounded-xl border border-zinc-200 bg-white p-5 shadow-sm transition-all duration-300 ${loungeIceGoldTheme.hoverBorder} hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900`}
+      className={`relative overflow-hidden rounded-xl border border-zinc-200 bg-white p-5 shadow-sm transition-all duration-300 ${categoryTheme.hoverBorder} hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900`}
     >
       <LoungeImpressionTracker entityType="business" businessId={business.id} locale={locale} source={source} />
-      <div className={`absolute inset-x-0 top-0 h-1 rounded-t-xl ${loungeIceGoldTheme.accentLine}`} />
+      <div className={`absolute inset-x-0 top-0 h-1 ${categoryTheme.accentLine}`} />
       <LoungeDetailLink
         entityType="business"
         businessId={business.id}
@@ -66,7 +67,7 @@ export function LoungeCard({
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
               <span
-                className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-bold ${loungeIceGoldTheme.badge}`}
+                className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-bold ${categoryTheme.badge}`}
               >
                 <Trophy className="h-3 w-3" />
                 {categoryLabel}
