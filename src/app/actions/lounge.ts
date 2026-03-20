@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { sanitizeLoungeExternalUrl } from "@/lib/lounge-link-utils";
 import { logAndNotify } from "@/lib/audit";
+import { sendPushNotification } from "@/app/actions/push";
 import { getAdminInfo } from "./admin-check";
 import { getAdmins } from "./admin";
 import { checkIsSuperUser } from "./superuser";
@@ -1252,6 +1253,21 @@ export async function upsertLoungeMembership(formData: FormData) {
     skipPush: true,
     url: `/ko/admin/lounge-management`,
   });
+
+  try {
+    await sendPushNotification(
+      userId,
+      membershipId
+        ? "파워플레이 라운지 멤버십 변경 안내 🏆"
+        : "파워플레이 라운지 멤버십 활성화 🏆",
+      membershipId
+        ? `라운지 프리미엄 멤버십 기간이 ${startsAt} ~ ${endsAt} 로 업데이트되었습니다. 관리자 페이지에서 바로 확인해보세요.`
+        : `라운지 프리미엄 멤버십이 ${startsAt} ~ ${endsAt} 동안 활성화되었습니다. 관리자 페이지에서 바로 이용하실 수 있습니다.`,
+      "/ko/admin/lounge"
+    );
+  } catch (pushError) {
+    console.error("Failed to send lounge membership push:", pushError);
+  }
 
   revalidatePath("/ko/admin/lounge");
   revalidatePath("/en/admin/lounge");
