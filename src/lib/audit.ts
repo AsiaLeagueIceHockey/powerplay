@@ -14,13 +14,22 @@ type AuditAction =
   | "CHAT_CREATE"
   | "PROFILE_UPDATE"
   | "CARD_ISSUE"
+  | "LOUNGE_BUSINESS_CREATE"
+  | "LOUNGE_BUSINESS_UPDATE"
+  | "LOUNGE_BUSINESS_PUBLISH"
+  | "LOUNGE_EVENT_CREATE"
+  | "LOUNGE_EVENT_BULK_CREATE"
+  | "LOUNGE_EVENT_UPDATE"
+  | "LOUNGE_EVENT_DELETE"
+  | "LOUNGE_MEMBERSHIP_SAVE"
+  | "LOUNGE_FEATURE_UPDATE"
   | "OTHER";
 
 interface AuditLogParams {
   userId: string;
   action: AuditAction;
   description: string; // Human readable description for Notification & Log
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   skipPush?: boolean; // If true, only log to DB, don't ping SuperUsers
   url?: string; // Optional URL for the push notification
 }
