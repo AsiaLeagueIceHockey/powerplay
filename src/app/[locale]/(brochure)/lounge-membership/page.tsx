@@ -69,6 +69,20 @@ function SectionHeader({
   );
 }
 
+function SectionShell({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <section className={`rounded-[32px] border border-zinc-200 bg-white p-6 shadow-sm md:p-8 ${className}`}>
+      {children}
+    </section>
+  );
+}
+
 function ScreenshotCard({
   src,
   alt,
@@ -104,17 +118,17 @@ function BrochurePage({ locale }: { locale: string }) {
     ? {
         heroTitle: "파워플레이 라운지 멤버십 소개자료",
         heroBody:
-          "레슨, 훈련장, 대회, 브랜드, 치료/재활까지. 하키 비즈니스를 위한 전용 홍보 공간을 통해 더 많은 하키인에게 안정적으로 노출하고, 일정 운영과 성과 추적까지 한 번에 관리할 수 있습니다.",
+          "레슨, 훈련장, 대회, 브랜드, 치료/재활까지. 하키 비즈니스를 위한 전용 홍보 공간을 만나보세요. 더 많은 하키인에게 노출하고, 일정과 성과 추적까지 한 번에 관리할 수 있습니다.",
         primaryCta: "라운지 둘러보기",
         secondaryCta: "관리 화면 보기",
         eyebrow1: "Why Lounge",
-        title1: "왜 파워플레이 라운지가 필요한가",
+        title1: "파워플레이 라운지의 특장점",
         body1:
-          "하키 비즈니스는 SNS와 커뮤니티를 병행해야 하지만, 노출과 문의 흐름이 흩어지기 쉽습니다. 파워플레이 라운지는 이미 하키에 관심 있는 유저에게 비즈니스와 일정을 함께 보여주는 전용 허브입니다.",
+          "하키 비즈니스를 알리고 싶더라도, 하키에 관심 있는 유저가 한 곳에 모여있는 공간은 많지 않습니다. 파워플레이 라운지에서는 하키 비즈니스에 대한 소개와 일정을 함께 노출할 수 있습니다.",
         eyebrow2: "Who It's For",
         title2: "이런 운영자에게 맞습니다",
         body2:
-          "유소년 레슨, 그룹 레슨, 지상훈련장, 대회, 브랜드, 치료/재활, 기타 하키 관련 서비스까지 폭넓게 소개할 수 있도록 설계했습니다.",
+          "유소년 클럽, 그룹 레슨, 지상훈련장, 대회, 브랜드, 치료/재활, 기타 하키 관련 서비스까지 폭넓게 소개할 수 있도록 설계했습니다.",
         eyebrow3: "What You Get",
         title3: "멤버십으로 바로 사용할 수 있는 기능",
         body3:
@@ -122,37 +136,37 @@ function BrochurePage({ locale }: { locale: string }) {
         eyebrow4: "Product Screens",
         title4: "실제 앱 화면 예시",
         body4:
-          "라운지 메인, 일정 카드, 상세 페이지 흐름을 기준으로 구성한 예시입니다. 다음 단계에서는 실제 운영 데이터 기반 스크린샷으로 교체할 수 있습니다.",
+          "라운지 메인, 일정 카드, 상세 페이지 흐름을 기준으로 구성한 실제 앱 화면입니다.",
         eyebrow5: "Workflow",
         title5: "운영자는 이렇게 사용합니다",
         body5:
-          "계약 등록 후 바로 비즈니스를 만들고, 일정을 등록하고, 공개 노출과 반응 데이터를 확인하는 흐름입니다.",
+          "신청 후 비즈니스 페이지를 만들고, 일정을 등록하고, 문의와 반응을 확인하는 흐름입니다.",
         eyebrow6: "Pricing",
         title6: "가격 및 운영 방식",
         body6:
-          "처음부터 가격이 명확하고, 운영진이 직접 구독 등록을 관리하는 방식이라 상담과 안내 흐름도 단순합니다.",
+          "입점 가격과 운영 방식을 아래에서 바로 확인할 수 있습니다.",
         eyebrow7: "Value",
-        title7: "재구매가 일어나는 이유",
+        title7: "라운지 멤버십으로 기대할 수 있는 효과",
         body7:
-          "단순 노출이 아니라, 소개 페이지, 일정 관리, 공유 URL, 문의 채널, 성과 확인까지 한 세트로 제공되기 때문입니다.",
+          "파워플레이 라운지는 소개, 일정 운영, 문의 유도, 공유까지 한 번에 갖춘 하키 비즈니스 홍보 공간입니다.",
         priceTitle: "PowerPlay Lounge Membership",
         priceBody:
-          "최초 등록: 200,000원 (첫 달)\n월 구독료: 100,000원 (둘째 달부터)\n\n신청 또는 문의 후 운영진이 계약 기간을 등록하면 바로 사용을 시작할 수 있습니다.",
+          "최초 등록: 200,000원 (첫 달)\n월 구독료: 100,000원 (둘째 달부터)\n\n신청 또는 문의 후 운영진이 구독 기간을 등록하면 바로 사용을 시작할 수 있습니다.",
       }
     : {
         heroTitle: "PowerPlay Lounge Membership Brochure",
         heroBody:
-          "From lessons and training centers to tournaments, brands, and rehab services. PowerPlay Lounge helps hockey businesses reach the right audience, publish schedules, and track engagement in one place.",
+          "From lessons and training centers to tournaments, brands, and rehab services. Discover a dedicated promotion space for hockey businesses. Reach more hockey users and manage schedules and performance in one place.",
         primaryCta: "Explore Lounge",
         secondaryCta: "Open Admin",
         eyebrow1: "Why Lounge",
-        title1: "Why PowerPlay Lounge exists",
+        title1: "What makes PowerPlay Lounge valuable",
         body1:
-          "Hockey businesses often split attention across SNS, chat communities, and ad hoc links. PowerPlay Lounge gives them a dedicated place where interested hockey users can discover businesses and schedules together.",
+          "Even when hockey businesses want more visibility, there are not many places where hockey users gather to browse them in one flow. PowerPlay Lounge lets you showcase both your business and your schedules in one dedicated space.",
         eyebrow2: "Who It's For",
         title2: "Built for a broad range of hockey businesses",
         body2:
-          "Youth lessons, group lessons, dryland centers, tournaments, brands, rehab and recovery, and other hockey-related services all fit the same structure.",
+          "Youth clubs, group lessons, dryland centers, tournaments, brands, rehab and recovery, and other hockey-related services all fit the same structure.",
         eyebrow3: "What You Get",
         title3: "Included with the membership",
         body3:
@@ -160,19 +174,19 @@ function BrochurePage({ locale }: { locale: string }) {
         eyebrow4: "Product Screens",
         title4: "Product screen examples",
         body4:
-          "These examples reflect the actual Lounge UX structure. The next iteration can replace them with production screenshots.",
+          "These are actual Lounge product screens showing the main discovery, schedule, and detail flow.",
         eyebrow5: "Workflow",
         title5: "How partners use it",
         body5:
-          "After the contract is registered, partners create the business page, publish schedules, and track incoming engagement.",
+          "From application to business setup, schedule publishing, and inquiry tracking, the flow is simple and operational.",
         eyebrow6: "Pricing",
         title6: "Pricing and operating model",
         body6:
-          "Pricing is fixed and the onboarding flow is managed by the PowerPlay team, which keeps activation simple.",
+          "You can review the pricing and operating model below.",
         eyebrow7: "Value",
-        title7: "Why partners keep renewing",
+        title7: "What you can expect from the membership",
         body7:
-          "Because the product combines a shareable landing page, schedule management, contact actions, and measurable performance in one package.",
+          "PowerPlay Lounge gives hockey businesses one place to introduce themselves, publish schedules, and turn interest into direct inquiries.",
         priceTitle: "PowerPlay Lounge Membership",
         priceBody:
           "Initial registration: KRW 200,000 (first month)\nMonthly subscription: KRW 100,000 (from second month)\n\nAfter inquiry or application, the PowerPlay team registers the contract period and activates the workspace.",
@@ -232,10 +246,11 @@ function BrochurePage({ locale }: { locale: string }) {
           </div>
         </section>
 
-        <section className="grid gap-10 lg:grid-cols-[1fr_0.9fr]">
-          <div className="space-y-6">
+        <SectionShell>
+          <div className="grid gap-10 lg:grid-cols-[1fr_0.9fr]">
+            <div>
             <SectionHeader eyebrow={strings.eyebrow1} title={strings.title1} body={strings.body1} />
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="mt-6 grid gap-4 md:grid-cols-2">
               {[
                 {
                   icon: <MapPinned className="h-5 w-5" />,
@@ -259,29 +274,30 @@ function BrochurePage({ locale }: { locale: string }) {
                 </div>
               ))}
             </div>
-          </div>
+            </div>
 
-          <div className="rounded-[32px] border border-zinc-200 bg-white p-6 shadow-sm">
-            <SectionHeader eyebrow={strings.eyebrow2} title={strings.title2} body={strings.body2} />
-            <div className="mt-6 flex flex-wrap gap-2">
-              {[
-                isKo ? "유소년 레슨" : "Youth lessons",
-                isKo ? "그룹 레슨" : "Group lessons",
-                isKo ? "지상훈련장" : "Dryland centers",
-                isKo ? "대회 운영" : "Tournaments",
-                isKo ? "브랜드" : "Brands",
-                isKo ? "치료/재활" : "Recovery & Rehab",
-                isKo ? "기타 하키 서비스" : "Other hockey services",
-              ].map((item) => (
-                <span key={item} className="rounded-full border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm font-medium text-zinc-700">
-                  {item}
-                </span>
-              ))}
+            <div>
+              <SectionHeader eyebrow={strings.eyebrow2} title={strings.title2} body={strings.body2} />
+              <div className="mt-6 flex flex-wrap gap-2">
+                {[
+                  isKo ? "유소년 클럽" : "Youth clubs",
+                  isKo ? "그룹 레슨" : "Group lessons",
+                  isKo ? "지상훈련장" : "Dryland centers",
+                  isKo ? "대회 운영" : "Tournaments",
+                  isKo ? "브랜드" : "Brands",
+                  isKo ? "치료/재활" : "Recovery & Rehab",
+                  isKo ? "기타 하키 서비스" : "Other hockey services",
+                ].map((item) => (
+                  <span key={item} className="rounded-full border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm font-medium text-zinc-700">
+                    {item}
+                  </span>
+                ))}
+              </div>
             </div>
           </div>
-        </section>
+        </SectionShell>
 
-        <section className="space-y-8">
+        <SectionShell className="space-y-8">
           <SectionHeader eyebrow={strings.eyebrow3} title={strings.title3} body={strings.body3} />
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             {[
@@ -313,15 +329,10 @@ function BrochurePage({ locale }: { locale: string }) {
               </div>
             ))}
           </div>
-        </section>
+        </SectionShell>
 
-        <section className="space-y-8">
+        <SectionShell className="space-y-8">
           <SectionHeader eyebrow={strings.eyebrow4} title={strings.title4} body={strings.body4} />
-          <div className="rounded-2xl border border-dashed border-zinc-300 bg-white/70 px-4 py-3 text-xs leading-6 text-zinc-500">
-            {isKo
-              ? "실제 앱 화면을 넣어두었습니다. PDF 저장 시에는 브라우저 인쇄에서 '배경 그래픽' 옵션을 켜면 현재 톤이 그대로 유지됩니다."
-              : "These are real product screenshots. Enable background graphics in the print dialog when saving as PDF."}
-          </div>
           <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
             <ScreenshotCard
               src="/lounge-brochure/info_1.png"
@@ -332,8 +343,8 @@ function BrochurePage({ locale }: { locale: string }) {
             <ScreenshotCard
               src="/lounge-brochure/info_2.png"
               alt="Lounge information screen 2"
-              title={isKo ? "대회/브랜드 등 카테고리 탐색" : "Category-based browsing"}
-              body={isKo ? "대회, 브랜드, 기타 서비스까지 같은 구조 안에서 노출할 수 있습니다." : "Tournament, brand, and other service categories fit the same discovery flow."}
+              title={isKo ? "카테고리 기반 탐색 지원" : "Category-based discovery"}
+              body={isKo ? "각 카테고리별로 정보를 확인할 수 있으며, 먼저 입점한 비즈니스일수록 더 자주 노출됩니다." : "Users can browse by category, and earlier entrants can earn more repeated exposure."}
             />
             <ScreenshotCard
               src="/lounge-brochure/schedule_1.png"
@@ -351,90 +362,92 @@ function BrochurePage({ locale }: { locale: string }) {
               src="/lounge-brochure/detail.png"
               alt="Lounge business detail screen"
               title={isKo ? "상세 페이지" : "Business detail page"}
-              body={isKo ? "소개, 예정 일정, 지도, 공유, 연락하기가 한 화면 안에서 정리됩니다." : "Detail pages bring together intro, schedule count, maps, sharing, and contact actions."}
+              body={isKo ? "나만의 비즈니스를 소개하는 전용 페이지와 공유 URL이 만들어져, 홈페이지처럼 활용하고 외부 채널로 바로 공유할 수 있습니다." : "Each business gets a dedicated page and shareable URL that works like a lightweight homepage for promotion."}
             />
           </div>
-        </section>
+        </SectionShell>
 
-        <section className="grid gap-10 lg:grid-cols-[0.95fr_1.05fr]">
-          <div className="rounded-[32px] border border-zinc-200 bg-white p-6 shadow-sm">
-            <SectionHeader eyebrow={strings.eyebrow5} title={strings.title5} body={strings.body5} />
-            <div className="mt-6 space-y-4">
-              {[
-                {
-                  step: "01",
-                  title: isKo ? "운영진이 구독 계약 등록" : "Contract registered by the team",
-                  body: isKo ? "신청 또는 문의 후 운영진이 구독 기간을 등록합니다." : "After inquiry or application, the PowerPlay team activates the contract period.",
-                },
-                {
-                  step: "02",
-                  title: isKo ? "대표 비즈니스 1개 설정" : "Set up one representative business",
-                  body: isKo ? "이름, 소개, 로고, 커버, 위치, 연락 채널, 공유 URL을 한 번에 관리합니다." : "Manage the name, intro, logo, cover, location, contact channels, and shareable URL.",
-                },
-                {
-                  step: "03",
-                  title: isKo ? "일정 등록 및 반복 일정 운영" : "Publish schedules and recurring events",
-                  body: isKo ? "레슨, 대회, 프로모션 일정을 등록하고 반복 일정도 한 번에 올릴 수 있습니다." : "Publish events and recurring schedules for lessons, tournaments, and promotions.",
-                },
-                {
-                  step: "04",
-                  title: isKo ? "성과 확인 및 운영 개선" : "Track performance and optimize",
-                  body: isKo ? "노출, 클릭, 문의 채널 반응을 보고 다음 일정과 운영 방식을 조정합니다." : "Review exposures, clicks, and inquiry actions to improve future operations.",
-                },
-              ].map((item) => (
-                <div key={item.step} className="flex gap-4 rounded-2xl border border-zinc-200 bg-zinc-50 p-4">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-zinc-900 text-sm font-black text-white">
-                    {item.step}
-                  </div>
-                  <div>
-                    <p className="text-base font-bold text-zinc-950">{item.title}</p>
-                    <p className="mt-1 text-sm leading-6 text-zinc-600">{item.body}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="space-y-8">
-            <div className="rounded-[32px] border border-zinc-200 bg-white p-6 shadow-sm">
-              <SectionHeader eyebrow={strings.eyebrow6} title={strings.title6} body={strings.body6} />
-              <div className="mt-6 rounded-[28px] border border-[#d4a017]/25 bg-[radial-gradient(circle_at_top_left,_rgba(243,210,122,0.18),_transparent_28%),linear-gradient(180deg,#fff8eb_0%,#fffdf7_100%)] p-6">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#8b6814]">{strings.priceTitle}</p>
-                <p className="mt-4 whitespace-pre-line text-base font-semibold leading-8 text-zinc-900">{strings.priceBody}</p>
-              </div>
-            </div>
-
-            <div className="rounded-[32px] border border-zinc-200 bg-white p-6 shadow-sm">
-              <SectionHeader eyebrow={strings.eyebrow7} title={strings.title7} body={strings.body7} />
-              <div className="mt-6 grid gap-3">
+        <SectionShell>
+          <div className="grid gap-10 lg:grid-cols-[0.95fr_1.05fr]">
+            <div>
+              <SectionHeader eyebrow={strings.eyebrow5} title={strings.title5} body={strings.body5} />
+              <div className="mt-6 space-y-4">
                 {[
                   {
-                    title: isKo ? "인스타/블로그에 바로 붙일 수 있는 URL" : "A shareable URL for Instagram and blogs",
-                    body: isKo ? "대표 비즈니스 페이지를 외부 채널과 연결해 유입을 하나로 모을 수 있습니다." : "Use one destination page from social, blog, and Kakao channels.",
+                    step: "01",
+                    title: isKo ? "멤버십 신청 및 문의" : "Membership inquiry and application",
+                    body: isKo ? "멤버십 신청 또는 문의 후 운영진이 구독 기간을 등록합니다." : "After applying or reaching out, the PowerPlay team registers the contract period.",
                   },
                   {
-                    title: isKo ? "일정 노출과 일정 상세 연결" : "Schedules connected to detail pages",
-                    body: isKo ? "홍보가 소개 카드에만 머무르지 않고, 실제 이벤트와 일정으로 이어집니다." : "Promotion flows into actual events instead of stopping at a profile card.",
+                    step: "02",
+                    title: isKo ? "대표 비즈니스 1개 설정" : "Set up one representative business",
+                    body: isKo ? "이름, 소개, 로고, 커버, 위치, 연락 채널, 공유 URL을 한 번에 관리합니다." : "Manage the name, intro, logo, cover, location, contact channels, and shareable URL.",
                   },
                   {
-                    title: isKo ? "무엇이 잘 먹히는지 바로 확인" : "Know what is working",
-                    body: isKo ? "노출과 클릭, CTA 반응을 확인해 운영 방향을 더 빠르게 잡을 수 있습니다." : "Exposure and click data makes it easier to adjust the next campaign or schedule.",
+                    step: "03",
+                    title: isKo ? "일정 등록 및 반복 일정 운영" : "Publish schedules and recurring events",
+                    body: isKo ? "레슨, 대회, 프로모션 일정을 등록하고 반복 일정도 한 번에 올릴 수 있습니다." : "Publish events and recurring schedules for lessons, tournaments, and promotions.",
+                  },
+                  {
+                    step: "04",
+                    title: isKo ? "성과 확인 및 운영 개선" : "Track performance and optimize",
+                    body: isKo ? "노출, 클릭, 문의 채널 반응을 보고 다음 일정과 운영 방식을 조정합니다." : "Review exposures, clicks, and inquiry actions to improve future operations.",
                   },
                 ].map((item) => (
-                  <div key={item.title} className="rounded-2xl border border-zinc-200 bg-zinc-50 p-4">
-                    <div className="flex items-start gap-3">
-                      <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-[#8b6814]" />
-                      <div>
-                        <p className="text-base font-bold text-zinc-950">{item.title}</p>
-                        <p className="mt-1 text-sm leading-6 text-zinc-600">{item.body}</p>
-                      </div>
+                  <div key={item.step} className="flex gap-4 rounded-2xl border border-zinc-200 bg-zinc-50 p-4">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-zinc-900 text-sm font-black text-white">
+                      {item.step}
+                    </div>
+                    <div>
+                      <p className="text-base font-bold text-zinc-950">{item.title}</p>
+                      <p className="mt-1 text-sm leading-6 text-zinc-600">{item.body}</p>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
+
+            <div className="space-y-8">
+              <div>
+                <SectionHeader eyebrow={strings.eyebrow6} title={strings.title6} body={strings.body6} />
+                <div className="mt-6 rounded-[28px] border border-[#d4a017]/25 bg-[radial-gradient(circle_at_top_left,_rgba(243,210,122,0.18),_transparent_28%),linear-gradient(180deg,#fff8eb_0%,#fffdf7_100%)] p-6">
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#8b6814]">{strings.priceTitle}</p>
+                  <p className="mt-4 whitespace-pre-line text-base font-semibold leading-8 text-zinc-900">{strings.priceBody}</p>
+                </div>
+              </div>
+
+              <div>
+                <SectionHeader eyebrow={strings.eyebrow7} title={strings.title7} body={strings.body7} />
+                <div className="mt-6 grid gap-3">
+                  {[
+                    {
+                      title: isKo ? "내 비즈니스를 소개하는 전용 페이지" : "A dedicated page for your business",
+                      body: isKo ? "인스타, 블로그, 카카오톡 등 외부 채널에서 한 곳으로 연결할 수 있는 나만의 페이지를 운영할 수 있습니다." : "Run one shareable destination page across Instagram, blogs, KakaoTalk, and more.",
+                    },
+                    {
+                      title: isKo ? "소개와 일정이 함께 보이는 구조" : "Business intro and schedules together",
+                      body: isKo ? "비즈니스 소개만 노출되는 것이 아니라, 예정 일정과 이벤트까지 함께 보여줄 수 있습니다." : "Show not only your business story, but also the schedules and events users can act on.",
+                    },
+                    {
+                      title: isKo ? "관심 고객 반응까지 확인" : "Track audience response",
+                      body: isKo ? "노출, 클릭, 문의 채널 반응을 보면서 다음 일정과 운영 방향을 더 빠르게 정할 수 있습니다." : "Use exposure, click, and inquiry data to guide your next schedule and promotional decisions.",
+                    },
+                  ].map((item) => (
+                    <div key={item.title} className="rounded-2xl border border-zinc-200 bg-zinc-50 p-4">
+                      <div className="flex items-start gap-3">
+                        <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-[#8b6814]" />
+                        <div>
+                          <p className="text-base font-bold text-zinc-950">{item.title}</p>
+                          <p className="mt-1 text-sm leading-6 text-zinc-600">{item.body}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
-        </section>
+        </SectionShell>
 
         <section className="rounded-[36px] border border-zinc-200 bg-white px-6 py-8 shadow-sm md:px-8 md:py-10">
           <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
@@ -443,7 +456,7 @@ function BrochurePage({ locale }: { locale: string }) {
                 {isKo ? "Ready To Start" : "Ready To Start"}
               </p>
               <h2 className="text-2xl font-black tracking-tight text-zinc-950 md:text-3xl">
-                {isKo ? "파워플레이 라운지로 하키 비즈니스를 더 선명하게 소개하세요" : "Present your hockey business more clearly with PowerPlay Lounge"}
+                {isKo ? "파워플레이 라운지로 하키 비즈니스를 키워나가세요" : "Grow your hockey business with PowerPlay Lounge"}
               </h2>
               <p className="text-sm leading-7 text-zinc-600 md:text-base">
                 {isKo
