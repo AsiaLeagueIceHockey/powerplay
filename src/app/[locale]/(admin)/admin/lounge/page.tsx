@@ -1,6 +1,7 @@
 import { setRequestLocale } from "next-intl/server";
 import Link from "next/link";
 import { getLoungeAdminPageData } from "@/app/actions/lounge";
+import { submitLoungeMembershipApplication } from "@/app/actions/lounge";
 import { LoungeAdminDashboard } from "@/components/lounge-admin-dashboard";
 
 const inquiryLinks = {
@@ -32,6 +33,15 @@ export default async function AdminLoungePage({
 
   const data = await getLoungeAdminPageData();
 
+  async function submitApplicationAction(formData: FormData) {
+    "use server";
+
+    const result = await submitLoungeMembershipApplication(formData);
+    if (!result.success) {
+      console.error("[lounge] failed to submit membership application:", result.error);
+    }
+  }
+
   if (!data.ok) {
     return (
       <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-red-700 dark:border-red-900/30 dark:bg-red-900/10 dark:text-red-300">
@@ -42,8 +52,43 @@ export default async function AdminLoungePage({
 
   const metrics = data.metrics!;
   const showGate = data.membershipStatus !== "active";
+  const latestApplication = data.latestApplication;
+
   return (
     <div className="space-y-6">
+      <details className="overflow-hidden rounded-2xl border border-amber-500/30 bg-amber-500/10 text-zinc-100">
+        <summary className="cursor-pointer list-none px-4 py-3 text-sm font-semibold marker:hidden">
+          {locale === "ko"
+            ? "📢 라운지 안내: 왜 이 공간을 만들었는지 확인해보세요"
+            : "📢 Lounge notice: Why we created this space"}
+        </summary>
+        <div className="border-t border-amber-500/20 px-4 py-4 text-sm leading-7 text-zinc-300">
+          <p>안녕하세요, 파워플레이입니다!!</p>
+          <p className="mt-4">
+            파워플레이는 동호인의 편의를 위해 만든 플랫폼이여서 동호인분들께는 모든 기능을 무료로 제공해드리고 있고,
+            동호인뿐 아니라 모든 하키인들의 다양한 교류와 쉬운 사용을 통해서 더 많은 참여를 돕고자 플랫폼을 만들어 운영해오고 있습니다.
+          </p>
+          <p className="mt-4">
+            최근 사업자분들께서 홍보 관련 문의를 많이 주셔서 효과적이게 홍보를 할수있도록 홍보 라운지를 새롭게 오픈하게 되었습니다.
+          </p>
+          <p className="mt-4">
+            홍보 라운지는 사업자분들께서 회원 모집, 이벤트 안내, 상품 및 서비스 홍보 등을 보다 집중적으로 노출할 수 있는 전용 공간입니다.
+          </p>
+          <p className="mt-4">이에 따라 홍보 라운지는 아래와 같이 유료로 운영될 예정입니다</p>
+          <div className="mt-4 rounded-2xl border border-zinc-700/70 bg-zinc-950/50 p-4">
+            <p>최초 등록비: 200,000원 (첫 달)</p>
+            <p className="mt-1">월 구독료: 100,000원 (둘째 달부터)</p>
+          </div>
+          <p className="mt-4">
+            해당 공간을 통해 보다 많은 하키인들에게 효과적으로 홍보하실 수 있도록 지속적으로 기능과 노출을 강화해 나갈 예정입니다.
+          </p>
+          <p className="mt-4">
+            이용을 원하시거나 궁금하신 점이 있으시면 언제든 편하게 문의 부탁드립니다.
+          </p>
+          <p className="mt-4">감사합니다 🙏</p>
+        </div>
+      </details>
+
       <section className="rounded-[28px] border border-zinc-700 bg-[radial-gradient(circle_at_top_left,_rgba(251,191,36,0.14),_transparent_40%),linear-gradient(135deg,#3f3f46_0%,#27272a_48%,#18181b_100%)] px-5 py-4 shadow-sm">
         <div className="max-w-3xl">
           <span className="inline-flex rounded-full bg-zinc-100 px-3 py-1 text-xs font-semibold text-zinc-900">
@@ -84,12 +129,32 @@ export default async function AdminLoungePage({
               </div>
               <div className="flex flex-wrap gap-3">
                 <Link href={inquiryLinks.kakao} target="_blank" className="rounded-xl bg-[#FEE500] px-4 py-2.5 text-sm font-semibold text-[#3B1E1E]">
-                  {locale === "ko" ? "카카오로 문의하기" : "Contact via Kakao"}
+                  {locale === "ko" ? "카카오톡 문의" : "KakaoTalk inquiry"}
                 </Link>
                 <Link href={inquiryLinks.instagram} target="_blank" className="rounded-xl bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045] px-4 py-2.5 text-sm font-semibold text-white">
                   {locale === "ko" ? "인스타 DM 문의" : "Contact via Instagram DM"}
                 </Link>
+                <form action={submitApplicationAction}>
+                  <button
+                    type="submit"
+                    disabled={latestApplication?.status === "pending" || latestApplication?.status === "contacted"}
+                    className="rounded-xl bg-zinc-100 px-4 py-2.5 text-sm font-semibold text-zinc-950 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {latestApplication?.status === "pending"
+                      ? "멤버십 신청 완료"
+                      : latestApplication?.status === "contacted"
+                        ? "운영진 연락 대기 중"
+                        : "멤버십 신청하기"}
+                  </button>
+                </form>
               </div>
+              <p className="text-sm text-zinc-400">
+                {latestApplication?.status === "pending"
+                  ? "운영진이 신청 내역을 확인하고 등록하신 연락처로 안내드릴 예정입니다."
+                  : latestApplication?.status === "contacted"
+                    ? "운영진이 연락을 시작한 상태입니다. 프로필 연락처를 최신 상태로 유지해주세요."
+                    : "카카오톡/인스타로 바로 문의하거나, 멤버십 신청을 남기면 운영진이 직접 연락드립니다."}
+              </p>
               {data.membership && (
                 <p className="text-sm text-zinc-400">
                   {locale === "ko"
@@ -97,6 +162,11 @@ export default async function AdminLoungePage({
                     : `Latest contract: ${formatKstDate(data.membership.starts_at)} ~ ${formatKstDate(data.membership.ends_at)}`}
                 </p>
               )}
+              {latestApplication ? (
+                <p className="text-xs text-zinc-500">
+                  최근 신청 상태: {latestApplication.status}
+                </p>
+              ) : null}
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2">
