@@ -35,7 +35,7 @@ export function LoungePageClient({ businesses, events, locale, source }: LoungeP
     { value: "training_center", label: locale === "ko" ? "훈련장" : "Training" },
     { value: "tournament", label: locale === "ko" ? "대회" : "Tournament" },
     { value: "brand", label: locale === "ko" ? "브랜드" : "Brand" },
-    { value: "service", label: locale === "ko" ? "퍼포먼스 솔루션" : "Performance Solution" },
+    { value: "service", label: locale === "ko" ? "치료/재활" : "Recovery & Rehab" },
     { value: "other", label: locale === "ko" ? "기타" : "Other" },
   ];
 

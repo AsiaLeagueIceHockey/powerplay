@@ -89,7 +89,7 @@ function getCategoryLabel(locale: string, category?: LoungeBusinessCategory) {
     training_center: locale === "ko" ? "훈련장 / 슈팅센터" : "Training Center",
     tournament: locale === "ko" ? "대회" : "Tournament",
     brand: locale === "ko" ? "브랜드" : "Brand",
-    service: locale === "ko" ? "퍼포먼스 솔루션" : "Performance Solution",
+    service: locale === "ko" ? "치료/재활" : "Recovery & Rehab",
     other: locale === "ko" ? "기타" : "Other",
   }[category];
 }
