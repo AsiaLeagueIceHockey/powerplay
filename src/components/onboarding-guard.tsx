@@ -20,7 +20,8 @@ export function OnboardingGuard() {
       pathname.includes("/onboarding") || 
       pathname.includes("/auth") || 
       pathname.includes("/login") ||
-      pathname.includes("/signup");
+      pathname.includes("/signup") ||
+      pathname.includes("/lounge-membership");
 
     if (isExcluded) {
       setChecked(true);

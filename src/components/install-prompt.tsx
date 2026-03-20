@@ -4,8 +4,10 @@ import { useEffect, useState } from "react";
 import { Download, X } from "lucide-react";
 import { useNotification } from "@/contexts/notification-context";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 
 export function InstallPrompt() {
+  const pathname = usePathname();
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [isVisible, setIsVisible] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
@@ -84,6 +86,7 @@ export function InstallPrompt() {
     setIsVisible(false);
   };
 
+  if (pathname.includes("/lounge-membership")) return null;
   if (!isVisible || isOpen) return null;
 
   const handleDismiss = () => {

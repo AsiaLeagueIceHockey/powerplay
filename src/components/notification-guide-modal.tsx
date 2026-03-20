@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { useNotification } from "@/contexts/notification-context";
 import { saveSubscription } from "@/app/actions/push";
 import { X, Bell, Share, PlusSquare, CheckCircle, Download, RefreshCw, Compass } from "lucide-react";
@@ -22,6 +23,7 @@ function urlBase64ToUint8Array(base64String: string) {
 }
 
 export function NotificationGuideModal() {
+  const pathname = usePathname();
   const { isOpen, closeGuide, markOnboardingComplete, guideType, hasDbSubscription, refreshSubscriptionStatus } = useNotification();
   const [os, setOs] = useState<"ios" | "android" | "other">("other");
   const [isStandalone, setIsStandalone] = useState(false);
@@ -103,6 +105,7 @@ export function NotificationGuideModal() {
     closeGuide();
   };
 
+  if (pathname.includes("/lounge-membership")) return null;
   if (!isOpen) return null;
 
   // Determine if truly complete: permission granted AND DB subscription exists
