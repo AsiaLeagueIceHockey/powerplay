@@ -635,10 +635,7 @@ export async function getLoungeManagementPageData(): Promise<{
       .order("created_at", { ascending: false }),
     supabase
       .from("lounge_membership_applications")
-      .select(`
-        *,
-        user:user_id(id, email, full_name, phone)
-      `)
+      .select("*")
       .order("created_at", { ascending: false }),
     supabase
       .from("lounge_businesses")
@@ -659,8 +656,30 @@ export async function getLoungeManagementPageData(): Promise<{
     business: businessByOwner.get(membership.user_id) ?? null,
   }));
 
-  const applications = (((applicationsResult.data as LoungeMembershipApplication[] | null) ?? [])).map((application) => ({
+  if (applicationsResult.error) {
+    console.error("Error fetching lounge membership applications:", applicationsResult.error);
+  }
+
+  const rawApplications = (applicationsResult.data as LoungeMembershipApplication[] | null) ?? [];
+  const applicationUserIds = Array.from(new Set(rawApplications.map((application) => application.user_id).filter(Boolean)));
+  const { data: applicationProfiles, error: applicationProfilesError } = applicationUserIds.length
+    ? await supabase
+        .from("profiles")
+        .select("id, email, full_name, phone")
+        .in("id", applicationUserIds)
+    : { data: [], error: null };
+
+  if (applicationProfilesError) {
+    console.error("Error fetching lounge application profiles:", applicationProfilesError);
+  }
+
+  const applicationProfileMap = new Map(
+    ((applicationProfiles as Array<{ id: string; email: string | null; full_name: string | null; phone: string | null }> | null) ?? []).map((profile) => [profile.id, profile])
+  );
+
+  const applications = rawApplications.map((application) => ({
     ...application,
+    user: applicationProfileMap.get(application.user_id) ?? null,
     business: businessByOwner.get(application.user_id)
       ? {
           id: businessByOwner.get(application.user_id)!.id,
