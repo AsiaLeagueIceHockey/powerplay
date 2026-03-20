@@ -56,38 +56,13 @@ export default async function AdminLoungePage({
 
   return (
     <div className="space-y-6">
-      <details className="overflow-hidden rounded-2xl border border-amber-500/30 bg-amber-500/10 text-zinc-100">
-        <summary className="cursor-pointer list-none px-4 py-3 text-sm font-semibold marker:hidden">
-          {locale === "ko"
-            ? "📢 라운지 안내: 왜 이 공간을 만들었는지 확인해보세요"
-            : "📢 Lounge notice: Why we created this space"}
-        </summary>
-        <div className="border-t border-amber-500/20 px-4 py-4 text-sm leading-7 text-zinc-300">
-          <p>안녕하세요, 파워플레이입니다!!</p>
-          <p className="mt-4">
-            파워플레이는 동호인의 편의를 위해 만든 플랫폼이여서 동호인분들께는 모든 기능을 무료로 제공해드리고 있고,
-            동호인뿐 아니라 모든 하키인들의 다양한 교류와 쉬운 사용을 통해서 더 많은 참여를 돕고자 플랫폼을 만들어 운영해오고 있습니다.
-          </p>
-          <p className="mt-4">
-            최근 사업자분들께서 홍보 관련 문의를 많이 주셔서 효과적이게 홍보를 할수있도록 홍보 라운지를 새롭게 오픈하게 되었습니다.
-          </p>
-          <p className="mt-4">
-            홍보 라운지는 사업자분들께서 회원 모집, 이벤트 안내, 상품 및 서비스 홍보 등을 보다 집중적으로 노출할 수 있는 전용 공간입니다.
-          </p>
-          <p className="mt-4">이에 따라 홍보 라운지는 아래와 같이 유료로 운영될 예정입니다</p>
-          <div className="mt-4 rounded-2xl border border-zinc-700/70 bg-zinc-950/50 p-4">
-            <p>최초 등록비: 200,000원 (첫 달)</p>
-            <p className="mt-1">월 구독료: 100,000원 (둘째 달부터)</p>
-          </div>
-          <p className="mt-4">
-            해당 공간을 통해 보다 많은 하키인들에게 효과적으로 홍보하실 수 있도록 지속적으로 기능과 노출을 강화해 나갈 예정입니다.
-          </p>
-          <p className="mt-4">
-            이용을 원하시거나 궁금하신 점이 있으시면 언제든 편하게 문의 부탁드립니다.
-          </p>
-          <p className="mt-4">감사합니다 🙏</p>
-        </div>
-      </details>
+      <Link
+        href={`/${locale}/admin/lounge/guide`}
+        className="flex items-center justify-between rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm font-semibold text-zinc-100 transition hover:border-amber-400/50 hover:bg-amber-500/15"
+      >
+        <span>{locale === "ko" ? "📢 라운지 OPEN 안내!" : "📢 Lounge OPEN guide!"}</span>
+        <span className="text-xs text-amber-200">{locale === "ko" ? "확인하기" : "Open"}</span>
+      </Link>
 
       <section className="rounded-[28px] border border-zinc-700 bg-[radial-gradient(circle_at_top_left,_rgba(251,191,36,0.14),_transparent_40%),linear-gradient(135deg,#3f3f46_0%,#27272a_48%,#18181b_100%)] px-5 py-4 shadow-sm">
         <div className="max-w-3xl">
@@ -123,30 +98,43 @@ export default async function AdminLoungePage({
                       ? "등록된 계약 기간이 아직 시작되지 않았습니다. 시작일이 되면 라운지 비즈니스와 일정 관리 기능을 바로 사용할 수 있습니다."
                       : "Your contract period is registered but has not started yet. Lounge business and schedule management will unlock on the start date."
                     : locale === "ko"
-                      ? "예상 월 구독료는 약 100,000원입니다. 문의 후 계좌이체 확인이 완료되면 운영진이 구독 기간을 등록합니다."
-                      : "Expected monthly subscription is around 100,000 KRW. After inquiry and transfer confirmation, the team assigns your contract period."}
+                      ? "최초 등록비는 200,000원(첫 달), 월 구독료는 100,000원(둘째 달부터)입니다. 문의 또는 신청 후 확인이 완료되면 운영진이 구독 기간을 등록합니다."
+                      : "Pricing is fixed at 200,000 KRW for the first month and 100,000 KRW monthly from the second month. After inquiry or application, the team registers your contract period."}
                 </p>
               </div>
-              <div className="flex flex-wrap gap-3">
-                <Link href={inquiryLinks.kakao} target="_blank" className="rounded-xl bg-[#FEE500] px-4 py-2.5 text-sm font-semibold text-[#3B1E1E]">
-                  {locale === "ko" ? "카카오톡 문의" : "KakaoTalk inquiry"}
-                </Link>
-                <Link href={inquiryLinks.instagram} target="_blank" className="rounded-xl bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045] px-4 py-2.5 text-sm font-semibold text-white">
-                  {locale === "ko" ? "인스타 DM 문의" : "Contact via Instagram DM"}
-                </Link>
-                <form action={submitApplicationAction}>
-                  <button
-                    type="submit"
-                    disabled={latestApplication?.status === "pending" || latestApplication?.status === "contacted"}
-                    className="rounded-xl bg-zinc-100 px-4 py-2.5 text-sm font-semibold text-zinc-950 disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    {latestApplication?.status === "pending"
-                      ? "멤버십 신청 완료"
-                      : latestApplication?.status === "contacted"
-                        ? "운영진 연락 대기 중"
-                        : "멤버십 신청하기"}
-                  </button>
-                </form>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
+                    {locale === "ko" ? "신청하기" : "Apply"}
+                  </p>
+                  <form action={submitApplicationAction}>
+                    <button
+                      type="submit"
+                      disabled={latestApplication?.status === "pending" || latestApplication?.status === "contacted"}
+                      className="rounded-xl bg-zinc-100 px-4 py-2.5 text-sm font-semibold text-zinc-950 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {latestApplication?.status === "pending"
+                        ? "멤버십 신청 완료"
+                        : latestApplication?.status === "contacted"
+                          ? "운영진 연락 대기 중"
+                          : "멤버십 신청하기"}
+                    </button>
+                  </form>
+                </div>
+
+                <div className="space-y-2">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500">
+                    {locale === "ko" ? "문의하기" : "Inquiry"}
+                  </p>
+                  <div className="flex flex-wrap gap-3">
+                    <Link href={inquiryLinks.kakao} target="_blank" className="rounded-xl bg-[#FEE500] px-4 py-2.5 text-sm font-semibold text-[#3B1E1E]">
+                      {locale === "ko" ? "카카오톡 문의" : "KakaoTalk inquiry"}
+                    </Link>
+                    <Link href={inquiryLinks.instagram} target="_blank" className="rounded-xl bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045] px-4 py-2.5 text-sm font-semibold text-white">
+                      {locale === "ko" ? "인스타 DM 문의" : "Contact via Instagram DM"}
+                    </Link>
+                  </div>
+                </div>
               </div>
               <p className="text-sm text-zinc-400">
                 {latestApplication?.status === "pending"
