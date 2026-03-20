@@ -246,6 +246,16 @@ function toKstDateKey(input: string | Date) {
   return `${year}-${month}-${day}`;
 }
 
+function extractJoinedSlug(
+  joined:
+    | { slug?: string | null }[]
+    | { slug?: string | null }
+    | null
+    | undefined
+) {
+  return Array.isArray(joined) ? joined[0]?.slug ?? null : joined?.slug ?? null;
+}
+
 function buildLoungeEventPayload(
   businessId: string,
   formData: FormData,
@@ -963,8 +973,10 @@ export async function deleteLoungeEvent(eventId: string) {
     return { success: false, error: error.message };
   }
 
-  const businessSlug = (existingEvent as { lounge_businesses?: { slug?: string | null }[] | { slug?: string | null } | null }).lounge_businesses;
-  const resolvedSlug = Array.isArray(businessSlug) ? businessSlug[0]?.slug : businessSlug?.slug;
+  const businessSlug = (existingEvent as {
+    lounge_businesses?: { slug?: string | null }[] | { slug?: string | null } | null;
+  }).lounge_businesses;
+  const resolvedSlug = extractJoinedSlug(businessSlug);
   revalidateLoungePaths(resolvedSlug ?? null);
   return { success: true };
 }
