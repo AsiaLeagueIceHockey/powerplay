@@ -53,7 +53,9 @@ export function LoungeBusinessForm({
 
     const instagramResult = sanitizeLoungeExternalUrl(formData.get("instagram_url") as string | null, "instagram");
     if (instagramResult.error) {
-      return locale === "ko" ? "인스타그램 링크는 https://instagram.com 형식이어야 합니다." : "Instagram URL must use https://instagram.com.";
+      return locale === "ko"
+        ? "인스타그램은 instagram.com 주소 또는 @아이디 형식으로 입력해주세요."
+        : "Instagram must use an instagram.com URL or an @handle.";
     }
 
     const websiteResult = sanitizeLoungeExternalUrl(formData.get("website_url") as string | null, "website");
@@ -390,7 +392,12 @@ export function LoungeBusinessForm({
         </label>
         <label className="space-y-2 text-sm">
           <span className="font-semibold text-zinc-100">Instagram URL</span>
-          <input name="instagram_url" defaultValue={business?.instagram_url ?? ""} className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100" />
+          <input
+            name="instagram_url"
+            defaultValue={business?.instagram_url ?? ""}
+            placeholder="https://instagram.com/powerplay.kr or @powerplay.kr"
+            className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100 placeholder:text-zinc-500"
+          />
         </label>
         <label className="space-y-2 text-sm">
           <span className="font-semibold text-zinc-100">Website URL</span>

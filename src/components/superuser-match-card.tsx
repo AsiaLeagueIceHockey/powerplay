@@ -6,50 +6,32 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { AdminParticipantList } from "./admin-participant-list";
 import { deleteMatch, cancelMatchByAdmin } from "@/app/actions/admin";
+import {
+  getMatchParticipantsForSuperuser,
+  type SuperuserMatchParticipant,
+  type SuperuserMatchSummary,
+} from "@/app/actions/superuser";
 import { AdminNewBadge, markMatchAsSeen } from "./admin-new-badge";
 import { CopyButton } from "./copy-button";
-
-interface Match {
-  id: string;
-  start_time: string;
-  status: "open" | "closed" | "canceled";
-  rink: {
-    name_ko: string;
-    name_en: string;
-  } | null;
-  participants: any[];
-  participants_count: {
-    fw: number;
-    df: number;
-    g: number;
-  };
-  entry_points: number;
-  max_skaters: number;
-  max_goalies: number;
-  match_type?: string;
-  fee: number;
-  bank_account?: string | null;
-  creator?: {
-    full_name: string | null;
-    email: string;
-  };
-}
 
 export function SuperUserMatchCard({
   match,
   locale,
 }: {
-  match: Match;
+  match: SuperuserMatchSummary;
   locale: string;
 }) {
   const [showParticipants, setShowParticipants] = useState(false);
+  const [participants, setParticipants] = useState<SuperuserMatchParticipant[] | null>(null);
+  const [participantsError, setParticipantsError] = useState<string | null>(null);
+  const [isLoadingParticipants, setIsLoadingParticipants] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [badgeKey, setBadgeKey] = useState(0);
   const router = useRouter();
   const t = useTranslations("admin");
   const tMatch = useTranslations("match");
 
-  const totalParticipants = match.participants?.length || 0;
+  const totalParticipants = match.total_participants || 0;
   const hasParticipants = totalParticipants > 0;
   const isCanceled = match.status === "canceled";
 
@@ -90,10 +72,24 @@ export function SuperUserMatchCard({
     }
   };
 
-  const handleToggleParticipants = () => {
+  const handleToggleParticipants = async () => {
     if (!showParticipants) {
       markMatchAsSeen(match.id, totalParticipants);
-      setBadgeKey(prev => prev + 1);
+      setBadgeKey((prev) => prev + 1);
+      if (!participants) {
+        setIsLoadingParticipants(true);
+        setParticipantsError(null);
+        try {
+          const result = await getMatchParticipantsForSuperuser(match.id);
+          setParticipants(result);
+        } catch {
+          setParticipantsError(
+            locale === "ko" ? "참가자 정보를 불러오지 못했습니다." : "Failed to load participants."
+          );
+        } finally {
+          setIsLoadingParticipants(false);
+        }
+      }
     }
     setShowParticipants(!showParticipants);
   };
@@ -119,7 +115,7 @@ export function SuperUserMatchCard({
   const startDate = new Date(match.start_time);
   const now = new Date();
   const isPastMatch = startDate < now;
-  const displayStatus = isPastMatch ? 'finished' : match.status;
+  const displayStatus = isPastMatch ? "finished" : match.status;
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -181,6 +177,13 @@ export function SuperUserMatchCard({
           {match.creator.full_name || match.creator.email}
         </div>
       )}
+
+      {match.club?.name ? (
+        <div className="mb-4 text-xs text-zinc-300 bg-zinc-900/40 p-2 rounded border border-zinc-800">
+          <span className="text-zinc-400 font-medium">{locale === "ko" ? "동호회: " : "Club: "}</span>
+          {match.club.name}
+        </div>
+      ) : null}
 
       {match.match_type === "team_match" ? (
         <div className="flex justify-center items-center text-sm text-zinc-300 mb-6 bg-zinc-900/50 p-3 rounded-lg border border-zinc-700/50">
@@ -294,7 +297,17 @@ export function SuperUserMatchCard({
 
       {showParticipants && (
         <div className="mt-4 pt-4 border-t border-gray-200 dark:border-zinc-700">
-          <AdminParticipantList participants={match.participants} matchType={match.match_type} />
+          {isLoadingParticipants ? (
+            <div className="rounded-lg border border-zinc-700 bg-zinc-900/40 px-4 py-6 text-center text-sm text-zinc-400">
+              {locale === "ko" ? "참가자 정보를 불러오는 중..." : "Loading participants..."}
+            </div>
+          ) : participantsError ? (
+            <div className="rounded-lg border border-red-900/50 bg-red-950/20 px-4 py-6 text-center text-sm text-red-300">
+              {participantsError}
+            </div>
+          ) : (
+            <AdminParticipantList participants={participants ?? []} matchType={match.match_type ?? undefined} />
+          )}
         </div>
       )}
     </div>

@@ -30,16 +30,18 @@ export function LoungeContactMenu({
 
   const iconMap = {
     phone: {
-      icon: <Phone className="h-4 w-4" />,
-      className: "border border-zinc-200 text-zinc-700 dark:border-zinc-700 dark:text-zinc-200",
+      icon: <Phone className="h-4 w-4" strokeWidth={2.4} />,
+      className:
+        "border border-zinc-900 bg-zinc-900 text-white shadow-sm dark:border-zinc-100 dark:bg-zinc-100 dark:text-zinc-900",
     },
     kakao: {
       icon: <MessageCircle className="h-4 w-4" />,
       className: "bg-[#FEE500] text-[#3B1E1E]",
     },
     instagram: {
-      icon: <Instagram className="h-4 w-4" />,
-      className: "bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045] text-white",
+      icon: <Instagram className="h-4 w-4" strokeWidth={2.4} />,
+      className:
+        "border border-white/20 bg-[#E1306C] bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045] text-white shadow-sm",
     },
     website: {
       icon: <Globe className="h-4 w-4" />,
@@ -80,6 +82,7 @@ export function LoungeContactMenu({
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}
+        aria-expanded={open}
         className="inline-flex items-center gap-1 rounded-full border border-zinc-200 bg-white px-3 py-2 text-xs font-semibold text-zinc-700 shadow-sm transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
       >
         {locale === "ko" ? "연락하기" : "Contact"}

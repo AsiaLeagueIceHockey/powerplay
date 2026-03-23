@@ -854,7 +854,7 @@ export async function upsertLoungeBusiness(formData: FormData) {
 
   const instagramUrl = sanitizeLoungeExternalUrl(formData.get("instagram_url") as string | null, "instagram");
   if (instagramUrl.error) {
-    return { success: false, error: "인스타그램 링크는 https://instagram.com 형식이어야 합니다." };
+    return { success: false, error: "인스타그램은 instagram.com 주소 또는 @아이디 형식으로 입력해주세요." };
   }
 
   const websiteUrl = sanitizeLoungeExternalUrl(formData.get("website_url") as string | null, "website");

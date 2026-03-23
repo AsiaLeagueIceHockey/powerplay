@@ -188,9 +188,9 @@ export function LoungeBusinessDetail({
                   url={business.phone ? `tel:${business.phone}` : null}
                   locale={locale}
                   source={source}
-                  className="flex items-center justify-center gap-2 rounded-xl bg-zinc-900 px-3 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40 dark:bg-zinc-100 dark:text-zinc-900"
+                  className="flex items-center justify-center gap-2 rounded-xl border border-zinc-900 bg-zinc-900 px-3 py-2.5 text-sm font-semibold text-white shadow-sm disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-100 dark:bg-zinc-100 dark:text-zinc-900"
                 >
-                  <Phone className="h-4 w-4" />
+                  <Phone className="h-4 w-4" strokeWidth={2.4} />
                   {locale === "ko" ? "전화" : "Call"}
                 </LoungeCtaButton>
                 <LoungeCtaButton
