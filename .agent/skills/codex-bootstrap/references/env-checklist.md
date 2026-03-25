@@ -40,8 +40,8 @@ Used by SSR/browser clients, middleware, sitemap, and most server actions.
 
 - `sql/v18_secure_push_rpc.sql`: push token RPC
 - `sql/v28_player_card.sql`: player card sequence + RPC
-- `sql/v33_lounge_memberships.sql` through `sql/v39_lounge_business_category_other.sql`: lounge schema
-- latest schema file in repo: `sql/v39_lounge_business_category_other.sql`
+- `sql/v33_lounge_memberships.sql` through `sql/v40_lounge_business_category_youth_club.sql`: lounge schema
+- latest schema file in repo: `sql/v40_lounge_business_category_youth_club.sql`
 
 ## Safe Startup Checklist
 

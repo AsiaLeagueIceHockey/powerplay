@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { sendPushNotification } from "@/app/actions/push";
 import { logAndNotify } from "@/lib/audit";
+import type { LoungeBusinessCategory } from "@/lib/lounge-business-category";
 import { isAllowedNaverMapUrl } from "@/lib/lounge-link-utils";
 
 // Get all rinks for dropdown
@@ -1276,7 +1277,7 @@ interface AdminMatch {
 
 interface AdminLoungeBusiness {
   id: string;
-  category: "lesson" | "training_center" | "tournament" | "brand" | "service" | "other";
+  category: LoungeBusinessCategory;
   name: string;
   slug: string | null;
   tagline: string | null;

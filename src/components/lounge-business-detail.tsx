@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { CalendarDays, Globe, Instagram, List, MessageCircle, Phone, Trophy } from "lucide-react";
 import type { LoungeBusiness, LoungeEvent } from "@/app/actions/lounge";
+import { getLoungeBusinessCategoryLabel } from "@/lib/lounge-business-category";
 import { DateFilter } from "./date-filter";
 import { LoungeCalendarView } from "./lounge-calendar-view";
 import { LoungeCtaButton } from "./lounge-cta-button";
@@ -48,14 +49,7 @@ export function LoungeBusinessDetail({
   selectedEventId,
   initialDate,
 }: LoungeBusinessDetailProps) {
-  const categoryLabel = {
-    lesson: locale === "ko" ? "하키 레슨" : "Lessons",
-    training_center: locale === "ko" ? "훈련장 / 슈팅센터" : "Training Center",
-    tournament: locale === "ko" ? "대회" : "Tournament",
-    brand: locale === "ko" ? "브랜드" : "Brand",
-    service: locale === "ko" ? "치료/재활" : "Recovery & Rehab",
-    other: locale === "ko" ? "기타" : "Other",
-  }[business.category];
+  const categoryLabel = getLoungeBusinessCategoryLabel(locale, business.category);
   const categoryTheme = getLoungeBusinessCategoryTheme(business.category);
 
   const [selectedDate, setSelectedDate] = useState<string | null>(initialDate ?? null);

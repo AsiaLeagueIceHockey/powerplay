@@ -6,6 +6,7 @@ import { Image as ImageIcon, Loader2, MapPin, Search, Store, Upload, X } from "l
 import type { LoungeBusiness } from "@/app/actions/lounge";
 import { parseNaverMapUrl } from "@/app/actions/admin";
 import { uploadLoungeImage, upsertLoungeBusiness } from "@/app/actions/lounge";
+import { getLoungeBusinessCategoryOptions } from "@/lib/lounge-business-category";
 import { isAllowedNaverMapUrl, sanitizeLoungeExternalUrl } from "@/lib/lounge-link-utils";
 
 export function LoungeBusinessForm({
@@ -35,6 +36,7 @@ export function LoungeBusinessForm({
     lat: business?.lat?.toString() ?? "",
     lng: business?.lng?.toString() ?? "",
   });
+  const categoryOptions = getLoungeBusinessCategoryOptions(locale).filter((option) => option.value !== "all");
 
   const buildSlugPreview = (value: string) =>
     value
@@ -186,12 +188,11 @@ export function LoungeBusinessForm({
         <label className="space-y-2 text-sm">
           <span className="font-semibold text-zinc-100">{locale === "ko" ? "카테고리" : "Category"}</span>
           <select name="category" defaultValue={business?.category ?? "lesson"} className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100">
-            <option value="lesson">{locale === "ko" ? "하키 레슨" : "Lesson"}</option>
-            <option value="training_center">{locale === "ko" ? "훈련장 / 슈팅센터" : "Training Center"}</option>
-            <option value="tournament">{locale === "ko" ? "대회" : "Tournament"}</option>
-            <option value="brand">{locale === "ko" ? "브랜드" : "Brand"}</option>
-            <option value="service">{locale === "ko" ? "치료/재활" : "Recovery & Rehab"}</option>
-            <option value="other">{locale === "ko" ? "기타" : "Other"}</option>
+            {categoryOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
           </select>
         </label>
         <label className="space-y-2 text-sm md:col-span-2">

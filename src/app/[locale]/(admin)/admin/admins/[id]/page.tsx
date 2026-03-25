@@ -1,6 +1,7 @@
 
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { getAdminDetail } from "@/app/actions/admin";
+import { getLoungeBusinessCategoryLabel } from "@/lib/lounge-business-category";
 import Link from "next/link";
 import { ChevronLeft, User, Mail, Calendar, Users, Trophy, ExternalLink, Phone } from "lucide-react";
 import { notFound } from "next/navigation";
@@ -23,14 +24,7 @@ export default async function AdminDetailPage({
     const { profile, clubs, matches, loungeBusiness } = data;
 
     const loungeCategoryLabel = loungeBusiness
-      ? {
-          lesson: "하키 레슨",
-          training_center: "훈련장 / 슈팅센터",
-          tournament: "대회",
-          brand: "브랜드",
-          service: "치료/재활",
-          other: "기타",
-        }[loungeBusiness.category]
+      ? getLoungeBusinessCategoryLabel(locale, loungeBusiness.category)
       : null;
 
     return (

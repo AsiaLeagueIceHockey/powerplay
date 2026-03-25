@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { CalendarDays, PencilLine, Phone, UserRound } from "lucide-react";
 import type { LoungeManagedMembership, LoungeBusiness, LoungeBusinessCategory, LoungeManagedApplication } from "@/app/actions/lounge";
+import { getLoungeBusinessCategoryLabel } from "@/lib/lounge-business-category";
 import { LoungeApplicationManager } from "./lounge-application-manager";
 import { LoungeFeatureManager } from "./lounge-feature-manager";
 import { LoungeMembershipManager } from "./lounge-membership-manager";
@@ -83,15 +84,7 @@ function getMembershipPhaseLabel(locale: string, phase: LoungeMembershipPhase) {
 
 function getCategoryLabel(locale: string, category?: LoungeBusinessCategory) {
   if (!category) return locale === "ko" ? "비즈니스 미등록" : "No business";
-
-  return {
-    lesson: locale === "ko" ? "하키 레슨" : "Lesson",
-    training_center: locale === "ko" ? "훈련장 / 슈팅센터" : "Training Center",
-    tournament: locale === "ko" ? "대회" : "Tournament",
-    brand: locale === "ko" ? "브랜드" : "Brand",
-    service: locale === "ko" ? "치료/재활" : "Recovery & Rehab",
-    other: locale === "ko" ? "기타" : "Other",
-  }[category];
+  return getLoungeBusinessCategoryLabel(locale, category);
 }
 
 export function LoungeSuperuserManagementDashboard({

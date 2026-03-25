@@ -15,6 +15,7 @@ Manual QA checklist for the `라운지 / Lounge` feature before preview review a
   - [x] `sql/v37_fix_lounge_public_membership_rls.sql`
   - [x] `sql/v38_lounge_business_slugs.sql`
   - [x] `sql/v39_lounge_business_category_other.sql`
+  - [x] `sql/v40_lounge_business_category_youth_club.sql`
 - Key routes:
   - public lounge: `/{locale}/lounge`
   - public lounge detail: `/{locale}/lounge/{businessId}`
@@ -65,11 +66,13 @@ Manual QA checklist for the `라운지 / Lounge` feature before preview review a
 - [ ] Featured business shows `추천 파트너` badge
 - [ ] Category filter chips work:
   - [ ] `전체`
+  - [ ] `유소년 클럽`
   - [ ] `레슨`
   - [ ] `훈련장`
   - [ ] `대회`
   - [ ] `브랜드`
-  - [ ] `서비스`
+  - [ ] `치료/재활`
+  - [ ] `기타`
 - [ ] Empty-state message is correct when a category has no businesses
 - [ ] Business card shows:
   - [ ] category badge
