@@ -71,7 +71,7 @@ export default async function RinksDirectoryPage({
             ? "지도와 목록으로 링크장을 찾고, 각 링크장 상세 페이지에서 예정 경기와 활동 중인 동호회를 확인할 수 있습니다."
             : "Browse rinks by map or list and open each rink page for match and club details."}
         </p>
-        <p>{`Rinks: ${rinks.length}`}</p>
+        <p>{isKo ? `링크장 ${rinks.length}곳` : `${rinks.length} rinks`}</p>
       </section>
 
       <section>

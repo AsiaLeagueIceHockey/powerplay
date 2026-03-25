@@ -49,7 +49,7 @@ export function MatchCard({ match }: { match: Match }) {
 
   return (
     <div
-      className="group relative block flex cursor-pointer flex-col rounded-xl border border-zinc-200 bg-white p-4 transition-all duration-300 hover:border-blue-500 hover:shadow-lg dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-blue-400 overflow-hidden"
+      className="group relative block flex flex-col rounded-xl border border-zinc-200 bg-white p-4 transition-all duration-300 hover:border-blue-500 hover:shadow-lg dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-blue-400 overflow-hidden"
     >
       {/* Top Accent Line */}
       <div className="absolute top-0 left-0 h-1 w-full bg-[#172554] dark:bg-blue-600" />

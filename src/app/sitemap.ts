@@ -37,15 +37,29 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }))
   );
 
-  // --- Dynamic: Clubs ---
   let clubEntries: MetadataRoute.Sitemap = [];
-  try {
-    const { data: clubs } = await supabase
-      .from("clubs")
-      .select("id, updated_at");
+  let rinkEntries: MetadataRoute.Sitemap = [];
+  let matchEntries: MetadataRoute.Sitemap = [];
 
-    if (clubs) {
-      clubEntries = clubs.flatMap((club) =>
+  try {
+    const nowIso = new Date().toISOString();
+    const [clubsResult, rinksResult, matchesResult] = await Promise.all([
+      supabase.from("clubs").select("id, updated_at"),
+      supabase
+        .from("rinks")
+        .select("id, updated_at")
+        .eq("is_approved", true)
+        .order("name_ko", { ascending: true }),
+      supabase
+        .from("matches")
+        .select("id, start_time, status, updated_at")
+        .eq("status", "open")
+        .gte("start_time", nowIso)
+        .order("start_time", { ascending: true }),
+    ]);
+
+    if (clubsResult.data) {
+      clubEntries = clubsResult.data.flatMap((club) =>
         locales.map((locale) => ({
           url: `${baseUrl}/${locale}/clubs/${club.id}`,
           lastModified: club.updated_at ? new Date(club.updated_at) : new Date(),
@@ -54,21 +68,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         }))
       );
     }
-  } catch (e) {
-    console.error("Sitemap: Error fetching clubs", e);
-  }
 
-  // --- Dynamic: Rinks ---
-  let rinkEntries: MetadataRoute.Sitemap = [];
-  try {
-    const { data: rinks } = await supabase
-      .from("rinks")
-      .select("id, updated_at")
-      .eq("is_approved", true)
-      .order("name_ko", { ascending: true });
-
-    if (rinks) {
-      rinkEntries = rinks.flatMap((rink) =>
+    if (rinksResult.data) {
+      rinkEntries = rinksResult.data.flatMap((rink) =>
         locales.map((locale) => ({
           url: `${baseUrl}/${locale}/rinks/${rink.id}`,
           lastModified: rink.updated_at ? new Date(rink.updated_at) : new Date(),
@@ -77,23 +79,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         }))
       );
     }
-  } catch (e) {
-    console.error("Sitemap: Error fetching rinks", e);
-  }
 
-  // --- Dynamic: Matches ---
-  let matchEntries: MetadataRoute.Sitemap = [];
-  try {
-    const nowIso = new Date().toISOString();
-    const { data: matches } = await supabase
-      .from("matches")
-      .select("id, start_time, status, updated_at")
-      .eq("status", "open")
-      .gte("start_time", nowIso)
-      .order("start_time", { ascending: true });
-
-    if (matches) {
-      matchEntries = matches.flatMap((match) =>
+    if (matchesResult.data) {
+      matchEntries = matchesResult.data.flatMap((match) =>
         locales.map((locale) => ({
           url: `${baseUrl}/${locale}/match/${match.id}`,
           lastModified: match.updated_at
@@ -107,7 +95,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       );
     }
   } catch (e) {
-    console.error("Sitemap: Error fetching matches", e);
+    console.error("Sitemap: Error fetching dynamic sitemap data", e);
   }
 
   return [...staticEntries, ...rinkEntries, ...clubEntries, ...matchEntries];

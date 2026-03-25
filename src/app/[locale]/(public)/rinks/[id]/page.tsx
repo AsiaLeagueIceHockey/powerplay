@@ -127,7 +127,7 @@ export default async function RinkDetailPage({
             <a
               href={rink.map_url}
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
               className="inline-flex items-center rounded-lg bg-[#03C75A] px-3 py-2 font-semibold text-white transition-colors hover:bg-[#02b351]"
             >
               {isKo ? "네이버 지도 열기" : "Open in Naver Map"}

@@ -15,8 +15,8 @@ export function BottomNav({ locale }: { locale: string }) {
     if (path === `/${locale}`) {
       return (
         pathname === `/${locale}` ||
-        pathname === `/${locale}/rinks` ||
-        pathname === `/${locale}/clubs`
+        pathname.startsWith(`/${locale}/rinks`) ||
+        pathname.startsWith(`/${locale}/clubs`)
       );
     }
     return pathname.startsWith(normalizedPath);

@@ -127,7 +127,7 @@ export function RinkExplorer({ rinks, matches, clubs }: RinkExplorerProps) {
                                                     <div className="flex items-center justify-between p-3 bg-zinc-50 dark:bg-zinc-800/50 rounded-lg border border-zinc-100 dark:border-zinc-800 hover:border-blue-300 dark:hover:border-blue-700 transition-colors">
                                                         <div className="flex flex-col">
                                                             <span className="text-sm font-bold text-zinc-800 dark:text-zinc-200">
-                                                                {new Intl.DateTimeFormat("ko-KR", { month: "short", day: "numeric", weekday: "short", hour: "2-digit", minute:"2-digit", hour12: false }).format(new Date(match.start_time))}
+                                                                {new Intl.DateTimeFormat("ko-KR", { month: "short", day: "numeric", weekday: "short", hour: "2-digit", minute:"2-digit", hour12: false, timeZone: "Asia/Seoul" }).format(new Date(match.start_time))}
                                                             </span>
                                                             <span className="text-xs text-zinc-500 line-clamp-1">{match.description || "친선 경기"}</span>
                                                         </div>
