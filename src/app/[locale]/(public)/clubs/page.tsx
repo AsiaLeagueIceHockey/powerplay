@@ -1,9 +1,11 @@
-import Link from "next/link";
 import { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
 
-import { getPublicClubs } from "@/lib/public-clubs";
-import { extractRegion } from "@/lib/rink-utils";
+import { getCachedClubs, getCachedMatches, getCachedRinks } from "@/app/actions/cache";
+import { getProfile } from "@/app/actions/auth";
+import { FeedbackBanner } from "@/components/feedback-banner";
+import { HomeClient } from "@/components/home-client";
+import { PublicSectionTabs } from "@/components/public-section-tabs";
 
 const siteUrl = "https://powerplay.kr";
 
@@ -50,52 +52,34 @@ export default async function ClubsDirectoryPage({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const clubs = await getPublicClubs();
+  const [matches, rinks, clubs, profile] = await Promise.all([
+    getCachedMatches(),
+    getCachedRinks(),
+    getCachedClubs(),
+    getProfile(),
+  ]);
 
   return (
-    <div className="mx-auto max-w-5xl space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">
-          {locale === "ko" ? "동호회 둘러보기" : "Club Directory"}
-        </h1>
-        <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
-          {locale === "ko"
-            ? "파워플레이에서 활동 중인 동호회를 찾아보고 각 동호회 소개와 공지사항을 확인해보세요."
-            : "Explore clubs on PowerPlay and open each club page for introductions and notices."}
-        </p>
-      </div>
+    <div className="mx-auto max-w-6xl flex flex-col gap-6 -mt-2">
+      <FeedbackBanner />
+      <PublicSectionTabs locale={locale} activeTab="club" />
 
-      {clubs.length === 0 ? (
-        <div className="rounded-xl border border-zinc-200 bg-white px-6 py-12 text-center text-sm text-zinc-500 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400">
-          {locale === "ko" ? "등록된 동호회가 없습니다." : "No clubs available yet."}
-        </div>
-      ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {clubs.map((club) => {
-            const region = club.rinks?.[0]?.address ? extractRegion(club.rinks[0].address) : null;
-            return (
-              <Link
-                key={club.id}
-                href={`/${locale}/clubs/${club.id}`}
-                className="rounded-xl border border-zinc-200 bg-white p-5 transition-colors hover:border-blue-500 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900"
-              >
-                <div className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">{club.name}</div>
-                {club.description && (
-                  <p className="mt-2 line-clamp-3 text-sm text-zinc-600 dark:text-zinc-400">{club.description}</p>
-                )}
-                <div className="mt-4 flex items-center justify-between gap-2 text-xs text-zinc-500 dark:text-zinc-400">
-                  <span>{region || (locale === "ko" ? "동호회 상세 보기" : "View club details")}</span>
-                  <span>
-                    {locale === "ko"
-                      ? `멤버 ${club.member_count || 0}명`
-                      : `${club.member_count || 0} members`}
-                  </span>
-                </div>
-              </Link>
-            );
-          })}
-        </div>
-      )}
+      <section className="sr-only">
+        <h1>{locale === "ko" ? "아이스하키 동호회" : "Ice hockey clubs"}</h1>
+        <p>
+          {locale === "ko"
+            ? "지역과 링크장을 기준으로 활동 중인 동호회를 찾고 상세 페이지로 이동할 수 있습니다."
+            : "Browse active clubs by region and rink."}
+        </p>
+      </section>
+
+      <HomeClient
+        matches={matches}
+        rinks={rinks}
+        clubs={clubs}
+        userRole={profile?.role}
+        forcedTab="club"
+      />
     </div>
   );
 }

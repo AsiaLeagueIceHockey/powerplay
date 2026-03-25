@@ -1,9 +1,11 @@
+"use client";
+
 import { useState } from "react";
 import { Rink, Club } from "@/app/actions/types";
 import { Match } from "@/app/actions/match";
-import { useTranslations } from "next-intl";
+import { useLocale } from "next-intl";
 import { Map as MapIcon, List, Search, MapPin } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { DynamicRinkMap } from "@/components/dynamic-rink-map";
 
 interface RinkExplorerProps {
@@ -13,7 +15,7 @@ interface RinkExplorerProps {
 }
 
 export function RinkExplorer({ rinks, matches, clubs }: RinkExplorerProps) {
-  const t = useTranslations("home"); // Assuming relevant keys are here or need adding
+  const locale = useLocale();
   const [viewMode, setViewMode] = useState<"map" | "list">("map");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -160,14 +162,22 @@ export function RinkExplorer({ rinks, matches, clubs }: RinkExplorerProps) {
                             
                             {/* Actions */}
                              <div className="mt-5 pt-3 border-t border-zinc-100 dark:border-zinc-800">
-                                <a 
-                                    href={rink.map_url || `https://map.naver.com/v5/search/${rink.name_ko}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="block w-full text-center text-sm font-bold bg-[#03C75A] text-white py-3 rounded-xl hover:bg-[#02b351] transition-colors"
-                                >
-                                    네이버 지도
-                                </a>
+                                <div className="grid grid-cols-2 gap-2">
+                                    <Link
+                                        href={`/rinks/${rink.id}`}
+                                        className="block w-full text-center text-sm font-bold bg-zinc-900 text-white py-3 rounded-xl hover:bg-blue-600 transition-colors dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-blue-400"
+                                    >
+                                        {locale === "ko" ? "링크장 상세" : "Rink details"}
+                                    </Link>
+                                    <a 
+                                        href={rink.map_url || `https://map.naver.com/v5/search/${rink.name_ko}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="block w-full text-center text-sm font-bold bg-[#03C75A] text-white py-3 rounded-xl hover:bg-[#02b351] transition-colors"
+                                    >
+                                        네이버 지도
+                                    </a>
+                                </div>
                              </div>
                         </div>
                     );

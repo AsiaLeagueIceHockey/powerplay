@@ -20,6 +20,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // --- Static Pages ---
   const staticPages = [
     { path: "", changeFrequency: "daily" as const, priority: 1.0 },
+    { path: "/rinks", changeFrequency: "weekly" as const, priority: 0.8 },
     { path: "/clubs", changeFrequency: "weekly" as const, priority: 0.7 },
     { path: "/privacy", changeFrequency: "monthly" as const, priority: 0.3 },
     { path: "/terms", changeFrequency: "monthly" as const, priority: 0.3 },
@@ -57,6 +58,29 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.error("Sitemap: Error fetching clubs", e);
   }
 
+  // --- Dynamic: Rinks ---
+  let rinkEntries: MetadataRoute.Sitemap = [];
+  try {
+    const { data: rinks } = await supabase
+      .from("rinks")
+      .select("id, updated_at")
+      .eq("is_approved", true)
+      .order("name_ko", { ascending: true });
+
+    if (rinks) {
+      rinkEntries = rinks.flatMap((rink) =>
+        locales.map((locale) => ({
+          url: `${baseUrl}/${locale}/rinks/${rink.id}`,
+          lastModified: rink.updated_at ? new Date(rink.updated_at) : new Date(),
+          changeFrequency: "weekly" as const,
+          priority: 0.8,
+        }))
+      );
+    }
+  } catch (e) {
+    console.error("Sitemap: Error fetching rinks", e);
+  }
+
   // --- Dynamic: Matches ---
   let matchEntries: MetadataRoute.Sitemap = [];
   try {
@@ -86,5 +110,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.error("Sitemap: Error fetching matches", e);
   }
 
-  return [...staticEntries, ...clubEntries, ...matchEntries];
+  return [...staticEntries, ...rinkEntries, ...clubEntries, ...matchEntries];
 }

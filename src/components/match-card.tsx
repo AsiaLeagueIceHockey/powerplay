@@ -5,12 +5,10 @@ import { useTranslations, useLocale } from "next-intl";
 import type { Match } from "@/app/actions/match";
 import { Building2 } from "lucide-react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 
 export function MatchCard({ match }: { match: Match }) {
   const t = useTranslations("match");
   const locale = useLocale();
-  const router = useRouter();
 
   const rinkName = locale === "ko" ? match.rink?.name_ko : match.rink?.name_en;
   const dateFormatter = new Intl.DateTimeFormat(locale, {
@@ -51,7 +49,6 @@ export function MatchCard({ match }: { match: Match }) {
 
   return (
     <div
-      onClick={() => router.push(`/${locale}/match/${match.id}`)}
       className="group relative block flex cursor-pointer flex-col rounded-xl border border-zinc-200 bg-white p-4 transition-all duration-300 hover:border-blue-500 hover:shadow-lg dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-blue-400 overflow-hidden"
     >
       {/* Top Accent Line */}
@@ -92,13 +89,21 @@ export function MatchCard({ match }: { match: Match }) {
       {/* Rink Name & Address */}
       <div className="mb-3">
         <h3 className="text-lg font-bold text-[#172554] group-hover:text-blue-600 dark:text-zinc-100 dark:group-hover:text-blue-400 leading-tight transition-colors">
-          {rinkName || "Unknown Rink"}
+          <Link href={`/match/${match.id}`} className="relative z-10">
+            {rinkName || "Unknown Rink"}
+          </Link>
         </h3>
         {match.rink?.address && (
           <p className="mt-0.5 text-[11px] font-medium text-zinc-400 dark:text-zinc-500">
             {match.rink.address.split(" ").slice(0, 2).join(" ")}
           </p>
         )}
+        <Link
+          href={`/match/${match.id}`}
+          className="relative z-10 mt-2 inline-flex text-xs font-semibold text-blue-600 transition-colors hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+        >
+          {locale === "ko" ? "경기 상세 보기" : "View match details"}
+        </Link>
       </div>
 
       {/* Position Availability */}

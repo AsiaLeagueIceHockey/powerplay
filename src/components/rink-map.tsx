@@ -4,8 +4,9 @@ import { useState, useRef, useEffect } from "react";
 import { NaverMap, Marker, useNavermaps, Container as MapContainer, NavermapsProvider } from "react-naver-maps";
 import { Rink, Club } from "../app/actions/types";
 import { Match } from "../app/actions/match";
+import { useLocale } from "next-intl";
 import { Navigation, Calendar, MapPin, X, Users } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 
 interface RinkMapProps {
   rinks: Rink[];
@@ -15,6 +16,7 @@ interface RinkMapProps {
 }
 
 function RinkDetailCard({ rink, matches, clubs = [], onClose }: { rink: Rink; matches: Match[]; clubs?: Club[]; onClose: () => void }) {
+  const locale = useLocale();
   const rinkMatches = matches
     .filter((m) => m.rink?.id === rink.id)
     .filter((m) => m.status !== "canceled") // Hide canceled matches
@@ -98,6 +100,12 @@ function RinkDetailCard({ rink, matches, clubs = [], onClose }: { rink: Rink; ma
         )}
 
         <div className="grid grid-cols-2 gap-2">
+            <Link
+                href={`/rinks/${rink.id}`}
+                className="flex items-center justify-center gap-2 bg-zinc-900 hover:bg-blue-600 text-white text-sm font-bold py-2.5 rounded-lg transition-colors dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-blue-400"
+            >
+                {locale === "ko" ? "링크장 상세" : "Rink details"}
+            </Link>
             <a 
                 href={rink.map_url || `https://map.naver.com/v5/search/${rink.name_ko}`} 
                 target="_blank" 

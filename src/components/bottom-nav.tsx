@@ -13,8 +13,11 @@ export function BottomNav({ locale }: { locale: string }) {
   const isActive = (path: string) => {
     const normalizedPath = path.split("?")[0];
     if (path === `/${locale}`) {
-      // Exact match for home page
-      return pathname === `/${locale}`;
+      return (
+        pathname === `/${locale}` ||
+        pathname === `/${locale}/rinks` ||
+        pathname === `/${locale}/clubs`
+      );
     }
     return pathname.startsWith(normalizedPath);
   };

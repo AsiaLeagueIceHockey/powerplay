@@ -215,3 +215,74 @@ export function SportsEventJsonLd({
     />
   );
 }
+
+/**
+ * Place structured data for rink detail pages
+ */
+export function RinkPlaceJsonLd({
+  rink,
+  locale,
+}: {
+  rink: {
+    id: string;
+    name_ko: string;
+    name_en: string;
+    address?: string;
+    map_url?: string;
+    rink_type?: "FULL" | "MINI";
+    lat?: number;
+    lng?: number;
+    club_count?: number;
+    upcoming_match_count?: number;
+  };
+  locale: string;
+}) {
+  const isKo = locale === "ko";
+  const url = `${SITE_URL}/${locale}/rinks/${rink.id}`;
+  const name = isKo ? rink.name_ko : rink.name_en || rink.name_ko;
+
+  return (
+    <JsonLd
+      data={{
+        "@context": "https://schema.org",
+        "@type": "Place",
+        "@id": url,
+        name,
+        url,
+        description: isKo
+          ? `${name} 아이스하키 링크장 정보, 예정 경기, 활동 동호회 안내`
+          : `${name} rink information, upcoming matches, and club activity details`,
+        ...(rink.address && {
+          address: {
+            "@type": "PostalAddress",
+            streetAddress: rink.address,
+            addressCountry: "KR",
+          },
+        }),
+        ...(rink.lat && rink.lng && {
+          geo: {
+            "@type": "GeoCoordinates",
+            latitude: rink.lat,
+            longitude: rink.lng,
+          },
+        }),
+        ...(rink.map_url && { sameAs: [rink.map_url] }),
+        ...(rink.rink_type && {
+          additionalProperty: {
+            "@type": "PropertyValue",
+            name: "rinkType",
+            value: rink.rink_type,
+          },
+        }),
+        ...(typeof rink.club_count === "number" && {
+          containsPlace: {
+            "@type": "SportsActivityLocation",
+            sport: "Ice Hockey",
+            name,
+          },
+        }),
+        mainEntityOfPage: url,
+      }}
+    />
+  );
+}

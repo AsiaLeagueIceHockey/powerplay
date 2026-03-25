@@ -130,6 +130,11 @@ export async function createItem(formData: FormData) {
 - Use try/catch blocks for database operations and API calls.
 - Provide meaningful error messages. For user-facing errors, use translations from `next-intl`.
 
+### 7. User-Facing Copy
+- UI copy, landing-page text, helper descriptions, empty states, and CTAs must speak to the end user, not the implementer.
+- Do **not** use AI-agent framing such as explaining what the page is doing for SEO, crawlability, implementation, or the developer unless the page is explicitly for admins/tools.
+- Prefer concrete user benefit language such as what the user can find, compare, join, or check next.
+
 ---
 
 ## 📂 Project Structure

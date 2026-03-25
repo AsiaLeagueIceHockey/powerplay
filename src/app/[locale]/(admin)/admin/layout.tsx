@@ -5,6 +5,13 @@ import { createClient } from "@/lib/supabase/server";
 import { AdminSuperuserMenu } from "@/components/admin-superuser-menu";
 import { AdminUserMenu } from "@/components/admin-user-menu";
 
+export const metadata = {
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
+
 export default async function AdminLayout({
   children,
   params,

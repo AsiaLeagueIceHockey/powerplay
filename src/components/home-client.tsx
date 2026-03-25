@@ -22,24 +22,32 @@ interface HomeClientProps {
   rinks: Rink[];
   clubs: Club[];
   allMatches?: Match[]; // Optional, for backward compatibility if needed, but we'll use 'matches' as source
-  myClubIds?: string[];
   initialDate?: string;
   userRole?: string | null;
+  forcedTab?: "match" | "rink" | "club";
 }
 
-export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds = [], initialDate, userRole }: HomeClientProps) {
+export function HomeClient({
+  matches: allMatchesSource,
+  rinks,
+  clubs,
+  initialDate,
+  userRole,
+  forcedTab,
+}: HomeClientProps) {
   const locale = useLocale();
   const t = useTranslations("home");
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
 
-  const [activeTab, setActiveTabState] = useState<"match" | "rink" | "club">(() => {
+  const [activeTabState, setActiveTabState] = useState<"match" | "rink" | "club">(() => {
     const tabParam = searchParams.get("tab");
     if (tabParam === "rink") return "rink";
     if (tabParam === "club") return "club";
     return "match";
   });
+  const activeTab = forcedTab ?? activeTabState;
   const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
 
   // Client-side filtering state
@@ -84,7 +92,7 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
 
         if (dateStr) {
             setViewMode("list");
-            if (activeTab !== "match") {
+            if (!forcedTab && activeTab !== "match") {
                 setActiveTabState("match");
             }
         }
@@ -179,53 +187,52 @@ export function HomeClient({ matches: allMatchesSource, rinks, clubs, myClubIds 
 
   return (
     <div className="flex flex-col gap-6">
-      {/* ... Top Tab Navigation ... */}
-      <div className="flex border-b border-zinc-200 dark:border-zinc-800">
-        <button
-          onClick={() => setActiveTab("match")}
-          className={`flex-1 pb-3 text-lg font-bold transition-all relative ${activeTab === "match"
-            ? "text-zinc-900 dark:text-white"
-            : "text-zinc-400 hover:text-zinc-600"
-            }`}
-        >
-          <span className="flex items-center justify-center gap-2">
-            {t("tabs.match")}
-            {/* Optional Badge */}
-            {/* <span className="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded-full">{filteredMatches.length}</span> */}
-          </span>
-          {activeTab === "match" && (
-            <span className="absolute bottom-0 left-0 w-full h-0.5 bg-zinc-900 dark:bg-white" />
-          )}
-        </button>
-        <button
-          onClick={() => setActiveTab("rink")}
-          className={`flex-1 pb-3 text-lg font-bold transition-all relative ${activeTab === "rink"
-            ? "text-zinc-900 dark:text-white"
-            : "text-zinc-400 hover:text-zinc-600"
-            }`}
-        >
-          <span className="flex items-center justify-center gap-2">
-            {t("tabs.rink")}
-          </span>
-          {activeTab === "rink" && (
-            <span className="absolute bottom-0 left-0 w-full h-0.5 bg-zinc-900 dark:bg-white" />
-          )}
-        </button>
-        <button
-          onClick={() => setActiveTab("club")}
-          className={`flex-1 pb-3 text-lg font-bold transition-all relative ${activeTab === "club"
-            ? "text-zinc-900 dark:text-white"
-            : "text-zinc-400 hover:text-zinc-600"
-            }`}
-        >
-          <span className="flex items-center justify-center gap-2">
-            {t("tabs.club")}
-          </span>
-          {activeTab === "club" && (
-            <span className="absolute bottom-0 left-0 w-full h-0.5 bg-zinc-900 dark:bg-white" />
-          )}
-        </button>
-      </div>
+      {!forcedTab ? (
+        <div className="flex border-b border-zinc-200 dark:border-zinc-800">
+          <button
+            onClick={() => setActiveTab("match")}
+            className={`flex-1 pb-3 text-lg font-bold transition-all relative ${activeTab === "match"
+              ? "text-zinc-900 dark:text-white"
+              : "text-zinc-400 hover:text-zinc-600"
+              }`}
+          >
+            <span className="flex items-center justify-center gap-2">
+              {t("tabs.match")}
+            </span>
+            {activeTab === "match" && (
+              <span className="absolute bottom-0 left-0 w-full h-0.5 bg-zinc-900 dark:bg-white" />
+            )}
+          </button>
+          <button
+            onClick={() => setActiveTab("rink")}
+            className={`flex-1 pb-3 text-lg font-bold transition-all relative ${activeTab === "rink"
+              ? "text-zinc-900 dark:text-white"
+              : "text-zinc-400 hover:text-zinc-600"
+              }`}
+          >
+            <span className="flex items-center justify-center gap-2">
+              {t("tabs.rink")}
+            </span>
+            {activeTab === "rink" && (
+              <span className="absolute bottom-0 left-0 w-full h-0.5 bg-zinc-900 dark:bg-white" />
+            )}
+          </button>
+          <button
+            onClick={() => setActiveTab("club")}
+            className={`flex-1 pb-3 text-lg font-bold transition-all relative ${activeTab === "club"
+              ? "text-zinc-900 dark:text-white"
+              : "text-zinc-400 hover:text-zinc-600"
+              }`}
+          >
+            <span className="flex items-center justify-center gap-2">
+              {t("tabs.club")}
+            </span>
+            {activeTab === "club" && (
+              <span className="absolute bottom-0 left-0 w-full h-0.5 bg-zinc-900 dark:bg-white" />
+            )}
+          </button>
+        </div>
+      ) : null}
 
       {/* Tab Content */}
       <div className="relative min-h-[500px]">
