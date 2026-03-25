@@ -31,6 +31,12 @@ export const loungeIceGoldTheme = {
 } as const;
 
 const loungeBusinessCategoryThemes = {
+  youth_club: {
+    accentLine: "bg-[linear-gradient(90deg,#052e16_0%,#15803d_45%,#86efac_100%)]",
+    badge: "bg-[#ecfdf3] text-[#166534] dark:bg-[#15803d]/15 dark:text-[#86efac]",
+    subtleBadge: "bg-[#f1fdf5] text-[#166534] dark:bg-[#15803d]/12 dark:text-[#86efac]",
+    hoverBorder: "hover:border-[#22c55e] dark:hover:border-[#22c55e]",
+  },
   lesson: {
     accentLine: "bg-[linear-gradient(90deg,#0f172a_0%,#1d4ed8_45%,#60a5fa_100%)]",
     badge: "bg-[#eaf3ff] text-[#1f4fa3] dark:bg-[#1d4ed8]/15 dark:text-[#93c5fd]",

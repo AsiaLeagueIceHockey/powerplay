@@ -516,16 +516,73 @@ export async function rejectPointCharge(
 
 // ==================== ALL MATCHES (SuperUser Only) ====================
 
-export async function getAllMatchesForSuperuser() {
+export interface SuperuserMatchParticipant {
+  id: string;
+  position: "FW" | "DF" | "G";
+  status: "applied" | "confirmed" | "pending_payment" | "waiting" | "canceled";
+  payment_status: boolean;
+  team_color: string | null;
+  user: {
+    id: string;
+    full_name: string | null;
+    email: string;
+    phone: string | null;
+  } | null;
+}
+
+export interface SuperuserMatchSummary {
+  id: string;
+  start_time: string;
+  fee: number;
+  entry_points: number;
+  max_skaters: number;
+  max_goalies: number;
+  status: "open" | "closed" | "canceled";
+  description: string | null;
+  rink: {
+    name_ko: string;
+    name_en: string;
+  } | null;
+  club: {
+    name: string;
+  } | null;
+  match_type: string | null;
+  bank_account: string | null;
+  creator: {
+    full_name: string | null;
+    email: string;
+  };
+  participants_count: {
+    fw: number;
+    df: number;
+    g: number;
+  };
+  total_participants: number;
+}
+
+function buildMonthRange(month: string) {
+  const [year, monthNumber] = month.split("-").map(Number);
+  const nextMonthYear = monthNumber === 12 ? year + 1 : year;
+  const nextMonthNumber = monthNumber === 12 ? 1 : monthNumber + 1;
+
+  return {
+    startUtc: new Date(`${month}-01T00:00:00+09:00`).toISOString(),
+    endUtc: new Date(
+      `${nextMonthYear}-${String(nextMonthNumber).padStart(2, "0")}-01T00:00:00+09:00`
+    ).toISOString(),
+  };
+}
+
+export async function getAllMatchesForSuperuser(month: string): Promise<SuperuserMatchSummary[]> {
   const supabase = await createClient();
 
-  // Verify superuser
   const isSuperUser = await checkIsSuperUser();
   if (!isSuperUser) {
     return [];
   }
 
-  // Fetch ALL matches
+  const { startUtc, endUtc } = buildMonthRange(month);
+
   const { data: matches, error } = await supabase
     .from("matches")
     .select(
@@ -539,74 +596,124 @@ export async function getAllMatchesForSuperuser() {
       status,
       description,
       rink:rink_id(name_ko, name_en),
+      club:club_id(name),
       created_by,
+      match_type,
       bank_account
       `
     )
+    .gte("start_time", startUtc)
+    .lt("start_time", endUtc)
     .order("start_time", { ascending: true });
 
-  if (error) {
+  if (error || !matches) {
     console.error("Error fetching all matches:", error);
     return [];
   }
 
-  // Fetch creator profiles
-  const creatorIds = Array.from(new Set(matches.map(m => m.created_by).filter(Boolean)));
-  const { data: creators } = await supabase
-    .from("profiles")
-    .select("id, full_name, email")
-    .in("id", creatorIds);
-  
-  const creatorMap: Record<string, any> = {};
-  creators?.forEach(c => {
-    creatorMap[c.id] = c;
+  if (matches.length === 0) {
+    return [];
+  }
+
+  const creatorIds = Array.from(new Set(matches.map((match) => match.created_by).filter(Boolean)));
+  const matchIds = matches.map((match) => match.id);
+
+  const [{ data: creators }, { data: participantRows, error: participantError }] = await Promise.all([
+    creatorIds.length > 0
+      ? supabase.from("profiles").select("id, full_name, email").in("id", creatorIds)
+      : Promise.resolve({
+          data: [] as Array<{ id: string; full_name: string | null; email: string }>,
+          error: null,
+        }),
+    supabase
+      .from("participants")
+      .select("match_id, position, status")
+      .in("match_id", matchIds),
+  ]);
+
+  if (participantError) {
+    console.error("Error fetching participant summary:", participantError);
+    return [];
+  }
+
+  const creatorMap: Record<string, { full_name: string | null; email: string }> = {};
+  creators?.forEach((creator) => {
+    creatorMap[creator.id] = creator;
   });
 
-  // Fetch participants for each match
-  const matchesWithDetails = await Promise.all(
-    matches.map(async (match) => {
-      const { data: participants } = await supabase
-        .from("participants")
-        .select(`
-          id,
-          position,
-          status,
-          payment_status,
-          team_color,
-          user:user_id(id, full_name, email, phone)
-        `)
-        .eq("match_id", match.id)
-        .order("created_at", { ascending: true }); // Keep order
-      
-      const validParticipants = participants?.filter(p => ["applied", "confirmed"].includes(p.status)) || [];
+  const participantSummaryMap = new Map<
+    string,
+    {
+      totalParticipants: number;
+      counts: { fw: number; df: number; g: number };
+    }
+  >();
 
-      // Counts
-      const counts = {
-        fw: validParticipants.filter(p => p.position === 'FW').length || 0,
-        df: validParticipants.filter(p => p.position === 'DF').length || 0,
-        g: validParticipants.filter(p => p.position === 'G').length || 0,
-      };
+  participantRows?.forEach((participant) => {
+    const current = participantSummaryMap.get(participant.match_id) ?? {
+      totalParticipants: 0,
+      counts: { fw: 0, df: 0, g: 0 },
+    };
 
-      // Transform for UI (flatten user array if needed, usually supabase returns object or array depending on query. \`user:user_id\` implies object if single relation, but type is slightly ambiguous without checking. I'll treat it safely.)
-      const transformedParticipants = (participants || []).map((p) => {
-        const user = Array.isArray(p.user) ? p.user[0] : p.user;
-        return {
-          ...p,
-          user,
-        };
-      });
+    current.totalParticipants += 1;
 
-      return {
-        ...match,
-        rink: Array.isArray(match.rink) ? match.rink[0] : match.rink,
-        creator: creatorMap[match.created_by] || { email: "Unknown", full_name: "Unknown" },
-        participants: transformedParticipants, // Include full list for Card
-        participants_count: counts,
-      };
-    })
-  );
+    if (participant.status === "applied" || participant.status === "confirmed") {
+      if (participant.position === "FW") current.counts.fw += 1;
+      if (participant.position === "DF") current.counts.df += 1;
+      if (participant.position === "G") current.counts.g += 1;
+    }
 
-  return matchesWithDetails;
+    participantSummaryMap.set(participant.match_id, current);
+  });
+
+  return matches.map((match) => {
+    const summary = participantSummaryMap.get(match.id);
+
+    return {
+      ...match,
+      rink: Array.isArray(match.rink) ? match.rink[0] : match.rink,
+      club: Array.isArray(match.club) ? match.club[0] : match.club,
+      creator: creatorMap[match.created_by] || { email: "Unknown", full_name: "Unknown" },
+      participants_count: summary?.counts ?? { fw: 0, df: 0, g: 0 },
+      total_participants: summary?.totalParticipants ?? 0,
+    };
+  });
+}
+
+export async function getMatchParticipantsForSuperuser(
+  matchId: string
+): Promise<SuperuserMatchParticipant[]> {
+  const supabase = await createClient();
+
+  const isSuperUser = await checkIsSuperUser();
+  if (!isSuperUser) {
+    return [];
+  }
+
+  const { data: participants, error } = await supabase
+    .from("participants")
+    .select(
+      `
+      id,
+      position,
+      status,
+      payment_status,
+      team_color,
+      user:user_id(id, full_name, email, phone)
+    `
+    )
+    .eq("match_id", matchId)
+    .order("created_at", { ascending: true });
+
+  if (error) {
+    console.error("Error fetching match participants:", error);
+    return [];
+  }
+
+  return (participants ?? []).map((participant) => ({
+    ...participant,
+    user: Array.isArray(participant.user) ? participant.user[0] : participant.user,
+  })) as SuperuserMatchParticipant[];
 }
 
 // ==================== PUSH NOTIFICATION TEST (SuperUser Only) ====================

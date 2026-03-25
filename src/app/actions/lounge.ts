@@ -3,6 +3,10 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { sanitizeLoungeExternalUrl } from "@/lib/lounge-link-utils";
+import {
+  compareLoungeBusinessCategoryPriority,
+  type LoungeBusinessCategory,
+} from "@/lib/lounge-business-category";
 import { logAndNotify } from "@/lib/audit";
 import { sendPushNotification } from "@/app/actions/push";
 import { getAdminInfo } from "./admin-check";
@@ -11,13 +15,7 @@ import { checkIsSuperUser } from "./superuser";
 
 type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
 
-export type LoungeBusinessCategory =
-  | "lesson"
-  | "training_center"
-  | "tournament"
-  | "brand"
-  | "service"
-  | "other";
+export type { LoungeBusinessCategory } from "@/lib/lounge-business-category";
 
 export type LoungeEventCategory =
   | "lesson"
@@ -736,6 +734,10 @@ export async function getPublicLoungeData(): Promise<{
         if (a.is_featured && b.is_featured && a.featured_order !== b.featured_order) {
           return a.featured_order - b.featured_order;
         }
+        const categoryDiff = compareLoungeBusinessCategoryPriority(a.category, b.category);
+        if (categoryDiff !== 0) {
+          return categoryDiff;
+        }
         const eventDiff = (b.upcoming_events?.length ?? 0) - (a.upcoming_events?.length ?? 0);
         if (eventDiff !== 0) {
           return eventDiff;
@@ -781,6 +783,10 @@ export async function getPublicLoungeBusinessDetail(businessSlug: string): Promi
         }
         if (a.is_featured && b.is_featured && a.featured_order !== b.featured_order) {
           return a.featured_order - b.featured_order;
+        }
+        const categoryDiff = compareLoungeBusinessCategoryPriority(a.category, b.category);
+        if (categoryDiff !== 0) {
+          return categoryDiff;
         }
         return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
       })
@@ -854,7 +860,7 @@ export async function upsertLoungeBusiness(formData: FormData) {
 
   const instagramUrl = sanitizeLoungeExternalUrl(formData.get("instagram_url") as string | null, "instagram");
   if (instagramUrl.error) {
-    return { success: false, error: "인스타그램 링크는 https://instagram.com 형식이어야 합니다." };
+    return { success: false, error: "인스타그램은 instagram.com 주소 또는 @아이디 형식으로 입력해주세요." };
   }
 
   const websiteUrl = sanitizeLoungeExternalUrl(formData.get("website_url") as string | null, "website");
@@ -877,13 +883,13 @@ export async function upsertLoungeBusiness(formData: FormData) {
 
   if (result.error) {
     if (
-      payload.category === "other" &&
+      (payload.category === "other" || payload.category === "youth_club") &&
       (result.error.message.includes("lounge_businesses_category_check") ||
         result.error.message.includes("violates check constraint"))
     ) {
       return {
         success: false,
-        error: "DB에 v39_lounge_business_category_other.sql 이 아직 적용되지 않았습니다. 적용 후 다시 저장해주세요.",
+        error: "DB에 v40_lounge_business_category_youth_club.sql 이 아직 적용되지 않았습니다. 적용 후 다시 저장해주세요.",
       };
     }
     return { success: false, error: result.error.message };

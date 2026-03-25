@@ -2,6 +2,7 @@
 
 import { ArrowRight, Trophy } from "lucide-react";
 import type { LoungeBusiness } from "@/app/actions/lounge";
+import { getLoungeBusinessCategoryLabel } from "@/lib/lounge-business-category";
 import { extractRegion } from "@/lib/rink-utils";
 import { LoungeContactMenu } from "./lounge-contact-menu";
 import { LoungeDetailLink } from "./lounge-detail-link";
@@ -21,14 +22,7 @@ export function LoungeCard({
   const detailHref = `/${locale}/lounge/${business.slug}${source ? `?source=${encodeURIComponent(source)}` : ""}`;
   const isFeatured = business.is_featured;
   const region = extractRegion(business.address ?? undefined);
-  const categoryLabel = {
-    lesson: locale === "ko" ? "하키 레슨" : "Lessons",
-    training_center: locale === "ko" ? "훈련장 / 슈팅센터" : "Training Center",
-    tournament: locale === "ko" ? "대회" : "Tournament",
-    brand: locale === "ko" ? "브랜드" : "Brand",
-    service: locale === "ko" ? "치료/재활" : "Recovery & Rehab",
-    other: locale === "ko" ? "기타" : "Other",
-  }[business.category];
+  const categoryLabel = getLoungeBusinessCategoryLabel(locale, business.category);
   const categoryTheme = getLoungeBusinessCategoryTheme(business.category);
   const availableLinks = [
     {

@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { CalendarDays, List, Trophy } from "lucide-react";
 import type { LoungeBusiness, LoungeEvent } from "@/app/actions/lounge";
+import { getLoungeBusinessCategoryOptions } from "@/lib/lounge-business-category";
 import { DateFilter } from "./date-filter";
 import { LoungeCalendarView } from "./lounge-calendar-view";
 import { LoungeCard } from "./lounge-card";
@@ -29,15 +30,8 @@ export function LoungePageClient({ businesses, events, locale, source }: LoungeP
     [businesses]
   );
 
-  const categoryOptions: Array<{ value: "all" | LoungeBusiness["category"]; label: string }> = [
-    { value: "all", label: locale === "ko" ? "전체" : "All" },
-    { value: "lesson", label: locale === "ko" ? "레슨" : "Lessons" },
-    { value: "training_center", label: locale === "ko" ? "훈련장" : "Training" },
-    { value: "tournament", label: locale === "ko" ? "대회" : "Tournament" },
-    { value: "brand", label: locale === "ko" ? "브랜드" : "Brand" },
-    { value: "service", label: locale === "ko" ? "치료/재활" : "Recovery & Rehab" },
-    { value: "other", label: locale === "ko" ? "기타" : "Other" },
-  ];
+  const categoryOptions: Array<{ value: "all" | LoungeBusiness["category"]; label: string }> =
+    getLoungeBusinessCategoryOptions(locale);
 
   const featuredBusinesses = businesses.filter((business) => business.is_featured);
 
@@ -78,8 +72,8 @@ export function LoungePageClient({ businesses, events, locale, source }: LoungeP
             </p>
             <p className="mt-0.5 text-xs leading-tight text-zinc-200">
               {locale === "ko"
-                ? "레슨, 훈련장, 대회, 브랜드 정보를 만나보세요!"
-                : "Discover lessons, training centers, tournaments, and brand info."}
+                ? "유소년 클럽부터 레슨, 훈련장, 대회, 브랜드 정보를 만나보세요!"
+                : "Discover youth clubs, lessons, training centers, tournaments, and brand info."}
             </p>
           </div>
         </div>

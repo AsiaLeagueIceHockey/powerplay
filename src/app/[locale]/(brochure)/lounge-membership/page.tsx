@@ -119,10 +119,10 @@ function BrochurePage({ locale }: { locale: string }) {
   const isKo = locale === "ko";
 
   const strings = isKo
-    ? {
+      ? {
         heroTitle: "파워플레이 라운지 멤버십 소개자료",
         heroBody:
-          "레슨, 훈련장, 대회, 브랜드, 치료/재활까지. 하키 비즈니스를 위한 전용 홍보 공간을 만나보세요. 더 많은 하키인에게 노출하고, 일정과 성과 추적까지 한 번에 관리할 수 있습니다.",
+          "유소년 클럽부터 레슨, 훈련장, 대회, 브랜드, 치료/재활까지. 하키 비즈니스를 위한 전용 홍보 공간을 만나보세요. 더 많은 하키인에게 노출하고, 일정과 성과 추적까지 한 번에 관리할 수 있습니다.",
         primaryCta: "라운지 둘러보기",
         eyebrow1: "Why Lounge",
         title1: "파워플레이 라운지의 특장점",
@@ -159,7 +159,7 @@ function BrochurePage({ locale }: { locale: string }) {
     : {
         heroTitle: "PowerPlay Lounge Membership Brochure",
         heroBody:
-          "From lessons and training centers to tournaments, brands, and rehab services. Discover a dedicated promotion space for hockey businesses. Reach more hockey users and manage schedules and performance in one place.",
+          "From youth clubs and lessons to training centers, tournaments, brands, and rehab services. Discover a dedicated promotion space for hockey businesses. Reach more hockey users and manage schedules and performance in one place.",
         primaryCta: "Explore Lounge",
         eyebrow1: "Why Lounge",
         title1: "What makes PowerPlay Lounge valuable",

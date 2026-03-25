@@ -6,6 +6,7 @@ import { Image as ImageIcon, Loader2, MapPin, Search, Store, Upload, X } from "l
 import type { LoungeBusiness } from "@/app/actions/lounge";
 import { parseNaverMapUrl } from "@/app/actions/admin";
 import { uploadLoungeImage, upsertLoungeBusiness } from "@/app/actions/lounge";
+import { getLoungeBusinessCategoryOptions } from "@/lib/lounge-business-category";
 import { isAllowedNaverMapUrl, sanitizeLoungeExternalUrl } from "@/lib/lounge-link-utils";
 
 export function LoungeBusinessForm({
@@ -35,6 +36,7 @@ export function LoungeBusinessForm({
     lat: business?.lat?.toString() ?? "",
     lng: business?.lng?.toString() ?? "",
   });
+  const categoryOptions = getLoungeBusinessCategoryOptions(locale).filter((option) => option.value !== "all");
 
   const buildSlugPreview = (value: string) =>
     value
@@ -53,7 +55,9 @@ export function LoungeBusinessForm({
 
     const instagramResult = sanitizeLoungeExternalUrl(formData.get("instagram_url") as string | null, "instagram");
     if (instagramResult.error) {
-      return locale === "ko" ? "인스타그램 링크는 https://instagram.com 형식이어야 합니다." : "Instagram URL must use https://instagram.com.";
+      return locale === "ko"
+        ? "인스타그램은 instagram.com 주소 또는 @아이디 형식으로 입력해주세요."
+        : "Instagram must use an instagram.com URL or an @handle.";
     }
 
     const websiteResult = sanitizeLoungeExternalUrl(formData.get("website_url") as string | null, "website");
@@ -184,12 +188,11 @@ export function LoungeBusinessForm({
         <label className="space-y-2 text-sm">
           <span className="font-semibold text-zinc-100">{locale === "ko" ? "카테고리" : "Category"}</span>
           <select name="category" defaultValue={business?.category ?? "lesson"} className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100">
-            <option value="lesson">{locale === "ko" ? "하키 레슨" : "Lesson"}</option>
-            <option value="training_center">{locale === "ko" ? "훈련장 / 슈팅센터" : "Training Center"}</option>
-            <option value="tournament">{locale === "ko" ? "대회" : "Tournament"}</option>
-            <option value="brand">{locale === "ko" ? "브랜드" : "Brand"}</option>
-            <option value="service">{locale === "ko" ? "치료/재활" : "Recovery & Rehab"}</option>
-            <option value="other">{locale === "ko" ? "기타" : "Other"}</option>
+            {categoryOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
           </select>
         </label>
         <label className="space-y-2 text-sm md:col-span-2">
@@ -390,7 +393,12 @@ export function LoungeBusinessForm({
         </label>
         <label className="space-y-2 text-sm">
           <span className="font-semibold text-zinc-100">Instagram URL</span>
-          <input name="instagram_url" defaultValue={business?.instagram_url ?? ""} className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100" />
+          <input
+            name="instagram_url"
+            defaultValue={business?.instagram_url ?? ""}
+            placeholder="https://instagram.com/powerplay.kr or @powerplay.kr"
+            className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100 placeholder:text-zinc-500"
+          />
         </label>
         <label className="space-y-2 text-sm">
           <span className="font-semibold text-zinc-100">Website URL</span>

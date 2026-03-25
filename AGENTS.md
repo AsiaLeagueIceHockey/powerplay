@@ -565,6 +565,17 @@ UPDATE profiles SET role = 'superuser' WHERE email = 'your-email@example.com';
 
 <!-- Add new logs below this line -->
 
+### [2026-03-25] Lounge Youth Club Category Added
+- **Summary**: Added `유소년 클럽 / Youth Club` as the new highest-priority lounge business category across public and admin flows.
+- **Changes**:
+  - Added shared category definitions in `src/lib/lounge-business-category.ts` so labels, filter order, and priority stay consistent.
+  - Updated lounge public list/detail/admin surfaces to show the new category and place it ahead of `레슨`.
+  - Updated public lounge sorting in `src/app/actions/lounge.ts` so `featured` items still stay first, then `youth_club` businesses are prioritized over other categories.
+  - Added `sql/v40_lounge_business_category_youth_club.sql` to expand the `lounge_businesses.category` check constraint.
+  - Updated lounge brochure/admin guide/bootstrap docs and QA checklist to reference the new category and migration.
+- **Notes**:
+  - The database must apply `sql/v40_lounge_business_category_youth_club.sql` before admins can save a `youth_club` business.
+
 ### [2026-03-18] Search Indexing Hardening for Clubs and Matches
 - **Summary**: Reduced crawl-budget waste on match detail pages and strengthened internal linking to club detail pages without changing the main home-tab UX.
 - **Changes**:
