@@ -3,6 +3,7 @@ import { createServerClient } from "@supabase/ssr";
 
 const baseUrl = "https://powerplay.kr";
 const locales = ["ko", "en"];
+const maxIndexedMatches = 60;
 
 /**
  * Dynamic sitemap generation
@@ -20,18 +21,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // --- Static Pages ---
   const staticPages = [
     { path: "", changeFrequency: "daily" as const, priority: 1.0 },
-    { path: "/rinks", changeFrequency: "weekly" as const, priority: 0.8 },
-    { path: "/clubs", changeFrequency: "weekly" as const, priority: 0.7 },
+    { path: "/rinks", changeFrequency: "weekly" as const, priority: 0.9 },
+    { path: "/clubs", changeFrequency: "weekly" as const, priority: 0.9 },
+    { path: "/lounge", changeFrequency: "weekly" as const, priority: 0.85 },
     { path: "/privacy", changeFrequency: "monthly" as const, priority: 0.3 },
     { path: "/terms", changeFrequency: "monthly" as const, priority: 0.3 },
-    { path: "/login", changeFrequency: "monthly" as const, priority: 0.4 },
-    { path: "/signup", changeFrequency: "monthly" as const, priority: 0.4 },
   ];
 
   const staticEntries: MetadataRoute.Sitemap = staticPages.flatMap((page) =>
     locales.map((locale) => ({
       url: `${baseUrl}/${locale}${page.path}`,
-      lastModified: new Date(),
       changeFrequency: page.changeFrequency,
       priority: page.priority,
     }))
@@ -39,11 +38,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   let clubEntries: MetadataRoute.Sitemap = [];
   let rinkEntries: MetadataRoute.Sitemap = [];
+  let loungeEntries: MetadataRoute.Sitemap = [];
   let matchEntries: MetadataRoute.Sitemap = [];
 
   try {
     const nowIso = new Date().toISOString();
-    const [clubsResult, rinksResult, matchesResult] = await Promise.all([
+    const [clubsResult, rinksResult, loungeBusinessesResult, matchesResult] = await Promise.all([
       supabase.from("clubs").select("id, updated_at"),
       supabase
         .from("rinks")
@@ -51,11 +51,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         .eq("is_approved", true)
         .order("name_ko", { ascending: true }),
       supabase
+        .from("lounge_businesses")
+        .select("slug, updated_at, created_at")
+        .eq("is_published", true)
+        .order("created_at", { ascending: false }),
+      supabase
         .from("matches")
         .select("id, start_time, status, updated_at")
         .eq("status", "open")
         .gte("start_time", nowIso)
-        .order("start_time", { ascending: true }),
+        .order("start_time", { ascending: true })
+        .limit(maxIndexedMatches),
     ]);
 
     if (clubsResult.data) {
@@ -80,6 +86,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       );
     }
 
+    if (loungeBusinessesResult.data) {
+      loungeEntries = loungeBusinessesResult.data.flatMap((business) =>
+        locales.map((locale) => ({
+          url: `${baseUrl}/${locale}/lounge/${business.slug}`,
+          lastModified: business.updated_at
+            ? new Date(business.updated_at)
+            : business.created_at
+            ? new Date(business.created_at)
+            : new Date(),
+          changeFrequency: "weekly" as const,
+          priority: 0.8,
+        }))
+      );
+    }
+
     if (matchesResult.data) {
       matchEntries = matchesResult.data.flatMap((match) =>
         locales.map((locale) => ({
@@ -90,7 +111,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             ? new Date(match.start_time)
             : new Date(),
           changeFrequency: "daily" as const,
-          priority: 0.9,
+          priority: 0.6,
         }))
       );
     }
@@ -98,5 +119,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.error("Sitemap: Error fetching dynamic sitemap data", e);
   }
 
-  return [...staticEntries, ...rinkEntries, ...clubEntries, ...matchEntries];
+  return [...staticEntries, ...rinkEntries, ...clubEntries, ...loungeEntries, ...matchEntries];
 }
