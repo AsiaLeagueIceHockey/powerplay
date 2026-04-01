@@ -1,0 +1,1 @@
+export const MAX_MATCH_ENTRY_POINTS = 30000;
