@@ -19,11 +19,28 @@ interface LoungePageClientProps {
   source?: string;
 }
 
+type LoungeEventCategoryFilter = "all" | LoungeEvent["category"];
+
+function toDateKeyKst(input: string) {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    timeZone: "Asia/Seoul",
+  }).formatToParts(new Date(input));
+
+  const year = parts.find((part) => part.type === "year")?.value ?? "";
+  const month = parts.find((part) => part.type === "month")?.value ?? "";
+  const day = parts.find((part) => part.type === "day")?.value ?? "";
+  return `${year}-${month}-${day}`;
+}
+
 export function LoungePageClient({ businesses, events, locale, source }: LoungePageClientProps) {
   const [activeTab, setActiveTab] = useState<LoungePublicTab>("services");
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
   const [selectedCategory, setSelectedCategory] = useState<"all" | LoungeBusiness["category"]>("all");
+  const [selectedEventCategory, setSelectedEventCategory] = useState<LoungeEventCategoryFilter>("all");
 
   const handleCalendarDateSelect = (date: string, hasEvents: boolean) => {
     setSelectedDate(date);
@@ -49,13 +66,24 @@ export function LoungePageClient({ businesses, events, locale, source }: LoungeP
   });
 
   const filteredEvents = events.filter((event) => {
-    if (!selectedDate) return true;
-    const eventDate = new Date(event.start_time);
-    const year = eventDate.getFullYear();
-    const month = String(eventDate.getMonth() + 1).padStart(2, "0");
-    const day = String(eventDate.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}` === selectedDate;
+    if (selectedDate && toDateKeyKst(event.start_time) !== selectedDate) {
+      return false;
+    }
+
+    if (selectedEventCategory !== "all" && event.category !== selectedEventCategory) {
+      return false;
+    }
+
+    return true;
   });
+
+  const eventCategoryOptions: Array<{ value: LoungeEventCategoryFilter; label: string }> = [
+    { value: "all", label: locale === "ko" ? "전체" : "All" },
+    { value: "lesson", label: locale === "ko" ? "레슨" : "Lesson" },
+    { value: "training", label: locale === "ko" ? "훈련" : "Training" },
+    { value: "tournament", label: locale === "ko" ? "대회" : "Tournament" },
+    { value: "promotion", label: locale === "ko" ? "프로모션" : "Promotion" },
+  ];
 
   const tabs = [
     { id: "services" as const, label: locale === "ko" ? "하키 정보" : "Hockey Info" },
@@ -137,10 +165,10 @@ export function LoungePageClient({ businesses, events, locale, source }: LoungeP
                     key={option.value}
                     type="button"
                     onClick={() => setSelectedCategory(option.value)}
-                    className={`whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
+                    className={`whitespace-nowrap rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
                       active
-                        ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900"
-                        : "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300"
+                        ? "bg-zinc-900 text-white border-zinc-900 shadow-sm dark:bg-zinc-100 dark:text-zinc-900 dark:border-zinc-100"
+                        : "bg-white text-zinc-600 border-zinc-200 hover:bg-zinc-50 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700 dark:hover:bg-zinc-700"
                     }`}
                   >
                     {option.label}
@@ -189,9 +217,30 @@ export function LoungePageClient({ businesses, events, locale, source }: LoungeP
 
           <DateFilter selectedDate={selectedDate} onSelect={setSelectedDate} tone="ice-gold" />
 
+          <div className="flex overflow-x-auto gap-2 px-1 pb-2 no-scrollbar">
+            {eventCategoryOptions.map((option) => {
+              const active = selectedEventCategory === option.value;
+
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => setSelectedEventCategory(option.value)}
+                  className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors whitespace-nowrap ${
+                    active
+                      ? "bg-zinc-900 text-white border-zinc-900 shadow-sm dark:bg-zinc-100 dark:text-zinc-900 dark:border-zinc-100"
+                      : "bg-white text-zinc-600 border-zinc-200 hover:bg-zinc-50 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700 dark:hover:bg-zinc-700"
+                  }`}
+                >
+                  {option.label}
+                </button>
+              );
+            })}
+          </div>
+
           {viewMode === "calendar" ? (
             <LoungeCalendarView
-              events={events}
+              events={filteredEvents}
               locale={locale}
               onDateSelect={handleCalendarDateSelect}
               selectedDate={selectedDate}
