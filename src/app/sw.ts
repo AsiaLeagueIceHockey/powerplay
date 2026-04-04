@@ -1,6 +1,6 @@
 import { defaultCache } from "@serwist/next/worker";
 import type { PrecacheEntry, SerwistGlobalConfig } from "serwist";
-import { Serwist } from "serwist";
+import { ExpirationPlugin, NetworkFirst, Serwist } from "serwist";
 
 declare global {
   interface WorkerGlobalScope extends SerwistGlobalConfig {
@@ -10,14 +10,69 @@ declare global {
 
 declare const self: ServiceWorkerGlobalScope;
 
+const localeStartPath = /^\/(ko|en)\/?$/;
+
+const startPageRuntimeCaching = [
+  {
+    matcher: ({
+      request,
+      sameOrigin,
+      url,
+    }: {
+      request: Request;
+      sameOrigin: boolean;
+      url: URL;
+    }) =>
+      sameOrigin &&
+      request.method === "GET" &&
+      localeStartPath.test(url.pathname) &&
+      request.headers.get("RSC") !== "1",
+    handler: new NetworkFirst({
+      cacheName: "app-start-page",
+      networkTimeoutSeconds: 1,
+      plugins: [
+        new ExpirationPlugin({
+          maxEntries: 4,
+          maxAgeSeconds: 24 * 60 * 60,
+        }),
+      ],
+    }),
+  },
+  {
+    matcher: ({
+      request,
+      sameOrigin,
+      url,
+    }: {
+      request: Request;
+      sameOrigin: boolean;
+      url: URL;
+    }) =>
+      sameOrigin &&
+      request.method === "GET" &&
+      localeStartPath.test(url.pathname) &&
+      request.headers.get("RSC") === "1",
+    handler: new NetworkFirst({
+      cacheName: "app-start-rsc",
+      networkTimeoutSeconds: 1,
+      plugins: [
+        new ExpirationPlugin({
+          maxEntries: 4,
+          maxAgeSeconds: 10 * 60,
+        }),
+      ],
+    }),
+  },
+];
+
 const serwist = new Serwist({
   // iOS PWA에서 precaching이 SW 설치를 블로킹하여 push 등록이 실패하는 문제 방지.
-  // runtimeCaching(defaultCache)이 방문한 페이지를 자동 캐싱하므로 실사용에 지장 없음.
+  // 시작 경로는 별도 runtime cache로 빠르게 복구하고, install 단계는 계속 가볍게 유지한다.
   precacheEntries: [],
   skipWaiting: true,
   clientsClaim: true,
   navigationPreload: true,
-  runtimeCaching: defaultCache,
+  runtimeCaching: [...startPageRuntimeCaching, ...defaultCache],
 });
 
 serwist.addEventListeners();

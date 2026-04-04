@@ -563,6 +563,39 @@ UPDATE profiles SET role = 'superuser' WHERE email = 'your-email@example.com';
 
 ---
 
+## 🚨 장애 보고
+
+### [2026-04-04] iOS PWA Push Registration Failed Until Service Worker Precache Was Disabled
+- **Summary**: iPhone 홈 화면 PWA에서 푸시 권한 허용 후에도 기기 등록이 실패했다. 원인은 Serwist 서비스 워커의 precache 설치 단계가 iOS PWA에서 activation을 지연/실패시키며 `pushManager.subscribe()`가 요구하는 active service worker를 만들지 못한 것이었다.
+- **Symptoms**:
+  - `설정 중...` 상태가 오래 유지되거나 재등록 UI로 되돌아감
+  - `Timed out while waiting for the service worker to become ready`
+  - `Subscribing for push requires an active service worker`
+  - 동일 계정에 다른 기기 subscription이 있어도 현재 iPhone PWA는 subscription을 생성하지 못함
+- **Root Cause**:
+  - 기존 `src/app/sw.ts`는 `precacheEntries: self.__SW_MANIFEST` 기반으로 빌드 산출물을 install 시점에 precache했다.
+  - iOS PWA에서는 이 precache 작업이 service worker의 `install -> activate`를 블로킹하거나 과도하게 지연시키는 것으로 보였다.
+  - 푸시 구독은 active service worker가 필요하므로, precache가 끝나지 않으면 `navigator.serviceWorker.ready` 대기 또는 `pushManager.subscribe()` 호출이 실패한다.
+- **Resolution**:
+  - `src/app/sw.ts`에서 `precacheEntries`를 빈 배열로 변경했다.
+  - 현재 설정:
+    - `precacheEntries: []`
+    - `runtimeCaching: defaultCache`
+  - 의미:
+    - install 단계의 대규모 precache를 제거해 service worker가 빠르게 active 되도록 함
+    - 대신 runtime caching으로 사용자가 실제 방문한 리소스는 계속 캐싱되므로 실사용엔 큰 영향이 없음
+- **Why It Works**:
+  - push 등록 시점에 active service worker 확보가 가장 중요했는데, precache 제거로 install 부담이 사라지면서 iOS PWA에서도 activation이 통과하게 됨
+  - 즉, 문제의 본질은 푸시 API 자체가 아니라 precache-heavy SW install lifecycle이었음
+- **Do Not Reintroduce Without Verification**:
+  - iOS PWA push 등록 흐름이 중요한 상태에서 `precacheEntries: self.__SW_MANIFEST` 또는 대규모 precache 전략을 다시 넣지 말 것
+  - precache 재도입이 필요하면 iPhone 홈 화면 PWA 실기기에서 반드시 다음을 재검증할 것:
+    - 첫 설치 직후 push permission 요청
+    - `pushManager.subscribe()` 성공 여부
+    - `/admin/push-test` 실발송 수신 여부
+
+---
+
 ## 📝 Agent Handover Log
 
 > **Latest work log for the next agent.**

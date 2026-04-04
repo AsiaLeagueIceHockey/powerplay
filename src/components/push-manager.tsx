@@ -7,6 +7,45 @@ import {
   serializePushSubscription,
 } from "@/lib/push-subscription";
 
+const SUPPORTED_LOCALES = new Set(["ko", "en"]);
+
+function getWarmupStartPath() {
+  if (typeof window === "undefined") {
+    return "/ko";
+  }
+
+  const firstSegment = window.location.pathname.split("/").filter(Boolean)[0];
+
+  if (firstSegment && SUPPORTED_LOCALES.has(firstSegment)) {
+    return `/${firstSegment}`;
+  }
+
+  return "/ko";
+}
+
+async function warmupStartPage() {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  const startPath = getWarmupStartPath();
+  const warmupKey = `pp:start-warmed:${startPath}`;
+
+  if (sessionStorage.getItem(warmupKey) === "1") {
+    return;
+  }
+
+  try {
+    await fetch(startPath, {
+      credentials: "include",
+      cache: "no-cache",
+    });
+    sessionStorage.setItem(warmupKey, "1");
+  } catch (error) {
+    console.warn("Start page warmup failed:", error);
+  }
+}
+
 export function PushServiceWorkerRegister() {
   useEffect(() => {
     if ("serviceWorker" in navigator && "PushManager" in window) {
@@ -14,10 +53,24 @@ export function PushServiceWorkerRegister() {
         .register("/sw.js")
         .then((registration) => {
           console.log("Service Worker registered:", registration);
+
+          if (navigator.serviceWorker.controller || registration.active) {
+            void warmupStartPage();
+          }
         })
         .catch((error) => {
           console.error("Service Worker registration failed:", error);
         });
+
+      const handleControllerChange = () => {
+        void warmupStartPage();
+      };
+
+      navigator.serviceWorker.addEventListener("controllerchange", handleControllerChange);
+
+      return () => {
+        navigator.serviceWorker.removeEventListener("controllerchange", handleControllerChange);
+      };
     }
   }, []);
 
