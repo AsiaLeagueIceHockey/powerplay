@@ -1,7 +1,9 @@
 import { getPublicClubById, getPublicClubIds, getPublicClubNotices } from "@/lib/public-clubs";
+import { getMyClubVoteSummary } from "@/app/actions/clubs";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
-import { MessageCircle, Users, Calendar, Building2, MapPin, CreditCard } from "lucide-react";
+import { MessageCircle, Users, Calendar, Building2, MapPin, CreditCard, Heart, Medal } from "lucide-react";
+import { ClubVoteButton } from "@/components/club-vote-button";
 import { ClubShareButton } from "@/components/club-share-button";
 import { SportsTeamJsonLd } from "@/components/json-ld";
 import Link from "next/link";
@@ -73,9 +75,10 @@ export default async function ClubDetailPage({
   setRequestLocale(locale);
   const t = await getTranslations("club");
 
-  const [club, notices] = await Promise.all([
+  const [club, notices, clubVoteSummary] = await Promise.all([
     getPublicClubById(id),
     getPublicClubNotices(id),
+    getMyClubVoteSummary(),
   ]);
 
   if (!club) {
@@ -108,12 +111,30 @@ export default async function ClubDetailPage({
             <h1 className="text-2xl font-black text-zinc-900 dark:text-white tracking-tight break-keep">
               {club.name}
             </h1>
-            {club.member_count !== undefined && (
-              <span className="inline-flex items-center text-xs font-medium text-zinc-500 bg-zinc-100 dark:bg-zinc-800 px-2.5 py-1 rounded-full w-fit">
+            <div className="flex flex-wrap items-center gap-2">
+              {club.member_count !== undefined && (
+                <span className="inline-flex items-center text-xs font-medium text-zinc-500 bg-zinc-100 dark:bg-zinc-800 px-2.5 py-1 rounded-full w-fit">
                 <Users className="w-3.5 h-3.5 mr-1" />
                 {club.member_count} {locale === "ko" ? "명" : "Members"}
+                </span>
+              )}
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              {club.monthly_rank && (club.monthly_vote_count ?? 0) > 0 ? (
+                <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700 ring-1 ring-amber-200 dark:bg-amber-950/30 dark:text-amber-300 dark:ring-amber-900">
+                  <Medal className="h-3.5 w-3.5" />
+                  {locale === "ko"
+                    ? `${club.monthly_rank_tied ? "공동 " : ""}${club.monthly_rank}위`
+                    : `${club.monthly_rank_tied ? "T-" : "#"}${club.monthly_rank}`}
+                </span>
+              ) : null}
+              <span className="inline-flex items-center gap-1 rounded-full bg-rose-50 px-2.5 py-1 text-xs font-semibold text-rose-600 ring-1 ring-rose-200 dark:bg-rose-950/30 dark:text-rose-300 dark:ring-rose-900">
+                <Heart className="h-3.5 w-3.5 fill-current" />
+                {locale === "ko"
+                  ? `이번 달 응원 ${(club.monthly_vote_count ?? 0).toLocaleString()}표`
+                  : `${(club.monthly_vote_count ?? 0).toLocaleString()} votes this month`}
               </span>
-            )}
+            </div>
           </div>
         </div>
 
@@ -163,6 +184,12 @@ export default async function ClubDetailPage({
 
           {/* Bottom Row: Actions */}
           <div className="flex flex-col gap-3 mt-4">
+             <ClubVoteButton
+               clubId={club.id}
+               isLoggedIn={clubVoteSummary.isLoggedIn}
+               didVoteToday={clubVoteSummary.votedClubIdsToday.includes(club.id)}
+             />
+
              {/* 1. View Card */}
              <Link
                href={`/${locale}/clubs/${club.id}/card`}

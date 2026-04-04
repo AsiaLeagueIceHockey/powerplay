@@ -2,6 +2,12 @@ import { unstable_cache } from "next/cache";
 import { createServerClient } from "@supabase/ssr";
 
 import type { Club, ClubPost } from "@/app/actions/types";
+import { applyClubVoteRanking, type ClubVoteTotalRow } from "@/lib/club-voting";
+
+type ClubMemberCountRow = {
+  club_id: string;
+  member_count: number | string | null;
+};
 
 function createPublicSupabaseClient() {
   return createServerClient(
@@ -42,31 +48,38 @@ export const getPublicClubIds = unstable_cache(
 export const getPublicClubs = unstable_cache(
   async (): Promise<Club[]> => {
     const supabase = createPublicSupabaseClient();
-    const { data: clubs, error } = await supabase
-      .from("clubs")
-      .select("*, club_rinks(rink:rinks(*))")
-      .order("name", { ascending: true });
+    const [{ data: clubs, error }, { data: voteTotals, error: voteError }, { data: memberCounts, error: memberCountsError }] = await Promise.all([
+      supabase
+        .from("clubs")
+        .select("*, club_rinks(rink:rinks(*))")
+        .order("name", { ascending: true }),
+      supabase.rpc("get_public_club_vote_totals"),
+      supabase.rpc("get_public_club_member_counts"),
+    ]);
 
     if (error) {
       console.error("Error fetching public clubs:", error);
       return [];
     }
 
-    const clubsWithCounts = await Promise.all(
-      (clubs || []).map(async (club) => {
-        const { count } = await supabase
-          .from("club_memberships")
-          .select("*", { count: "exact", head: true })
-          .eq("club_id", club.id);
+    if (voteError) {
+      console.error("Error fetching public club vote totals:", voteError);
+    }
 
-        return {
-          ...mapClubWithRinks(club),
-          member_count: count || 0,
-        } as Club;
-      })
+    if (memberCountsError) {
+      console.error("Error fetching public club member counts:", memberCountsError);
+    }
+
+    const memberCountMap = new Map(
+      ((memberCounts || []) as ClubMemberCountRow[]).map((row) => [row.club_id, Number(row.member_count ?? 0)])
     );
 
-    return clubsWithCounts;
+    const clubsWithCounts = (clubs || []).map((club) => ({
+      ...mapClubWithRinks(club),
+      member_count: memberCountMap.get(club.id) ?? 0,
+    })) as Club[];
+
+    return applyClubVoteRanking(clubsWithCounts, (voteTotals || []) as ClubVoteTotalRow[]);
   },
   ["public-clubs"],
   { revalidate: 1800, tags: ["clubs"] }
@@ -75,25 +88,45 @@ export const getPublicClubs = unstable_cache(
 export const getPublicClubById = unstable_cache(
   async (id: string): Promise<Club | null> => {
     const supabase = createPublicSupabaseClient();
-    const { data: club, error } = await supabase
-      .from("clubs")
-      .select("*, club_rinks(rink:rinks(*))")
-      .eq("id", id)
-      .single();
+    const [{ data: club, error }, { data: clubs }, { data: voteTotals, error: voteError }, { data: memberCounts, error: memberCountsError }] = await Promise.all([
+      supabase
+        .from("clubs")
+        .select("*, club_rinks(rink:rinks(*))")
+        .eq("id", id)
+        .single(),
+      supabase
+        .from("clubs")
+        .select("id, name")
+        .order("name", { ascending: true }),
+      supabase.rpc("get_public_club_vote_totals"),
+      supabase.rpc("get_public_club_member_counts"),
+    ]);
 
     if (error) {
       console.error("Error fetching public club:", error);
       return null;
     }
 
-    const { count } = await supabase
-      .from("club_memberships")
-      .select("*", { count: "exact", head: true })
-      .eq("club_id", id);
+    if (voteError) {
+      console.error("Error fetching public club vote totals:", voteError);
+    }
+
+    if (memberCountsError) {
+      console.error("Error fetching public club member counts:", memberCountsError);
+    }
+
+    const rankedClubs = applyClubVoteRanking((clubs || []) as Club[], (voteTotals || []) as ClubVoteTotalRow[]);
+    const rankingTarget = rankedClubs.find((rankedClub) => rankedClub.id === id);
+    const memberCountMap = new Map(
+      ((memberCounts || []) as ClubMemberCountRow[]).map((row) => [row.club_id, Number(row.member_count ?? 0)])
+    );
 
     return {
       ...mapClubWithRinks(club),
-      member_count: count || 0,
+      member_count: memberCountMap.get(id) ?? 0,
+      monthly_vote_count: rankingTarget?.monthly_vote_count ?? 0,
+      monthly_rank: rankingTarget?.monthly_rank,
+      monthly_rank_tied: rankingTarget?.monthly_rank_tied ?? false,
     } as Club;
   },
   ["public-club-by-id"],

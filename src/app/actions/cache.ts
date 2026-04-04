@@ -1,8 +1,22 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { applyClubVoteRanking, type ClubVoteTotalRow } from "@/lib/club-voting";
 import { Rink, Club } from "./types";
 import type { Match, MatchRink, MatchClub } from "./match";
+
+type ClubRinkJoinRow = {
+  rink: Rink | null;
+};
+
+type ClubMemberCountRow = {
+  club_id: string;
+  member_count: number | string | null;
+};
+
+function extractClubRinks(clubRinks: ClubRinkJoinRow[] | null | undefined) {
+  return (clubRinks || []).map((clubRink) => clubRink.rink).filter((rink): rink is Rink => Boolean(rink));
+}
 
 // ============================================
 // Optimized Data Fetchers (No N+1 queries)
@@ -37,30 +51,86 @@ export async function getCachedRinks(): Promise<Rink[]> {
 export async function getCachedClubs(): Promise<Club[]> {
   const supabase = await createClient();
 
-  // Get clubs with member counts in a single query using subquery
-  const { data: clubs, error } = await supabase
-    .from("clubs")
-    .select(`
-      *,
-      club_memberships(count),
-      club_rinks(rink:rinks(*))
-    `)
-    .order("name", { ascending: true });
+  const [{ data: clubs, error }, { data: memberCounts, error: memberCountsError }] = await Promise.all([
+    supabase
+      .from("clubs")
+      .select(`
+        *,
+        club_rinks(rink:rinks(*))
+      `)
+      .order("name", { ascending: true }),
+    supabase.rpc("get_public_club_member_counts"),
+  ]);
 
   if (error) {
     console.error("Error fetching clubs:", error);
     return [];
   }
 
+  if (memberCountsError) {
+    console.error("Error fetching public club member counts:", memberCountsError);
+  }
+
+  const memberCountMap = new Map(
+    (((memberCounts || []) as ClubMemberCountRow[]).map((row) => [row.club_id, Number(row.member_count ?? 0)]))
+  );
+
   // Transform to include member_count and rinks
   return (clubs || []).map((club) => ({
     ...club,
-    member_count: club.club_memberships?.[0]?.count || 0,
-    // @ts-ignore
-    rinks: club.club_rinks?.map((cr) => cr.rink).filter(Boolean) || [],
-    club_memberships: undefined, // Remove nested data
+    member_count: memberCountMap.get(club.id) ?? 0,
+    rinks: extractClubRinks(club.club_rinks as ClubRinkJoinRow[] | null | undefined),
     club_rinks: undefined,
   })) as Club[];
+}
+
+/**
+ * Get club directory data ordered by current monthly vote ranking.
+ * Ties fall back to alphabetical club name ordering.
+ */
+export async function getRankedClubs(): Promise<Club[]> {
+  const supabase = await createClient();
+
+  const [
+    { data: clubs, error: clubsError },
+    { data: voteTotals, error: voteError },
+    { data: memberCounts, error: memberCountsError },
+  ] = await Promise.all([
+    supabase
+      .from("clubs")
+      .select(`
+        *,
+        club_rinks(rink:rinks(*))
+      `),
+    supabase.rpc("get_public_club_vote_totals"),
+    supabase.rpc("get_public_club_member_counts"),
+  ]);
+
+  if (clubsError) {
+    console.error("Error fetching ranked clubs:", clubsError);
+    return [];
+  }
+
+  if (voteError) {
+    console.error("Error fetching club vote totals:", voteError);
+  }
+
+  if (memberCountsError) {
+    console.error("Error fetching public club member counts:", memberCountsError);
+  }
+
+  const memberCountMap = new Map(
+    ((memberCounts || []) as ClubMemberCountRow[]).map((row) => [row.club_id, Number(row.member_count ?? 0)])
+  );
+
+  const clubsWithCounts = (clubs || []).map((club) => ({
+    ...club,
+    member_count: memberCountMap.get(club.id) ?? 0,
+    rinks: extractClubRinks(club.club_rinks as ClubRinkJoinRow[] | null | undefined),
+    club_rinks: undefined,
+  })) as Club[];
+
+  return applyClubVoteRanking(clubsWithCounts, (voteTotals || []) as ClubVoteTotalRow[]);
 }
 
 /**

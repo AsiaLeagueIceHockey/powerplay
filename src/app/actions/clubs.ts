@@ -2,6 +2,7 @@
 
 import { revalidatePath, revalidateTag } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { CLUB_VOTE_DAILY_LIMIT, getKstDateKey, getKstMonthKey } from "@/lib/club-voting";
 import { Club, ClubMembership, ClubPost, Rink } from "./types";
 import { logAndNotify } from "@/lib/audit";
 import { checkIsSuperUser } from "./superuser";
@@ -36,6 +37,28 @@ export interface ClubDeleteImpact {
 
 const CLUB_LOCALES = ["ko", "en"] as const;
 
+export interface ClubVoteSummary {
+  isLoggedIn: boolean;
+  dailyLimit: number;
+  remainingDailyVotes: number;
+  votedClubIdsToday: string[];
+  todayKey: string;
+  monthKey: string;
+}
+
+type CastClubVoteRpcRow = {
+  vote_id: string;
+  vote_date_kst: string;
+  vote_month_kst: string;
+  remaining_daily_votes: number;
+  monthly_vote_count: number;
+};
+
+type ClubMemberCountRow = {
+  club_id: string;
+  member_count: number | string | null;
+};
+
 function revalidateClubPaths(clubId?: string) {
   revalidateTag("clubs", "max");
   revalidatePath("/sitemap.xml");
@@ -50,6 +73,35 @@ function revalidateClubPaths(clubId?: string) {
       revalidatePath(`/${locale}/admin/clubs/${clubId}/edit`);
     }
   }
+}
+
+function normalizeClubVoteError(errorMessage?: string) {
+  if (!errorMessage) {
+    return "UNKNOWN_ERROR";
+  }
+
+  if (errorMessage.includes("AUTH_REQUIRED")) return "AUTH_REQUIRED";
+  if (errorMessage.includes("CLUB_REQUIRED")) return "CLUB_REQUIRED";
+  if (errorMessage.includes("CLUB_NOT_FOUND")) return "CLUB_NOT_FOUND";
+  if (errorMessage.includes("DAILY_LIMIT_REACHED")) return "DAILY_LIMIT_REACHED";
+  if (errorMessage.includes("ALREADY_VOTED_TODAY")) return "ALREADY_VOTED_TODAY";
+
+  return "UNKNOWN_ERROR";
+}
+
+async function fetchClubMemberCountMap(
+  supabase: Awaited<ReturnType<typeof createClient>>
+) {
+  const { data, error } = await supabase.rpc("get_public_club_member_counts");
+
+  if (error) {
+    console.error("Error fetching public club member counts:", error);
+    return new Map<string, number>();
+  }
+
+  return new Map(
+    ((data || []) as ClubMemberCountRow[]).map((row) => [row.club_id, Number(row.member_count ?? 0)])
+  );
 }
 
 function extractClubLogoStoragePath(logoUrl: string | null | undefined): string | null {
@@ -199,6 +251,7 @@ export async function uploadClubLogo(formData: FormData): Promise<{ url?: string
 
 export async function getClubs(): Promise<Club[]> {
   const supabase = await createClient();
+  const memberCountMapPromise = fetchClubMemberCountMap(supabase);
 
   const { data: clubs, error } = await supabase
     .from("clubs")
@@ -211,13 +264,9 @@ export async function getClubs(): Promise<Club[]> {
   }
 
   // Get member counts for each club
+  const memberCountMap = await memberCountMapPromise;
   const clubsWithCounts = await Promise.all(
     (clubs || []).map(async (club) => {
-      const { count } = await supabase
-        .from("club_memberships")
-        .select("*", { count: "exact", head: true })
-        .eq("club_id", club.id);
-
       // Fetch detailed member info
       const { data: membersData } = await supabase
         .from("club_memberships")
@@ -229,7 +278,7 @@ export async function getClubs(): Promise<Club[]> {
 
       return {
         ...club,
-        member_count: count || 0,
+        member_count: memberCountMap.get(club.id) ?? 0,
         rinks,
         members,
       } as Club;
@@ -241,6 +290,7 @@ export async function getClubs(): Promise<Club[]> {
 
 export async function getAdminClubs(): Promise<Club[]> {
   const supabase = await createClient();
+  const memberCountMapPromise = fetchClubMemberCountMap(supabase);
   
   const {
     data: { user },
@@ -275,13 +325,9 @@ export async function getAdminClubs(): Promise<Club[]> {
   // For regular admins, ONLY show clubs they created (as per user request)
   // No longer showing clubs they joined.
 
+  const memberCountMap = await memberCountMapPromise;
   const clubsWithCounts = await Promise.all(
     (createdClubs || []).map(async (club) => {
-      const { count } = await supabase
-        .from("club_memberships")
-        .select("*", { count: "exact", head: true })
-        .eq("club_id", club.id);
-
       // Fetch detailed member info
       const { data: membersData } = await supabase
         .from("club_memberships")
@@ -293,7 +339,7 @@ export async function getAdminClubs(): Promise<Club[]> {
 
       return {
         ...club,
-        member_count: count || 0,
+        member_count: memberCountMap.get(club.id) ?? 0,
         rinks,
         members,
       } as Club;
@@ -607,6 +653,92 @@ export async function joinClub(clubId: string) {
   revalidateClubPaths(clubId);
 
   return { success: true };
+}
+
+export async function getMyClubVoteSummary(): Promise<ClubVoteSummary> {
+  const supabase = await createClient();
+  const todayKey = getKstDateKey(new Date());
+  const monthKey = getKstMonthKey(new Date());
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return {
+      isLoggedIn: false,
+      dailyLimit: CLUB_VOTE_DAILY_LIMIT,
+      remainingDailyVotes: CLUB_VOTE_DAILY_LIMIT,
+      votedClubIdsToday: [],
+      todayKey,
+      monthKey,
+    };
+  }
+
+  const { data, error } = await supabase
+    .from("club_votes")
+    .select("club_id")
+    .eq("user_id", user.id)
+    .eq("vote_date_kst", todayKey);
+
+  if (error) {
+    console.error("Error fetching club vote summary:", error);
+    return {
+      isLoggedIn: true,
+      dailyLimit: CLUB_VOTE_DAILY_LIMIT,
+      remainingDailyVotes: CLUB_VOTE_DAILY_LIMIT,
+      votedClubIdsToday: [],
+      todayKey,
+      monthKey,
+    };
+  }
+
+  const votedClubIdsToday = (data || []).map((vote) => vote.club_id);
+
+  return {
+    isLoggedIn: true,
+    dailyLimit: CLUB_VOTE_DAILY_LIMIT,
+    remainingDailyVotes: Math.max(0, CLUB_VOTE_DAILY_LIMIT - votedClubIdsToday.length),
+    votedClubIdsToday,
+    todayKey,
+    monthKey,
+  };
+}
+
+export async function castClubVote(clubId: string): Promise<{
+  success: boolean;
+  error?: string;
+  remainingDailyVotes?: number;
+  monthlyVoteCount?: number;
+}> {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { success: false, error: "AUTH_REQUIRED" };
+  }
+
+  const { data, error } = await supabase.rpc("cast_club_vote", {
+    target_club_id: clubId,
+  });
+
+  if (error) {
+    console.error("Error casting club vote:", error);
+    return { success: false, error: normalizeClubVoteError(error.message) };
+  }
+
+  const vote = ((data || []) as CastClubVoteRpcRow[])[0];
+
+  revalidateClubPaths(clubId);
+
+  return {
+    success: true,
+    remainingDailyVotes: vote?.remaining_daily_votes ?? 0,
+    monthlyVoteCount: vote?.monthly_vote_count ?? 0,
+  };
 }
 
 export async function leaveClub(clubId: string) {

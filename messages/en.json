@@ -47,6 +47,18 @@
             "goToAdmin": "Go to Admin Page",
             "becomeAdmin": "Become an Admin & Promote Your Club!"
         },
+        "clubRanking": {
+            "badge": "Monthly ranking",
+            "bannerTitle": "Help our team reach #1! 🏆",
+            "bannerDescription": "Which club will get the most support this month?",
+            "bannerSubdescription": "* 3 votes per day, 1 per club. Ranking refreshes on the 1st of each month.",
+            "voteErrors": {
+                "alreadyVotedToday": "You already voted for this club today.",
+                "dailyLimitReached": "You already used all 3 votes for today.",
+                "clubNotFound": "Club not found.",
+                "generic": "Something went wrong while casting your vote. Please try again."
+            }
+        },
         "noClubs": "No clubs registered",
         "filter": {
             "skaterSpots": "🏒 Player Spots",

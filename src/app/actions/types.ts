@@ -21,6 +21,9 @@ export interface Club {
   created_by?: string;
   created_at?: string;
   member_count?: number;
+  monthly_vote_count?: number;
+  monthly_rank?: number;
+  monthly_rank_tied?: boolean;
   rinks?: Rink[];
   members?: { full_name: string | null; email: string; }[];
 }
