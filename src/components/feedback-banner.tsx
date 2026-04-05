@@ -25,7 +25,7 @@ export async function FeedbackBanner({ locale }: { locale: string }) {
     })),
     {
       id: "instagram",
-      href: "https://www.instagram.com/powerplay.kr/",
+      href: "https://www.instagram.com/p/DWu4WLTj7tv/",
       internal: false,
       bgClass: "bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045] hover:opacity-90",
       iconBg: "bg-white",
