@@ -19,6 +19,7 @@ interface FortuneRow {
   details_ko: string[];
   details_en: string[];
   viewed_at: string | null;
+  signals?: Record<string, unknown> | null;
 }
 
 interface FortuneDayScore {
@@ -134,7 +135,7 @@ export async function getDailyHockeyFortuneScreen(locale: string) {
   const todayKey = getTodayKstDateKey();
   const { data: existing, error: existingError } = await supabase
     .from("daily_hockey_fortunes")
-    .select("fortune_date, score, title_ko, title_en, summary_ko, summary_en, details_ko, details_en, viewed_at")
+    .select("fortune_date, score, title_ko, title_en, summary_ko, summary_en, details_ko, details_en, viewed_at, signals")
     .eq("user_id", user.id)
     .eq("fortune_date", todayKey)
     .maybeSingle();
@@ -174,7 +175,7 @@ export async function getDailyHockeyFortuneScreen(locale: string) {
         },
         { onConflict: "user_id,fortune_date" }
       )
-      .select("fortune_date, score, title_ko, title_en, summary_ko, summary_en, details_ko, details_en, viewed_at")
+      .select("fortune_date, score, title_ko, title_en, summary_ko, summary_en, details_ko, details_en, viewed_at, signals")
       .single();
 
     if (insertError) {
@@ -190,7 +191,7 @@ export async function getDailyHockeyFortuneScreen(locale: string) {
       .update({ viewed_at: new Date().toISOString() })
       .eq("user_id", user.id)
       .eq("fortune_date", todayKey)
-      .select("fortune_date, score, title_ko, title_en, summary_ko, summary_en, details_ko, details_en, viewed_at")
+      .select("fortune_date, score, title_ko, title_en, summary_ko, summary_en, details_ko, details_en, viewed_at, signals")
       .single();
 
     if (updateError) {
@@ -199,6 +200,10 @@ export async function getDailyHockeyFortuneScreen(locale: string) {
       row = updated as FortuneRow;
       shouldLogView = true;
     }
+  }
+
+  if (row && !shouldLogView) {
+    shouldLogView = row.signals?.viewLogged !== true;
   }
 
   if (shouldLogView) {
@@ -213,7 +218,27 @@ export async function getDailyHockeyFortuneScreen(locale: string) {
         titleEn: row.title_en,
       },
       url: "/admin/audit-logs",
+      mode: "immediate",
     });
+
+    const nextSignals = {
+      ...(row.signals ?? {}),
+      viewLogged: true,
+    };
+
+    const { data: patchedRow, error: patchError } = await supabase
+      .from("daily_hockey_fortunes")
+      .update({ signals: nextSignals })
+      .eq("user_id", user.id)
+      .eq("fortune_date", todayKey)
+      .select("fortune_date, score, title_ko, title_en, summary_ko, summary_en, details_ko, details_en, viewed_at, signals")
+      .single();
+
+    if (patchError) {
+      console.error("Error patching fortune viewLogged signal:", patchError);
+    } else {
+      row = patchedRow as FortuneRow;
+    }
   }
 
   const recentScores = await getRecentFortuneScoresForUser(user.id);
