@@ -39,6 +39,52 @@ interface AuditLogParams {
   metadata?: Record<string, unknown>;
   skipPush?: boolean; // If true, only log to DB, don't ping SuperUsers
   url?: string; // Optional URL for the push notification
+  mode?: "after" | "immediate";
+}
+
+async function runLogAndNotify({
+  userId,
+  action,
+  description,
+  metadata,
+  skipPush,
+  url,
+}: Required<Omit<AuditLogParams, "mode">>) {
+  try {
+    const supabase = await createClient();
+
+    // Fetch user profile for standardized label: Name(Email)
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("full_name, email")
+      .eq("id", userId)
+      .single();
+
+    const userLabel = profile
+      ? `${profile.full_name || "Unknown"}(${profile.email || "No Email"})`
+      : userId;
+
+    const finalDescription = `${userLabel}: ${description}`;
+
+    const { error } = await supabase.from("audit_logs").insert({
+      user_id: userId,
+      action_type: action,
+      description: finalDescription,
+      metadata,
+    });
+
+    if (error) {
+      console.error("[AUDIT] DB Log Failed:", error);
+    } else {
+      console.log(`[AUDIT] Logged: ${action} - ${finalDescription}`);
+    }
+
+    if (!skipPush) {
+      await sendPushToSuperUsers(`🔔 알림: ${action}`, finalDescription, url);
+    }
+  } catch (err) {
+    console.error("[AUDIT] Background Task Failed:", err);
+  }
 }
 
 /**
@@ -52,50 +98,16 @@ export async function logAndNotify({
   metadata = {},
   skipPush = false,
   url = "/admin/audit-logs",
+  mode = "after",
 }: AuditLogParams) {
-  // Use `after` to execute independently of the response lifecycle
+  const params = { userId, action, description, metadata, skipPush, url };
+
+  if (mode === "immediate") {
+    await runLogAndNotify(params);
+    return;
+  }
+
   after(async () => {
-    try {
-      const supabase = await createClient();
-
-      // Fetch user profile for standardized label: Name(Email)
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("full_name, email")
-        .eq("id", userId)
-        .single();
-
-      const userLabel = profile 
-        ? `${profile.full_name || "Unknown"}(${profile.email || "No Email"})`
-        : userId;
-      
-      const finalDescription = `${userLabel}: ${description}`;
-
-      // 1. Log to DB
-      const { error } = await supabase.from("audit_logs").insert({
-        user_id: userId,
-        action_type: action,
-        description: finalDescription,
-        metadata,
-      });
-
-      if (error) {
-        console.error("[AUDIT] DB Log Failed:", error);
-      } else {
-        console.log(`[AUDIT] Logged: ${action} - ${finalDescription}`);
-      }
-
-      // 2. Send Push Notification to SuperUsers
-      if (!skipPush) {
-        await sendPushToSuperUsers(
-          `🔔 알림: ${action}`, // Title
-          finalDescription, // Body
-          url // URL
-        );
-      }
-
-    } catch (err) {
-      console.error("[AUDIT] Background Task Failed:", err);
-    }
+    await runLogAndNotify(params);
   });
 }
