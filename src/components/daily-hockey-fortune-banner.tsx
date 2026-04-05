@@ -21,7 +21,7 @@ export async function DailyHockeyFortuneBanner({
     <section className="mb-6">
       <Link
         href={`/${locale}/mypage/fortune`}
-        className="group flex items-center justify-between gap-4 overflow-hidden rounded-[22px] border border-blue-200 bg-blue-50 px-5 py-4 shadow-sm transition-all duration-300 hover:border-blue-300 hover:shadow-md dark:border-blue-900/70 dark:bg-blue-950/30"
+        className="group flex items-center justify-between gap-4 overflow-hidden rounded-xl border border-blue-200 bg-blue-50 px-5 py-4 shadow-sm transition-all duration-300 hover:border-blue-300 hover:shadow-md dark:border-blue-900/70 dark:bg-blue-950/30"
       >
         <div className="min-w-0 flex-1">
           <div className="flex min-w-0 items-center gap-2 text-blue-700 dark:text-blue-300">
