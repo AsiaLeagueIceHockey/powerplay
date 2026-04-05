@@ -5,6 +5,7 @@ import { sendPushToSuperUsers } from "@/app/actions/push";
 type AuditAction = 
   | "USER_SIGNUP"
   | "CLUB_CREATE"
+  | "CLUB_VOTE"
   | "CLUB_DELETE"
   | "RINK_DELETE"
   | "MATCH_CREATE"
@@ -16,6 +17,7 @@ type AuditAction =
   | "CHAT_CREATE"
   | "PROFILE_UPDATE"
   | "CARD_ISSUE"
+  | "FORTUNE_VIEW"
   | "LOUNGE_BUSINESS_CREATE"
   | "LOUNGE_BUSINESS_UPDATE"
   | "LOUNGE_BUSINESS_PUBLISH"

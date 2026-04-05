@@ -280,7 +280,24 @@
         "title": "My Page",
         "subtitle": "My match applications",
         "noMatches": "No matches applied yet",
-        "browseMatches": "Browse matches"
+        "browseMatches": "Browse matches",
+        "fortune": {
+            "banner": {
+                "ctaBadge": "Today's hockey fortune",
+                "ctaTitle": "Open today's fortune",
+                "ctaDescription": "Take a quick look at today's hockey vibe.",
+                "seenBadge": "Today's hockey fortune",
+                "scoreSuffix": ""
+            },
+            "screen": {
+                "pageTitle": "Today's Fortune",
+                "loadingTitle": "Checking today's hockey fortune...",
+                "loadingSubtitle": "We are lining up today's flow on the ice.",
+                "todayBest": "Today's hockey fortune",
+                "scoreSuffix": " pts",
+                "nameSuffix": ","
+            }
+        }
     },
     "points": {
         "title": "Credits",
