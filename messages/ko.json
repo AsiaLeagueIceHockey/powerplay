@@ -280,7 +280,24 @@
         "title": "마이페이지",
         "subtitle": "내가 신청한 경기 목록",
         "noMatches": "신청한 경기가 없습니다",
-        "browseMatches": "경기 둘러보기"
+        "browseMatches": "경기 둘러보기",
+        "fortune": {
+            "banner": {
+                "ctaBadge": "오늘의 하키 운세",
+                "ctaTitle": "오늘의 운세 열어보기",
+                "ctaDescription": "오늘 플레이 감각을 가볍게 확인해보세요.",
+                "seenBadge": "오늘의 하키 운세",
+                "scoreSuffix": "점"
+            },
+            "screen": {
+                "pageTitle": "오늘의 하키 운세",
+                "loadingTitle": "오늘의 운세를 확인하고 있어요...",
+                "loadingSubtitle": "오늘의 플레이 흐름을 정리하고 있습니다.",
+                "todayBest": "오늘의 하키 운세",
+                "scoreSuffix": "점",
+                "nameSuffix": "님,"
+            }
+        }
     },
     "points": {
         "title": "충전 금액",

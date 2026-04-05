@@ -3,23 +3,26 @@ import { getTranslations, getLocale } from "next-intl/server";
 import { getUser, getProfile } from "@/app/actions/auth";
 import { getMyMatches } from "@/app/actions/mypage";
 import { getClubs } from "@/app/actions/clubs";
+import { getTodayFortuneBanner } from "@/app/actions/fortune";
+import { DailyHockeyFortuneBanner } from "@/components/daily-hockey-fortune-banner";
 import { MyMatchList } from "@/components/my-match-list";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { NotificationStatus } from "@/components/notification-status";
 import { ProfileEditor } from "@/components/profile-editor";
 
 export default async function MyPage() {
-  const profile = await getProfile();
-  const user = await getUser();
-  const locale = await getLocale();
+  const [profile, user, locale] = await Promise.all([getProfile(), getUser(), getLocale()]);
 
   if (!user) {
     redirect(`/${locale}/login`);
   }
 
-  const t = await getTranslations();
-  const myMatches = await getMyMatches();
-  const clubsData = await getClubs();
+  const [t, myMatches, clubsData, todayFortune] = await Promise.all([
+    getTranslations(),
+    getMyMatches(),
+    getClubs(),
+    getTodayFortuneBanner(locale),
+  ]);
   const clubs = clubsData.map((c) => ({ id: c.id, name: c.name }));
 
   return (
@@ -33,6 +36,8 @@ export default async function MyPage() {
           {locale === "ko" ? "님, 안녕하세요! 👋" : ", Welcome back! 👋"}
         </h1>
       </div>
+
+      <DailyHockeyFortuneBanner locale={locale} fortune={todayFortune} />
 
       {/* Profile Editor */}
       <div className="mb-8">
