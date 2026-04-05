@@ -825,6 +825,26 @@ export async function castClubVote(clubId: string): Promise<{
 
   const vote = ((data || []) as CastClubVoteRpcRow[])[0];
 
+  const { data: club } = await supabase
+    .from("clubs")
+    .select("name")
+    .eq("id", clubId)
+    .maybeSingle();
+
+  await logAndNotify({
+    userId: user.id,
+    action: "CLUB_VOTE",
+    description: `'${club?.name || "알 수 없는 동호회"}'에 응원 투표를 남겼습니다.`,
+    metadata: {
+      clubId,
+      clubName: club?.name || null,
+      voteDateKst: vote?.vote_date_kst ?? null,
+      voteMonthKst: vote?.vote_month_kst ?? null,
+      remainingDailyVotes: vote?.remaining_daily_votes ?? 0,
+      monthlyVoteCount: vote?.monthly_vote_count ?? 0,
+    },
+  });
+
   revalidateClubPaths(clubId);
 
   return {
