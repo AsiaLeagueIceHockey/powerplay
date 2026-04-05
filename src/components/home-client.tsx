@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { castClubVote, type ClubVoteSummary } from "@/app/actions/clubs";
 import { Match } from "@/app/actions/match";
 import { Rink } from "@/app/actions/types";
 import { DateFilter } from "@/components/date-filter";
@@ -15,6 +16,7 @@ import { RegionFilterDrawer } from "@/components/region-filter-drawer";
 import { List, CalendarDays, Loader2, ChevronDown, Search } from "lucide-react";
 import { Club } from "@/app/actions/types";
 import { ClubCard } from "@/components/club-card";
+import { CLUB_VOTE_DAILY_LIMIT, POWERPLAY_INSTAGRAM_URL, applyClubVoteRanking } from "@/lib/club-voting";
 import { extractRegion, getUniqueRegions } from "@/lib/rink-utils";
 
 interface HomeClientProps {
@@ -23,7 +25,7 @@ interface HomeClientProps {
   clubs: Club[];
   allMatches?: Match[]; // Optional, for backward compatibility if needed, but we'll use 'matches' as source
   initialDate?: string;
-  userRole?: string | null;
+  clubVoteSummary?: ClubVoteSummary;
   forcedTab?: "match" | "rink" | "club";
 }
 
@@ -32,7 +34,7 @@ export function HomeClient({
   rinks,
   clubs,
   initialDate,
-  userRole,
+  clubVoteSummary,
   forcedTab,
 }: HomeClientProps) {
   const locale = useLocale();
@@ -40,6 +42,17 @@ export function HomeClient({
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
+  const [clubsState, setClubsState] = useState(clubs);
+  const [voteSummary, setVoteSummary] = useState<ClubVoteSummary>(
+    clubVoteSummary ?? {
+      isLoggedIn: false,
+      dailyLimit: CLUB_VOTE_DAILY_LIMIT,
+      remainingDailyVotes: CLUB_VOTE_DAILY_LIMIT,
+      votedClubIdsToday: [],
+      todayKey: "",
+      monthKey: "",
+    }
+  );
 
   const [activeTabState, setActiveTabState] = useState<"match" | "rink" | "club">(() => {
     const tabParam = searchParams.get("tab");
@@ -157,7 +170,7 @@ export function HomeClient({
     return dateMatch && filterMatch;
   });
 
-  const filteredClubs = clubs.filter((club) => {
+  const filteredClubs = clubsState.filter((club) => {
     // 1. Name search filter
     if (clubSearchQuery.trim()) {
       if (!club.name.toLowerCase().includes(clubSearchQuery.trim().toLowerCase())) {
@@ -182,8 +195,57 @@ export function HomeClient({
   });
 
   // Compute available regions from all clubs' rinks
-  const allClubRinks = clubs.flatMap(c => c.rinks || []);
+  const allClubRinks = clubsState.flatMap(c => c.rinks || []);
   const availableRegions = getUniqueRegions(allClubRinks);
+
+  const handleVote = async (clubId: string) => {
+    if (!voteSummary.isLoggedIn) {
+      router.push(`/${locale}/login`);
+      return;
+    }
+
+    const result = await castClubVote(clubId);
+
+    if (!result.success) {
+      switch (result.error) {
+        case "ALREADY_VOTED_TODAY":
+          alert(t("clubRanking.voteErrors.alreadyVotedToday"));
+          break;
+        case "DAILY_LIMIT_REACHED":
+          alert(t("clubRanking.voteErrors.dailyLimitReached"));
+          break;
+        case "AUTH_REQUIRED":
+          router.push(`/${locale}/login`);
+          break;
+        case "CLUB_NOT_FOUND":
+          alert(t("clubRanking.voteErrors.clubNotFound"));
+          break;
+        default:
+          alert(t("clubRanking.voteErrors.generic"));
+      }
+      return;
+    }
+
+    const nextVotedClubIdsToday = [...voteSummary.votedClubIdsToday, clubId];
+    setVoteSummary((current) => ({
+      ...current,
+      remainingDailyVotes: result.remainingDailyVotes ?? Math.max(0, current.remainingDailyVotes - 1),
+      votedClubIdsToday: nextVotedClubIdsToday,
+    }));
+
+    const updatedClubs = clubsState.map((club) =>
+      club.id === clubId
+        ? { ...club, monthly_vote_count: result.monthlyVoteCount ?? (club.monthly_vote_count ?? 0) + 1 }
+        : club
+    );
+
+    setClubsState(applyClubVoteRanking(updatedClubs, updatedClubs.map((club) => ({
+      club_id: club.id,
+      vote_count: club.id === clubId
+        ? result.monthlyVoteCount ?? (club.monthly_vote_count ?? 0)
+        : club.monthly_vote_count ?? 0,
+    }))));
+  };
 
   return (
     <div className="flex flex-col gap-6">
@@ -391,6 +453,25 @@ export function HomeClient({
           <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
             {/* Club Tab */}
             <div className="mb-6">
+              <a
+                href={POWERPLAY_INSTAGRAM_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="mb-4 block rounded-2xl border border-rose-200 bg-gradient-to-r from-rose-50 via-white to-amber-50 p-4 shadow-sm transition-transform hover:scale-[1.01] dark:border-rose-900/40 dark:from-rose-950/30 dark:via-zinc-950 dark:to-amber-950/20"
+              >
+                <div>
+                  <h2 className="mb-[5px] text-base font-black tracking-tight text-zinc-900 dark:text-white">
+                    {t("clubRanking.bannerTitle")}
+                  </h2>
+                  <p className="mb-0 text-sm leading-relaxed text-zinc-600 dark:text-zinc-300">
+                    {t("clubRanking.bannerDescription")}
+                  </p>
+                  <p className="mt-0 text-xs leading-relaxed text-zinc-500 dark:text-zinc-400">
+                    {t("clubRanking.bannerSubdescription")}
+                  </p>
+                </div>
+              </a>
+
               {/* Search Input */}
               <div className="relative mb-3">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
@@ -404,7 +485,7 @@ export function HomeClient({
               </div>
 
               {/* Filter Chips */}
-              <div className="flex overflow-x-auto gap-2 px-1 pb-4 no-scrollbar">
+              <div className="flex overflow-x-auto gap-2 px-1 pb-1 no-scrollbar">
                 <button
                   onClick={() => setIsRegionFilterOpen(true)}
                   className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium border transition-colors whitespace-nowrap ${
@@ -430,50 +511,6 @@ export function HomeClient({
                   <ChevronDown className={`w-3 h-3 transition-transform ${isRinkFilterOpen ? "rotate-180" : ""}`} />
                 </button>
               </div>
-
-             {["admin", "superuser"].includes(userRole || "") ? (
-                <button
-                  onClick={() => router.push(`/${locale}/admin/matches`)}
-                  className="w-full py-4 px-6 bg-amber-50 dark:bg-amber-950/30 hover:bg-amber-100 dark:hover:bg-amber-950/50 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800/50 rounded-xl shadow-sm transition-all transform hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 group"
-                >
-                  <span className="font-bold text-base">{t("admin.goToAdmin")}</span>
-                  <svg
-                    className="w-5 h-5 group-hover:translate-x-1 transition-transform"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M13 7l5 5m0 0l-5 5m5-5H6"
-                    />
-                  </svg>
-                </button>
-              ) : (
-                <button
-                  onClick={() => router.push(`/${locale}/admin-apply`)}
-                  className="w-full py-4 px-6 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-sm transition-all transform hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 group"
-                >
-                  <span className="font-bold text-base">
-                    {t("admin.becomeAdmin")}
-                  </span>
-                  <svg
-                    className="w-5 h-5 group-hover:translate-x-1 transition-transform"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M13 7l5 5m0 0l-5 5m5-5H6"
-                    />
-                  </svg>
-                </button>
-              )}
             </div>
 
             {filteredClubs.length === 0 ? (
@@ -481,11 +518,13 @@ export function HomeClient({
                 <p className="text-zinc-500">{t("noClubs")}</p>
               </div>
             ) : (
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-x-4 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
                 {filteredClubs.map((club) => (
                   <ClubCard
                     key={club.id}
                     club={club}
+                    didVoteToday={voteSummary.votedClubIdsToday.includes(club.id)}
+                    onVote={handleVote}
                   />
                 ))}
               </div>

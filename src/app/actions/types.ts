@@ -21,6 +21,9 @@ export interface Club {
   created_by?: string;
   created_at?: string;
   member_count?: number;
+  monthly_vote_count?: number;
+  monthly_rank?: number;
+  monthly_rank_tied?: boolean;
   rinks?: Rink[];
   members?: { full_name: string | null; email: string; }[];
 }
@@ -30,6 +33,7 @@ export interface ClubMembership {
   club_id: string;
   user_id: string;
   role: "admin" | "member";
+  source?: "legacy_join" | "club_create" | "manual_subscribe" | "primary_club";
   created_at?: string;
   club?: Club;
 }

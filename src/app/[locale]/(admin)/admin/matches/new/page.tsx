@@ -1,6 +1,6 @@
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { getRinks } from "@/app/actions/admin";
-import { getClubs, getMyClubs } from "@/app/actions/clubs";
+import { getClubs, getMyManagedClubs } from "@/app/actions/clubs";
 import { getAdminInfo } from "@/app/actions/admin-check";
 import { MatchForm } from "@/components/match-form";
 import type { Club } from "@/app/actions/types";
@@ -25,8 +25,8 @@ export default async function NewMatchPage({
     // superuser는 전체 동호회 목록 표시
     clubs = await getClubs();
   } else {
-    // admin은 본인이 속한 동호회만 표시
-    const myClubs = await getMyClubs();
+    // admin은 본인이 관리하는 동호회만 표시
+    const myClubs = await getMyManagedClubs();
     clubs = myClubs
       .filter((m) => m.club != null)
       .map((m) => ({ id: m.club!.id, name: m.club!.name }) as Club);
@@ -49,4 +49,3 @@ export default async function NewMatchPage({
     </div>
   );
 }
-

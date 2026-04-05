@@ -1,9 +1,9 @@
 import { setRequestLocale, getTranslations } from "next-intl/server";
-import { redirect, notFound } from "next/navigation";
+import { notFound } from "next/navigation";
 import { getMatch } from "@/app/actions/match";
 import { getRinks } from "@/app/actions/admin";
 import { getAdminInfo } from "@/app/actions/admin-check";
-import { getClubs, getMyClubs } from "@/app/actions/clubs";
+import { getClubs, getMyManagedClubs } from "@/app/actions/clubs";
 import { MatchEditForm } from "@/components/match-edit-form";
 import type { Club } from "@/app/actions/types";
 import Link from "next/link";
@@ -32,7 +32,7 @@ export default async function EditMatchPage({
   if (adminInfo.isSuperuser) {
     clubs = await getClubs();
   } else {
-    const myClubs = await getMyClubs();
+    const myClubs = await getMyManagedClubs();
     clubs = myClubs
       .filter((m) => m.club != null)
       .map((m) => ({ id: m.club!.id, name: m.club!.name }) as Club);

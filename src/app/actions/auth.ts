@@ -6,6 +6,60 @@ import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { logAndNotify } from "@/lib/audit";
 
+const CLUB_LOCALES = ["ko", "en"] as const;
+
+async function syncPrimaryClubMembership(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string,
+  previousPrimaryClubId: string | null,
+  nextPrimaryClubId: string | null
+) {
+  if (previousPrimaryClubId && previousPrimaryClubId !== nextPrimaryClubId) {
+    const { error: deleteError } = await supabase
+      .from("club_memberships")
+      .delete()
+      .eq("club_id", previousPrimaryClubId)
+      .eq("user_id", userId)
+      .eq("role", "member")
+      .eq("source", "primary_club");
+
+    if (deleteError) {
+      console.error("Error removing previous primary club membership:", deleteError);
+    }
+  }
+
+  if (!nextPrimaryClubId) {
+    return;
+  }
+
+  const { data: existingMembership, error: existingMembershipError } = await supabase
+    .from("club_memberships")
+    .select("id")
+    .eq("club_id", nextPrimaryClubId)
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (existingMembershipError) {
+    console.error("Error checking primary club membership:", existingMembershipError);
+    return;
+  }
+
+  if (existingMembership) {
+    return;
+  }
+
+  const { error: insertError } = await supabase.from("club_memberships").insert({
+    club_id: nextPrimaryClubId,
+    user_id: userId,
+    role: "member",
+    source: "primary_club",
+  });
+
+  if (insertError) {
+    console.error("Error creating primary club membership:", insertError);
+  }
+}
+
 function resolveOriginFromHeaders(headersList: Headers) {
   const origin = headersList.get("origin");
   if (origin) return origin;
@@ -162,6 +216,23 @@ export async function updateProfile(formData: FormData) {
 
   // Build updateData dynamically based on what's provided in formData
   const updateData: Record<string, unknown> = {};
+  let previousPrimaryClubId: string | null = null;
+  let nextPrimaryClubId: string | null = null;
+
+  if (formData.has("primaryClubId")) {
+    const { data: currentProfile, error: currentProfileError } = await supabase
+      .from("profiles")
+      .select("primary_club_id")
+      .eq("id", user.id)
+      .single();
+
+    if (currentProfileError) {
+      return { error: currentProfileError.message };
+    }
+
+    previousPrimaryClubId = currentProfile?.primary_club_id ?? null;
+    nextPrimaryClubId = (formData.get("primaryClubId") as string) || null;
+  }
 
   if (formData.has("fullName")) updateData.full_name = formData.get("fullName");
   if (formData.has("position")) updateData.position = formData.get("position") || null;
@@ -171,7 +242,7 @@ export async function updateProfile(formData: FormData) {
   if (formData.has("termsAgreed")) updateData.terms_agreed = formData.get("termsAgreed") === "true";
   if (formData.has("bio")) updateData.bio = formData.get("bio") || null;
   if (formData.has("hockeyStartDate")) updateData.hockey_start_date = formData.get("hockeyStartDate") || null;
-  if (formData.has("primaryClubId")) updateData.primary_club_id = formData.get("primaryClubId") || null;
+  if (formData.has("primaryClubId")) updateData.primary_club_id = nextPrimaryClubId;
   if (formData.has("stickDirection")) updateData.stick_direction = formData.get("stickDirection") || null;
   if (formData.has("detailedPositions")) {
     const rawPositions = formData.get("detailedPositions");
@@ -196,6 +267,20 @@ export async function updateProfile(formData: FormData) {
 
   if (error) {
     return { error: error.message };
+  }
+
+  if (formData.has("primaryClubId")) {
+    await syncPrimaryClubMembership(supabase, user.id, previousPrimaryClubId, nextPrimaryClubId);
+
+    for (const locale of CLUB_LOCALES) {
+      revalidatePath(`/${locale}/clubs`);
+      if (previousPrimaryClubId) {
+        revalidatePath(`/${locale}/clubs/${previousPrimaryClubId}`);
+      }
+      if (nextPrimaryClubId) {
+        revalidatePath(`/${locale}/clubs/${nextPrimaryClubId}`);
+      }
+    }
   }
 
   revalidatePath("/profile", "page");

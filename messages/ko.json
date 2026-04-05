@@ -47,6 +47,18 @@
             "goToAdmin": "관리자 페이지로 이동",
             "becomeAdmin": "관리자가 되어 동호회를 홍보해보세요!"
         },
+        "clubRanking": {
+            "badge": "월간 랭킹",
+            "bannerTitle": "우리 팀을 1위로 만들어주세요! 🏆",
+            "bannerDescription": "이번 달 가장 많은 응원을 받은 동호회는 어디일까요?",
+            "bannerSubdescription": "* 하루 3번(같은 동호회는 1번) 투표 가능, 랭킹은 매월 1일 갱신",
+            "voteErrors": {
+                "alreadyVotedToday": "이 동호회에는 오늘 이미 투표했어요.",
+                "dailyLimitReached": "오늘 사용할 수 있는 3표를 모두 사용했어요.",
+                "clubNotFound": "동호회를 찾지 못했어요.",
+                "generic": "투표 처리 중 문제가 발생했어요. 잠시 후 다시 시도해주세요."
+            }
+        },
         "noClubs": "등록된 동호회가 없습니다",
         "filter": {
             "skaterSpots": "🏒 플레이어 모집",
@@ -158,6 +170,10 @@
             "shareText": "파워플레이에서 우리 동호회를 확인해보세요.",
             "ratioStory": "스토리 9:16",
             "ratioPost": "게시물 4:5"
+        },
+        "subscription": {
+            "subscribe": "동호회 소식 받기",
+            "subscribed": "소식 받는 중"
         }
     },
     "chat": {

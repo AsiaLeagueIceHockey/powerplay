@@ -1,8 +1,8 @@
 import { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
 
-import { getCachedClubs, getCachedMatches, getCachedRinks } from "@/app/actions/cache";
-import { getProfile } from "@/app/actions/auth";
+import { getCachedMatches, getCachedRinks, getRankedClubs } from "@/app/actions/cache";
+import { getMyClubVoteSummary } from "@/app/actions/clubs";
 import { FeedbackBanner } from "@/components/feedback-banner";
 import { HomeClient } from "@/components/home-client";
 import { PublicSectionTabs } from "@/components/public-section-tabs";
@@ -52,11 +52,11 @@ export default async function ClubsDirectoryPage({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const [matches, rinks, clubs, profile] = await Promise.all([
+  const [matches, rinks, clubs, clubVoteSummary] = await Promise.all([
     getCachedMatches(),
     getCachedRinks(),
-    getCachedClubs(),
-    getProfile(),
+    getRankedClubs(),
+    getMyClubVoteSummary(),
   ]);
 
   return (
@@ -77,7 +77,7 @@ export default async function ClubsDirectoryPage({
         matches={matches}
         rinks={rinks}
         clubs={clubs}
-        userRole={profile?.role}
+        clubVoteSummary={clubVoteSummary}
         forcedTab="club"
       />
     </div>
