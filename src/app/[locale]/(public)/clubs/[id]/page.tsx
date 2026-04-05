@@ -1,9 +1,10 @@
 import { getPublicClubById, getPublicClubIds, getPublicClubNotices } from "@/lib/public-clubs";
-import { getMyClubVoteSummary } from "@/app/actions/clubs";
+import { getMyClubVoteSummary, isClubMember } from "@/app/actions/clubs";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { MessageCircle, Users, Calendar, Building2, MapPin, CreditCard, Heart, Medal } from "lucide-react";
 import { ClubVoteButton } from "@/components/club-vote-button";
+import { ClubSubscribeButton } from "@/components/club-subscribe-button";
 import { ClubShareButton } from "@/components/club-share-button";
 import { SportsTeamJsonLd } from "@/components/json-ld";
 import Link from "next/link";
@@ -75,10 +76,11 @@ export default async function ClubDetailPage({
   setRequestLocale(locale);
   const t = await getTranslations("club");
 
-  const [club, notices, clubVoteSummary] = await Promise.all([
+  const [club, notices, clubVoteSummary, isSubscribed] = await Promise.all([
     getPublicClubById(id),
     getPublicClubNotices(id),
     getMyClubVoteSummary(),
+    isClubMember(id),
   ]);
 
   if (!club) {
@@ -183,36 +185,35 @@ export default async function ClubDetailPage({
           )}
 
           {/* Bottom Row: Actions */}
-          <div className="flex flex-col gap-3 mt-4">
+          <div className="mt-4 grid grid-cols-2 gap-3">
              <ClubVoteButton
                clubId={club.id}
                isLoggedIn={clubVoteSummary.isLoggedIn}
                didVoteToday={clubVoteSummary.votedClubIdsToday.includes(club.id)}
+               className="text-sm"
              />
 
-             {/* 1. View Card */}
              <Link
                href={`/${locale}/clubs/${club.id}/card`}
-               className="flex items-center justify-center gap-2 px-4 py-3.5 bg-zinc-900 border border-zinc-200 dark:border-zinc-700 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-xl font-bold hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors w-full"
+               className="flex w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl border border-zinc-200 bg-zinc-900 px-3 py-3.5 text-sm font-bold leading-none text-white transition-colors hover:bg-zinc-800 dark:border-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 sm:px-4"
              >
                <CreditCard className="w-5 h-5 flex-shrink-0" />
                <span>{t("card.view", { fallback: "동호회 카드 보기" })}</span>
              </Link>
-             
-             {/* 2. Join Club */}
-             {/* 
-             <div className="w-full">
-               <JoinClubButton club={club} initialIsMember={isMember} className="w-full justify-center py-3.5 rounded-xl text-base" />
-             </div>
-             */}
-             
-             {/* 3. Kakao Open Chat */}
+
+             <ClubSubscribeButton
+               clubId={club.id}
+               isLoggedIn={clubVoteSummary.isLoggedIn}
+               isSubscribed={isSubscribed}
+               className={club.kakao_open_chat_url ? "text-sm" : "col-span-2 text-sm"}
+             />
+
              {club.kakao_open_chat_url && (
                <a
                  href={club.kakao_open_chat_url}
                  target="_blank"
                  rel="noreferrer"
-                 className="flex items-center justify-center gap-2 px-4 py-3.5 bg-[#FAE100] text-[#371D1E] rounded-xl font-bold hover:bg-[#FCE620] transition-colors w-full"
+                 className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#FAE100] px-4 py-3.5 text-sm font-bold text-[#371D1E] transition-colors hover:bg-[#FCE620]"
                >
                  <MessageCircle className="w-5 h-5 fill-current" />
                  {locale === "ko" ? "오픈채팅 참여" : "KakaoTalk Open Chat"}

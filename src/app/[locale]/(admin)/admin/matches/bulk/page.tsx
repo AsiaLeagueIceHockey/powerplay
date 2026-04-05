@@ -1,6 +1,6 @@
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { getRinks } from "@/app/actions/admin";
-import { getClubs, getMyClubs } from "@/app/actions/clubs";
+import { getClubs, getMyManagedClubs } from "@/app/actions/clubs";
 import { getAdminInfo } from "@/app/actions/admin-check";
 import { BulkMatchForm } from "@/components/bulk-match-form";
 import type { Club } from "@/app/actions/types";
@@ -27,7 +27,7 @@ export default async function BulkMatchPage({
   if (adminInfo.isSuperuser) {
     clubs = await getClubs();
   } else {
-    const myClubs = await getMyClubs();
+    const myClubs = await getMyManagedClubs();
     clubs = myClubs
       .filter((m) => m.club != null)
       .map((m) => ({ id: m.club!.id, name: m.club!.name }) as Club);

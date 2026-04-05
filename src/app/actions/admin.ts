@@ -136,6 +136,21 @@ export async function createMatch(formData: FormData) {
 
   const rinkId = formData.get("rink_id") as string;
   const clubId = formData.get("club_id") as string;
+
+  if (clubId && profile?.role !== "superuser") {
+    const { data: manageableMembership } = await supabase
+      .from("club_memberships")
+      .select("id")
+      .eq("club_id", clubId)
+      .eq("user_id", user.id)
+      .eq("role", "admin")
+      .maybeSingle();
+
+    if (!manageableMembership) {
+      return { error: "해당 동호회 경기를 생성할 권한이 없습니다." };
+    }
+  }
+
   const startTimeInput = formData.get("start_time") as string;
   const matchType = (formData.get("match_type") as "training" | "game" | "team_match") || "training";
   const isTeamMatch = matchType === "team_match";
@@ -261,6 +276,21 @@ export async function updateMatch(matchId: string, formData: FormData) {
 
   const rinkId = formData.get("rink_id") as string;
   const clubId = formData.get("club_id") as string;
+
+  if (clubId && profile?.role !== "superuser") {
+    const { data: manageableMembership } = await supabase
+      .from("club_memberships")
+      .select("id")
+      .eq("club_id", clubId)
+      .eq("user_id", user.id)
+      .eq("role", "admin")
+      .maybeSingle();
+
+    if (!manageableMembership) {
+      return { error: "해당 동호회 경기를 수정할 권한이 없습니다." };
+    }
+  }
+
   const startTimeInput = formData.get("start_time") as string;
   const matchType = (formData.get("match_type") as "training" | "game" | "team_match") || "training";
   const isTeamMatch = matchType === "team_match";
@@ -650,6 +680,20 @@ export async function createBulkMatches(
 
   if (matches.length === 0) {
     return { error: "No matches to create" };
+  }
+
+  if (clubId && profile?.role !== "superuser") {
+    const { data: manageableMembership } = await supabase
+      .from("club_memberships")
+      .select("id")
+      .eq("club_id", clubId)
+      .eq("user_id", user.id)
+      .eq("role", "admin")
+      .maybeSingle();
+
+    if (!manageableMembership) {
+      return { error: "해당 동호회 경기를 생성할 권한이 없습니다." };
+    }
   }
 
   const hasEntryPointsOverLimit = matches.some(

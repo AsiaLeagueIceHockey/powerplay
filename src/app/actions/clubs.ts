@@ -6,6 +6,7 @@ import { CLUB_VOTE_DAILY_LIMIT, getKstDateKey, getKstMonthKey } from "@/lib/club
 import { Club, ClubMembership, ClubPost, Rink } from "./types";
 import { logAndNotify } from "@/lib/audit";
 import { checkIsSuperUser } from "./superuser";
+import { sendPushNotification } from "./push";
 
 type ClubWithRinksRow = Club & {
   club_rinks?: Array<{ rink: Rink | null }> | null;
@@ -59,6 +60,8 @@ type ClubMemberCountRow = {
   member_count: number | string | null;
 };
 
+type ClubMembershipSource = "legacy_join" | "club_create" | "manual_subscribe" | "primary_club";
+
 function revalidateClubPaths(clubId?: string) {
   revalidateTag("clubs", "max");
   revalidatePath("/sitemap.xml");
@@ -87,6 +90,42 @@ function normalizeClubVoteError(errorMessage?: string) {
   if (errorMessage.includes("ALREADY_VOTED_TODAY")) return "ALREADY_VOTED_TODAY";
 
   return "UNKNOWN_ERROR";
+}
+
+async function ensureClubMembership(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  clubId: string,
+  userId: string,
+  source: ClubMembershipSource,
+  role: "admin" | "member" = "member"
+) {
+  const { data: existingMembership, error: existingMembershipError } = await supabase
+    .from("club_memberships")
+    .select("id, role, source")
+    .eq("club_id", clubId)
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (existingMembershipError) {
+    return { error: existingMembershipError.message, created: false };
+  }
+
+  if (existingMembership) {
+    return { created: false };
+  }
+
+  const { error: insertError } = await supabase.from("club_memberships").insert({
+    club_id: clubId,
+    user_id: userId,
+    role,
+    source,
+  });
+
+  if (insertError) {
+    return { error: insertError.message, created: false };
+  }
+
+  return { created: true };
 }
 
 async function fetchClubMemberCountMap(
@@ -429,6 +468,7 @@ export async function createClub(formData: FormData) {
     club_id: club.id,
     user_id: user.id,
     role: "admin",
+    source: "club_create",
   });
 
   // Insert associated rinks
@@ -600,6 +640,7 @@ export async function getMyClubs(): Promise<ClubMembership[]> {
       club_id,
       user_id,
       role,
+      source,
       created_at,
       club:club_id(id, name, kakao_open_chat_url)
     `)
@@ -617,6 +658,42 @@ export async function getMyClubs(): Promise<ClubMembership[]> {
   })) as ClubMembership[];
 }
 
+export async function getMyManagedClubs(): Promise<ClubMembership[]> {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return [];
+  }
+
+  const { data: memberships, error } = await supabase
+    .from("club_memberships")
+    .select(`
+      id,
+      club_id,
+      user_id,
+      role,
+      source,
+      created_at,
+      club:club_id(id, name, kakao_open_chat_url)
+    `)
+    .eq("user_id", user.id)
+    .eq("role", "admin");
+
+  if (error) {
+    console.error("Error fetching my managed clubs:", error);
+    return [];
+  }
+
+  return (memberships || []).map((m) => ({
+    ...m,
+    club: Array.isArray(m.club) ? m.club[0] : m.club,
+  })) as ClubMembership[];
+}
+
 export async function joinClub(clubId: string) {
   const supabase = await createClient();
 
@@ -628,31 +705,47 @@ export async function joinClub(clubId: string) {
     return { error: "Not authenticated" };
   }
 
-  // Check if already a member
-  const { data: existing } = await supabase
-    .from("club_memberships")
-    .select("id")
-    .eq("club_id", clubId)
-    .eq("user_id", user.id)
-    .single();
+  const membershipResult = await ensureClubMembership(supabase, clubId, user.id, "manual_subscribe");
 
-  if (existing) {
-    return { error: "Already a member of this club" };
-  }
-
-  const { error } = await supabase.from("club_memberships").insert({
-    club_id: clubId,
-    user_id: user.id,
-    role: "member",
-  });
-
-  if (error) {
-    return { error: error.message };
+  if (membershipResult.error) {
+    return { error: membershipResult.error };
   }
 
   revalidateClubPaths(clubId);
 
   return { success: true };
+}
+
+export async function subscribeToClubNews(clubId: string) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "Not authenticated" };
+  }
+
+  const { data: club, error: clubError } = await supabase
+    .from("clubs")
+    .select("id")
+    .eq("id", clubId)
+    .maybeSingle();
+
+  if (clubError || !club) {
+    return { error: "Club not found" };
+  }
+
+  const membershipResult = await ensureClubMembership(supabase, clubId, user.id, "manual_subscribe");
+
+  if (membershipResult.error) {
+    return { error: membershipResult.error };
+  }
+
+  revalidateClubPaths(clubId);
+
+  return { success: true, alreadySubscribed: !membershipResult.created };
 }
 
 export async function getMyClubVoteSummary(): Promise<ClubVoteSummary> {
@@ -851,6 +944,38 @@ export async function createClubNotice(clubId: string, title: string, content: s
 
   if (error) {
     return { error: error.message };
+  }
+
+  const [{ data: club }, { data: subscribers, error: subscribersError }] = await Promise.all([
+    supabase.from("clubs").select("name").eq("id", clubId).maybeSingle(),
+    supabase
+      .from("club_memberships")
+      .select("user_id")
+      .eq("club_id", clubId)
+      .neq("user_id", user.id),
+  ]);
+
+  if (subscribersError) {
+    console.error("Error fetching club notice subscribers:", subscribersError);
+  } else if (subscribers && subscribers.length > 0) {
+    const clubName = club?.name || "PowerPlay";
+    const pushTitle = `${clubName} 새 공지`;
+    const pushBody = title;
+    const noticeUrl = `/ko/clubs/${clubId}`;
+
+    const uniqueUserIds = Array.from(new Set(subscribers.map((subscriber) => subscriber.user_id)));
+
+    const pushResults = await Promise.allSettled(
+      uniqueUserIds.map((targetUserId) =>
+        sendPushNotification(targetUserId, pushTitle, pushBody, noticeUrl)
+      )
+    );
+
+    for (const result of pushResults) {
+      if (result.status === "rejected") {
+        console.error("Failed to send club notice push:", result.reason);
+      }
+    }
   }
 
   revalidateClubPaths(clubId);
