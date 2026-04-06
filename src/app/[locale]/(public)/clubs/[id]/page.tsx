@@ -202,7 +202,7 @@ export default async function ClubDetailPage({
                className={`${clubDetailActionButtonClass} border border-zinc-200 bg-zinc-900 text-white transition-colors hover:bg-zinc-800 dark:border-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200`}
              >
                <CreditCard className={clubDetailActionIconClass} />
-               <span className={clubDetailActionLabelClass}>{t("card.view", { fallback: "동호회 카드 보기" })}</span>
+               <span className={clubDetailActionLabelClass}>{t("card.view", { fallback: "카드 보기" })}</span>
              </Link>
 
              <ClubSubscribeButton

@@ -164,7 +164,7 @@
     "club": {
         "card": {
             "title": "Club Digital Card",
-            "view": "View Club Card",
+            "view": "View Card",
             "share": "Share",
             "shareTitle": "Check out our club!",
             "shareText": "Check out our club on PowerPlay.",
@@ -172,7 +172,7 @@
             "ratioPost": "Post 4:5"
         },
         "subscription": {
-            "subscribe": "Get Club Updates",
+            "subscribe": "Get Updates",
             "subscribed": "Subscribed"
         }
     },

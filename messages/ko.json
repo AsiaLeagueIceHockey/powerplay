@@ -164,7 +164,7 @@
     "club": {
         "card": {
             "title": "동호회 디지털 카드",
-            "view": "동호회 카드 보기",
+            "view": "카드 보기",
             "share": "공유하기",
             "shareTitle": "우리 동호회를 소개합니다!",
             "shareText": "파워플레이에서 우리 동호회를 확인해보세요.",
@@ -172,7 +172,7 @@
             "ratioPost": "게시물 4:5"
         },
         "subscription": {
-            "subscribe": "동호회 소식 받기",
+            "subscribe": "소식 받기",
             "subscribed": "소식 받는 중"
         }
     },
