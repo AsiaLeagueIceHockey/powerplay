@@ -213,7 +213,7 @@ export default async function ClubDetailPage({
                  href={club.kakao_open_chat_url}
                  target="_blank"
                  rel="noreferrer"
-                 className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#FAE100] px-4 py-3.5 text-sm font-bold text-[#371D1E] transition-colors hover:bg-[#FCE620]"
+                 className="flex w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-[#FAE100] px-3 py-3.5 text-sm font-bold leading-none text-[#371D1E] transition-colors hover:bg-[#FCE620] sm:px-4"
                >
                  <MessageCircle className="w-5 h-5 fill-current" />
                  {locale === "ko" ? "오픈채팅 참여" : "KakaoTalk Open Chat"}

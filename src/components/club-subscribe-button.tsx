@@ -63,7 +63,7 @@ export function ClubSubscribeButton({
       type="button"
       onClick={handleSubscribe}
       disabled={subscribed || isSubmitting}
-      className={`flex w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl border border-zinc-200 px-3 py-3.5 text-base font-bold leading-none transition-all sm:px-4 ${
+      className={`flex w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl border border-zinc-200 px-3 py-3.5 text-sm font-bold leading-none transition-all sm:px-4 ${
         subscribed || isSubmitting
           ? "bg-zinc-100 text-zinc-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400"
           : "bg-white text-zinc-900 hover:border-zinc-300 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white dark:hover:border-zinc-600 dark:hover:bg-zinc-800"

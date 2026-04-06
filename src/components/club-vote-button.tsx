@@ -66,7 +66,7 @@ export function ClubVoteButton({
       type="button"
       onClick={handleVote}
       disabled={didVoteToday || isSubmitting}
-      className={`flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3.5 text-base font-bold transition-all ${
+      className={`flex w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl px-3 py-3.5 text-sm font-bold leading-none transition-all sm:px-4 ${
         didVoteToday || isSubmitting
           ? "bg-zinc-100 text-zinc-400 dark:bg-zinc-800 dark:text-zinc-500"
           : "bg-rose-100 text-zinc-900 hover:bg-rose-200"
