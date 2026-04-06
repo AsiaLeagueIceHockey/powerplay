@@ -6,6 +6,11 @@ import { useLocale } from "next-intl";
 import { Heart } from "lucide-react";
 
 import { castClubVote } from "@/app/actions/clubs";
+import {
+  clubDetailActionButtonClass,
+  clubDetailActionIconClass,
+  clubDetailActionLabelClass,
+} from "@/components/club-detail-action-styles";
 
 interface ClubVoteButtonProps {
   clubId: string;
@@ -66,22 +71,28 @@ export function ClubVoteButton({
       type="button"
       onClick={handleVote}
       disabled={didVoteToday || isSubmitting}
-      className={`flex w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl px-3 py-3.5 text-sm font-bold leading-none transition-all sm:px-4 ${
+      className={`${clubDetailActionButtonClass} transition-all ${
         didVoteToday || isSubmitting
           ? "bg-zinc-100 text-zinc-400 dark:bg-zinc-800 dark:text-zinc-500"
           : "bg-rose-100 text-zinc-900 hover:bg-rose-200"
       } ${className}`}
     >
-      <Heart className={`h-4 w-4 ${didVoteToday || isSubmitting ? "" : "fill-rose-500 text-rose-500"}`} />
-      {isSubmitting
-        ? "..."
-        : didVoteToday
-        ? locale === "ko"
-          ? "오늘 투표 완료"
-          : "Voted today"
-        : locale === "ko"
-        ? "응원 투표"
-        : "Vote"}
+      <Heart
+        className={`${clubDetailActionIconClass} ${
+          didVoteToday || isSubmitting ? "" : "fill-rose-500 text-rose-500"
+        }`}
+      />
+      <span className={clubDetailActionLabelClass}>
+        {isSubmitting
+          ? "..."
+          : didVoteToday
+          ? locale === "ko"
+            ? "오늘 투표 완료"
+            : "Voted today"
+          : locale === "ko"
+          ? "응원 투표"
+          : "Vote"}
+      </span>
     </button>
   );
 }

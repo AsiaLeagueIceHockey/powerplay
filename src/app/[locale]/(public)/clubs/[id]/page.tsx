@@ -6,6 +6,11 @@ import { MessageCircle, Users, Calendar, Building2, MapPin, CreditCard, Heart, M
 import { ClubVoteButton } from "@/components/club-vote-button";
 import { ClubSubscribeButton } from "@/components/club-subscribe-button";
 import { ClubShareButton } from "@/components/club-share-button";
+import {
+  clubDetailActionButtonClass,
+  clubDetailActionIconClass,
+  clubDetailActionLabelClass,
+} from "@/components/club-detail-action-styles";
 import { SportsTeamJsonLd } from "@/components/json-ld";
 import Link from "next/link";
 import Image from "next/image";
@@ -190,22 +195,21 @@ export default async function ClubDetailPage({
                clubId={club.id}
                isLoggedIn={clubVoteSummary.isLoggedIn}
                didVoteToday={clubVoteSummary.votedClubIdsToday.includes(club.id)}
-               className="text-sm"
              />
 
              <Link
                href={`/${locale}/clubs/${club.id}/card`}
-               className="flex w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl border border-zinc-200 bg-zinc-900 px-3 py-3.5 text-sm font-bold leading-none text-white transition-colors hover:bg-zinc-800 dark:border-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 sm:px-4"
+               className={`${clubDetailActionButtonClass} border border-zinc-200 bg-zinc-900 text-white transition-colors hover:bg-zinc-800 dark:border-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200`}
              >
-               <CreditCard className="w-5 h-5 flex-shrink-0" />
-               <span>{t("card.view", { fallback: "동호회 카드 보기" })}</span>
+               <CreditCard className={clubDetailActionIconClass} />
+               <span className={clubDetailActionLabelClass}>{t("card.view", { fallback: "동호회 카드 보기" })}</span>
              </Link>
 
              <ClubSubscribeButton
                clubId={club.id}
                isLoggedIn={clubVoteSummary.isLoggedIn}
                isSubscribed={isSubscribed}
-               className={club.kakao_open_chat_url ? "text-sm" : "col-span-2 text-sm"}
+               className={club.kakao_open_chat_url ? "" : "col-span-2"}
              />
 
              {club.kakao_open_chat_url && (
@@ -213,10 +217,12 @@ export default async function ClubDetailPage({
                  href={club.kakao_open_chat_url}
                  target="_blank"
                  rel="noreferrer"
-                 className="flex w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-[#FAE100] px-3 py-3.5 text-sm font-bold leading-none text-[#371D1E] transition-colors hover:bg-[#FCE620] sm:px-4"
+                 className={`${clubDetailActionButtonClass} bg-[#FAE100] text-[#371D1E] transition-colors hover:bg-[#FCE620]`}
                >
-                 <MessageCircle className="w-5 h-5 fill-current" />
-                 {locale === "ko" ? "오픈채팅 참여" : "KakaoTalk Open Chat"}
+                 <MessageCircle className={`${clubDetailActionIconClass} fill-current`} />
+                 <span className={clubDetailActionLabelClass}>
+                   {locale === "ko" ? "오픈채팅 참여" : "KakaoTalk Open Chat"}
+                 </span>
                </a>
              )}
           </div>

@@ -6,6 +6,11 @@ import { useLocale, useTranslations } from "next-intl";
 import { Bell } from "lucide-react";
 
 import { subscribeToClubNews } from "@/app/actions/clubs";
+import {
+  clubDetailActionButtonClass,
+  clubDetailActionIconClass,
+  clubDetailActionLabelClass,
+} from "@/components/club-detail-action-styles";
 
 interface ClubSubscribeButtonProps {
   clubId: string;
@@ -63,22 +68,27 @@ export function ClubSubscribeButton({
       type="button"
       onClick={handleSubscribe}
       disabled={subscribed || isSubmitting}
-      className={`flex w-full items-center justify-center gap-2 whitespace-nowrap rounded-xl border border-zinc-200 px-3 py-3.5 text-sm font-bold leading-none transition-all sm:px-4 ${
+      className={`${clubDetailActionButtonClass} border border-zinc-200 transition-all ${
         subscribed || isSubmitting
           ? "bg-zinc-100 text-zinc-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400"
           : "bg-white text-zinc-900 hover:border-zinc-300 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white dark:hover:border-zinc-600 dark:hover:bg-zinc-800"
       } ${className}`}
     >
-      <Bell className={`h-4 w-4 ${subscribed || isSubmitting ? "" : "text-zinc-900 dark:text-white"}`} />
-      {isSubmitting
-        ? "..."
-        : subscribed
-        ? locale === "ko"
-          ? t("subscribed")
-          : t("subscribed")
-        : locale === "ko"
-        ? t("subscribe")
-        : t("subscribe")}
+      <Bell
+        strokeWidth={2.25}
+        className={`${clubDetailActionIconClass} ${subscribed || isSubmitting ? "" : "text-zinc-900 dark:text-white"}`}
+      />
+      <span className={clubDetailActionLabelClass}>
+        {isSubmitting
+          ? "..."
+          : subscribed
+          ? locale === "ko"
+            ? t("subscribed")
+            : t("subscribed")
+          : locale === "ko"
+          ? t("subscribe")
+          : t("subscribe")}
+      </span>
     </button>
   );
 }
