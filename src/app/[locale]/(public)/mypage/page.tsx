@@ -4,8 +4,10 @@ import { getUser, getProfile } from "@/app/actions/auth";
 import { getMyMatches } from "@/app/actions/mypage";
 import { getClubs } from "@/app/actions/clubs";
 import { getTodayFortuneBanner } from "@/app/actions/fortune";
+import { getTamagotchiState } from "@/app/actions/tamagotchi";
 import { DailyHockeyFortuneBanner } from "@/components/daily-hockey-fortune-banner";
 import { MyMatchList } from "@/components/my-match-list";
+import { TamagotchiBanner } from "@/components/tamagotchi-banner";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { NotificationStatus } from "@/components/notification-status";
 import { ProfileEditor } from "@/components/profile-editor";
@@ -17,17 +19,17 @@ export default async function MyPage() {
     redirect(`/${locale}/login`);
   }
 
-  const [t, myMatches, clubsData, todayFortune] = await Promise.all([
+  const [t, myMatches, clubsData, todayFortune, tamagotchiState] = await Promise.all([
     getTranslations(),
     getMyMatches(),
     getClubs(),
     getTodayFortuneBanner(locale),
+    getTamagotchiState(locale),
   ]);
   const clubs = clubsData.map((c) => ({ id: c.id, name: c.name }));
 
   return (
     <div className="container mx-auto px-4 max-w-4xl">
-      {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold mb-2 text-zinc-900 dark:text-white">
           <span className="text-blue-600 dark:text-blue-400">
@@ -38,11 +40,11 @@ export default async function MyPage() {
       </div>
 
       <DailyHockeyFortuneBanner locale={locale} fortune={todayFortune} />
+      <TamagotchiBanner locale={locale} state={tamagotchiState} />
 
-      {/* Profile Editor */}
       <div className="mb-8">
-        <ProfileEditor 
-          initialBio={profile?.bio || null} 
+        <ProfileEditor
+          initialBio={profile?.bio || null}
           hockeyStartDate={profile?.hockey_start_date || null}
           primaryClubId={profile?.primary_club_id || null}
           detailedPositions={profile?.detailed_positions || null}
@@ -55,20 +57,15 @@ export default async function MyPage() {
         />
       </div>
 
-      {/* My Matches Title and List */}
       <div className="mb-4">
-        <h2 className="text-lg font-bold text-zinc-900 dark:text-white">
-          {t("mypage.subtitle")}
-        </h2>
+        <h2 className="text-lg font-bold text-zinc-900 dark:text-white">{t("mypage.subtitle")}</h2>
       </div>
       <MyMatchList matches={myMatches} />
-      
-      {/* Language Switcher */}
+
       <div className="mt-8">
         <LanguageSwitcher locale={locale} />
       </div>
 
-      {/* Notification Status */}
       <div className="mt-8">
         <div className="space-y-4">
           <div className="px-1">

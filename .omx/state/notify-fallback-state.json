@@ -1,0 +1,68 @@
+{
+  "pid": 1080,
+  "parent_pid": 1039,
+  "started_at": "2026-04-06T15:06:20.539Z",
+  "cwd": "/Users/joelonsw/Desktop/PP/powerplay",
+  "notify_script": "/opt/homebrew/lib/node_modules/oh-my-codex/dist/scripts/notify-hook.js",
+  "authority_only": false,
+  "poll_ms": 250,
+  "pid_file": "/Users/joelonsw/Desktop/PP/powerplay/.omx/state/notify-fallback.pid",
+  "max_lifetime_ms": 21600000,
+  "tracked_files": 0,
+  "seen_turns": 0,
+  "dispatch_drain": {
+    "enabled": true,
+    "max_per_tick": 5,
+    "run_count": 52230,
+    "leader_only": true,
+    "last_tick_at": "2026-04-06T21:06:20.217Z",
+    "last_result": {
+      "processed": 0,
+      "skipped": 0,
+      "failed": 0
+    },
+    "last_error": null
+  },
+  "leader_nudge": {
+    "enabled": true,
+    "leader_only": true,
+    "stale_threshold_ms": 180000,
+    "precomputed_leader_stale": true,
+    "last_tick_at": "2026-04-06T21:06:20.217Z",
+    "last_error": null,
+    "run_count": 49833
+  },
+  "ralph_continue_steer": {
+    "enabled": true,
+    "cadence_ms": 60000,
+    "message": "Ralph loop active continue",
+    "active": false,
+    "last_state_check_at": "2026-04-06T21:06:20.373Z",
+    "last_sent_at": "2026-04-06T16:09:58.542Z",
+    "cooldown_anchor_at": "2026-04-06T16:09:58.542Z",
+    "last_reason": "terminal",
+    "last_error": null,
+    "state_path": "/Users/joelonsw/Desktop/PP/powerplay/.omx/state/sessions/omx-1775487976577-sqnydp/ralph-state.json",
+    "pane_id": "%2",
+    "pane_current_command": "",
+    "current_phase": "complete",
+    "shared_timestamp_path": "/Users/joelonsw/Desktop/PP/powerplay/.omx/state/ralph-last-steer-at",
+    "shared_last_sent_at": "2026-04-06T16:09:58.542Z",
+    "singleton_lock_path": "/Users/joelonsw/Desktop/PP/powerplay/.omx/state/ralph-continue-steer.lock"
+  },
+  "fallback_auto_nudge": {
+    "enabled": true,
+    "stall_ms": 5000,
+    "last_tick_at": "2026-04-06T21:06:20.319Z",
+    "last_turn_at": "2026-04-06T16:12:14.978Z",
+    "last_turn_count": 14,
+    "last_message": "완료했습니다. `$ralph`까지 이어서 **하키 다마고치 v1 구현** 마무리해뒀어요.\n\n변경 파일\n- `sql/v50_tamagotchi_v1.sql`\n- `src/app/ac",
+    "last_reason": "eligible_but_not_sent",
+    "last_error": null,
+    "last_nudged_signature": "",
+    "last_nudged_at": ""
+  },
+  "stop_reason": "max_lifetime_exceeded",
+  "stop_signal": null,
+  "stopping": true
+}

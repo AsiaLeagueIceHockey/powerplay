@@ -1,0 +1,34 @@
+# Deep Interview Context Snapshot
+
+- Task statement: Plan a new 'ice hockey tamagotchi mini-game' for Power Play to increase DAU, push opt-in/receipt rate, and time spent.
+- Desired outcome: A clarified product/architecture brief with edge cases, hidden risks, and decision boundaries before planning/implementation.
+- Stated solution: Add a MyPage entry point to a dedicated tamagotchi page; use time-delta evaluation from last access instead of background decay; use placeholder pixel block UI with floating CSS animation; schedule a push 8 hours after feed/train actions.
+- Probable intent hypothesis: Create a lightweight daily-return loop that feels playful and habit-forming, while also increasing notification value and repeat visits.
+- Known facts/evidence:
+  - Existing MyPage route is `src/app/[locale]/(public)/mypage/page.tsx` and already surfaces one repeat-visit feature: daily hockey fortune banner linking to `/${locale}/mypage/fortune`.
+  - Existing gamified precedent: `src/app/actions/fortune.ts`, `src/components/daily-hockey-fortune-banner.tsx`, `src/components/daily-hockey-fortune-screen.tsx`, and `sql/v49_daily_hockey_fortunes.sql`.
+  - Push exists today via `src/app/actions/push.ts` with immediate `sendPushNotification(userId, title, body, url)` delivery and notification logging in `notification_logs`.
+  - Current push stack has no repo-level delayed/scheduled delivery system or queue table yet.
+  - Notification settings UI already exists in `src/components/notification-status.tsx` and client registration in `src/components/push-manager.tsx`.
+- Constraints:
+  - Must fit current Next.js + Supabase + web push architecture.
+  - Public/user pages require KR/EN i18n.
+  - New schema should use `sql/v{next}_{description}.sql`.
+  - User explicitly wants deep interview only now, not implementation.
+- Unknowns/open questions:
+  - What exact daily loop should drive return behavior: maintenance, progression, streaks, collection, social comparison, rewards, etc.?
+  - What exact failure/recovery model should the pet use: neglect penalty, death, reset, cooldown, forgiveness?
+  - Should scheduled push be strict/reliable, best-effort, per-action, deduped, or opt-out?
+  - How tightly should the feature connect to existing Power Play primitives like matches, clubs, points, fortune, onboarding, or push permission flows?
+  - What should be explicitly out of scope for v1?
+- Decision-boundary unknowns:
+  - What the agent may decide alone on schema/UI wording/system behavior.
+  - Whether external infra (cron/queue/edge functions) is allowed if 8-hour scheduling requires it.
+- Likely codebase touchpoints:
+  - `src/app/[locale]/(public)/mypage/page.tsx`
+  - `src/app/[locale]/mypage/*`
+  - `src/app/actions/push.ts`
+  - `src/components/notification-status.tsx`
+  - `src/components/push-manager.tsx`
+  - `src/app/actions/fortune.ts`
+  - `sql/v49_daily_hockey_fortunes.sql` as precedent
