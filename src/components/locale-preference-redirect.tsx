@@ -1,13 +1,12 @@
 "use client";
 
 import { startTransition, useEffect } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { browserPrefersEnglish, getStoredLocalePreference } from "@/lib/locale-preference";
 
 export function LocalePreferenceRedirect({ locale }: { locale: string }) {
   const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
 
   useEffect(() => {
     if (locale !== "ko") {
@@ -31,13 +30,13 @@ export function LocalePreferenceRedirect({ locale }: { locale: string }) {
     }
 
     const nextPath = pathname.replace(/^\/ko(?=\/|$)/, "/en");
-    const query = searchParams.toString();
-    const nextUrl = query ? `${nextPath}?${query}` : nextPath;
+    const query = window.location.search;
+    const nextUrl = query ? `${nextPath}${query}` : nextPath;
 
     startTransition(() => {
       router.replace(nextUrl);
     });
-  }, [locale, pathname, router, searchParams]);
+  }, [locale, pathname, router]);
 
   return null;
 }
