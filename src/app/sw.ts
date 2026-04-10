@@ -10,6 +10,10 @@ declare global {
 
 declare const self: ServiceWorkerGlobalScope;
 
+// Keep Serwist's inject-manifest placeholder available for the build step
+// without re-enabling install-time precaching on iOS PWA.
+void self.__SW_MANIFEST;
+
 const localeStartPath = /^\/(ko|en)\/?$/;
 
 const startPageRuntimeCaching = [
@@ -68,7 +72,7 @@ const startPageRuntimeCaching = [
 const serwist = new Serwist({
   // iOS PWA에서 precaching이 SW 설치를 블로킹하여 push 등록이 실패하는 문제 방지.
   // 시작 경로는 별도 runtime cache로 빠르게 복구하고, install 단계는 계속 가볍게 유지한다.
-  precacheEntries: self.__SW_MANIFEST ?? [],
+  precacheEntries: [],
   skipWaiting: true,
   clientsClaim: true,
   navigationPreload: true,
