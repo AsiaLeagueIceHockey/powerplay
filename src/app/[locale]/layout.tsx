@@ -12,6 +12,7 @@ import { ChatUnreadProvider } from "@/contexts/chat-unread-context";
 import { NotificationGuideModal } from "@/components/notification-guide-modal";
 import { InstallPrompt } from "@/components/install-prompt";
 import { OnboardingGuard } from "@/components/onboarding-guard";
+import { LocalePreferenceRedirect } from "@/components/locale-preference-redirect";
 import NextTopLoader from "nextjs-toploader";
 import { Analytics } from "@vercel/analytics/next";
 
@@ -136,6 +137,7 @@ export default async function LocaleLayout({
           <NextTopLoader color="#2563EB" showSpinner={false} />
           <NotificationProvider>
             <ChatUnreadProvider locale={locale}>
+              <LocalePreferenceRedirect locale={locale} />
               <ScrollToTop />
               <PushServiceWorkerRegister />
               <OnboardingGuard />

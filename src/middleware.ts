@@ -10,6 +10,12 @@ export async function middleware(request: NextRequest) {
     return new NextResponse(null, { status: 204 });
   }
 
+  if (request.nextUrl.pathname === "/") {
+    const redirectUrl = request.nextUrl.clone();
+    redirectUrl.pathname = "/ko";
+    return NextResponse.redirect(redirectUrl, 301);
+  }
+
   // First, update Supabase session and get user data
   const { supabaseResponse, user, supabase } = await updateSession(request);
 

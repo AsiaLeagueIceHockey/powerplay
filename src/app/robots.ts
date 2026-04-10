@@ -1,7 +1,7 @@
 import { MetadataRoute } from "next";
+import { SEO_BASE_URL } from "@/lib/seo/sitemap";
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = "https://powerplay.kr";
   const locales = ["ko", "en"];
   const privatePaths = [
     "/admin/",
@@ -19,28 +19,12 @@ export default function robots(): MetadataRoute.Robots {
   );
 
   return {
-    rules: [
-      {
-        userAgent: "*",
-        allow: "/",
-        disallow: [...privatePaths, ...localePrivatePaths],
-      },
-      {
-        userAgent: "Yeti",
-        allow: [
-          "/",
-          "/ko/",
-          "/ko/rinks",
-          "/ko/rinks/",
-          "/ko/clubs",
-          "/ko/clubs/",
-          "/ko/lounge",
-          "/ko/lounge/",
-          "/ko/match/",
-        ],
-        disallow: [...privatePaths, ...localePrivatePaths],
-      },
-    ],
-    sitemap: [`${baseUrl}/sitemap.xml`, `${baseUrl}/naver-sitemap.xml`],
+    rules: {
+      userAgent: "*",
+      allow: "/",
+      disallow: [...privatePaths, ...localePrivatePaths],
+    },
+    host: SEO_BASE_URL,
+    sitemap: [`${SEO_BASE_URL}/sitemap.xml`, `${SEO_BASE_URL}/naver-sitemap.xml`],
   };
 }
