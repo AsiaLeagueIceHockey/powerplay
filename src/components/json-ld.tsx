@@ -35,8 +35,8 @@ export function WebSiteJsonLd({ locale }: { locale: string }) {
             name: "PowerPlay",
             alternateName: "파워플레이",
             description: isKo
-              ? "아이스하키 동호회 경기 운영 & 게스트 매칭 플랫폼"
-              : "Ice hockey club match management & player matching platform",
+              ? "아이스하키 경기 일정 확인, 게스트 참가, 동호회 찾기, 링크장 정보까지. 한국 아이스하키 커뮤니티 플랫폼."
+              : "Find ice hockey games, join as a guest player, discover clubs, and explore rinks. The all-in-one platform for Korea's hockey community.",
             inLanguage: isKo ? "ko-KR" : "en-US",
           },
           {
@@ -47,8 +47,8 @@ export function WebSiteJsonLd({ locale }: { locale: string }) {
             url: SITE_URL,
             logo: `${SITE_URL}/favicon.png`,
             description: isKo
-              ? "아이스하키 동호회 경기 운영 & 게스트 매칭 플랫폼"
-              : "Ice hockey club match management & player matching platform",
+              ? "아이스하키 경기 일정 확인, 게스트 참가, 동호회 찾기, 링크장 정보까지. 한국 아이스하키 커뮤니티 플랫폼."
+              : "Find ice hockey games, join as a guest player, discover clubs, and explore rinks. The all-in-one platform for Korea's hockey community.",
             sameAs: [],
           },
         ],

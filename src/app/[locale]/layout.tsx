@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { routing, type Locale } from "@/i18n/routing";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Metadata } from "next";
+import { headers } from "next/headers";
 import { ScrollToTop } from "@/components/scroll-to-top";
 import { WebSiteJsonLd } from "@/components/json-ld";
 import { PushServiceWorkerRegister } from "@/components/push-manager";
@@ -51,11 +52,11 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
 
-  const title = locale === "ko" ? "파워플레이 - 아이스하키 경기 매칭" : "PowerPlay - Ice Hockey Match Management";
+  const title = locale === "ko" ? "파워플레이 - 아이스하키 경기·동호회·게스트 모집" : "PowerPlay - Ice Hockey Games, Clubs & Guest Recruitment";
   const description =
     locale === "ko"
-      ? "아이스하키 동호회 경기 운영 및 게스트 매칭 관리 플랫폼"
-      : "Ice hockey club match management and player matching platform";
+      ? "아이스하키 경기 일정 확인, 게스트 참가, 동호회 찾기, 링크장 정보까지. 한국 아이스하키 커뮤니티 플랫폼 파워플레이."
+      : "Find ice hockey games, join as a guest player, discover clubs, and explore rinks. The all-in-one platform for Korea's hockey community.";
 
   return {
     title: {
@@ -79,7 +80,7 @@ export async function generateMetadata({
           url: `${siteUrl}/og-new.png`,
           width: 1200,
           height: 630,
-          alt: "PowerPlay - Ice Hockey Match Management",
+          alt: "PowerPlay - Ice Hockey Games, Clubs & Guest Recruitment",
         },
       ],
       locale: locale === "ko" ? "ko_KR" : "en_US",
@@ -119,7 +120,7 @@ export default async function LocaleLayout({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  
+
   // Validate locale
   if (!routing.locales.includes(locale as Locale)) {
     notFound();
@@ -127,6 +128,11 @@ export default async function LocaleLayout({
 
   setRequestLocale(locale);
   const messages = await getMessages();
+
+  // Detect bots to skip client-side locale redirect (prevents /ko → /en for crawlers)
+  const headersList = await headers();
+  const ua = headersList.get("user-agent") || "";
+  const isCrawler = /Yeti|Googlebot|bingbot|Baiduspider|DuckDuckBot|Slurp|facebookexternalhit|Twitterbot|LinkedInBot|NaverBot|AdsBot|Mediapartners/i.test(ua);
 
   return (
     <html lang={locale}>
@@ -137,7 +143,7 @@ export default async function LocaleLayout({
           <NextTopLoader color="#2563EB" showSpinner={false} />
           <NotificationProvider>
             <ChatUnreadProvider locale={locale}>
-              <LocalePreferenceRedirect locale={locale} />
+              {!isCrawler && <LocalePreferenceRedirect locale={locale} />}
               <ScrollToTop />
               <PushServiceWorkerRegister />
               <OnboardingGuard />

@@ -5,6 +5,14 @@ import { routing } from "@/i18n/routing";
 
 const intlMiddleware = createMiddleware(routing);
 
+const BOT_UA_PATTERN =
+  /Yeti|Googlebot|bingbot|Baiduspider|DuckDuckBot|Slurp|facebookexternalhit|Twitterbot|LinkedInBot|NaverBot|AdsBot|Mediapartners/i;
+
+function isBot(request: NextRequest): boolean {
+  const ua = request.headers.get("user-agent") || "";
+  return BOT_UA_PATTERN.test(ua);
+}
+
 export async function middleware(request: NextRequest) {
   if (request.method === "OPTIONS") {
     return new NextResponse(null, { status: 204 });
@@ -14,6 +22,12 @@ export async function middleware(request: NextRequest) {
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = "/ko";
     return NextResponse.redirect(redirectUrl, 301);
+  }
+
+  // For search engine bots: skip Supabase session entirely to avoid
+  // unnecessary latency and potential errors that cause "수집제한"
+  if (isBot(request)) {
+    return intlMiddleware(request);
   }
 
   // First, update Supabase session and get user data
