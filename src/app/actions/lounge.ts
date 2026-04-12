@@ -7,6 +7,8 @@ import {
   buildMetricsSummary as buildMetricsSummaryUtil,
   buildDailyMetricPoints as buildDailyMetricPointsUtil,
   buildEventMetricRows as buildEventMetricRowsUtil,
+  dailyMetricsToRows,
+  type DailyMetricsRow,
 } from "@/lib/lounge-metrics";
 import {
   compareLoungeBusinessCategoryPriority,
@@ -424,30 +426,61 @@ function buildSourceMetricRows(rows: LoungeMetricRow[]): LoungeSourceMetricRow[]
     });
 }
 
-async function fetchAllMetrics(
+/**
+ * Hybrid metrics fetch: lounge_daily_metrics (과거 집계) + lounge_metrics (최신 실시간)
+ * - lounge_daily_metrics에서 가장 최근 집계 날짜를 확인
+ * - 그 이후 데이터만 lounge_metrics에서 실시간 조회
+ * - 집계 데이터가 없으면 전체 lounge_metrics에서 조회 (배치 미실행 상태에서도 동작)
+ */
+async function fetchMetricsHybrid(
   supabase: SupabaseServerClient,
   businessId: string
 ): Promise<LoungeMetricRow[]> {
+  // 1. Fetch all daily aggregated metrics
+  const { data: dailyData } = await supabase
+    .from("lounge_daily_metrics")
+    .select("business_id, date, metrics")
+    .eq("business_id", businessId)
+    .order("date", { ascending: true });
+
+  const dailyRows = (dailyData as DailyMetricsRow[] | null) ?? [];
+
+  // 2. Find the last aggregated date
+  const lastAggregatedDate = dailyRows.length > 0
+    ? dailyRows[dailyRows.length - 1].date
+    : null;
+
+  // 3. Convert aggregated JSONB to LoungeMetricRow[] format
+  const aggregatedRows = dailyMetricsToRows(dailyRows);
+
+  // 4. Fetch real-time metrics after the last aggregated date
+  const realtimeRows: LoungeMetricRow[] = [];
   const PAGE_SIZE = 1000;
-  const allRows: LoungeMetricRow[] = [];
   let offset = 0;
 
   while (true) {
-    const { data } = await supabase
+    let query = supabase
       .from("lounge_metrics")
       .select("metric_type, cta_type, event_id, source, created_at")
       .eq("business_id", businessId)
       .order("created_at", { ascending: false })
       .range(offset, offset + PAGE_SIZE - 1);
 
+    // Only fetch metrics after the last aggregated date (KST end of day → UTC)
+    if (lastAggregatedDate) {
+      query = query.gt("created_at", `${lastAggregatedDate}T14:59:59.999Z`);
+    }
+
+    const { data } = await query;
     const rows = (data as LoungeMetricRow[] | null) ?? [];
-    allRows.push(...rows);
+    realtimeRows.push(...rows);
 
     if (rows.length < PAGE_SIZE) break;
     offset += PAGE_SIZE;
   }
 
-  return allRows;
+  // 5. Combine: aggregated (past) + realtime (recent)
+  return [...aggregatedRows, ...realtimeRows];
 }
 
 async function buildLoungeBusinessPerformance(
@@ -460,7 +493,7 @@ async function buildLoungeBusinessPerformance(
       .select("*")
       .eq("business_id", business.id)
       .order("start_time", { ascending: true }),
-    fetchAllMetrics(supabase, business.id),
+    fetchMetricsHybrid(supabase, business.id),
   ]);
 
   const events = (eventsResult.data as LoungeEvent[] | null) ?? [];
@@ -594,7 +627,7 @@ export async function getLoungeAdminPageData() {
     : { data: [] as LoungeEvent[] };
 
   const metricRows = businessData
-    ? await fetchAllMetrics(supabase, businessData.id)
+    ? await fetchMetricsHybrid(supabase, businessData.id)
     : [];
 
   const membershipStatus = getLoungeMembershipPhase(membership);

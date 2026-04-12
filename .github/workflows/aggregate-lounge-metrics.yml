@@ -1,0 +1,37 @@
+name: Daily Lounge Metrics Aggregation
+
+on:
+  schedule:
+    # KST 00:10 (UTC 15:10) - 자정 데이터 안정화 후 실행
+    - cron: "10 15 * * *"
+  # 수동 실행 지원
+  workflow_dispatch:
+    inputs:
+      delete_old_logs:
+        description: "90일 이전 원본 로그 삭제 여부 (true/false)"
+        required: false
+        default: "false"
+        type: string
+
+jobs:
+  aggregate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Run Aggregation Script
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          DELETE_OLD_LOGS: ${{ github.event.inputs.delete_old_logs || 'false' }}
+        run: npx tsx scripts/aggregate-lounge-metrics.ts
