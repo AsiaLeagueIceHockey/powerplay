@@ -521,26 +521,46 @@ function buildSourceMetricRows(rows: LoungeMetricRow[]): LoungeSourceMetricRow[]
     });
 }
 
+async function fetchAllMetrics(
+  supabase: SupabaseServerClient,
+  businessId: string
+): Promise<LoungeMetricRow[]> {
+  const PAGE_SIZE = 1000;
+  const allRows: LoungeMetricRow[] = [];
+  let offset = 0;
+
+  while (true) {
+    const { data } = await supabase
+      .from("lounge_metrics")
+      .select("metric_type, cta_type, event_id, source, created_at")
+      .eq("business_id", businessId)
+      .order("created_at", { ascending: false })
+      .range(offset, offset + PAGE_SIZE - 1);
+
+    const rows = (data as LoungeMetricRow[] | null) ?? [];
+    allRows.push(...rows);
+
+    if (rows.length < PAGE_SIZE) break;
+    offset += PAGE_SIZE;
+  }
+
+  return allRows;
+}
+
 async function buildLoungeBusinessPerformance(
   supabase: SupabaseServerClient,
   business: LoungeBusiness
 ): Promise<LoungeBusinessPerformance> {
-  const [eventsResult, metricsResult] = await Promise.all([
+  const [eventsResult, metricRows] = await Promise.all([
     supabase
       .from("lounge_events")
       .select("*")
       .eq("business_id", business.id)
       .order("start_time", { ascending: true }),
-    supabase
-      .from("lounge_metrics")
-      .select("metric_type, cta_type, event_id, source, created_at")
-      .eq("business_id", business.id)
-      .order("created_at", { ascending: false })
-      .limit(10000),
+    fetchAllMetrics(supabase, business.id),
   ]);
 
   const events = (eventsResult.data as LoungeEvent[] | null) ?? [];
-  const metricRows = (metricsResult.data as LoungeMetricRow[] | null) ?? [];
 
   return {
     business,
@@ -669,16 +689,9 @@ export async function getLoungeAdminPageData() {
         .order("start_time", { ascending: true })
     : { data: [] as LoungeEvent[] };
 
-  const metrics = businessData
-    ? await supabase
-        .from("lounge_metrics")
-        .select("metric_type, cta_type, event_id, source, created_at")
-        .eq("business_id", businessData.id)
-        .order("created_at", { ascending: false })
-        .limit(10000)
-    : { data: [] as LoungeMetricRow[] };
-
-  const metricRows = (metrics.data as LoungeMetricRow[] | null) ?? [];
+  const metricRows = businessData
+    ? await fetchAllMetrics(supabase, businessData.id)
+    : [];
 
   const membershipStatus = getLoungeMembershipPhase(membership);
 
