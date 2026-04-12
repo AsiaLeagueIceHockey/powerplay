@@ -88,9 +88,8 @@ export function ClubCard({
               <Image 
                 src={club.logo_url} 
                 alt={club.name} 
-                width={48} 
-                height={48} 
-                unoptimized
+                width={48}
+                height={48}
                 className="w-full h-full object-cover"
               />
             ) : (

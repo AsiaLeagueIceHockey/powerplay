@@ -192,7 +192,6 @@ export function LoungeEventCard({
                   alt={business.name || "Business logo"}
                   width={22}
                   height={22}
-                  unoptimized
                   className="h-[22px] w-[22px] rounded object-cover bg-white shadow-sm"
                 />
               ) : null}

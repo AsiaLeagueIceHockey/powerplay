@@ -236,7 +236,6 @@ export default async function MatchPage({
                     alt={match.club.name}
                     width={16}
                     height={16}
-                    unoptimized
                     className="h-4 w-4 rounded object-cover bg-white"
                   />
                 ) : (
@@ -506,7 +505,6 @@ export default async function MatchPage({
                         alt={match.club.name}
                         width={20}
                         height={20}
-                        unoptimized
                         className="h-5 w-5 rounded object-cover bg-white"
                       />
                     ) : (

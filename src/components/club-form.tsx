@@ -105,9 +105,8 @@ export function ClubForm({ locale, club, allRinks }: ClubFormProps) {
               <Image 
                 src={logoUrl} 
                 alt="Club logo" 
-                width={96} 
-                height={96} 
-                unoptimized
+                width={96}
+                height={96}
                 className="w-full h-full object-cover"
               />
             ) : (

@@ -1531,7 +1531,7 @@ export async function uploadLoungeImage(formData: FormData): Promise<{ url?: str
   const { error: uploadError } = await supabase.storage
     .from("club-logos")
     .upload(fileName, file, {
-      cacheControl: "3600",
+      cacheControl: "31536000",
       upsert: false,
     });
 

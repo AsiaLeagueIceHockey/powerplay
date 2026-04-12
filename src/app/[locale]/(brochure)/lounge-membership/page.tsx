@@ -104,7 +104,7 @@ function ScreenshotCard({
     <div className="overflow-hidden rounded-3xl border border-zinc-200 bg-white shadow-sm">
       <div className="relative bg-zinc-100">
         <div className={`relative w-full ${tall ? "aspect-[9/19.5]" : "aspect-[9/16]"}`}>
-          <Image src={src} alt={alt} fill unoptimized className="object-cover object-top" />
+          <Image src={src} alt={alt} fill className="object-cover object-top" />
         </div>
       </div>
       <div className="space-y-2 p-4">

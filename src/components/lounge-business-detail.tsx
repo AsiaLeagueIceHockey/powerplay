@@ -111,7 +111,6 @@ export function LoungeBusinessDetail({
               alt={business.name}
               fill
               priority
-              unoptimized
               className="object-cover"
               sizes="(max-width: 768px) 100vw, 1200px"
             />
@@ -132,7 +131,6 @@ export function LoungeBusinessDetail({
                   alt={business.name}
                   width={64}
                   height={64}
-                  unoptimized
                   className="h-16 w-16 shrink-0 rounded-2xl border border-zinc-200 object-cover dark:border-zinc-700"
                 />
               ) : null}

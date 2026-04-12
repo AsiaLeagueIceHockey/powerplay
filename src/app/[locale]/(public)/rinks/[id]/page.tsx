@@ -256,7 +256,6 @@ export default async function RinkDetailPage({
                               alt={club.name}
                               width={48}
                               height={48}
-                              unoptimized
                               className="h-full w-full object-cover"
                             />
                           ) : (

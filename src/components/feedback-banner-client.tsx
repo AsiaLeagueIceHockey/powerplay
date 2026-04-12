@@ -104,7 +104,6 @@ export function FeedbackBannerClient({
                 alt={banner.imageAlt || banner.title}
                 width={40}
                 height={40}
-                unoptimized
                 className="h-full w-full object-cover"
               />
             ) : banner.iconType === "instagram" ? (

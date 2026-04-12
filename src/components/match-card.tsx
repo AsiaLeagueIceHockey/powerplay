@@ -184,9 +184,8 @@ export function MatchCard({ match }: { match: Match }) {
                 <Image 
                   src={match.club.logo_url} 
                   alt={match.club.name} 
-                  width={16} 
-                  height={16} 
-                  unoptimized
+                  width={16}
+                  height={16}
                   className="w-4 h-4 rounded shrink-0 object-cover shadow-sm bg-white"
                 />
               ) : (

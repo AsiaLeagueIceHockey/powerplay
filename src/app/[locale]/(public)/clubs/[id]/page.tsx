@@ -103,9 +103,8 @@ export default async function ClubDetailPage({
               <Image 
                 src={club.logo_url} 
                 alt={club.name} 
-                width={64} 
-                height={64} 
-                unoptimized
+                width={64}
+                height={64}
                 className="w-full h-full object-cover"
               />
             ) : (
