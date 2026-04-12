@@ -536,7 +536,7 @@ async function buildLoungeBusinessPerformance(
       .select("metric_type, cta_type, event_id, source, created_at")
       .eq("business_id", business.id)
       .order("created_at", { ascending: false })
-      .limit(1000),
+      .limit(10000),
   ]);
 
   const events = (eventsResult.data as LoungeEvent[] | null) ?? [];
@@ -675,7 +675,7 @@ export async function getLoungeAdminPageData() {
         .select("metric_type, cta_type, event_id, source, created_at")
         .eq("business_id", businessData.id)
         .order("created_at", { ascending: false })
-        .limit(1000)
+        .limit(10000)
     : { data: [] as LoungeMetricRow[] };
 
   const metricRows = (metrics.data as LoungeMetricRow[] | null) ?? [];
