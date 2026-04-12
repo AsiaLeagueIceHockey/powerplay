@@ -4,6 +4,11 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { sanitizeLoungeExternalUrl } from "@/lib/lounge-link-utils";
 import {
+  buildMetricsSummary as buildMetricsSummaryUtil,
+  buildDailyMetricPoints as buildDailyMetricPointsUtil,
+  buildEventMetricRows as buildEventMetricRowsUtil,
+} from "@/lib/lounge-metrics";
+import {
   compareLoungeBusinessCategoryPriority,
   type LoungeBusinessCategory,
 } from "@/lib/lounge-business-category";
@@ -160,7 +165,7 @@ export interface LoungeMetricsSummary {
 
 export type LoungeMembershipPhase = "none" | "upcoming" | "active" | "expired";
 
-interface LoungeMetricRow {
+export interface LoungeMetricRow {
   metric_type: "impression" | "click";
   cta_type: LoungeCtaType | null;
   event_id: string | null;
@@ -197,6 +202,7 @@ export interface LoungeBusinessPerformance {
   dailyMetrics: LoungeDailyMetricPoint[];
   eventMetrics: LoungeEventMetricRow[];
   sourceMetrics: LoungeSourceMetricRow[];
+  rawMetrics: LoungeMetricRow[];
 }
 
 interface LoungeEventPayload {
@@ -382,114 +388,11 @@ function getLoungeMembershipPhase(membership: LoungeMembership | null): LoungeMe
   return "active";
 }
 
-function buildMetricsSummary(rows: LoungeMetricRow[]): LoungeMetricsSummary {
-  const summary: LoungeMetricsSummary = {
-    businessImpressions: 0,
-    businessClicks: 0,
-    eventImpressions: 0,
-    eventClicks: 0,
-    homeBannerImpressions: 0,
-    homeBannerClicks: 0,
-    ctaClicks: {
-      phone: 0,
-      kakao: 0,
-      instagram: 0,
-      website: 0,
-      detail: 0,
-    },
-    sourceBreakdown: {},
-  };
+const buildMetricsSummary = buildMetricsSummaryUtil;
 
-  rows.forEach((row) => {
-    const isEvent = !!row.event_id;
-    const isHomeBannerImpression = row.metric_type === "impression" && row.source === "home-banner-impression";
-    const isHomeBannerClick = row.metric_type === "click" && row.source === "home-banner-click";
+const buildDailyMetricPoints = buildDailyMetricPointsUtil;
 
-    if (row.source) {
-      summary.sourceBreakdown[row.source] = (summary.sourceBreakdown[row.source] ?? 0) + 1;
-    }
-
-    if (isHomeBannerImpression) {
-      summary.homeBannerImpressions += 1;
-      return;
-    }
-
-    if (isHomeBannerClick) {
-      summary.homeBannerClicks += 1;
-      return;
-    }
-
-    if (row.metric_type === "impression") {
-      if (isEvent) summary.eventImpressions += 1;
-      else summary.businessImpressions += 1;
-      return;
-    }
-
-    if (isEvent) summary.eventClicks += 1;
-    else summary.businessClicks += 1;
-
-    if (row.cta_type) {
-      summary.ctaClicks[row.cta_type] += 1;
-    }
-  });
-
-  return summary;
-}
-
-function buildDailyMetricPoints(rows: LoungeMetricRow[]): LoungeDailyMetricPoint[] {
-  const map = new Map<string, LoungeDailyMetricPoint>();
-
-  rows.forEach((row) => {
-    const dateKey = toKstDateKey(row.created_at);
-    const current = map.get(dateKey) ?? {
-      date: dateKey,
-      impressions: 0,
-      clicks: 0,
-    };
-
-    if (row.metric_type === "impression") current.impressions += 1;
-    else current.clicks += 1;
-
-    map.set(dateKey, current);
-  });
-
-  return [...map.values()].sort((a, b) => a.date.localeCompare(b.date)).slice(-7);
-}
-
-function buildEventMetricRows(events: LoungeEvent[], rows: LoungeMetricRow[]): LoungeEventMetricRow[] {
-  const map = new Map<string, LoungeEventMetricRow>();
-
-  events.forEach((event) => {
-    map.set(event.id, {
-      eventId: event.id,
-      title: event.title,
-      startTime: event.start_time,
-      impressions: 0,
-      clicks: 0,
-      ctr: 0,
-    });
-  });
-
-  rows.forEach((row) => {
-    if (!row.event_id) return;
-    const current = map.get(row.event_id);
-    if (!current) return;
-
-    if (row.metric_type === "impression") current.impressions += 1;
-    else current.clicks += 1;
-  });
-
-  return [...map.values()]
-    .map((item) => ({
-      ...item,
-      ctr: item.impressions > 0 ? Number(((item.clicks / item.impressions) * 100).toFixed(1)) : 0,
-    }))
-    .sort((a, b) => {
-      if (b.clicks !== a.clicks) return b.clicks - a.clicks;
-      if (b.impressions !== a.impressions) return b.impressions - a.impressions;
-      return new Date(a.startTime).getTime() - new Date(b.startTime).getTime();
-    });
-}
+const buildEventMetricRows = buildEventMetricRowsUtil;
 
 function buildSourceMetricRows(rows: LoungeMetricRow[]): LoungeSourceMetricRow[] {
   const map = new Map<string, LoungeSourceMetricRow>();
@@ -569,6 +472,7 @@ async function buildLoungeBusinessPerformance(
     dailyMetrics: buildDailyMetricPoints(metricRows),
     eventMetrics: buildEventMetricRows(events, metricRows),
     sourceMetrics: buildSourceMetricRows(metricRows),
+    rawMetrics: metricRows,
   };
 }
 
@@ -717,6 +621,7 @@ export async function getLoungeAdminPageData() {
     dailyMetrics: buildDailyMetricPoints(metricRows),
     eventMetrics: buildEventMetricRows((events.data as LoungeEvent[]) ?? [], metricRows),
     sourceMetrics: buildSourceMetricRows(metricRows),
+    rawMetrics: metricRows,
     isSuperUser,
     featuredBusinesses: (featuredBusinesses?.data as LoungeBusiness[]) ?? [],
   };

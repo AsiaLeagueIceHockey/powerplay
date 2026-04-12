@@ -3,11 +3,9 @@
 import { useMemo, useState } from "react";
 import type {
   LoungeBusiness,
-  LoungeDailyMetricPoint,
   LoungeEvent,
-  LoungeEventMetricRow,
   LoungeMembership,
-  LoungeMetricsSummary,
+  LoungeMetricRow,
 } from "@/app/actions/lounge";
 import { LoungeBusinessForm } from "./lounge-business-form";
 import { LoungeEventForm } from "./lounge-event-form";
@@ -20,9 +18,7 @@ export function LoungeAdminDashboard({
   locale,
   business,
   events,
-  metrics,
-  dailyMetrics,
-  eventMetrics,
+  rawMetrics,
   membership,
   isSuperUser,
   featuredBusinesses,
@@ -30,9 +26,7 @@ export function LoungeAdminDashboard({
   locale: string;
   business: LoungeBusiness | null;
   events: LoungeEvent[];
-  metrics: LoungeMetricsSummary;
-  dailyMetrics: LoungeDailyMetricPoint[];
-  eventMetrics: LoungeEventMetricRow[];
+  rawMetrics: LoungeMetricRow[];
   membership: LoungeMembership | null;
   isSuperUser: boolean;
   featuredBusinesses: LoungeBusiness[];
@@ -58,9 +52,8 @@ export function LoungeAdminDashboard({
       <LoungePerformancePanel
         locale={locale}
         business={business}
-        metrics={metrics}
-        dailyMetrics={dailyMetrics}
-        eventMetrics={eventMetrics}
+        rawMetrics={rawMetrics}
+        events={events}
         onEmptyAction={() => setActiveTab("business")}
         onEmptyActionLabel={locale === "ko" ? "비즈니스 등록하러 가기" : "Go to business tab"}
       />

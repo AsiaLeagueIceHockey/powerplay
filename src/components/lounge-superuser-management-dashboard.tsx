@@ -383,24 +383,8 @@ export function LoungeSuperuserManagementDashboard({
           <LoungePerformancePanel
             locale={locale}
             business={selectedPerformanceBusiness?.business ?? null}
-            metrics={selectedPerformanceBusiness?.metrics ?? {
-              businessImpressions: 0,
-              businessClicks: 0,
-              eventImpressions: 0,
-              eventClicks: 0,
-              homeBannerImpressions: 0,
-              homeBannerClicks: 0,
-              ctaClicks: {
-                phone: 0,
-                kakao: 0,
-                instagram: 0,
-                website: 0,
-                detail: 0,
-              },
-              sourceBreakdown: {},
-            }}
-            dailyMetrics={selectedPerformanceBusiness?.dailyMetrics ?? []}
-            eventMetrics={selectedPerformanceBusiness?.eventMetrics ?? []}
+            rawMetrics={selectedPerformanceBusiness?.rawMetrics ?? []}
+            events={selectedPerformanceBusiness?.events ?? []}
             emptyTitle={locale === "ko" ? "현재 확인할 수 있는 활성 라운지 비즈니스가 없습니다." : "No active lounge businesses available."}
             emptyDescription={
               locale === "ko"

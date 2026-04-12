@@ -57,7 +57,6 @@ export default async function AdminLoungePage({
     );
   }
 
-  const metrics = data.metrics!;
   const showGate = data.membershipStatus !== "active";
   const latestApplication = data.latestApplication;
 
@@ -194,9 +193,7 @@ export default async function AdminLoungePage({
           locale={locale}
           business={data.business}
           events={data.events}
-          metrics={metrics}
-          dailyMetrics={data.dailyMetrics}
-          eventMetrics={data.eventMetrics}
+          rawMetrics={data.rawMetrics}
           membership={data.membership}
           isSuperUser={data.isSuperUser}
           featuredBusinesses={data.featuredBusinesses}
