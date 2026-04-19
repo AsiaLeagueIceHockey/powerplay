@@ -86,10 +86,6 @@ export default async function HomePage({
 
       <div className="border-t border-zinc-200 pt-3 text-center text-[11px] text-zinc-400 dark:border-zinc-800 dark:text-zinc-500">
         <div className="flex items-center justify-center gap-3">
-          <Link href="/rinks" className="transition-colors hover:text-zinc-600 dark:hover:text-zinc-300">
-            {locale === "ko" ? "링크장" : "Rinks"}
-          </Link>
-          <span aria-hidden="true">|</span>
           <Link href="/privacy" className="transition-colors hover:text-zinc-600 dark:hover:text-zinc-300">
             {locale === "ko" ? "개인정보처리방침" : "Privacy Policy"}
           </Link>
