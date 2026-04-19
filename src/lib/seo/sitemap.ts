@@ -8,6 +8,7 @@ export const NAVER_SITEMAP_LOCALES = ["ko"] as const;
 const MAX_INDEXED_MATCHES = 60;
 const STATIC_PAGES = [
   { path: "", changeFrequency: "daily" as const, priority: 1.0 },
+  { path: "/find-club", changeFrequency: "weekly" as const, priority: 0.9 },
   { path: "/rinks", changeFrequency: "weekly" as const, priority: 0.9 },
   { path: "/clubs", changeFrequency: "weekly" as const, priority: 0.9 },
   { path: "/lounge", changeFrequency: "weekly" as const, priority: 0.85 },

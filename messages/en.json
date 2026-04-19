@@ -529,5 +529,63 @@
             "confirmPayment": "Confirm Payment",
             "cancel": "Cancel"
         }
+    },
+    "findClub": {
+        "title": "Find Your Hockey Club",
+        "subtitle": "Answer 4 simple questions to get personalized club recommendations",
+        "meta": {
+            "title": "Find Your Hockey Club | PowerPlay",
+            "description": "Answer 4 questions and get personalized ice hockey club recommendations."
+        },
+        "step": "{current} / {total}",
+        "next": "Next",
+        "prev": "Back",
+        "restart": "Try Again",
+        "q1": {
+            "title": "What type of hockey are you looking for?",
+            "adult": "Adult Hockey",
+            "adultDesc": "Club activities, guest games",
+            "youth": "Youth Hockey",
+            "youthDesc": "Junior clubs, youth lessons"
+        },
+        "q2": {
+            "title": "Where would you like to play?",
+            "all": "All Regions",
+            "allDesc": "Recommend from all regions"
+        },
+        "q3": {
+            "title": "How often do you want to play per week?",
+            "low": "1-2 times/week",
+            "lowDesc": "Casual play",
+            "high": "3+ times/week",
+            "highDesc": "Serious play"
+        },
+        "q4": {
+            "title": "Do you have ice hockey equipment?",
+            "yes": "Yes, I do",
+            "yesDesc": "I have my own gear",
+            "no": "No, I don't",
+            "noDesc": "I need equipment rental"
+        },
+        "result": {
+            "title": "Recommended Clubs",
+            "subtitle": "We found {count} clubs for you!",
+            "noResult": "No matching clubs found",
+            "noResultDesc": "Try adjusting your preferences, or browse all clubs directly.",
+            "members": "{count} members",
+            "matches": "{count} recent matches",
+            "rentalBadge": "Equipment rental",
+            "kakaoChat": "KakaoTalk Open Chat",
+            "viewDetail": "View Details",
+            "viewAll": "Browse All Clubs",
+            "share": "Share Results",
+            "shareText": "I got personalized hockey club recommendations on PowerPlay! 🏒\n\n{clubs}\n\nGet yours 👉 {url}",
+            "totalInfo": "Currently {clubs} clubs and {businesses} businesses are on PowerPlay."
+        },
+        "cta": {
+            "badge": "🏒 Start Hockey",
+            "title": "Find Your Hockey Club",
+            "description": "Get personalized club recommendations with 4 simple questions"
+        }
     }
 }

@@ -3,6 +3,7 @@ import { setRequestLocale } from "next-intl/server";
 
 import { getCachedClubs, getCachedMatches } from "@/app/actions/cache";
 import { FeedbackBanner } from "@/components/feedback-banner";
+import { FindClubBanner } from "@/components/find-club-banner";
 import { PublicSectionTabs } from "@/components/public-section-tabs";
 import { RinkExplorer } from "@/components/rink-explorer";
 import { getPublicRinks } from "@/lib/public-rinks";
@@ -63,6 +64,7 @@ export default async function RinksDirectoryPage({
     <div className="mx-auto max-w-6xl flex flex-col gap-6 -mt-2">
       <FeedbackBanner locale={locale} />
       <PublicSectionTabs locale={locale} activeTab="rink" />
+      <FindClubBanner locale={locale} />
 
       <section className="sr-only">
         <h1>{isKo ? "전국 아이스하키 링크장" : "Ice hockey rinks across Korea"}</h1>

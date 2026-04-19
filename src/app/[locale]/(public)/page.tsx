@@ -6,6 +6,7 @@ import { PublicSectionTabs } from "@/components/public-section-tabs";
 import { Suspense } from "react";
 import { HomePageSkeleton } from "@/components/skeletons";
 import { Metadata } from "next";
+import { FindClubBanner } from "@/components/find-club-banner";
 import { Link } from "@/i18n/navigation";
 
 const siteUrl = "https://powerplay.kr";
@@ -78,6 +79,9 @@ export default async function HomePage({
       <FeedbackBanner locale={locale} />
 
       <PublicSectionTabs locale={locale} activeTab="match" />
+
+      {/* Find Club CTA */}
+      <FindClubBanner locale={locale} />
 
       {/* Main Content - streamed with Suspense */}
       <Suspense fallback={<HomePageSkeleton />}>

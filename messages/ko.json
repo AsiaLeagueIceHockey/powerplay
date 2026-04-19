@@ -531,5 +531,63 @@
             "confirmPayment": "입금 확인",
             "cancel": "취소"
         }
+    },
+    "findClub": {
+        "title": "나에게 맞는 하키클럽 찾기",
+        "subtitle": "4가지 질문으로 딱 맞는 클럽을 추천해드려요",
+        "meta": {
+            "title": "나에게 맞는 하키클럽 찾기 | 파워플레이",
+            "description": "4가지 질문으로 나에게 딱 맞는 아이스하키 동호회를 추천받아 보세요."
+        },
+        "step": "{current} / {total}",
+        "next": "다음",
+        "prev": "이전",
+        "restart": "다시 해보기",
+        "q1": {
+            "title": "어떤 하키를 찾고 계세요?",
+            "adult": "성인 하키",
+            "adultDesc": "동호회 활동, 게스트 참가",
+            "youth": "유소년 하키",
+            "youthDesc": "주니어 클럽, 유소년 레슨"
+        },
+        "q2": {
+            "title": "어디에서 운동하고 싶으세요?",
+            "all": "전체 지역",
+            "allDesc": "지역 상관없이 추천"
+        },
+        "q3": {
+            "title": "일주일에 몇 번 운동하고 싶으세요?",
+            "low": "주 1~2회",
+            "lowDesc": "취미로 즐기기",
+            "high": "주 3회 이상",
+            "highDesc": "본격적으로 즐기기"
+        },
+        "q4": {
+            "title": "아이스하키 장비를 가지고 계세요?",
+            "yes": "네, 있어요",
+            "yesDesc": "개인 장비 보유",
+            "no": "아니요, 없어요",
+            "noDesc": "장비 대여가 필요해요"
+        },
+        "result": {
+            "title": "추천 하키클럽",
+            "subtitle": "{count}개의 클럽을 찾았어요!",
+            "noResult": "조건에 맞는 클럽을 찾지 못했어요",
+            "noResultDesc": "조건을 바꿔서 다시 검색해 보시거나, 모든 동호회를 직접 둘러보세요.",
+            "members": "{count}명",
+            "matches": "최근 경기 {count}건",
+            "rentalBadge": "장비대여 가능",
+            "kakaoChat": "카카오톡 오픈채팅",
+            "viewDetail": "자세히 보기",
+            "viewAll": "모든 동호회 보기",
+            "share": "추천 결과 공유",
+            "shareText": "파워플레이에서 나에게 맞는 하키클럽을 추천받았어요! 🏒\n\n{clubs}\n\n나도 추천받기 👉 {url}",
+            "totalInfo": "현재 파워플레이에 {clubs}개 동호회, {businesses}개 비즈니스가 등록되어 있어요."
+        },
+        "cta": {
+            "badge": "🏒 하키 시작하기",
+            "title": "나에게 맞는 하키클럽 찾기",
+            "description": "4가지 질문으로 딱 맞는 클럽을 추천받아 보세요"
+        }
     }
 }
