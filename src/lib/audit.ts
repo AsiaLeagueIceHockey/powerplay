@@ -30,6 +30,7 @@ type AuditAction =
   | "LOUNGE_APPLICATION_UPDATE"
   | "LOUNGE_FEATURE_UPDATE"
   | "LOUNGE_HOME_BANNER_UPDATE"
+  | "FIND_CLUB_COMPLETE"
   | "OTHER";
 
 interface AuditLogParams {
