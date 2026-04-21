@@ -4,7 +4,6 @@ import { setRequestLocale } from "next-intl/server";
 import { getCachedMatches, getCachedRinks, getRankedClubs } from "@/app/actions/cache";
 import { getMyClubVoteSummary } from "@/app/actions/clubs";
 import { FeedbackBanner } from "@/components/feedback-banner";
-import { FindClubBanner } from "@/components/find-club-banner";
 import { HomeClient } from "@/components/home-client";
 import { PublicSectionTabs } from "@/components/public-section-tabs";
 
@@ -64,7 +63,6 @@ export default async function ClubsDirectoryPage({
     <div className="mx-auto max-w-6xl flex flex-col gap-6 -mt-2">
       <FeedbackBanner locale={locale} />
       <PublicSectionTabs locale={locale} activeTab="club" />
-      <FindClubBanner locale={locale} />
 
       <section className="sr-only">
         <h1>{locale === "ko" ? "아이스하키 동호회" : "Ice hockey clubs"}</h1>

@@ -532,10 +532,10 @@
     },
     "findClub": {
         "title": "Find Your Hockey Club",
-        "subtitle": "Answer 4 simple questions to get personalized club recommendations",
+        "subtitle": "Answer 3 simple questions to get personalized club recommendations",
         "meta": {
             "title": "Find Your Hockey Club | PowerPlay",
-            "description": "Answer 4 questions and get personalized ice hockey club recommendations."
+            "description": "Answer 3 questions and get personalized ice hockey club recommendations."
         },
         "step": "{current} / {total}",
         "next": "Next",
@@ -550,15 +550,7 @@
         },
         "q2": {
             "title": "Where would you like to play?",
-            "all": "All Regions",
-            "allDesc": "Recommend from all regions"
-        },
-        "q3": {
-            "title": "How often do you want to play per week?",
-            "low": "1-2 times/week",
-            "lowDesc": "Casual play",
-            "high": "3+ times/week",
-            "highDesc": "Serious play"
+            "hint": "You can select multiple regions"
         },
         "q4": {
             "title": "Do you have ice hockey equipment?",
@@ -580,12 +572,12 @@
             "viewAll": "Browse All Clubs",
             "share": "Share Results",
             "shareText": "I got personalized hockey club recommendations on PowerPlay! 🏒\n\n{clubs}\n\nGet yours 👉 {url}",
-            "totalInfo": "Currently {clubs} clubs and {businesses} businesses are on PowerPlay."
+            "totalInfo": "Currently {clubs} hockey clubs are on PowerPlay."
         },
         "cta": {
             "badge": "🏒 Start Hockey",
             "title": "Find Your Hockey Club",
-            "description": "Get personalized club recommendations with 4 simple questions"
+            "description": "Get personalized club recommendations with 3 simple questions"
         }
     }
 }

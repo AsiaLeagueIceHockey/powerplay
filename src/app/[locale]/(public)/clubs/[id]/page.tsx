@@ -6,6 +6,7 @@ import { MessageCircle, Users, Calendar, Building2, MapPin, CreditCard, Heart, M
 import { ClubVoteButton } from "@/components/club-vote-button";
 import { ClubSubscribeButton } from "@/components/club-subscribe-button";
 import { ClubShareButton } from "@/components/club-share-button";
+import { StartChatButton } from "@/components/start-chat-button";
 import {
   clubDetailActionButtonClass,
   clubDetailActionIconClass,
@@ -223,6 +224,14 @@ export default async function ClubDetailPage({
                    {locale === "ko" ? "오픈채팅 참여" : "KakaoTalk Open Chat"}
                  </span>
                </a>
+             )}
+
+             {club.created_by && (
+               <StartChatButton
+                 targetUserId={club.created_by}
+                 label={locale === "ko" ? "동호회 문의하기" : "Contact Club"}
+                 className={`${clubDetailActionButtonClass} col-span-2 bg-[#1e3a6e] text-white hover:bg-[#162d58] dark:bg-[#1e3a6e] dark:hover:bg-[#162d58]`}
+               />
              )}
           </div>
         </div>

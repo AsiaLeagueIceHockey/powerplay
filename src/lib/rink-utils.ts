@@ -27,21 +27,20 @@ const PROVINCE_MAP: Record<string, string> = {
 /**
  * Extract region (시도 + 시군구) from a Korean address string.
  * e.g. "서울특별시 성북구 안암로 145" → "서울 성북구"
+ * Normalizes extra whitespace so "경기도  성남시" and "경기도 성남시" collapse.
  */
 export function extractRegion(address?: string): string {
   if (!address) return "";
-  const parts = address.split(" ");
-  if (parts.length >= 1) {
-    let province = parts[0];
-    if (PROVINCE_MAP[province]) {
-      province = PROVINCE_MAP[province];
-    }
-    if (parts.length >= 2) {
-      return `${province} ${parts[1]}`;
-    }
-    return province;
+  const parts = address.trim().replace(/\s+/g, " ").split(" ").filter(Boolean);
+  if (parts.length === 0) return "";
+  let province = parts[0];
+  if (PROVINCE_MAP[province]) {
+    province = PROVINCE_MAP[province];
   }
-  return "";
+  if (parts.length >= 2) {
+    return `${province} ${parts[1]}`;
+  }
+  return province;
 }
 
 /**

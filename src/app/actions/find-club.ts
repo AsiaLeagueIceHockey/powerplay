@@ -10,7 +10,7 @@ import { extractRegion } from "@/lib/rink-utils";
 
 export interface FindClubPreferences {
   playerType: "adult" | "youth";
-  regions: string[]; // array of detailed regions like ["서울특별시 성북구", "경기도 고양시"]. Empty means all regions.
+  regions: string[]; // array of normalized regions like ["서울 성북구", "경기 고양시"]. Must contain at least one.
   hasEquipment: boolean;
 }
 
@@ -55,27 +55,19 @@ function scoreClub(
 ): number {
   let score = 0;
 
-  // 1. Region match (weight: critical)
-  let isRegionMatch = false;
-  if (prefs.regions.length > 0) {
-    if (club.rinks && club.rinks.length > 0) {
-      const hasMatchingRegion = club.rinks.some((rink) => {
-        const region = extractRegion(rink.address);
-        return prefs.regions.some(r => region.includes(r) || r.includes(region));
-      });
-      
-      if (hasMatchingRegion) {
-        score += 100;
-        isRegionMatch = true;
-      } else {
-        return -100; // Penalize mismatch
-      }
-    } else {
-      return -100; // User wants specific region, but club has no rinks
-    }
-  } else if (prefs.regions.length === 0) {
-    score += 20; // Neutral bonus when all regions selected
-    isRegionMatch = true;
+  // 1. Region match (weight: critical — user picked at least one region)
+  if (!club.rinks || club.rinks.length === 0) {
+    // Club has no rink info; cannot match a specific region.
+    return -100;
+  }
+  const clubRegions = club.rinks.map((rink) => extractRegion(rink.address));
+  const hasMatchingRegion = clubRegions.some((region) =>
+    prefs.regions.includes(region)
+  );
+  if (hasMatchingRegion) {
+    score += 100;
+  } else {
+    return -100;
   }
 
   // 2. Equipment rental (weight: medium — critical for beginners)
@@ -98,7 +90,6 @@ function scoreClub(
   if (club.logo_url) score += 5;
   if (club.kakao_open_chat_url) score += 10; // Important for onboarding
   if ((club.member_count ?? 0) > 5) score += 5;
-  if (club.rinks && club.rinks.length > 0) score += 5;
 
   return score;
 }
@@ -110,6 +101,11 @@ function scoreClub(
 export async function getClubRecommendations(
   prefs: FindClubPreferences
 ): Promise<FindClubResult> {
+  // Defensive: empty regions produce no results (UI enforces at least one)
+  if (prefs.regions.length === 0) {
+    return { recommendations: [], totalClubCount: 0, totalBusinessCount: 0 };
+  }
+
   const supabase = await createClient();
 
   // Parallel fetch: clubs + recent matches + lounge businesses (for youth)
@@ -217,25 +213,17 @@ export async function getClubRecommendations(
     const businesses = loungeResult.data as LoungeBiz[];
 
     businesses.forEach((biz) => {
-      let score = 30; // Base score for being a youth-specific business
+      // 1. Region match — strict equality, same as clubs
+      if (!biz.address) return; // No address, cannot match region
+      const bizRegion = extractRegion(biz.address);
+      if (!prefs.regions.includes(bizRegion)) return; // Mismatch → skip entirely
 
-      // Region match
-      if (prefs.regions.length > 0 && biz.address) {
-        const region = extractRegion(biz.address);
-        const hasMatchingRegion = prefs.regions.some(r => region.includes(r) || r.includes(region));
-        if (hasMatchingRegion) {
-          score += 100;
-        } else {
-          score -= 100; // Penalize mismatch
-        }
-      } else if (prefs.regions.length === 0) {
-        score += 20;
-      }
+      let score = 130; // Base (30) + region match (100)
 
-      // Equipment — youth businesses almost always provide equipment
+      // 2. Equipment — youth businesses almost always provide equipment
       if (!prefs.hasEquipment) score += 20;
 
-      // Info completeness
+      // 3. Info completeness
       if (biz.description) score += 5;
       if (biz.logo_url) score += 5;
       if (biz.kakao_open_chat_url) score += 10;
@@ -246,7 +234,7 @@ export async function getClubRecommendations(
         name: biz.name,
         logoUrl: biz.logo_url,
         description: biz.tagline || biz.description || null,
-        regionLabel: biz.address ? extractRegion(biz.address) : "",
+        regionLabel: bizRegion,
         memberCount: 0,
         recentMatchCount: 0,
         hasRentalMatches: true, // Youth businesses typically provide gear
@@ -259,7 +247,7 @@ export async function getClubRecommendations(
     });
   }
 
-  // Merge and sort
+  // Merge and sort (both arrays already filtered to score > 0)
   const allRecommendations = [...scoredClubs, ...scoredBusinesses]
     .sort((a, b) => b.score - a.score)
     .slice(0, 3);

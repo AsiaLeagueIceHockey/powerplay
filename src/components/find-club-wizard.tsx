@@ -55,7 +55,7 @@ export function FindClubWizard({ regions }: FindClubWizardProps) {
   const canProceed = () => {
     switch (step) {
       case 1: return playerType !== null;
-      case 2: return true; // Region can be empty (meaning "All")
+      case 2: return selectedRegions.length > 0;
       case 3: return hasEquipment !== null;
       default: return false;
     }
@@ -186,110 +186,99 @@ export function FindClubWizard({ regions }: FindClubWizardProps) {
     };
 
     return (
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-        <button
-          onClick={() => setSelectedRegions([])}
-          className={`p-3 rounded-xl border-2 text-center font-bold text-sm transition-all col-span-2 sm:col-span-3 ${
-            selectedRegions.length === 0
-              ? "border-blue-500 bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300"
-              : "border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 hover:border-blue-300"
-          }`}
-        >
-          <MapPin className="w-4 h-4 inline mr-1" />
-          {t("q2.all")}
-          <span className="block text-xs font-normal text-zinc-500 mt-0.5">
-            {t("q2.allDesc")}
-          </span>
-        </button>
-        {regions.map((r) => (
-          <button
-            key={r}
-            onClick={() => toggleRegion(r)}
-            className={`p-3 rounded-xl border-2 text-center font-medium text-xs sm:text-sm transition-all truncate ${
-              selectedRegions.includes(r)
-                ? "border-blue-500 bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300"
-                : "border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 hover:border-blue-300"
-            }`}
-          >
-            {r}
-          </button>
-        ))}
-      </div>
+      <>
+        <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-3 flex items-center gap-1.5">
+          <MapPin className="w-4 h-4 shrink-0" />
+          {t("q2.hint")}
+        </p>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+          {regions.map((r) => (
+            <button
+              key={r}
+              onClick={() => toggleRegion(r)}
+              className={`p-3 rounded-xl border-2 text-center font-medium text-xs sm:text-sm transition-all truncate ${
+                selectedRegions.includes(r)
+                  ? "border-blue-500 bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300"
+                  : "border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 hover:border-blue-300"
+              }`}
+            >
+              {r}
+            </button>
+          ))}
+        </div>
+      </>
     );
   }
 
   // ============================================
   // Result card
   // ============================================
-  function ResultCard({ club, rank }: { club: RecommendedClub; rank: number }) {
+  function ResultCard({ club }: { club: RecommendedClub }) {
     const detailHref = club.type === "business"
       ? `/lounge/${club.slug}`
       : `/clubs/${club.id}`;
 
     return (
-      <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-5 shadow-sm hover:shadow-md hover:border-blue-400 transition-all duration-200">
-        <div className="flex items-start gap-4">
-          {/* Rank badge */}
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white font-black text-sm shrink-0 shadow-sm">
-            {rank}
-          </div>
-
+      <Link
+        href={detailHref}
+        className="block bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-4 shadow-sm hover:shadow-md hover:border-zinc-300 dark:hover:border-zinc-600 transition-all duration-200"
+      >
+        <div className="flex items-center gap-3">
           {/* Logo */}
-          <div className="w-14 h-14 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center overflow-hidden shrink-0 border border-zinc-200 dark:border-zinc-700">
+          <div className="w-12 h-12 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center overflow-hidden shrink-0 border border-zinc-200 dark:border-zinc-700">
             {club.logoUrl ? (
               <Image
                 src={club.logoUrl}
                 alt={club.name}
-                width={56}
-                height={56}
+                width={48}
+                height={48}
                 className="w-full h-full object-cover"
               />
             ) : (
-              <Building2 className="w-6 h-6 text-zinc-400" />
+              <Building2 className="w-5 h-5 text-zinc-400" />
             )}
           </div>
 
           {/* Info */}
           <div className="flex-1 min-w-0">
-            <h3 className="font-bold text-lg text-zinc-900 dark:text-white truncate">
+            <h3 className="font-semibold text-sm text-zinc-900 dark:text-white truncate">
               {club.name}
             </h3>
             {club.regionLabel && (
-              <p className="text-sm text-zinc-500 flex items-center gap-1 mt-0.5">
-                <MapPin className="w-3.5 h-3.5 shrink-0" />
+              <p className="text-xs text-zinc-400 flex items-center gap-1 mt-0.5">
+                <MapPin className="w-3 h-3 shrink-0" />
                 {club.regionLabel}
               </p>
             )}
           </div>
+
+          {/* Arrow */}
+          <ChevronRight className="w-4 h-4 text-zinc-300 dark:text-zinc-600 shrink-0" />
         </div>
 
         {/* Badges */}
-        <div className="flex flex-wrap gap-1.5 mt-3">
-          {club.memberCount > 0 && (
-            <span className="inline-flex items-center gap-1 text-xs font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 px-2 py-1 rounded-full">
-              <Users className="w-3 h-3" />
-              {t("result.members", { count: club.memberCount })}
-            </span>
-          )}
-          {club.recentMatchCount > 0 && (
-            <span className="inline-flex items-center gap-1 text-xs font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 px-2 py-1 rounded-full">
-              <Calendar className="w-3 h-3" />
-              {t("result.matches", { count: club.recentMatchCount })}
-            </span>
-          )}
-          {club.hasRentalMatches && (
-            <span className="inline-flex items-center gap-1 text-xs font-medium bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-300 px-2 py-1 rounded-full ring-1 ring-green-200 dark:ring-green-900">
-              <ShieldCheck className="w-3 h-3" />
-              {t("result.rentalBadge")}
-            </span>
-          )}
-          {club.hasKakaoChat && (
-            <span className="inline-flex items-center gap-1 text-xs font-medium bg-yellow-50 dark:bg-yellow-950/30 text-yellow-800 dark:text-yellow-300 px-2 py-1 rounded-full ring-1 ring-yellow-200 dark:ring-yellow-900">
-              <MessageCircle className="w-3 h-3" />
-              {t("result.kakaoChat")}
-            </span>
-          )}
-        </div>
+        {(club.recentMatchCount > 0 || club.hasRentalMatches || club.hasKakaoChat) && (
+          <div className="flex flex-wrap gap-1.5 mt-3">
+            {club.recentMatchCount > 0 && (
+              <span className="inline-flex items-center gap-1 text-xs text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-full">
+                <Calendar className="w-3 h-3" />
+                {t("result.matches", { count: club.recentMatchCount })}
+              </span>
+            )}
+            {club.hasRentalMatches && (
+              <span className="inline-flex items-center gap-1 text-xs font-medium text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-950/30 px-2 py-0.5 rounded-full ring-1 ring-green-200 dark:ring-green-900">
+                <ShieldCheck className="w-3 h-3" />
+                {t("result.rentalBadge")}
+              </span>
+            )}
+            {club.hasKakaoChat && (
+              <span className="inline-flex items-center gap-1 text-xs font-medium text-yellow-700 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-950/30 px-2 py-0.5 rounded-full ring-1 ring-yellow-200 dark:ring-yellow-900">
+                <MessageCircle className="w-3 h-3" />
+                {t("result.kakaoChat")}
+              </span>
+            )}
+          </div>
+        )}
 
         {/* Rink names */}
         {club.rinkNames.length > 0 && (
@@ -300,20 +289,11 @@ export function FindClubWizard({ regions }: FindClubWizardProps) {
 
         {/* Description */}
         {club.description && (
-          <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-2 line-clamp-2">
+          <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-2 line-clamp-2 leading-relaxed">
             {club.description}
           </p>
         )}
-
-        {/* CTA */}
-        <Link
-          href={detailHref}
-          className="mt-4 w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-blue-600 text-white font-bold text-sm hover:bg-blue-700 transition-colors"
-        >
-          {t("result.viewDetail")}
-          <ChevronRight className="w-4 h-4" />
-        </Link>
-      </div>
+      </Link>
     );
   }
 
@@ -416,31 +396,21 @@ export function FindClubWizard({ regions }: FindClubWizardProps) {
         {/* Results */}
         {step === "result" && result && !isPending && (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="text-center mb-6">
-              <div className="inline-flex items-center gap-2 bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300 px-4 py-2 rounded-full text-sm font-bold mb-3">
-                <Sparkles className="w-4 h-4" />
-                {t("result.title")}
-              </div>
-              {result.recommendations.length > 0 ? (
-                <h2 className="text-2xl font-black text-zinc-900 dark:text-white">
-                  {t("result.subtitle", { count: result.recommendations.length })}
+            {result.recommendations.length === 0 && (
+              <div className="text-center mb-6">
+                <h2 className="text-lg font-bold text-zinc-900 dark:text-white">
+                  {t("result.noResult")}
                 </h2>
-              ) : (
-                <div>
-                  <h2 className="text-2xl font-black text-zinc-900 dark:text-white">
-                    {t("result.noResult")}
-                  </h2>
-                  <p className="text-zinc-500 mt-2 text-sm">
-                    {t("result.noResultDesc")}
-                  </p>
-                </div>
-              )}
-            </div>
+                <p className="text-zinc-500 mt-2 text-sm">
+                  {t("result.noResultDesc")}
+                </p>
+              </div>
+            )}
 
             {/* Recommendation cards */}
-            <div className="space-y-4 mb-6">
-              {result.recommendations.map((club, index) => (
-                <ResultCard key={club.id} club={club} rank={index + 1} />
+            <div className="space-y-3 mb-6">
+              {result.recommendations.map((club) => (
+                <ResultCard key={club.id} club={club} />
               ))}
             </div>
 
@@ -448,7 +418,6 @@ export function FindClubWizard({ regions }: FindClubWizardProps) {
             <p className="text-center text-xs text-zinc-400 dark:text-zinc-500 mb-4">
               {t("result.totalInfo", {
                 clubs: result.totalClubCount,
-                businesses: result.totalBusinessCount,
               })}
             </p>
 

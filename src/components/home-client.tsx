@@ -457,16 +457,13 @@ export function HomeClient({
                 href={POWERPLAY_INSTAGRAM_URL}
                 target="_blank"
                 rel="noreferrer"
-                className="mb-4 block rounded-2xl border border-rose-200 bg-gradient-to-r from-rose-50 via-white to-amber-50 p-4 shadow-sm transition-transform hover:scale-[1.01] dark:border-rose-900/40 dark:from-rose-950/30 dark:via-zinc-950 dark:to-amber-950/20"
+                className="mb-4 block rounded-xl border border-rose-200 bg-gradient-to-r from-rose-50 via-white to-amber-50 px-4 py-2.5 shadow-sm transition-opacity hover:opacity-80 dark:border-rose-900/40 dark:from-rose-950/30 dark:via-zinc-950 dark:to-amber-950/20"
               >
                 <div>
-                  <h2 className="mb-[5px] text-base font-black tracking-tight text-zinc-900 dark:text-white">
+                  <h2 className="text-sm font-bold tracking-tight text-zinc-900 dark:text-white">
                     {t("clubRanking.bannerTitle")}
                   </h2>
-                  <p className="mb-0 text-sm leading-relaxed text-zinc-600 dark:text-zinc-300">
-                    {t("clubRanking.bannerDescription")}
-                  </p>
-                  <p className="mt-0 text-xs leading-relaxed text-zinc-500 dark:text-zinc-400">
+                  <p className="mt-0.5 text-[11px] text-zinc-500 dark:text-zinc-400">
                     {t("clubRanking.bannerSubdescription")}
                   </p>
                 </div>

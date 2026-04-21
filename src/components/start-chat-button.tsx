@@ -52,9 +52,9 @@ export function StartChatButton({
       title={label || t("chat.newChatTooltip")}
     >
       {isLoading ? (
-        <Loader2 className="w-4 h-4 animate-spin" />
+        <Loader2 className="h-[18px] w-[18px] animate-spin" />
       ) : (
-        <MessageCircle className="w-4 h-4" />
+        <MessageCircle className="h-[18px] w-[18px]" />
       )}
       {!iconOnly && <span>{label || t("match.contactManager")}</span>}
     </button>
