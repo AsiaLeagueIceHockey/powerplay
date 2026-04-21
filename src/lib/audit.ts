@@ -34,7 +34,7 @@ type AuditAction =
   | "OTHER";
 
 interface AuditLogParams {
-  userId: string;
+  userId: string | null;
   action: AuditAction;
   description: string; // Human readable description for Notification & Log
   metadata?: Record<string, unknown>;
@@ -55,20 +55,23 @@ async function runLogAndNotify({
     const supabase = await createClient();
 
     // Fetch user profile for standardized label: Name(Email)
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("full_name, email")
-      .eq("id", userId)
-      .single();
+    let userLabel = "비로그인 사용자";
+    if (userId) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("full_name, email")
+        .eq("id", userId)
+        .single();
 
-    const userLabel = profile
-      ? `${profile.full_name || "Unknown"}(${profile.email || "No Email"})`
-      : userId;
+      userLabel = profile
+        ? `${profile.full_name || "Unknown"}(${profile.email || "No Email"})`
+        : userId;
+    }
 
     const finalDescription = `${userLabel}: ${description}`;
 
     const { error } = await supabase.from("audit_logs").insert({
-      user_id: userId,
+      user_id: userId ?? null,
       action_type: action,
       description: finalDescription,
       metadata,

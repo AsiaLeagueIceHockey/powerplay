@@ -259,32 +259,30 @@ export async function getClubRecommendations(
     totalBusinessCount: (loungeResult.data || []).length,
   };
 
-  // Audit log — fire-and-forget in background
+  // Audit log — fire-and-forget in background (로그인 여부 무관)
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (user) {
-    const typeLabel = prefs.playerType === "adult" ? "성인" : "유소년";
-    const regionLabel = prefs.regions.join(", ");
-    const resultCount = allRecommendations.length;
-    const topClubNames = allRecommendations.map((c) => c.name).join(", ") || "없음";
+  const typeLabel = prefs.playerType === "adult" ? "성인" : "유소년";
+  const regionLabel = prefs.regions.join(", ");
+  const resultCount = allRecommendations.length;
+  const topClubNames = allRecommendations.map((c) => c.name).join(", ") || "없음";
 
-    await logAndNotify({
-      userId: user.id,
-      action: "FIND_CLUB_COMPLETE",
-      description: `하키클럽 찾기 완료 — ${typeLabel} / ${regionLabel} / 추천 ${resultCount}개 (${topClubNames})`,
-      metadata: {
-        playerType: prefs.playerType,
-        regions: prefs.regions,
-        hasEquipment: prefs.hasEquipment,
-        resultCount,
-        topClubs: allRecommendations.map((c) => ({ id: c.id, name: c.name, type: c.type })),
-      },
-      url: "/admin/audit-logs",
-      mode: "after",
-    });
-  }
+  await logAndNotify({
+    userId: user?.id ?? null,
+    action: "FIND_CLUB_COMPLETE",
+    description: `하키클럽 찾기 완료 — ${typeLabel} / ${regionLabel} / 추천 ${resultCount}개 (${topClubNames})`,
+    metadata: {
+      playerType: prefs.playerType,
+      regions: prefs.regions,
+      hasEquipment: prefs.hasEquipment,
+      resultCount,
+      topClubs: allRecommendations.map((c) => ({ id: c.id, name: c.name, type: c.type })),
+    },
+    url: "/admin/audit-logs",
+    mode: "after",
+  });
 
   return result;
 }
