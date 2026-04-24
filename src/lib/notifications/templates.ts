@@ -52,9 +52,11 @@ export function renderEmailHtml(
         <table width="100%" cellpadding="0" cellspacing="0"
                style="max-width:520px;background:#ffffff;border-radius:12px;
                       box-shadow:0 2px 8px rgba(0,0,0,0.07);overflow:hidden;">
-          <!-- 헤더: 로고 (powerplay.kr 로 링크) -->
+          <!-- 헤더: 흰 배경 + 네이비 하단 라인, 네이비 PowerPlay 로고 -->
           <tr>
-            <td align="center" style="background:#1e3a5f;padding:24px 32px;">
+            <td align="center"
+                style="background:#ffffff;padding:28px 32px 24px;
+                       border-bottom:3px solid #1e3a5f;">
               <a href="${SITE_URL}" style="display:inline-block;text-decoration:none;border:0;outline:none;">
                 <img src="${LOGO_URL}"
                      alt="PowerPlay"
