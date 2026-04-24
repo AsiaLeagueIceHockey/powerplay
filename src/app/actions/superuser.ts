@@ -962,6 +962,126 @@ export async function sendTestPushNotification(
   }
 }
 
+// ==================== EMAIL NOTIFICATION TEST (SuperUser Only) ====================
+
+export interface EmailRecipient {
+  id: string;
+  email: string;
+  full_name: string | null;
+}
+
+export async function getEmailRecipients(): Promise<EmailRecipient[]> {
+  const supabase = await createClient();
+  const isSuperUser = await checkIsSuperUser();
+  if (!isSuperUser) return [];
+
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("id, email, full_name")
+    .order("full_name", { ascending: true });
+
+  if (error) {
+    console.error("Error fetching email recipients:", error);
+    return [];
+  }
+
+  return (data || []).filter((p) => p.email) as EmailRecipient[];
+}
+
+export async function sendTestEmailNotification(
+  userId: string,
+  title: string,
+  body: string
+): Promise<{
+  success: boolean;
+  error?: string;
+  details?: unknown;
+  resendId?: string;
+  recipientEmail?: string;
+}> {
+  const isSuperUser = await checkIsSuperUser();
+  if (!isSuperUser) {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  // 1. RESEND_API_KEY 환경변수 검증
+  if (!process.env.RESEND_API_KEY) {
+    return {
+      success: false,
+      error: "RESEND_API_KEY 환경변수 미설정",
+      details: { hint: "Vercel Settings → Environment Variables 에서 추가 후 재배포 필요" },
+    };
+  }
+
+  const supabase = await createClient();
+
+  // 2. 수신자 이메일 조회
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("email")
+    .eq("id", userId)
+    .single();
+
+  if (!profile?.email) {
+    return { success: false, error: "수신자의 이메일을 찾을 수 없습니다." };
+  }
+
+  // 3. Resend 직접 호출 (raw response 받기 위해 dispatch 우회)
+  try {
+    const { Resend } = await import("resend");
+    const { renderEmailHtml } = await import("@/lib/notifications/templates");
+    const { FROM_EMAIL, REPLY_TO } = await import("@/lib/notifications/resend-client");
+
+    const resend = new Resend(process.env.RESEND_API_KEY);
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
+    const html = renderEmailHtml(title, body, appUrl ? `${appUrl}/` : undefined);
+
+    const { data, error } = await resend.emails.send({
+      from: FROM_EMAIL,
+      replyTo: REPLY_TO,
+      to: profile.email,
+      subject: title,
+      html,
+    });
+
+    // 4. notification_logs 기록
+    await supabase.from("notification_logs").insert({
+      user_id: userId,
+      title,
+      body,
+      url: "/",
+      status: error ? "failed" : "sent",
+      devices_sent: error ? 0 : 1,
+      error_message: error ? JSON.stringify(error) : null,
+      channel: "email",
+    });
+
+    if (error) {
+      return {
+        success: false,
+        error: error.message || "Resend 발송 실패",
+        details: error,
+        recipientEmail: profile.email,
+      };
+    }
+
+    return {
+      success: true,
+      resendId: data?.id,
+      recipientEmail: profile.email,
+    };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    const stack = err instanceof Error ? err.stack : undefined;
+    return {
+      success: false,
+      error: message,
+      details: { stack },
+      recipientEmail: profile.email,
+    };
+  }
+}
+
 // ==================== POINT STATUS MANAGEMENT (SuperUser Only) ====================
 
 export interface UserPointStatus {

@@ -252,6 +252,13 @@ export async function sendPushNotification(
   url: string = "/",
   options?: { skipEmail?: boolean }
 ): Promise<{ success: boolean; sent?: number; error?: string }> {
+  // 이메일 병행 발송 — push 실패/구독 없음/VAPID 미설정과 무관하게 항상 시도
+  // (sendEmailNotification 자체가 try/catch 처리되어 있어 throw 안 함)
+  if (!options?.skipEmail) {
+    console.log(`[PUSH→EMAIL] Triggering email for user ${userId}`);
+    await sendEmailNotification(userId, title, body, url);
+  }
+
   // Validate VAPID configuration
   try {
     validateVapidConfig();
@@ -319,11 +326,6 @@ export async function sendPushNotification(
   const status = successCount > 0 ? "sent" : "failed";
   const errorMessage = errors.length > 0 ? errors.join("; ") : undefined;
   await logNotification(userId, title, body, url, status, successCount, errorMessage);
-
-  // 이메일 병행 발송 (skipEmail 옵션이 없는 경우)
-  if (!options?.skipEmail) {
-    await sendEmailNotification(userId, title, body, url);
-  }
 
   return { success: successCount > 0, sent: successCount };
 }

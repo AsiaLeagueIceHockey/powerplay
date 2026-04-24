@@ -41,6 +41,11 @@ const superuserMenuItems = (locale: string) => [
     icon: "🔔",
     label: "Push Test",
   },
+  {
+    href: `/${locale}/admin/email-test`,
+    icon: "✉️",
+    label: "Email Test",
+  },
 ];
 
 export function AdminSuperuserMenu({ locale }: { locale: string }) {
