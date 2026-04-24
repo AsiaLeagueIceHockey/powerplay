@@ -1030,11 +1030,10 @@ export async function sendTestEmailNotification(
   try {
     const { Resend } = await import("resend");
     const { renderEmailHtml } = await import("@/lib/notifications/templates");
-    const { FROM_EMAIL } = await import("@/lib/notifications/resend-client");
+    const { FROM_EMAIL, getAppUrl } = await import("@/lib/notifications/resend-client");
 
     const resend = new Resend(process.env.RESEND_API_KEY);
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
-    const html = renderEmailHtml(title, body, appUrl ? `${appUrl}/` : undefined);
+    const html = renderEmailHtml(title, body, `${getAppUrl()}/`);
 
     const { data, error } = await resend.emails.send({
       from: FROM_EMAIL,
@@ -1131,14 +1130,13 @@ export async function sendChatUnreadEmailReminder(
     `안녕하세요, ${recipientLabel}님. 파워플레이 운영팀입니다.\n\n` +
     `${counterpartLabel}님과 아직 읽지 않은 채팅이 있어요.\n` +
     `파워플레이에 접속해서 확인 부탁드립니다.`;
-  const ctaUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? "https://powerplay.kr"}/chat`;
-
   try {
     const { Resend } = await import("resend");
     const { renderEmailHtml } = await import("@/lib/notifications/templates");
-    const { FROM_EMAIL } = await import(
+    const { FROM_EMAIL, getAppUrl } = await import(
       "@/lib/notifications/resend-client"
     );
+    const ctaUrl = `${getAppUrl()}/chat`;
 
     const resend = new Resend(process.env.RESEND_API_KEY);
     const html = renderEmailHtml(title, body, ctaUrl);

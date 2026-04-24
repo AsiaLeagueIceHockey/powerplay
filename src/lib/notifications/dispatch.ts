@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { FROM_EMAIL } from "./resend-client";
+import { FROM_EMAIL, getAppUrl } from "./resend-client";
 import { renderEmailHtml } from "./templates";
 
 /**
@@ -36,11 +36,11 @@ export async function sendEmailNotification(
       return;
     }
 
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
+    const appUrl = getAppUrl();
     const absoluteUrl = url
       ? url.startsWith("http")
         ? url
-        : `${appUrl}${url}`
+        : `${appUrl}${url.startsWith("/") ? url : `/${url}`}`
       : undefined;
 
     const html = renderEmailHtml(title, body, absoluteUrl);
