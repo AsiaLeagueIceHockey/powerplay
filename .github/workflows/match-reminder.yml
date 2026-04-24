@@ -1,0 +1,17 @@
+name: Match D-1 Reminder
+
+on:
+  schedule:
+    - cron: "0 11 * * *" # 11:00 UTC = 20:00 KST
+  workflow_dispatch: # 수동 실행 가능
+
+jobs:
+  send-reminder:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call match reminder endpoint
+        run: |
+          curl -f -X GET \
+            "${{ secrets.NEXT_PUBLIC_APP_URL }}/api/cron/match-reminder" \
+            -H "x-cron-secret: ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json"

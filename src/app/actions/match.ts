@@ -455,7 +455,7 @@ export async function cancelJoin(matchId: string) {
   // Get match info for refund calculation including goalie_free and rental_fee
   const { data: match } = await supabase
     .from("matches")
-    .select("entry_points, rental_fee, start_time, goalie_free, status")
+    .select("entry_points, rental_fee, start_time, goalie_free, status, created_by, rink:rinks(name_ko)")
     .eq("id", matchId)
     .single();
 
@@ -598,7 +598,31 @@ export async function cancelJoin(matchId: string) {
     );
   }
 
-  // ... (previous notifications)
+  // M6: 경기 생성자(어드민)에게 참가자 취소 알림
+  if (match?.created_by && match.created_by !== user.id) {
+    const { data: userProfile } = await supabase
+      .from("profiles")
+      .select("full_name")
+      .eq("id", user.id)
+      .single();
+    const participantName = userProfile?.full_name || user.email?.split("@")[0] || "참가자";
+    // @ts-ignore
+    const rinkName = match.rink?.name_ko || "경기";
+    const cancelStartTime = new Date(match.start_time).toLocaleString("ko-KR", {
+      month: "short", day: "numeric", hour: "2-digit", minute: "2-digit",
+      timeZone: "Asia/Seoul",
+    });
+    const cancelMsg = isTeamMatchCancel
+      ? `${participantName}님이 ${rinkName} (${cancelStartTime}) 팀 매칭 참가를 취소했습니다.`
+      : `${participantName}님이 ${rinkName} (${cancelStartTime}) 경기 참가를 취소했습니다.`;
+
+    await sendPushNotification(
+      match.created_by,
+      "참가자 취소 알림 ↩️",
+      cancelMsg,
+      `/admin/matches`
+    );
+  }
 
   // Trigger Waitlist Promotion
   try {

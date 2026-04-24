@@ -291,6 +291,13 @@ export async function updateMatch(matchId: string, formData: FormData) {
     }
   }
 
+  // M1: 비취소 변경 알림 — 수정 전 값 저장 (시간/링크장 변경 감지용)
+  const { data: oldMatchData } = await supabase
+    .from("matches")
+    .select("start_time, rink_id")
+    .eq("id", matchId)
+    .single();
+
   const startTimeInput = formData.get("start_time") as string;
   const matchType = (formData.get("match_type") as "training" | "game" | "team_match") || "training";
   const isTeamMatch = matchType === "team_match";
@@ -426,6 +433,42 @@ export async function updateMatch(matchId: string, formData: FormData) {
               `/mypage`
             );
           })
+        );
+      }
+    }
+  }
+
+  // M1: 시간 또는 링크장이 변경됐을 때 확정 참가자에게 알림
+  const timeChanged = oldMatchData?.start_time !== startTimeUTC;
+  const rinkChanged = (oldMatchData?.rink_id ?? null) !== (rinkId || null);
+
+  if (status !== "canceled" && (timeChanged || rinkChanged)) {
+    const { data: confirmedParticipants } = await supabase
+      .from("participants")
+      .select("user_id")
+      .eq("match_id", matchId)
+      .eq("status", "confirmed");
+
+    if (confirmedParticipants && confirmedParticipants.length > 0) {
+      const { data: updatedMatch } = await supabase
+        .from("matches")
+        .select("start_time, rink:rinks(name_ko)")
+        .eq("id", matchId)
+        .single();
+
+      // @ts-ignore
+      const rinkName = updatedMatch?.rink?.name_ko || "경기";
+      const updatedStartTime = new Date(updatedMatch?.start_time ?? startTimeUTC).toLocaleString("ko-KR", {
+        month: "short", day: "numeric", hour: "2-digit", minute: "2-digit",
+        timeZone: "Asia/Seoul",
+      });
+
+      for (const p of confirmedParticipants) {
+        await sendPushNotification(
+          p.user_id,
+          "경기 정보 변경 안내 📢",
+          `${rinkName} (${updatedStartTime}) 경기 정보가 변경되었습니다. 앱에서 확인해 주세요.`,
+          `/match/${matchId}`
         );
       }
     }

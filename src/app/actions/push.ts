@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import webpush from "web-push";
+import { sendEmailNotification } from "@/lib/notifications/dispatch";
 
 // ============================================
 // VAPID Key Validation (Task 4)
@@ -235,7 +236,7 @@ export async function sendPushToSuperUsers(
   }
 
   const results = await Promise.allSettled(
-    superusers.map((admin) => sendPushNotification(admin.id, title, body, url))
+    superusers.map((admin) => sendPushNotification(admin.id, title, body, url, { skipEmail: true }))
   );
 
   return { success: true, sent: results.filter(r => r.status === "fulfilled").length };
@@ -248,7 +249,8 @@ export async function sendPushNotification(
   userId: string,
   title: string,
   body: string,
-  url: string = "/"
+  url: string = "/",
+  options?: { skipEmail?: boolean }
 ): Promise<{ success: boolean; sent?: number; error?: string }> {
   // Validate VAPID configuration
   try {
@@ -317,6 +319,11 @@ export async function sendPushNotification(
   const status = successCount > 0 ? "sent" : "failed";
   const errorMessage = errors.length > 0 ? errors.join("; ") : undefined;
   await logNotification(userId, title, body, url, status, successCount, errorMessage);
+
+  // 이메일 병행 발송 (skipEmail 옵션이 없는 경우)
+  if (!options?.skipEmail) {
+    await sendEmailNotification(userId, title, body, url);
+  }
 
   return { success: successCount > 0, sent: successCount };
 }

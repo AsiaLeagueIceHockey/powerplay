@@ -202,14 +202,31 @@ export async function sendMessage(roomId: string, content: string, receiverId: s
     senderName = profile.full_name;
   }
 
-  // Send push notification to receiver
-  // The url points directly to the chat room
+  // 첫 메시지 여부 확인 (email_notified_at IS NULL = 아직 이메일 미발송)
+  const { data: room } = await supabase
+    .from("chat_rooms")
+    .select("email_notified_at")
+    .eq("id", roomId)
+    .single();
+
+  const isFirstMessage = room?.email_notified_at == null;
+
+  // push는 매번, email은 첫 메시지만
   await sendPushNotification(
     receiverId,
     senderName,
     content,
-    `/chat/${roomId}`
+    `/chat/${roomId}`,
+    { skipEmail: !isFirstMessage }
   );
+
+  // 첫 메시지라면 email_notified_at 기록 (이후 메시지는 이메일 생략)
+  if (isFirstMessage) {
+    await supabase
+      .from("chat_rooms")
+      .update({ email_notified_at: new Date().toISOString() })
+      .eq("id", roomId);
+  }
 
   return { success: true, message: newMessage };
 }
