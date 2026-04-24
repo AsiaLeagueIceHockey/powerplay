@@ -1030,15 +1030,17 @@ export async function sendTestEmailNotification(
   try {
     const { Resend } = await import("resend");
     const { renderEmailHtml } = await import("@/lib/notifications/templates");
-    const { FROM_EMAIL, getAppUrl } = await import("@/lib/notifications/resend-client");
+    const { FROM_EMAIL, buildEmailAbsoluteUrl } = await import("@/lib/notifications/resend-client");
+    const { toEmailSubject } = await import("@/lib/notifications/email-subject");
 
     const resend = new Resend(process.env.RESEND_API_KEY);
-    const html = renderEmailHtml(title, body, `${getAppUrl()}/`);
+    const emailSubject = toEmailSubject(title);
+    const html = renderEmailHtml(emailSubject, body, buildEmailAbsoluteUrl("/"));
 
     const { data, error } = await resend.emails.send({
       from: FROM_EMAIL,
       to: profile.email,
-      subject: title,
+      subject: emailSubject,
       html,
     });
 
@@ -1133,18 +1135,20 @@ export async function sendChatUnreadEmailReminder(
   try {
     const { Resend } = await import("resend");
     const { renderEmailHtml } = await import("@/lib/notifications/templates");
-    const { FROM_EMAIL, getAppUrl } = await import(
+    const { FROM_EMAIL, buildEmailAbsoluteUrl } = await import(
       "@/lib/notifications/resend-client"
     );
-    const ctaUrl = `${getAppUrl()}/chat`;
+    const { toEmailSubject } = await import("@/lib/notifications/email-subject");
+    const ctaUrl = buildEmailAbsoluteUrl("/chat");
 
     const resend = new Resend(process.env.RESEND_API_KEY);
-    const html = renderEmailHtml(title, body, ctaUrl);
+    const emailSubject = toEmailSubject(title);
+    const html = renderEmailHtml(emailSubject, body, ctaUrl);
 
     const { data, error } = await resend.emails.send({
       from: FROM_EMAIL,
       to: profile.email,
-      subject: title,
+      subject: emailSubject,
       html,
     });
 

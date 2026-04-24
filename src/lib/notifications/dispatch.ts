@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
-import { FROM_EMAIL, getAppUrl } from "./resend-client";
+import { FROM_EMAIL, buildEmailAbsoluteUrl } from "./resend-client";
 import { renderEmailHtml } from "./templates";
+import { toEmailSubject } from "./email-subject";
 
 /**
  * 이메일 알림 발송 + notification_logs에 channel='email'로 기록
@@ -36,19 +37,15 @@ export async function sendEmailNotification(
       return;
     }
 
-    const appUrl = getAppUrl();
-    const absoluteUrl = url
-      ? url.startsWith("http")
-        ? url
-        : `${appUrl}${url.startsWith("/") ? url : `/${url}`}`
-      : undefined;
+    const absoluteUrl = url ? buildEmailAbsoluteUrl(url) : undefined;
+    const emailSubject = toEmailSubject(title);
 
-    const html = renderEmailHtml(title, body, absoluteUrl);
+    const html = renderEmailHtml(emailSubject, body, absoluteUrl);
 
     const { error } = await resend.emails.send({
       from: FROM_EMAIL,
       to: profile.email,
-      subject: title,
+      subject: emailSubject,
       html,
     });
 
