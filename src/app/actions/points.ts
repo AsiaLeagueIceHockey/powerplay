@@ -376,18 +376,26 @@ export async function getRefundPolicy(): Promise<RefundPolicy | null> {
 
 /**
  * 경기 취소 시 환불 비율 계산
- * - 경기 전일 23:59까지 (경기 당일 00:00 이전): 100% 환불
+ * - 경기 전일 23:59 KST 까지 (경기 당일 00:00 KST 이전): 100% 환불
  * - 경기 당일 이후: 환불 불가 (0%)
+ *
+ * NOTE: `setHours(0,0,0,0)` 은 서버 로컬 타임존(Vercel=UTC) 기준이라
+ * KST 로 변환하면 당일 09:00 이 컷오프가 되어버리는 버그가 있었다.
+ * KST 당일 00:00 을 명시적으로 계산한다.
  */
 export async function calculateRefundPercent(matchStartTime: string): Promise<number> {
-  // 경기 당일 00:00 (전일 자정) 이전이면 100% 환불
   const matchStart = new Date(matchStartTime);
-  const matchDayMidnight = new Date(matchStart);
-  matchDayMidnight.setHours(0, 0, 0, 0); // 경기 당일 00:00:00
-  
-  const now = new Date();
-  
-  if (now < matchDayMidnight) {
+  // KST 기준 경기 당일 YYYY-MM-DD 추출 ("en-CA" 은 YYYY-MM-DD 포맷)
+  const kstDate = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(matchStart);
+  // 해당 날짜의 KST 00:00:00 을 절대 시각으로
+  const matchDayMidnightKst = new Date(`${kstDate}T00:00:00+09:00`);
+
+  if (new Date() < matchDayMidnightKst) {
     return 100;
   }
 
