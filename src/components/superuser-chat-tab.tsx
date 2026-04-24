@@ -3,6 +3,7 @@ import { MessageCircleMore, Phone, UserRound } from "lucide-react";
 
 import type { SuperuserChatRoomSummary, SuperuserUnreadRecipient } from "@/app/actions/superuser";
 import { CopyButton } from "@/components/copy-button";
+import { ChatUnreadEmailButton } from "@/components/chat-unread-email-button";
 
 function formatDateTime(locale: string, value: string) {
   return new Intl.DateTimeFormat(locale === "ko" ? "ko-KR" : "en-US", {
@@ -221,6 +222,16 @@ export function SuperuserChatTab({
                                   </a>
                                 ) : null}
                                 <CopyButton text={smsTemplate} className="rounded-full border border-zinc-700 px-3 py-1.5 text-xs text-zinc-200 hover:text-white" />
+                                <ChatUnreadEmailButton
+                                  recipientId={unreadRecipient.recipient.id}
+                                  recipientEmail={unreadRecipient.recipient.email}
+                                  counterpartName={
+                                    unreadRecipient.counterpart.full_name ||
+                                    unreadRecipient.counterpart.email ||
+                                    (locale === "ko" ? "상대방" : "the other participant")
+                                  }
+                                  locale={locale}
+                                />
                               </div>
                             </div>
                           </div>

@@ -1082,6 +1082,112 @@ export async function sendTestEmailNotification(
   }
 }
 
+// ==================== CHAT UNREAD EMAIL REMINDER (SuperUser Only) ====================
+
+/**
+ * 채팅 미읽음 사용자에게 운영자 명의로 이메일 알림 발송 (SuperUser 전용)
+ * - chat 모니터링 페이지의 "수동 문자 안내 템플릿"과 동일한 문구를 이메일로 전달
+ * - notification_logs 에 channel='email' 로 기록
+ */
+export async function sendChatUnreadEmailReminder(
+  recipientId: string,
+  counterpartName: string
+): Promise<{
+  success: boolean;
+  error?: string;
+  details?: unknown;
+  resendId?: string;
+  recipientEmail?: string;
+}> {
+  const isSuperUser = await checkIsSuperUser();
+  if (!isSuperUser) {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  if (!process.env.RESEND_API_KEY) {
+    return {
+      success: false,
+      error: "RESEND_API_KEY 환경변수 미설정",
+      details: { hint: "Vercel 환경변수에 RESEND_API_KEY 추가 후 재배포 필요" },
+    };
+  }
+
+  const supabase = await createClient();
+
+  // 수신자 조회
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("email, full_name")
+    .eq("id", recipientId)
+    .single();
+
+  if (!profile?.email) {
+    return { success: false, error: "수신자의 이메일을 찾을 수 없습니다." };
+  }
+
+  const recipientLabel = profile.full_name || profile.email.split("@")[0];
+  const counterpartLabel = counterpartName || "상대방";
+  const title = "확인하지 않은 채팅이 있어요 💬";
+  const body =
+    `안녕하세요, ${recipientLabel}님. 파워플레이 운영팀입니다.\n\n` +
+    `${counterpartLabel}님과 아직 읽지 않은 채팅이 있어요.\n` +
+    `파워플레이에 접속해서 확인 부탁드립니다.`;
+  const ctaUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? "https://powerplay.kr"}/chat`;
+
+  try {
+    const { Resend } = await import("resend");
+    const { renderEmailHtml } = await import("@/lib/notifications/templates");
+    const { FROM_EMAIL, REPLY_TO } = await import(
+      "@/lib/notifications/resend-client"
+    );
+
+    const resend = new Resend(process.env.RESEND_API_KEY);
+    const html = renderEmailHtml(title, body, ctaUrl);
+
+    const { data, error } = await resend.emails.send({
+      from: FROM_EMAIL,
+      replyTo: REPLY_TO,
+      to: profile.email,
+      subject: title,
+      html,
+    });
+
+    await supabase.from("notification_logs").insert({
+      user_id: recipientId,
+      title,
+      body,
+      url: "/chat",
+      status: error ? "failed" : "sent",
+      devices_sent: error ? 0 : 1,
+      error_message: error ? JSON.stringify(error) : null,
+      channel: "email",
+    });
+
+    if (error) {
+      return {
+        success: false,
+        error: error.message || "Resend 발송 실패",
+        details: error,
+        recipientEmail: profile.email,
+      };
+    }
+
+    return {
+      success: true,
+      resendId: data?.id,
+      recipientEmail: profile.email,
+    };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    return {
+      success: false,
+      error: message,
+      details: { stack: err instanceof Error ? err.stack : undefined },
+      recipientEmail: profile.email,
+    };
+  }
+}
+
 // ==================== POINT STATUS MANAGEMENT (SuperUser Only) ====================
 
 export interface UserPointStatus {
