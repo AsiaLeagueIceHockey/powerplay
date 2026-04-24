@@ -87,10 +87,7 @@ export function renderEmailHtml(
               </p>
               <p style="margin:0;font-size:12px;color:#9ca3af;line-height:1.6;">
                 PowerPlay | 아이스하키 동호회 운영 플랫폼<br />
-                이 메일은 발신 전용입니다. 문의:
-                <a href="mailto:support@powerplay.kr" style="color:#9ca3af;text-decoration:underline;">
-                  support@powerplay.kr
-                </a>
+                이 메일은 발신 전용입니다. 회신은 처리되지 않습니다.
               </p>
             </td>
           </tr>

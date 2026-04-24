@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { FROM_EMAIL, REPLY_TO } from "./resend-client";
+import { FROM_EMAIL } from "./resend-client";
 import { renderEmailHtml } from "./templates";
 
 /**
@@ -47,7 +47,6 @@ export async function sendEmailNotification(
 
     const { error } = await resend.emails.send({
       from: FROM_EMAIL,
-      replyTo: REPLY_TO,
       to: profile.email,
       subject: title,
       html,

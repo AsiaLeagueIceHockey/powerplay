@@ -1030,7 +1030,7 @@ export async function sendTestEmailNotification(
   try {
     const { Resend } = await import("resend");
     const { renderEmailHtml } = await import("@/lib/notifications/templates");
-    const { FROM_EMAIL, REPLY_TO } = await import("@/lib/notifications/resend-client");
+    const { FROM_EMAIL } = await import("@/lib/notifications/resend-client");
 
     const resend = new Resend(process.env.RESEND_API_KEY);
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
@@ -1038,7 +1038,6 @@ export async function sendTestEmailNotification(
 
     const { data, error } = await resend.emails.send({
       from: FROM_EMAIL,
-      replyTo: REPLY_TO,
       to: profile.email,
       subject: title,
       html,
@@ -1137,7 +1136,7 @@ export async function sendChatUnreadEmailReminder(
   try {
     const { Resend } = await import("resend");
     const { renderEmailHtml } = await import("@/lib/notifications/templates");
-    const { FROM_EMAIL, REPLY_TO } = await import(
+    const { FROM_EMAIL } = await import(
       "@/lib/notifications/resend-client"
     );
 
@@ -1146,7 +1145,6 @@ export async function sendChatUnreadEmailReminder(
 
     const { data, error } = await resend.emails.send({
       from: FROM_EMAIL,
-      replyTo: REPLY_TO,
       to: profile.email,
       subject: title,
       html,
