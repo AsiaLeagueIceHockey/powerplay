@@ -67,6 +67,7 @@ async function run() {
   // 3. Setup Playwright
   console.log("Launching browser...");
   const browser = await chromium.launch({ headless: true });
+  const uploadedUrls: string[] = [];
 
   try {
     for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
@@ -115,17 +116,73 @@ async function run() {
           .getPublicUrl(fileName);
 
         console.log(`Public URL: ${publicUrlData.publicUrl}`);
+        uploadedUrls.push(publicUrlData.publicUrl);
       }
 
       await context.close();
     }
 
     console.log("\nAll captures completed successfully!");
+    await sendSlackNotification(targetDateStr, uploadedUrls);
   } catch (error) {
     console.error("Capture failed:", error);
     process.exit(1);
   } finally {
     await browser.close();
+  }
+}
+
+async function sendSlackNotification(date: string, urls: string[]) {
+  const webhookUrl = process.env.SLACK_WEBHOOK_URL;
+  if (!webhookUrl) {
+    console.log("SLACK_WEBHOOK_URL not set; skipping Slack notification.");
+    return;
+  }
+  if (urls.length === 0) return;
+
+  const blocks: Array<Record<string, unknown>> = [
+    {
+      type: "header",
+      text: {
+        type: "plain_text",
+        text: `📸 ${date} 경기 인스타 스토리 (${urls.length}장)`,
+        emoji: true,
+      },
+    },
+    {
+      type: "context",
+      elements: [
+        {
+          type: "mrkdwn",
+          text: "이미지를 길게 눌러 저장 후 인스타그램 스토리에 업로드하세요.",
+        },
+      ],
+    },
+  ];
+
+  urls.forEach((url, i) => {
+    blocks.push({
+      type: "image",
+      image_url: url,
+      alt_text: `Page ${i + 1}`,
+      title: { type: "plain_text", text: `Page ${i + 1}/${urls.length}` },
+    });
+  });
+
+  try {
+    const res = await fetch(webhookUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ blocks }),
+    });
+    if (!res.ok) {
+      const body = await res.text();
+      console.error(`Slack notification failed: ${res.status} ${body}`);
+    } else {
+      console.log("Slack notification sent.");
+    }
+  } catch (err) {
+    console.error("Slack notification error:", err);
   }
 }
 
