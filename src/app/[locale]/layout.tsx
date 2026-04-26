@@ -4,7 +4,6 @@ import { notFound } from "next/navigation";
 import { routing, type Locale } from "@/i18n/routing";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Metadata } from "next";
-import { headers } from "next/headers";
 import { ScrollToTop } from "@/components/scroll-to-top";
 import { WebSiteJsonLd } from "@/components/json-ld";
 import { PushServiceWorkerRegister } from "@/components/push-manager";
@@ -129,11 +128,6 @@ export default async function LocaleLayout({
   setRequestLocale(locale);
   const messages = await getMessages();
 
-  // Detect bots to skip client-side locale redirect (prevents /ko → /en for crawlers)
-  const headersList = await headers();
-  const ua = headersList.get("user-agent") || "";
-  const isCrawler = /Yeti|Googlebot|bingbot|Baiduspider|DuckDuckBot|Slurp|facebookexternalhit|Twitterbot|LinkedInBot|NaverBot|AdsBot|Mediapartners/i.test(ua);
-
   return (
     <html lang={locale}>
       <body
@@ -143,7 +137,7 @@ export default async function LocaleLayout({
           <NextTopLoader color="#2563EB" showSpinner={false} />
           <NotificationProvider>
             <ChatUnreadProvider locale={locale}>
-              {!isCrawler && <LocalePreferenceRedirect locale={locale} />}
+              <LocalePreferenceRedirect locale={locale} />
               <ScrollToTop />
               <PushServiceWorkerRegister />
               <OnboardingGuard />

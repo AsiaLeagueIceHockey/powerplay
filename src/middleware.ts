@@ -25,9 +25,19 @@ export async function middleware(request: NextRequest) {
   }
 
   // For search engine bots: skip Supabase session entirely to avoid
-  // unnecessary latency and potential errors that cause "수집제한"
+  // unnecessary latency and potential errors that cause "수집제한".
+  // Also strip set-cookie and force public cache so Vercel CDN doesn't
+  // mark the response as private (Naver Yeti rejects private responses).
   if (isBot(request)) {
-    return intlMiddleware(request);
+    const botResponse = intlMiddleware(request);
+    const cookieNames = botResponse.cookies.getAll().map((c) => c.name);
+    cookieNames.forEach((name) => botResponse.cookies.delete(name));
+    botResponse.headers.delete("set-cookie");
+    botResponse.headers.set(
+      "Cache-Control",
+      "public, s-maxage=300, stale-while-revalidate=86400"
+    );
+    return botResponse;
   }
 
   // First, update Supabase session and get user data
