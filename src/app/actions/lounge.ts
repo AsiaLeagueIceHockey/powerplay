@@ -18,6 +18,7 @@ import { logAndNotify } from "@/lib/audit";
 import { sendPushNotification } from "@/app/actions/push";
 import { getAdminInfo } from "./admin-check";
 import { checkIsSuperUser } from "./superuser";
+import { compressImageToWebp, type ImageKind } from "@/lib/image-utils";
 
 type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
 
@@ -1525,14 +1526,28 @@ export async function uploadLoungeImage(formData: FormData): Promise<{ url?: str
     return { error: "File size must be 5MB or less" };
   }
 
-  const fileExt = file.name.split(".").pop() || "jpg";
-  const fileName = `lounge/${adminInfo.userId}/${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
+  // 호출부에서 logo/cover 구분 전달. 기본값은 logo.
+  const rawKind = formData.get("kind");
+  const kind: ImageKind = rawKind === "cover" ? "cover" : "logo";
+
+  let compressed: Buffer;
+  try {
+    const inputBuffer = Buffer.from(await file.arrayBuffer());
+    compressed = await compressImageToWebp(inputBuffer, kind);
+  } catch (compressError) {
+    console.error("Image compression error:", compressError);
+    return { error: "Failed to process image" };
+  }
+
+  // 항상 WebP 확장자로 통일
+  const fileName = `lounge/${adminInfo.userId}/${Date.now()}-${Math.random().toString(36).slice(2)}.webp`;
 
   const { error: uploadError } = await supabase.storage
     .from("club-logos")
-    .upload(fileName, file, {
+    .upload(fileName, compressed, {
       cacheControl: "31536000",
       upsert: false,
+      contentType: "image/webp",
     });
 
   if (uploadError) {

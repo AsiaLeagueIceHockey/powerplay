@@ -84,6 +84,7 @@ export function LoungeBusinessForm({
 
     const formData = new FormData();
     formData.set("file", file);
+    formData.set("kind", target); // "logo" | "cover" → 서버에서 사이즈 분기
     const result = await uploadLoungeImage(formData);
 
     if (!result.url) {

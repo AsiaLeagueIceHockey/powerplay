@@ -10,6 +10,10 @@ const nextConfig: NextConfig = {
     },
   },
   images: {
+    // Vercel Image Optimization 변환을 전역 비활성화한다.
+    // 업로드 시 sharp로 미리 압축/리사이즈하므로 런타임 변환이 불필요.
+    // 결과: Vercel "Image Optimization - Transformations" 카운트 = 0
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',

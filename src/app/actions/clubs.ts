@@ -7,6 +7,7 @@ import { Club, ClubMembership, ClubPost, Rink } from "./types";
 import { logAndNotify } from "@/lib/audit";
 import { checkIsSuperUser } from "./superuser";
 import { sendPushNotification } from "./push";
+import { compressImageToWebp } from "@/lib/image-utils";
 
 type ClubWithRinksRow = Club & {
   club_rinks?: Array<{ rink: Rink | null }> | null;
@@ -254,21 +255,31 @@ function extractClubMembers(membersData: ClubMembershipUserRow[] | null | undefi
 
 export async function uploadClubLogo(formData: FormData): Promise<{ url?: string; error?: string }> {
   const supabase = await createClient();
-  
+
   const file = formData.get("file") as File;
   if (!file || file.size === 0) {
     return { error: "No file provided" };
   }
 
-  // Generate unique filename
-  const fileExt = file.name.split(".").pop();
-  const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+  // sharp로 256x256 WebP 압축. 5MB 원본도 5~20KB로 줄어든다.
+  let compressed: Buffer;
+  try {
+    const inputBuffer = Buffer.from(await file.arrayBuffer());
+    compressed = await compressImageToWebp(inputBuffer, "logo");
+  } catch (compressError) {
+    console.error("Image compression error:", compressError);
+    return { error: "Failed to process image" };
+  }
+
+  // 항상 WebP 확장자로 통일
+  const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.webp`;
 
   const { error: uploadError } = await supabase.storage
     .from("club-logos")
-    .upload(fileName, file, {
+    .upload(fileName, compressed, {
       cacheControl: "31536000",
       upsert: false,
+      contentType: "image/webp",
     });
 
   if (uploadError) {
