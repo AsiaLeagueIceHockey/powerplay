@@ -68,6 +68,10 @@ export default async function AdminMatchesPage({
             <span className="text-amber-300">•</span>
             <span>{t("admin.matches.noticeLine2")}</span>
           </li>
+          <li className="flex items-center gap-2 whitespace-nowrap text-[clamp(8px,2.55vw,14px)] leading-none tracking-tight">
+            <span className="text-amber-300">•</span>
+            <span>{t("admin.matches.noticeLine3")}</span>
+          </li>
         </ul>
       </div>
 
