@@ -69,6 +69,10 @@ async function run() {
   const browser = await chromium.launch({ headless: true });
   const uploadedUrls: string[] = [];
 
+  // Force Korean locale to prevent LocalePreferenceRedirect from sending
+  // /ko/* → /en/* on headless Chrome (which defaults to en-US navigator.language).
+  const siteHost = new URL(SITE_URL).hostname;
+
   try {
     for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
       console.log(`\nCapturing Page ${pageNum}/${totalPages}...`);
@@ -76,6 +80,21 @@ async function run() {
       const context = await browser.newContext({
         viewport: { width: 1080, height: 1920 },
         deviceScaleFactor: 2, // Retina display quality
+        locale: "ko-KR",
+        extraHTTPHeaders: { "Accept-Language": "ko-KR,ko;q=0.9" },
+      });
+
+      await context.addCookies([
+        { name: "NEXT_LOCALE", value: "ko", domain: siteHost, path: "/" },
+        { name: "powerplay-locale-preference", value: "ko", domain: siteHost, path: "/" },
+      ]);
+
+      await context.addInitScript(() => {
+        try {
+          window.localStorage.setItem("powerplay-locale-preference", "ko");
+        } catch {
+          // ignore storage errors
+        }
       });
 
       const page = await context.newPage();
@@ -107,6 +126,9 @@ async function run() {
 
       if (uploadError) {
         console.error(`Failed to upload page ${pageNum}:`, uploadError);
+        throw new Error(
+          `Upload failed for page ${pageNum}/${totalPages}: ${uploadError.message}`
+        );
       } else {
         console.log(`Successfully uploaded: ${data.path}`);
 
