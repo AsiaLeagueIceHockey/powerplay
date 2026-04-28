@@ -582,5 +582,17 @@
             "title": "나에게 맞는 하키클럽 찾기",
             "description": "3가지 질문으로 딱 맞는 클럽을 추천받아 보세요"
         }
+    },
+    "instagram": {
+        "clubRanking": {
+            "headerTitle": "🏆 {month} 응원 랭킹 TOP 5",
+            "voteCount": "{count, plural, =0 {0표} other {#표}}",
+            "tieBadge": "공동",
+            "tiedRank": "공동 {rank}위",
+            "emptySlot": "-",
+            "emptyState": "이번 달 응원 데이터가 없습니다",
+            "footerTagline": "매달 동호회를 응원해 주세요",
+            "footerSite": "powerplay.kr"
+        }
     }
 }

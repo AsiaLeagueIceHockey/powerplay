@@ -580,5 +580,17 @@
             "title": "Find Your Hockey Club",
             "description": "Get personalized club recommendations with 3 simple questions"
         }
+    },
+    "instagram": {
+        "clubRanking": {
+            "headerTitle": "🏆 {month} Cheer Ranking TOP 5",
+            "voteCount": "{count, plural, =0 {0 votes} one {# vote} other {# votes}}",
+            "tieBadge": "Tied",
+            "tiedRank": "Tied #{rank}",
+            "emptySlot": "-",
+            "emptyState": "No cheer votes this month yet",
+            "footerTagline": "Cheer your club every month",
+            "footerSite": "powerplay.kr"
+        }
     }
 }
