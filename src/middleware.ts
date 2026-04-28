@@ -8,9 +8,46 @@ const intlMiddleware = createMiddleware(routing);
 const BOT_UA_PATTERN =
   /Yeti|Googlebot|bingbot|Baiduspider|DuckDuckBot|Slurp|facebookexternalhit|Twitterbot|LinkedInBot|NaverBot|AdsBot|Mediapartners/i;
 
+const BOT_INDEXABLE_TOP_LEVEL = new Set([
+  "",
+  "/clubs",
+  "/rinks",
+  "/find-club",
+  "/lounge",
+]);
+
 function isBot(request: NextRequest): boolean {
   const ua = request.headers.get("user-agent") || "";
   return BOT_UA_PATTERN.test(ua);
+}
+
+function resolveBotRewritePath(pathname: string): string | null {
+  const match = pathname.match(/^\/(ko|en)(\/.*)?$/);
+  if (!match) return null;
+  const locale = match[1];
+  const rest = (match[2] ?? "").replace(/\/$/, "");
+
+  if (BOT_INDEXABLE_TOP_LEVEL.has(rest)) {
+    return `/seo-bot/${locale}${rest}`;
+  }
+
+  if (rest.startsWith("/lounge/")) {
+    return `/seo-bot/${locale}${rest}`;
+  }
+
+  return null;
+}
+
+function applyBotResponseHeaders(response: NextResponse): NextResponse {
+  const cookieNames = response.cookies.getAll().map((c) => c.name);
+  cookieNames.forEach((name) => response.cookies.delete(name));
+  response.headers.delete("set-cookie");
+  response.headers.set(
+    "Cache-Control",
+    "public, s-maxage=600, stale-while-revalidate=86400"
+  );
+  response.headers.set("X-Robots-Tag", "index, follow");
+  return response;
 }
 
 export async function middleware(request: NextRequest) {
@@ -24,20 +61,26 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(redirectUrl, 301);
   }
 
-  // For search engine bots: skip Supabase session entirely to avoid
-  // unnecessary latency and potential errors that cause "수집제한".
-  // Also strip set-cookie and force public cache so Vercel CDN doesn't
-  // mark the response as private (Naver Yeti rejects private responses).
+  // For search engine bots: serve a fully static SEO-friendly response.
+  // Naver Yeti and other crawlers reject `Cache-Control: private, no-store`
+  // pages as non-indexable. The dynamic public layout cannot avoid that
+  // header (UserHeaderLoader reads cookies → forces dynamic rendering),
+  // so we rewrite indexable paths to `/seo-bot/[locale]/...` which has its
+  // own cookies-free layout and renders fully static (revalidate ISR).
   if (isBot(request)) {
-    const botResponse = intlMiddleware(request);
-    const cookieNames = botResponse.cookies.getAll().map((c) => c.name);
-    cookieNames.forEach((name) => botResponse.cookies.delete(name));
-    botResponse.headers.delete("set-cookie");
-    botResponse.headers.set(
-      "Cache-Control",
-      "public, s-maxage=300, stale-while-revalidate=86400"
-    );
-    return botResponse;
+    const rewritePath = resolveBotRewritePath(request.nextUrl.pathname);
+
+    if (rewritePath) {
+      const rewriteUrl = request.nextUrl.clone();
+      rewriteUrl.pathname = rewritePath;
+      const botResponse = NextResponse.rewrite(rewriteUrl);
+      return applyBotResponseHeaders(botResponse);
+    }
+
+    // Non-indexable bot requests: keep prior behavior (skip Supabase session,
+    // strip cookies, force public cache headers).
+    const fallback = intlMiddleware(request);
+    return applyBotResponseHeaders(fallback);
   }
 
   // First, update Supabase session and get user data

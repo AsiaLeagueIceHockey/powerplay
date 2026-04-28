@@ -13,6 +13,7 @@ export default function robots(): MetadataRoute.Robots {
     "/admin-apply/",
     "/mypage/points/",
     "/mypage/card/",
+    "/seo-bot/",
   ];
   const localePrivatePaths = locales.flatMap((locale) =>
     privatePaths.map((path) => `/${locale}${path}`)
