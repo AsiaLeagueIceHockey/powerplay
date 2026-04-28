@@ -35,13 +35,15 @@ export async function GET(request: NextRequest) {
     );
     const tomorrowEndUtc = new Date(tomorrowStartUtc.getTime() + 24 * 60 * 60 * 1000);
 
-    // 내일 열리는 경기 조회 (취소/종료 제외)
+    // 내일 열리는 경기 조회 (취소 제외)
+    // DB match_status enum 은 ('open', 'closed', 'canceled') — 'finished' 는 enum 에
+    // 존재하지 않아 .not.in 절에 넣으면 PostgREST 가 enum 캐스트 실패로 throw.
     const { data: matches, error: matchError } = await supabase
       .from("matches")
       .select("id, start_time, rink:rinks(name_ko)")
       .gte("start_time", tomorrowStartUtc.toISOString())
       .lt("start_time", tomorrowEndUtc.toISOString())
-      .not("status", "in", '("canceled","finished")');
+      .in("status", ["open", "closed"]);
 
     if (matchError) {
       console.error("[REMINDER] 경기 조회 실패:", matchError);

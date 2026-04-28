@@ -11,7 +11,8 @@ jobs:
     steps:
       - name: Call match reminder endpoint
         run: |
-          curl -f -X GET \
+          # --fail-with-body: 4xx/5xx 도 응답 body 출력 후 fail (기존 -f 는 silent fail)
+          curl --fail-with-body -sS -X GET \
             "${{ secrets.NEXT_PUBLIC_APP_URL }}/api/cron/match-reminder" \
             -H "x-cron-secret: ${{ secrets.CRON_SECRET }}" \
             -H "Content-Type: application/json"
