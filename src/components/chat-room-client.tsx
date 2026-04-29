@@ -58,6 +58,7 @@ export function ChatRoomClient({
   const [inputValue, setInputValue] = useState("");
   const [isSending, setIsSending] = useState(false);
   const mainRef = useRef<HTMLElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const router = useRouter();
   const params = useParams();
@@ -216,12 +217,17 @@ export function ChatRoomClient({
       alert("Failed to send message: " + result.error);
     } else if (result.message) {
       // Replace optimistic message with real message
-      setMessages((prev) => 
+      setMessages((prev) =>
         prev.map((msg) => msg.id === tempId ? result.message : msg)
       );
     }
 
     setIsSending(false);
+    // Keep the keyboard up after sending — user typically wants to keep typing.
+    // The mousedown preventDefault on the send button stops focus from leaving
+    // in the first place, and this refocus is a defensive fallback for cases
+    // where focus drifted (e.g., desktop Enter triggered re-render).
+    textareaRef.current?.focus();
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -347,6 +353,7 @@ export function ChatRoomClient({
       <footer className="p-3 bg-white dark:bg-zinc-950 border-t border-zinc-200 dark:border-zinc-800 pb-safe">
         <form onSubmit={handleSend} className="max-w-3xl mx-auto flex items-end gap-2 relative">
           <textarea
+            ref={textareaRef}
             value={inputValue}
             onChange={adjustTextareaHeight}
             onKeyDown={handleKeyDown}
@@ -357,6 +364,10 @@ export function ChatRoomClient({
           <button
             type="submit"
             disabled={!inputValue.trim() || isSending}
+            // preventDefault on mousedown blocks the focus shift from textarea
+            // to the button on tap, so iOS Safari does NOT dismiss the keyboard.
+            // The click event still fires and submits the form normally.
+            onMouseDown={(e) => e.preventDefault()}
             className="absolute right-2 bottom-1.5 p-2 rounded-full text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:bg-zinc-300 dark:disabled:bg-zinc-700 disabled:text-zinc-500 transition-colors"
           >
             <Send size={18} />
