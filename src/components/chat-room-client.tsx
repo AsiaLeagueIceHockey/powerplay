@@ -57,17 +57,24 @@ export function ChatRoomClient({
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [inputValue, setInputValue] = useState("");
   const [isSending, setIsSending] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  
+  const mainRef = useRef<HTMLElement>(null);
+
   const router = useRouter();
   const params = useParams();
   const locale = params.locale as string;
   const supabase = useMemo(() => createClient(), []);
   const rootRef = useRef<HTMLDivElement>(null);
 
-  // Scroll to bottom
+  // Scroll the messages container to the bottom *without* using
+  // Element.scrollIntoView — that method bubbles up and scrolls every
+  // scrollable ancestor (and the document itself on iOS Safari when the
+  // keyboard opens), which previously yanked the footer up to the top of the
+  // screen and left a huge gap above the keyboard. Manipulating
+  // <main>'s scrollTop directly keeps the scroll local.
   const scrollToBottom = (behavior: ScrollBehavior = "smooth") => {
-    messagesEndRef.current?.scrollIntoView({ behavior });
+    const mainEl = mainRef.current;
+    if (!mainEl) return;
+    mainEl.scrollTo({ top: mainEl.scrollHeight, behavior });
   };
 
   useEffect(() => {
@@ -76,14 +83,12 @@ export function ChatRoomClient({
 
   // iOS Safari/PWA visualViewport correction.
   // When the on-screen keyboard appears on iOS Safari, the layout viewport
-  // (window.innerHeight / 100dvh) does NOT shrink, leaving a large blank space
-  // between the last message and the keyboard. visualViewport.height reflects the
-  // actual visible region, so we cap the chat root's height to that value, which
-  // pulls the footer right above the keyboard.
-  //
-  // On Android Chrome the layout viewport itself shrinks when the keyboard appears,
-  // so visualViewport.height === window.innerHeight and the cap matches the natural
-  // height — no double correction.
+  // (window.innerHeight / 100dvh) does NOT shrink, so the textarea would sit
+  // behind the keyboard. We cap the chat root's height to visualViewport.height
+  // which pulls the footer up above the keyboard. The `mt-auto` spacer in
+  // <main> keeps messages glued to the bottom of the visible area — no extra
+  // scroll is needed (and previously calling scrollIntoView here bubbled up
+  // and broke the layout, see scrollToBottom comment).
   useEffect(() => {
     if (typeof window === "undefined") return;
     const viewport = window.visualViewport;
@@ -93,11 +98,8 @@ export function ChatRoomClient({
     const applyOffset = () => {
       const offset = Math.max(0, window.innerHeight - viewport.height);
       if (offset > 0) {
-        // Lock the chat surface to the visible portion of the screen.
         root.style.height = `${viewport.height}px`;
         root.style.maxHeight = `${viewport.height}px`;
-        // Keep the latest message glued to the new bottom edge after the keyboard moves.
-        messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
       } else {
         root.style.height = "";
         root.style.maxHeight = "";
@@ -267,7 +269,7 @@ export function ChatRoomClient({
 
       <ChatAccessBanner />
 
-      <main className="flex-1 overflow-y-auto p-4 bg-white dark:bg-zinc-900 mb-safe flex flex-col">
+      <main ref={mainRef} className="flex-1 overflow-y-auto p-4 bg-white dark:bg-zinc-900 mb-safe flex flex-col">
         {/* Spacer pushes the message list to the bottom when content is shorter than the viewport.
             Once messages overflow, this auto margin collapses and natural scrolling takes over. */}
         <div className="mt-auto flex flex-col gap-1">
@@ -339,7 +341,6 @@ export function ChatRoomClient({
               </div>
             );
           })}
-          <div ref={messagesEndRef} />
         </div>
       </main>
 
