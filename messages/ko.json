@@ -200,7 +200,15 @@
         "toastTitle": "새 채팅이 도착했어요",
         "toastDescription": "{name}님과 읽지 않은 메시지 {count}건이 있습니다.",
         "toastAction": "채팅 열기",
-        "toastDismiss": "채팅 알림 닫기"
+        "toastDismiss": "채팅 알림 닫기",
+        "cannotChatWithSelf": "본인과의 대화방은 열 수 없습니다.",
+        "startChatFailed": "채팅방을 열 수 없습니다. 잠시 후 다시 시도해 주세요.",
+        "systemMessages": {
+            "club": "{name}님이 [{clubName}] 동호회를 보고 채팅을 시작했습니다.",
+            "match": "{name}님이 {date} {rinkName} 경기를 보고 채팅을 시작했습니다.",
+            "unknown": "{name}님이 채팅을 시작했습니다.",
+            "originDeleted": "(출처 정보가 삭제되었습니다)"
+        }
     },
     "match": {
         "rentalFee": "체험 장비 대여",

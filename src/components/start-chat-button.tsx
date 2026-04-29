@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { MessageCircle, Loader2 } from "lucide-react";
-import { createOrGetRoom } from "@/app/actions/chat";
+import { createOrGetRoom, type ChatOrigin } from "@/app/actions/chat";
 import { useTranslations } from "next-intl";
 
 interface StartChatButtonProps {
@@ -11,6 +11,13 @@ interface StartChatButtonProps {
   className?: string;
   iconOnly?: boolean;
   label?: string;
+  /**
+   * Optional context describing where this chat was started from. When
+   * provided and the chat room is newly created, the server emits a system
+   * message ("X started this chat from the [club Y] page") so the recipient
+   * sees the entry point. Re-opening an existing room does not duplicate it.
+   */
+  origin?: ChatOrigin;
 }
 
 export function StartChatButton({
@@ -18,6 +25,7 @@ export function StartChatButton({
   className = "",
   iconOnly = false,
   label,
+  origin,
 }: StartChatButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -26,19 +34,22 @@ export function StartChatButton({
   const handleStartChat = async () => {
     try {
       setIsLoading(true);
-      const result = await createOrGetRoom(targetUserId);
-      if ("room" in result && result.room && result.room.id) {
-        // Router will prepend the locale automatically if configured, or we can use a Link
-        // For server actions pushing, we rely on the action, but client side pushing:
+      const result = await createOrGetRoom(targetUserId, origin);
+      if (result.ok) {
         const locale = document.documentElement.lang || "ko";
-        router.push(`/${locale}/chat/${result.room.id}`);
-      } else if ("error" in result) {
-        console.error("Failed to start chat:", result.error);
-        alert(t("common.error"));
+        router.push(`/${locale}/chat/${result.roomId}`);
+        return;
+      }
+      // Failure path — surface a specific reason when known.
+      if (result.code === "cannot_chat_with_self") {
+        alert(t("chat.cannotChatWithSelf"));
+      } else {
+        console.error("Failed to start chat:", result.code, result.message);
+        alert(t("chat.startChatFailed"));
       }
     } catch (error) {
       console.error("Failed to start chat:", error);
-      alert(t("common.error"));
+      alert(t("chat.startChatFailed"));
     } finally {
       setIsLoading(false);
     }

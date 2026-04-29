@@ -196,6 +196,39 @@ export default async function MatchPage({
     creatorName = creatorProfile?.full_name || "";
   }
 
+  // Origin metadata for chat — every chat button on this page carries it.
+  // Stored in the chat_messages.metadata jsonb so the recipient sees a
+  // localized "started this chat from the {date} game at {rinkName}" header.
+  // Date is formatted KST short (e.g. "5월 1일 목 19:00" / "May 1 Thu 7:00 PM").
+  const matchDateShortKo = date.toLocaleString("ko-KR", {
+    month: "short",
+    day: "numeric",
+    weekday: "short",
+    hour: "numeric",
+    minute: "2-digit",
+    timeZone: "Asia/Seoul",
+  });
+  const matchDateShortEn = date.toLocaleString("en-US", {
+    month: "short",
+    day: "numeric",
+    weekday: "short",
+    hour: "numeric",
+    minute: "2-digit",
+    timeZone: "Asia/Seoul",
+  });
+  const matchOrigin = {
+    type: "match" as const,
+    id: match.id,
+    metadata: {
+      date: locale === "ko" ? matchDateShortKo : matchDateShortEn,
+      // Both locales stored so the recipient renders in their own language
+      // even if their locale differs from the sender's.
+      rinkName: match.rink?.name_ko ?? match.rink?.name_en ?? "",
+      rinkNameKo: match.rink?.name_ko ?? "",
+      rinkNameEn: match.rink?.name_en ?? match.rink?.name_ko ?? "",
+    },
+  };
+
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       {/* JSON-LD Structured Data */}
@@ -380,6 +413,7 @@ export default async function MatchPage({
                     className="p-1.5 text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 dark:text-blue-400 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 rounded-full"
                     iconOnly
                     label={t("match.contactManager")}
+                    origin={matchOrigin}
                   />
                 </div>
               </div>
@@ -544,6 +578,7 @@ export default async function MatchPage({
                         className="p-1.5 text-zinc-400 hover:text-blue-600 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full"
                         iconOnly
                         label={t("match.contactParticipant")}
+                        origin={matchOrigin}
                       />
                     </div>
                   )}
@@ -597,6 +632,7 @@ export default async function MatchPage({
                             className="p-1.5 text-zinc-400 hover:text-blue-600 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full"
                             iconOnly
                             label={t("match.contactParticipant")}
+                            origin={matchOrigin}
                           />
                         </div>
                       )}
@@ -634,6 +670,7 @@ export default async function MatchPage({
                             className="p-1.5 text-zinc-400 hover:text-blue-600 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full"
                             iconOnly
                             label={t("match.contactParticipant")}
+                            origin={matchOrigin}
                           />
                         </div>
                       )}
@@ -686,6 +723,7 @@ export default async function MatchPage({
                         className="p-1.5 text-zinc-400 hover:text-blue-600 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full"
                         iconOnly
                         label={t("match.contactParticipant")}
+                        origin={matchOrigin}
                       />
                     </div>
                   )}
@@ -729,6 +767,7 @@ export default async function MatchPage({
                         className="p-1.5 text-zinc-400 hover:text-blue-600 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full"
                         iconOnly
                         label={t("match.contactParticipant")}
+                        origin={matchOrigin}
                       />
                     </div>
                   )}
@@ -772,6 +811,7 @@ export default async function MatchPage({
                         className="p-1.5 text-zinc-400 hover:text-blue-600 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full"
                         iconOnly
                         label={t("match.contactParticipant")}
+                        origin={matchOrigin}
                       />
                     </div>
                   )}
@@ -813,6 +853,7 @@ export default async function MatchPage({
                         className="p-1.5 text-zinc-400 hover:text-blue-600 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full"
                         iconOnly
                         label={t("match.contactParticipant")}
+                        origin={matchOrigin}
                       />
                     </div>
                   )}

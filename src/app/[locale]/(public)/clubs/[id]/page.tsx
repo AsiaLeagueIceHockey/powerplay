@@ -231,6 +231,16 @@ export default async function ClubDetailPage({
                  targetUserId={club.created_by}
                  label={locale === "ko" ? "동호회 문의하기" : "Contact Club"}
                  className={`${clubDetailActionButtonClass} col-span-2 bg-[#1e3a6e] text-white hover:bg-[#162d58] dark:bg-[#1e3a6e] dark:hover:bg-[#162d58]`}
+                 origin={{
+                   type: "club",
+                   id: club.id,
+                   metadata: {
+                     // Single `name` column; same value used regardless of
+                     // recipient locale. clubNameKo/clubNameEn collapse onto
+                     // this when only one is populated.
+                     clubName: club.name,
+                   },
+                 }}
                />
              )}
           </div>

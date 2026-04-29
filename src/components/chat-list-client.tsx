@@ -19,7 +19,48 @@ interface ChatRoom {
   };
   unreadCount: number;
   lastMessage: string | null;
+  // v51 — last message may be a server-emitted system message whose `content`
+  // is empty by design. The list shows a localized origin preview instead.
+  lastMessageType?: "user" | "system";
+  lastMessageMetadata?: Record<string, unknown> | null;
   lastMessageAt: string;
+}
+
+function renderSystemPreview(
+  metadata: Record<string, unknown> | null | undefined,
+  locale: string,
+  t: (key: string, vars?: Record<string, string>) => string,
+): string {
+  const meta = (metadata ?? {}) as {
+    origin_type?: string;
+    name?: string;
+    clubName?: string;
+    clubNameKo?: string;
+    clubNameEn?: string;
+    date?: string;
+    rinkName?: string;
+    rinkNameKo?: string;
+    rinkNameEn?: string;
+  };
+  const name = meta.name ?? "";
+  if (meta.origin_type === "club") {
+    const clubName =
+      (locale === "ko" ? meta.clubNameKo : meta.clubNameEn) ??
+      meta.clubName ??
+      "";
+    if (!clubName) return t("systemMessages.unknown", { name });
+    return t("systemMessages.club", { name, clubName });
+  }
+  if (meta.origin_type === "match") {
+    const rinkName =
+      (locale === "ko" ? meta.rinkNameKo : meta.rinkNameEn) ??
+      meta.rinkName ??
+      "";
+    const date = meta.date ?? "";
+    if (!rinkName || !date) return t("systemMessages.unknown", { name });
+    return t("systemMessages.match", { name, date, rinkName });
+  }
+  return t("systemMessages.unknown", { name });
 }
 
 export function ChatListClient({ initialRooms, isAuthenticated = true }: { initialRooms: ChatRoom[], isAuthenticated?: boolean }) {
@@ -143,7 +184,9 @@ export function ChatListClient({ initialRooms, isAuthenticated = true }: { initi
                     </div>
                     <div className="flex items-center justify-between">
                       <p className="text-sm text-zinc-500 dark:text-zinc-400 truncate pr-4">
-                        {room.lastMessage || ""}
+                        {room.lastMessageType === "system"
+                          ? renderSystemPreview(room.lastMessageMetadata, locale, t)
+                          : room.lastMessage || ""}
                       </p>
                       {room.unreadCount > 0 && (
                         <div className="px-2 py-0.5 min-w-[1.25rem] h-5 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center">

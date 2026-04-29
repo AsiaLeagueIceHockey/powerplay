@@ -61,14 +61,19 @@ export function ChatUserSelector({ isOpen, onClose }: { isOpen: boolean; onClose
   const handleUserClick = async (targetUser: UserProfile) => {
     if (confirm(t("startChatConfirm"))) {
       setIsCreating(true);
-      const { room, error } = await createOrGetRoom(targetUser.id);
+      // Global selector — no origin context; system message is not emitted.
+      const result = await createOrGetRoom(targetUser.id);
       setIsCreating(false);
-      
-      if (!error && room) {
+
+      if (result.ok) {
         onClose();
-        router.push(`/${locale}/chat/${room.id}`);
+        router.push(`/${locale}/chat/${result.roomId}`);
+        return;
+      }
+      if (result.code === "cannot_chat_with_self") {
+        alert(t("cannotChatWithSelf"));
       } else {
-        alert("Error creating chat room.");
+        alert(t("startChatFailed"));
       }
     }
   };

@@ -200,7 +200,15 @@
         "toastTitle": "New chat message",
         "toastDescription": "You have {count} unread message(s) from {name}.",
         "toastAction": "Open chat",
-        "toastDismiss": "Dismiss chat notification"
+        "toastDismiss": "Dismiss chat notification",
+        "cannotChatWithSelf": "You can't start a chat with yourself.",
+        "startChatFailed": "Couldn't open the chat room. Please try again.",
+        "systemMessages": {
+            "club": "{name} started this chat from the {clubName} club.",
+            "match": "{name} started this chat from the {date} game at {rinkName}.",
+            "unknown": "{name} started this chat.",
+            "originDeleted": "(origin no longer available)"
+        }
     },
     "match": {
         "rentalFee": "Experience Equipment",

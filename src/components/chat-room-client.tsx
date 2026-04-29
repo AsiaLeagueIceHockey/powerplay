@@ -15,7 +15,26 @@ interface Message {
   content: string;
   is_read: boolean;
   created_at: string;
+  // v51 — server-emitted system messages (chat origin context). Existing rows
+  // default to 'user' so older payloads remain shape-compatible.
+  message_type?: "user" | "system";
+  metadata?: Record<string, unknown> | null;
 }
+
+// Whitelist of metadata keys the system-message renderer reads.
+// Kept narrow on purpose — anything outside this shape is ignored.
+type SystemMessageMetadata = {
+  origin_type?: "club" | "match" | string;
+  origin_id?: string;
+  name?: string;
+  clubName?: string;
+  clubNameKo?: string;
+  clubNameEn?: string;
+  date?: string;
+  rinkName?: string;
+  rinkNameKo?: string;
+  rinkNameEn?: string;
+};
 
 interface UserProfile {
   id: string;
@@ -44,6 +63,7 @@ export function ChatRoomClient({
   const params = useParams();
   const locale = params.locale as string;
   const supabase = useMemo(() => createClient(), []);
+  const rootRef = useRef<HTMLDivElement>(null);
 
   // Scroll to bottom
   const scrollToBottom = (behavior: ScrollBehavior = "smooth") => {
@@ -53,6 +73,48 @@ export function ChatRoomClient({
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // iOS Safari/PWA visualViewport correction.
+  // When the on-screen keyboard appears on iOS Safari, the layout viewport
+  // (window.innerHeight / 100dvh) does NOT shrink, leaving a large blank space
+  // between the last message and the keyboard. visualViewport.height reflects the
+  // actual visible region, so we cap the chat root's height to that value, which
+  // pulls the footer right above the keyboard.
+  //
+  // On Android Chrome the layout viewport itself shrinks when the keyboard appears,
+  // so visualViewport.height === window.innerHeight and the cap matches the natural
+  // height — no double correction.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const viewport = window.visualViewport;
+    const root = rootRef.current;
+    if (!viewport || !root) return;
+
+    const applyOffset = () => {
+      const offset = Math.max(0, window.innerHeight - viewport.height);
+      if (offset > 0) {
+        // Lock the chat surface to the visible portion of the screen.
+        root.style.height = `${viewport.height}px`;
+        root.style.maxHeight = `${viewport.height}px`;
+        // Keep the latest message glued to the new bottom edge after the keyboard moves.
+        messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
+      } else {
+        root.style.height = "";
+        root.style.maxHeight = "";
+      }
+    };
+
+    viewport.addEventListener("resize", applyOffset);
+    viewport.addEventListener("scroll", applyOffset);
+    applyOffset();
+
+    return () => {
+      viewport.removeEventListener("resize", applyOffset);
+      viewport.removeEventListener("scroll", applyOffset);
+      root.style.height = "";
+      root.style.maxHeight = "";
+    };
+  }, []);
 
   useEffect(() => {
     // console.log("Establishing Realtime subscription for room:", roomId);
@@ -185,7 +247,7 @@ export function ChatRoomClient({
   };
 
   return (
-    <div className="flex flex-col flex-1 h-[100dvh] overflow-hidden">
+    <div ref={rootRef} className="flex flex-col flex-1 min-h-0 overflow-hidden">
       <header className="px-4 py-3 flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md shrink-0 z-10 pt-safe">
         <div className="flex items-center gap-3">
           <button 
@@ -205,40 +267,80 @@ export function ChatRoomClient({
 
       <ChatAccessBanner />
 
-      <main className="flex-1 overflow-y-auto p-4 bg-white dark:bg-zinc-900 mb-safe flex flex-col gap-1">
-        {messages.map((message, index) => {
-          const isMine = message.sender_id === currentUserId;
-          const isLastInGroup = index === messages.length - 1 || messages[index + 1].sender_id !== message.sender_id;
-
-          return (
-            <div 
-              key={message.id} 
-              className={`flex flex-col ${isMine ? 'items-end' : 'items-start'} ${isLastInGroup ? 'mb-2' : ''}`}
-            >
-              <div className={`flex items-end gap-1.5 max-w-[80%] ${isMine ? 'flex-row-reverse' : 'flex-row'}`}>
-                <div 
-                  className={`px-4 py-2.5 rounded-2xl break-words whitespace-pre-wrap ${
-                    isMine 
-                      ? 'bg-blue-600 text-white rounded-br-sm' 
-                      : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-700/50 rounded-bl-sm'
-                  }`}
-                >
-                  {message.content}
+      <main className="flex-1 overflow-y-auto p-4 bg-white dark:bg-zinc-900 mb-safe flex flex-col">
+        {/* Spacer pushes the message list to the bottom when content is shorter than the viewport.
+            Once messages overflow, this auto margin collapses and natural scrolling takes over. */}
+        <div className="mt-auto flex flex-col gap-1">
+          {messages.map((message, index) => {
+            // System message — origin context bubble emitted by the server
+            // (v51 chat_origin RPC). Rendered centered with neutral chip
+            // styling, regardless of who triggered the room creation.
+            if (message.message_type === "system") {
+              const meta = (message.metadata ?? {}) as SystemMessageMetadata;
+              const senderName = meta.name ?? "";
+              let text: string;
+              if (meta.origin_type === "club") {
+                const clubName =
+                  (locale === "ko" ? meta.clubNameKo : meta.clubNameEn) ??
+                  meta.clubName ??
+                  "";
+                text = clubName
+                  ? t("systemMessages.club", { name: senderName, clubName })
+                  : t("systemMessages.originDeleted");
+              } else if (meta.origin_type === "match") {
+                const rinkName =
+                  (locale === "ko" ? meta.rinkNameKo : meta.rinkNameEn) ??
+                  meta.rinkName ??
+                  "";
+                const date = meta.date ?? "";
+                text = rinkName && date
+                  ? t("systemMessages.match", { name: senderName, date, rinkName })
+                  : t("systemMessages.originDeleted");
+              } else {
+                text = t("systemMessages.unknown", { name: senderName });
+              }
+              return (
+                <div key={message.id} className="my-2 flex justify-center">
+                  <span className="rounded-full bg-zinc-100 dark:bg-zinc-800 px-3 py-1 text-xs text-zinc-500 dark:text-zinc-400 max-w-[85%] text-center">
+                    {text}
+                  </span>
                 </div>
-                
-                <div className={`flex flex-col gap-0.5 text-[10px] text-zinc-400 ${isMine ? 'items-end' : 'items-start'}`}>
-                  {isMine && !message.is_read && (
-                    <span className="text-blue-500 font-semibold px-0.5">1</span>
-                  )}
-                  {isLastInGroup && (
-                    <span className="whitespace-nowrap pb-0.5">{formatMessageTime(message.created_at)}</span>
-                  )}
+              );
+            }
+
+            const isMine = message.sender_id === currentUserId;
+            const isLastInGroup = index === messages.length - 1 || messages[index + 1].sender_id !== message.sender_id;
+
+            return (
+              <div
+                key={message.id}
+                className={`flex flex-col ${isMine ? 'items-end' : 'items-start'} ${isLastInGroup ? 'mb-2' : ''}`}
+              >
+                <div className={`flex items-end gap-1.5 max-w-[80%] ${isMine ? 'flex-row-reverse' : 'flex-row'}`}>
+                  <div
+                    className={`px-4 py-2.5 rounded-2xl break-words whitespace-pre-wrap ${
+                      isMine
+                        ? 'bg-blue-600 text-white rounded-br-sm'
+                        : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-700/50 rounded-bl-sm'
+                    }`}
+                  >
+                    {message.content}
+                  </div>
+
+                  <div className={`flex flex-col gap-0.5 text-[10px] text-zinc-400 ${isMine ? 'items-end' : 'items-start'}`}>
+                    {isMine && !message.is_read && (
+                      <span className="text-blue-500 font-semibold px-0.5">1</span>
+                    )}
+                    {isLastInGroup && (
+                      <span className="whitespace-nowrap pb-0.5">{formatMessageTime(message.created_at)}</span>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
-        <div ref={messagesEndRef} />
+            );
+          })}
+          <div ref={messagesEndRef} />
+        </div>
       </main>
 
       <footer className="p-3 bg-white dark:bg-zinc-950 border-t border-zinc-200 dark:border-zinc-800 pb-safe">
