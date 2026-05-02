@@ -305,6 +305,24 @@
                 "scoreSuffix": "점",
                 "nameSuffix": "님,"
             }
+        },
+        "tamagotchi": {
+            "hero": {
+                "greeting": "{name}님의 하키 루키",
+                "fallbackNickname": "친구",
+                "energyLabel": "에너지",
+                "conditionLabel": "컨디션",
+                "feedCta": "먹이기",
+                "feedDone": "오늘 식사 완료",
+                "trainCta": "훈련하기",
+                "trainDone": "오늘 훈련 완료",
+                "bothDone": "오늘 루틴 완료! 내일 또 만나요",
+                "statusActive": "먹이기와 훈련을 마치면 오늘 루틴 완료",
+                "error": "잠시 후 다시 시도해주세요",
+                "feedingAlt": "라면을 먹는 하키 루키",
+                "trainingAlt": "슈팅 연습 중인 하키 루키",
+                "idleAlt": "스틱을 든 하키 루키"
+            }
         }
     },
     "points": {

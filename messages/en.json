@@ -305,6 +305,24 @@
                 "scoreSuffix": " pts",
                 "nameSuffix": ","
             }
+        },
+        "tamagotchi": {
+            "hero": {
+                "greeting": "{name}'s Hockey Rookie",
+                "fallbackNickname": "friend",
+                "energyLabel": "Energy",
+                "conditionLabel": "Condition",
+                "feedCta": "Feed",
+                "feedDone": "Fed today",
+                "trainCta": "Train",
+                "trainDone": "Trained today",
+                "bothDone": "All done today! See you tomorrow",
+                "statusActive": "Feed and train to complete today's routine",
+                "error": "Please try again in a moment",
+                "feedingAlt": "Hockey rookie eating ramen",
+                "trainingAlt": "Hockey rookie practicing shots",
+                "idleAlt": "Hockey rookie holding stick"
+            }
         }
     },
     "points": {

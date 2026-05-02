@@ -4,11 +4,13 @@ import { getUser, getProfile } from "@/app/actions/auth";
 import { getMyMatches } from "@/app/actions/mypage";
 import { getClubs } from "@/app/actions/clubs";
 import { getTodayFortuneBanner } from "@/app/actions/fortune";
+import { getTamagotchiState } from "@/app/actions/tamagotchi";
 import { DailyHockeyFortuneBanner } from "@/components/daily-hockey-fortune-banner";
 import { MyMatchList } from "@/components/my-match-list";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { NotificationStatus } from "@/components/notification-status";
 import { ProfileEditor } from "@/components/profile-editor";
+import { TamagotchiHero } from "@/components/tamagotchi-hero";
 
 export default async function MyPage() {
   const [profile, user, locale] = await Promise.all([getProfile(), getUser(), getLocale()]);
@@ -17,13 +19,19 @@ export default async function MyPage() {
     redirect(`/${locale}/login`);
   }
 
-  const [t, myMatches, clubsData, todayFortune] = await Promise.all([
+  const [t, myMatches, clubsData, todayFortune, tamagotchiState] = await Promise.all([
     getTranslations(),
     getMyMatches(),
     getClubs(),
     getTodayFortuneBanner(locale),
+    getTamagotchiState(locale),
   ]);
   const clubs = clubsData.map((c) => ({ id: c.id, name: c.name }));
+
+  const displayName =
+    profile?.full_name?.split(" ")[0] ||
+    user.email?.split("@")[0] ||
+    (locale === "ko" ? "친구" : "friend");
 
   return (
     <div className="container mx-auto px-4 max-w-4xl">
@@ -36,6 +44,14 @@ export default async function MyPage() {
           {locale === "ko" ? "님, 안녕하세요! 👋" : ", Welcome back! 👋"}
         </h1>
       </div>
+
+      {tamagotchiState ? (
+        <TamagotchiHero
+          locale={locale}
+          initialState={tamagotchiState}
+          displayName={displayName}
+        />
+      ) : null}
 
       <DailyHockeyFortuneBanner locale={locale} fortune={todayFortune} />
 
