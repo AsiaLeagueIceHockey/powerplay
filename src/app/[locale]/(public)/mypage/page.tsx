@@ -1,16 +1,12 @@
 import { redirect } from "next/navigation";
 import { getTranslations, getLocale } from "next-intl/server";
 import { getUser, getProfile } from "@/app/actions/auth";
-import { getMyMatches } from "@/app/actions/mypage";
-import { getClubs } from "@/app/actions/clubs";
 import { getTodayFortuneBanner } from "@/app/actions/fortune";
 import { getTamagotchiState } from "@/app/actions/tamagotchi";
 import { DailyHockeyFortuneBanner } from "@/components/daily-hockey-fortune-banner";
-import { MyMatchList } from "@/components/my-match-list";
-import { LanguageSwitcher } from "@/components/language-switcher";
-import { NotificationStatus } from "@/components/notification-status";
-import { ProfileEditor } from "@/components/profile-editor";
 import { TamagotchiHero } from "@/components/tamagotchi-hero";
+import { MypageMenuRow } from "@/components/mypage-menu-row";
+import { User, ListChecks, Globe, Bell } from "lucide-react";
 
 export default async function MyPage() {
   const [profile, user, locale] = await Promise.all([getProfile(), getUser(), getLocale()]);
@@ -19,14 +15,11 @@ export default async function MyPage() {
     redirect(`/${locale}/login`);
   }
 
-  const [t, myMatches, clubsData, todayFortune, tamagotchiState] = await Promise.all([
+  const [t, todayFortune, tamagotchiState] = await Promise.all([
     getTranslations(),
-    getMyMatches(),
-    getClubs(),
     getTodayFortuneBanner(locale),
     getTamagotchiState(locale),
   ]);
-  const clubs = clubsData.map((c) => ({ id: c.id, name: c.name }));
 
   const displayName =
     profile?.full_name?.split(" ")[0] ||
@@ -45,6 +38,8 @@ export default async function MyPage() {
         </h1>
       </div>
 
+      <DailyHockeyFortuneBanner locale={locale} fortune={todayFortune} />
+
       {tamagotchiState ? (
         <TamagotchiHero
           locale={locale}
@@ -53,48 +48,39 @@ export default async function MyPage() {
         />
       ) : null}
 
-      <DailyHockeyFortuneBanner locale={locale} fortune={todayFortune} />
-
-      {/* Profile Editor */}
-      <div className="mb-8">
-        <ProfileEditor 
-          initialBio={profile?.bio || null} 
-          hockeyStartDate={profile?.hockey_start_date || null}
-          primaryClubId={profile?.primary_club_id || null}
-          detailedPositions={profile?.detailed_positions || null}
-          stickDirection={profile?.stick_direction || null}
-          phone={profile?.phone || null}
-          fullName={profile?.full_name || null}
-          clubs={clubs}
-          cardIssuedAt={profile?.card_issued_at || null}
-          updatedAt={profile?.updated_at || null}
-        />
-      </div>
-
-      {/* My Matches Title and List */}
-      <div className="mb-4">
-        <h2 className="text-lg font-bold text-zinc-900 dark:text-white">
-          {t("mypage.subtitle")}
-        </h2>
-      </div>
-      <MyMatchList matches={myMatches} />
-      
-      {/* Language Switcher */}
-      <div className="mt-8">
-        <LanguageSwitcher locale={locale} />
-      </div>
-
-      {/* Notification Status */}
-      <div className="mt-8">
-        <div className="space-y-4">
-          <div className="px-1">
-            <h2 className="text-lg font-bold text-zinc-900 dark:text-white flex items-center gap-2">
-              {locale === "ko" ? "알림 설정" : "Notification Settings"}
-            </h2>
-          </div>
-          <NotificationStatus />
-        </div>
-      </div>
+      {/* Menu list */}
+      <nav className="mt-6 overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <ul className="divide-y divide-zinc-100 dark:divide-zinc-800">
+          <li>
+            <MypageMenuRow
+              href={`/${locale}/mypage/profile`}
+              icon={<User className="h-5 w-5" />}
+              label={t("mypage.menu.profile")}
+            />
+          </li>
+          <li>
+            <MypageMenuRow
+              href={`/${locale}/mypage/matches`}
+              icon={<ListChecks className="h-5 w-5" />}
+              label={t("mypage.menu.matches")}
+            />
+          </li>
+          <li>
+            <MypageMenuRow
+              href={`/${locale}/mypage/language`}
+              icon={<Globe className="h-5 w-5" />}
+              label={t("mypage.menu.language")}
+            />
+          </li>
+          <li>
+            <MypageMenuRow
+              href={`/${locale}/mypage/notifications`}
+              icon={<Bell className="h-5 w-5" />}
+              label={t("mypage.menu.notifications")}
+            />
+          </li>
+        </ul>
+      </nav>
     </div>
   );
 }

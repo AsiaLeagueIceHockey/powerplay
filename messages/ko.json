@@ -323,7 +323,20 @@
                 "trainingAlt": "슈팅 연습 중인 하키 루키",
                 "idleAlt": "스틱을 든 하키 루키"
             }
-        }
+        },
+        "menu": {
+            "profile": "프로필",
+            "matches": "신청한 경기",
+            "language": "언어 설정",
+            "notifications": "알림 설정"
+        },
+        "subpageTitle": {
+            "profile": "프로필",
+            "matches": "신청한 경기",
+            "language": "언어 설정",
+            "notifications": "알림 설정"
+        },
+        "back": "마이페이지로 돌아가기"
     },
     "points": {
         "title": "충전 금액",

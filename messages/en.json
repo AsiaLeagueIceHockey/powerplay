@@ -323,7 +323,20 @@
                 "trainingAlt": "Hockey rookie practicing shots",
                 "idleAlt": "Hockey rookie holding stick"
             }
-        }
+        },
+        "menu": {
+            "profile": "Profile",
+            "matches": "My Matches",
+            "language": "Language",
+            "notifications": "Notifications"
+        },
+        "subpageTitle": {
+            "profile": "Profile",
+            "matches": "My Matches",
+            "language": "Language Settings",
+            "notifications": "Notification Settings"
+        },
+        "back": "Back to My Page"
     },
     "points": {
         "title": "Credits",
