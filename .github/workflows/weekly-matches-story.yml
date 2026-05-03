@@ -1,0 +1,41 @@
+name: Weekly Matches Instagram Story Capture
+
+on:
+  schedule:
+    # 일요일 21:00 KST (UTC 12:00) — 다음 월요일~일요일 7일치 일정 캡처
+    - cron: "0 12 * * 0"
+  # 수동 실행 지원
+  workflow_dispatch:
+    inputs:
+      target_week_start:
+        description: "주 시작일 (월요일 KST, YYYY-MM-DD). 비워두면 다음 월요일로 자동 계산."
+        required: false
+        type: string
+
+jobs:
+  capture-and-upload:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Install Playwright Browsers
+        run: npx playwright install chromium --with-deps
+
+      - name: Run Weekly Capture Script
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SITE_URL: ${{ secrets.SITE_URL || 'https://powerplay.kr' }}
+          TARGET_WEEK_START: ${{ github.event.inputs.target_week_start }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: npx tsx scripts/capture-instagram-weekly.ts

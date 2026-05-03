@@ -669,6 +669,17 @@
             "emptyState": "No cheer votes this month yet",
             "footerTagline": "Cheer your club every month",
             "footerSite": "powerplay.kr"
+        },
+        "weekly": {
+            "title": "Weekly Match Schedule",
+            "dateRange": "{startMonth}/{startDay} - {endMonth}/{endDay}",
+            "pageIndicator": "Listing",
+            "dayHeader": {
+                "matches": "{count, plural, =0 {Rest} one {# match} other {# matches}}",
+                "rest": "Rest"
+            },
+            "empty": "No matches this day",
+            "emptyWeek": "No matches scheduled this week"
         }
     }
 }

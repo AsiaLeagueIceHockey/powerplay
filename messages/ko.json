@@ -671,6 +671,17 @@
             "emptyState": "이번 달 응원 데이터가 없습니다",
             "footerTagline": "매달 동호회를 응원해 주세요",
             "footerSite": "powerplay.kr"
+        },
+        "weekly": {
+            "title": "주간 경기 일정",
+            "dateRange": "{startMonth}/{startDay} - {endMonth}/{endDay}",
+            "pageIndicator": "Listing",
+            "dayHeader": {
+                "matches": "{count, plural, =0 {휴식} other {#경기}}",
+                "rest": "휴식"
+            },
+            "empty": "이 날은 경기 없어요",
+            "emptyWeek": "이번 주는 예정된 경기가 없어요"
         }
     }
 }
