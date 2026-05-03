@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { ChevronRight, Drumstick, Dumbbell } from "lucide-react";
 import { feedTamagotchi, trainTamagotchi } from "@/app/actions/tamagotchi";
+import { TamagotchiAvatar } from "@/components/tamagotchi-avatar";
 import type { TamagotchiScreenState } from "@/lib/tamagotchi-types";
 
 type TamagotchiActiveImage = "idle" | "feed" | "train";
@@ -13,8 +13,9 @@ type TamagotchiActiveImage = "idle" | "feed" | "train";
 interface TamagotchiHeroProps {
   locale: string;
   initialState: TamagotchiScreenState;
-  displayName: string;
 }
+
+const ACTION_CYCLE: readonly TamagotchiActiveImage[] = ["idle", "feed", "train"] as const;
 
 interface StatBarProps {
   label: string;
@@ -40,14 +41,20 @@ function StatBar({ label, value, accent }: StatBarProps) {
   );
 }
 
-export function TamagotchiHero({ locale, initialState, displayName }: TamagotchiHeroProps) {
+export function TamagotchiHero({ locale, initialState }: TamagotchiHeroProps) {
   const t = useTranslations("mypage.tamagotchi.hero");
   const [state, setState] = useState<TamagotchiScreenState>(initialState);
   const [error, setError] = useState<string | null>(null);
   const [activeImage, setActiveImage] = useState<TamagotchiActiveImage>("idle");
   const [isPending, startTransition] = useTransition();
 
-  const heroName = displayName?.trim() || t("fallbackNickname");
+  const cycleActiveImage = () => {
+    if (isPending) return;
+    setActiveImage((prev) => {
+      const idx = ACTION_CYCLE.indexOf(prev);
+      return ACTION_CYCLE[(idx + 1) % ACTION_CYCLE.length];
+    });
+  };
 
   const runAction = (kind: "feed" | "train") => {
     setError(null);
@@ -85,7 +92,7 @@ export function TamagotchiHero({ locale, initialState, displayName }: Tamagotchi
     <section className="mb-6 rounded-2xl border border-sky-200 bg-gradient-to-br from-sky-50 via-white to-violet-50 p-5 shadow-sm transition-colors dark:border-sky-900/60 dark:from-sky-950/40 dark:via-zinc-900 dark:to-violet-950/40">
       <div className="flex items-center justify-between gap-3">
         <h2 className="truncate text-lg font-black text-zinc-900 dark:text-white">
-          {t("greeting", { name: heroName })}
+          {t("greeting")}
         </h2>
         <Link
           href={`/${locale}/mypage/tamagotchi`}
@@ -98,15 +105,13 @@ export function TamagotchiHero({ locale, initialState, displayName }: Tamagotchi
 
       <div className="mt-4 flex items-stretch gap-4">
         <div className="flex h-24 w-24 flex-shrink-0 items-center justify-center rounded-2xl border border-sky-200/80 bg-white/80 dark:border-sky-900/60 dark:bg-zinc-900/70">
-          <Image
-            src={`/tamagotchi/${activeImage}.png`}
+          <TamagotchiAvatar
+            size={80}
+            colors={state.pet.colors}
+            action={activeImage}
             alt={t(altKey[activeImage])}
-            width={96}
-            height={96}
+            onTap={cycleActiveImage}
             priority
-            unoptimized
-            style={{ imageRendering: "pixelated" }}
-            className="h-20 w-20 select-none"
           />
         </div>
         <div className="flex flex-1 flex-col justify-center gap-3">

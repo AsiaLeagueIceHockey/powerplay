@@ -1,19 +1,21 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import Image from "next/image";
 import { useTranslations } from "next-intl";
-import { Drumstick, Dumbbell, Shirt } from "lucide-react";
-import { feedTamagotchi, trainTamagotchi } from "@/app/actions/tamagotchi";
-import type { TamagotchiScreenState } from "@/lib/tamagotchi-types";
+import { ChevronRight, Drumstick, Dumbbell, Shirt } from "lucide-react";
+import { feedTamagotchi, trainTamagotchi, updateTamagotchiColors } from "@/app/actions/tamagotchi";
+import { TamagotchiAvatar } from "@/components/tamagotchi-avatar";
+import { TamagotchiCloset } from "@/components/tamagotchi-closet";
+import type { TamagotchiPetColors, TamagotchiScreenState } from "@/lib/tamagotchi-types";
 
 type TamagotchiActiveImage = "idle" | "feed" | "train";
 
 interface TamagotchiDetailProps {
   locale: string;
   initialState: TamagotchiScreenState;
-  displayName: string;
 }
+
+const ACTION_CYCLE: readonly TamagotchiActiveImage[] = ["idle", "feed", "train"] as const;
 
 interface StatBarProps {
   label: string;
@@ -39,15 +41,23 @@ function StatBar({ label, value, accent }: StatBarProps) {
   );
 }
 
-export function TamagotchiDetail({ locale, initialState, displayName }: TamagotchiDetailProps) {
+export function TamagotchiDetail({ locale, initialState }: TamagotchiDetailProps) {
   const tHero = useTranslations("mypage.tamagotchi.hero");
   const tDetail = useTranslations("mypage.tamagotchi.detail");
+  const tCloset = useTranslations("mypage.tamagotchi.closet");
   const [state, setState] = useState<TamagotchiScreenState>(initialState);
   const [error, setError] = useState<string | null>(null);
   const [activeImage, setActiveImage] = useState<TamagotchiActiveImage>("idle");
   const [isPending, startTransition] = useTransition();
+  const [isClosetOpen, setIsClosetOpen] = useState(false);
 
-  const heroName = displayName?.trim() || tHero("fallbackNickname");
+  const cycleActiveImage = () => {
+    if (isPending) return;
+    setActiveImage((prev) => {
+      const idx = ACTION_CYCLE.indexOf(prev);
+      return ACTION_CYCLE[(idx + 1) % ACTION_CYCLE.length];
+    });
+  };
 
   const runAction = (kind: "feed" | "train") => {
     setError(null);
@@ -81,25 +91,28 @@ export function TamagotchiDetail({ locale, initialState, displayName }: Tamagotc
 
   const statusMessage = state.actions.bothCompleted ? tHero("bothDone") : tHero("statusActive");
 
+  const handleSaveColors = async (next: TamagotchiPetColors) => {
+    const result = await updateTamagotchiColors(locale, next);
+    if (result.success && result.state) {
+      setState(result.state);
+      return { success: true };
+    }
+    return { success: false, error: result.error ?? tCloset("error") };
+  };
+
   return (
     <div className="space-y-5">
-      {/* Character + Name + Stats card */}
+      {/* Character + Stats card */}
       <section className="rounded-2xl border border-sky-200 bg-gradient-to-br from-sky-50 via-white to-violet-50 p-5 shadow-sm transition-colors dark:border-sky-900/60 dark:from-sky-950/40 dark:via-zinc-900 dark:to-violet-950/40">
-        <h2 className="truncate text-2xl font-black text-zinc-900 dark:text-white">
-          {tDetail("pageSubtitle", { name: heroName })}
-        </h2>
-
-        <div className="mt-5 flex flex-col items-center">
+        <div className="flex flex-col items-center">
           <div className="flex aspect-square w-full max-w-[256px] items-center justify-center rounded-2xl border border-sky-200/80 bg-white/80 dark:border-sky-900/60 dark:bg-zinc-900/70 sm:max-w-[320px]">
-            <Image
-              src={`/tamagotchi/${activeImage}.png`}
+            <TamagotchiAvatar
+              size={216}
+              colors={state.pet.colors}
+              action={activeImage}
               alt={tDetail(altKey[activeImage])}
-              width={320}
-              height={320}
+              onTap={cycleActiveImage}
               priority
-              unoptimized
-              style={{ imageRendering: "pixelated" }}
-              className="h-[80%] w-[80%] select-none"
             />
           </div>
         </div>
@@ -152,26 +165,45 @@ export function TamagotchiDetail({ locale, initialState, displayName }: Tamagotc
         ) : null}
       </section>
 
-      {/* Closet stub (Phase B preview) */}
-      <section
-        aria-disabled="true"
-        className="cursor-not-allowed rounded-2xl border border-zinc-200 bg-zinc-50 p-5 opacity-60 transition-colors dark:border-zinc-800 dark:bg-zinc-900/40"
+      {/* Closet entry card */}
+      <button
+        type="button"
+        onClick={() => setIsClosetOpen(true)}
+        className="group block w-full rounded-xl border border-zinc-200 bg-white p-5 text-left shadow-sm transition-colors hover:border-blue-500 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900"
       >
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex min-w-0 items-center gap-2">
-            <Shirt className="h-5 w-5 flex-shrink-0 text-zinc-500 dark:text-zinc-400" />
-            <h3 className="truncate text-base font-bold text-zinc-800 dark:text-zinc-100">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-sky-100 dark:bg-sky-950/60">
+            <Shirt className="h-5 w-5 text-sky-600 dark:text-sky-300" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <h3 className="truncate text-base font-bold text-zinc-900 dark:text-zinc-100">
               {tDetail("closetHeading")}
             </h3>
+            <p className="mt-0.5 truncate text-sm text-zinc-600 dark:text-zinc-400">
+              {tDetail("closetDescription")}
+            </p>
           </div>
-          <span className="flex-shrink-0 whitespace-nowrap rounded-full bg-zinc-200 px-2.5 py-0.5 text-xs font-semibold text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
-            {tDetail("closetComingSoon")}
-          </span>
+          <div className="flex flex-shrink-0 items-center gap-1.5">
+            {(["helmet", "jersey", "skate"] as const).map((part) => (
+              <span
+                key={part}
+                aria-hidden="true"
+                className="h-4 w-4 rounded-full border border-zinc-300 dark:border-zinc-700"
+                style={{ backgroundColor: state.pet.colors[part] }}
+              />
+            ))}
+            <ChevronRight className="ml-1 h-5 w-5 flex-shrink-0 text-zinc-400 transition-colors group-hover:text-blue-500 dark:text-zinc-500" />
+          </div>
         </div>
-        <p className="mt-2 text-sm leading-5 text-zinc-600 dark:text-zinc-400">
-          {tDetail("closetDescription")}
-        </p>
-      </section>
+      </button>
+
+      <TamagotchiCloset
+        isOpen={isClosetOpen}
+        initialColors={state.pet.colors}
+        alt={tDetail(altKey.idle)}
+        onSave={handleSaveColors}
+        onClose={() => setIsClosetOpen(false)}
+      />
     </div>
   );
 }

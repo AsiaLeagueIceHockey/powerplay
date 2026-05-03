@@ -21,11 +21,6 @@ export default async function MyPage() {
     getTamagotchiState(locale),
   ]);
 
-  const displayName =
-    profile?.full_name?.split(" ")[0] ||
-    user.email?.split("@")[0] ||
-    (locale === "ko" ? "친구" : "friend");
-
   return (
     <div className="container mx-auto px-4 max-w-4xl">
       {/* Header */}
@@ -41,11 +36,7 @@ export default async function MyPage() {
       <DailyHockeyFortuneBanner locale={locale} fortune={todayFortune} />
 
       {tamagotchiState ? (
-        <TamagotchiHero
-          locale={locale}
-          initialState={tamagotchiState}
-          displayName={displayName}
-        />
+        <TamagotchiHero locale={locale} initialState={tamagotchiState} />
       ) : null}
 
       {/* Menu list */}

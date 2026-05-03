@@ -308,32 +308,58 @@
         },
         "tamagotchi": {
             "hero": {
-                "greeting": "{name}'s Hockey Rookie",
-                "fallbackNickname": "friend",
+                "greeting": "Power Player",
                 "energyLabel": "Energy",
                 "conditionLabel": "Condition",
-                "feedCta": "Feed",
-                "feedDone": "Fed today",
+                "feedCta": "Eat",
+                "feedDone": "Ate today",
                 "trainCta": "Train",
                 "trainDone": "Trained today",
                 "bothDone": "All done today! See you tomorrow",
-                "statusActive": "Feed and train to complete today's routine",
+                "statusActive": "Eat and train to complete today’s routine",
                 "error": "Please try again in a moment",
-                "feedingAlt": "Hockey rookie eating ramen",
-                "trainingAlt": "Hockey rookie practicing shots",
-                "idleAlt": "Hockey rookie holding stick",
-                "detailLink": "View hockey rookie details"
+                "feedingAlt": "Power player eating ramen",
+                "trainingAlt": "Power player practicing shots",
+                "idleAlt": "Power player holding stick",
+                "detailLink": "View power player details"
             },
             "detail": {
-                "pageSubtitle": "{name}'s growth journal",
-                "characterAlt": "Hockey rookie on the big screen",
-                "feedingAlt": "Hockey rookie eating ramen",
-                "trainingAlt": "Hockey rookie practicing shots",
+                "characterAlt": "Power player on the big screen",
+                "feedingAlt": "Power player eating ramen",
+                "trainingAlt": "Power player practicing shots",
                 "statsHeading": "Today's Condition",
                 "actionsHeading": "Today's Routine",
-                "closetHeading": "Closet",
-                "closetComingSoon": "Coming soon",
-                "closetDescription": "More outfits and gear are on the way"
+                "closetHeading": "Style",
+                "closetDescription": "Pick colors for helmet, jersey and laces"
+            },
+            "closet": {
+                "modalTitle": "Style",
+                "preview": "Preview",
+                "save": "Save",
+                "saving": "Saving...",
+                "cancel": "Cancel",
+                "saved": "Saved",
+                "error": "Failed to save. Please try again",
+                "parts": {
+                    "helmet": "Helmet",
+                    "jersey": "Jersey",
+                    "skate": "Skate Laces"
+                },
+                "colors": {
+                    "white": "White",
+                    "black": "Black",
+                    "red": "Red",
+                    "blue": "Blue",
+                    "navy": "Navy",
+                    "gold": "Gold",
+                    "silver": "Silver",
+                    "green": "Green",
+                    "orange": "Orange",
+                    "purple": "Purple",
+                    "yellow": "Yellow",
+                    "neonGreen": "Neon Green"
+                },
+                "swatchAria": "Select {colorLabel} for {partLabel}"
             }
         },
         "menu": {
@@ -347,7 +373,7 @@
             "matches": "My Matches",
             "language": "Language Settings",
             "notifications": "Notification Settings",
-            "tamagotchi": "Hockey Rookie"
+            "tamagotchi": "Power Player"
         },
         "back": "Back to My Page"
     },

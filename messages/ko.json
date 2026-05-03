@@ -308,32 +308,58 @@
         },
         "tamagotchi": {
             "hero": {
-                "greeting": "{name}님의 하키 루키",
-                "fallbackNickname": "친구",
+                "greeting": "파워 플레이어",
                 "energyLabel": "에너지",
                 "conditionLabel": "컨디션",
-                "feedCta": "먹이기",
+                "feedCta": "식사하기",
                 "feedDone": "오늘 식사 완료",
                 "trainCta": "훈련하기",
                 "trainDone": "오늘 훈련 완료",
                 "bothDone": "오늘 루틴 완료! 내일 또 만나요",
-                "statusActive": "먹이기와 훈련을 마치면 오늘 루틴 완료",
+                "statusActive": "식사하기와 훈련을 마치면 오늘 루틴 완료",
                 "error": "잠시 후 다시 시도해주세요",
-                "feedingAlt": "라면을 먹는 하키 루키",
-                "trainingAlt": "슈팅 연습 중인 하키 루키",
-                "idleAlt": "스틱을 든 하키 루키",
-                "detailLink": "하키 루키 자세히 보기"
+                "feedingAlt": "라면을 먹는 파워 플레이어",
+                "trainingAlt": "슈팅 연습 중인 파워 플레이어",
+                "idleAlt": "스틱을 든 파워 플레이어",
+                "detailLink": "파워 플레이어 자세히 보기"
             },
             "detail": {
-                "pageSubtitle": "{name}님의 성장 일지",
-                "characterAlt": "큰 화면으로 본 하키 루키",
-                "feedingAlt": "라면을 먹는 하키 루키",
-                "trainingAlt": "슈팅 연습 중인 하키 루키",
+                "characterAlt": "큰 화면으로 본 파워 플레이어",
+                "feedingAlt": "라면을 먹는 파워 플레이어",
+                "trainingAlt": "슈팅 연습 중인 파워 플레이어",
                 "statsHeading": "오늘의 컨디션",
                 "actionsHeading": "오늘의 루틴",
-                "closetHeading": "옷장",
-                "closetComingSoon": "준비 중",
-                "closetDescription": "곧 다양한 옷과 장비를 입혀줄 수 있어요"
+                "closetHeading": "스타일",
+                "closetDescription": "헬멧, 져지, 스케이트 끈 색상을 골라 꾸며보세요"
+            },
+            "closet": {
+                "modalTitle": "스타일",
+                "preview": "미리보기",
+                "save": "저장",
+                "saving": "저장 중...",
+                "cancel": "취소",
+                "saved": "저장되었어요",
+                "error": "저장에 실패했어요. 잠시 후 다시 시도해주세요",
+                "parts": {
+                    "helmet": "헬멧",
+                    "jersey": "져지",
+                    "skate": "스케이트 끈"
+                },
+                "colors": {
+                    "white": "화이트",
+                    "black": "블랙",
+                    "red": "레드",
+                    "blue": "블루",
+                    "navy": "네이비",
+                    "gold": "골드",
+                    "silver": "실버",
+                    "green": "그린",
+                    "orange": "오렌지",
+                    "purple": "퍼플",
+                    "yellow": "노랑",
+                    "neonGreen": "네온 그린"
+                },
+                "swatchAria": "{partLabel} {colorLabel} 선택"
             }
         },
         "menu": {
@@ -347,7 +373,7 @@
             "matches": "신청한 경기",
             "language": "언어 설정",
             "notifications": "알림 설정",
-            "tamagotchi": "하키 루키"
+            "tamagotchi": "파워 플레이어"
         },
         "back": "마이페이지로 돌아가기"
     },

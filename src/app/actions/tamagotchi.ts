@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { logAndNotify } from "@/lib/audit";
 import type { TamagotchiLocale } from "@/lib/tamagotchi-config";
 import {
   applyFeedAction,
@@ -24,7 +25,8 @@ import {
   buildTamagotchiReminderDedupeKey,
   buildTamagotchiReminderPayload,
 } from "@/lib/tamagotchi-reminders";
-import type { TamagotchiScreenState } from "@/lib/tamagotchi-types";
+import type { TamagotchiPetColors, TamagotchiScreenState } from "@/lib/tamagotchi-types";
+import { isAllowedColor, normalizeColors } from "@/lib/tamagotchi-palette";
 
 export type TamagotchiStateResponse = TamagotchiScreenState;
 export interface TamagotchiActionResponse {
@@ -45,6 +47,20 @@ interface TamagotchiPetRow {
   last_trained_at: string | null;
   last_training_key: string | null;
   pending_special_meal_key: string | null;
+  helmet_color: string | null;
+  jersey_color: string | null;
+  skate_color: string | null;
+}
+
+const PET_COLUMNS =
+  "id, user_id, nickname, energy, condition, last_decay_at, last_interacted_at, last_fed_at, last_trained_at, last_training_key, pending_special_meal_key, helmet_color, jersey_color, skate_color";
+
+function rowToColors(row: TamagotchiPetRow): TamagotchiPetColors {
+  return normalizeColors({
+    helmet: row.helmet_color ?? undefined,
+    jersey: row.jersey_color ?? undefined,
+    skate: row.skate_color ?? undefined,
+  });
 }
 
 function toSnapshot(row: TamagotchiPetRow): TamagotchiPetSnapshot {
@@ -95,11 +111,16 @@ async function getAuthedContext() {
   return { supabase, user, profile };
 }
 
-async function getOrCreatePet(userId: string) {
+interface PetWithColors {
+  snapshot: TamagotchiPetSnapshot;
+  colors: TamagotchiPetColors;
+}
+
+async function getOrCreatePet(userId: string): Promise<PetWithColors> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("tamagotchi_pets")
-    .select("id, user_id, nickname, energy, condition, last_decay_at, last_interacted_at, last_fed_at, last_trained_at, last_training_key, pending_special_meal_key")
+    .select(PET_COLUMNS)
     .eq("user_id", userId)
     .maybeSingle();
 
@@ -108,36 +129,39 @@ async function getOrCreatePet(userId: string) {
   }
 
   if (data) {
-    return toSnapshot(data as TamagotchiPetRow);
+    const row = data as TamagotchiPetRow;
+    return { snapshot: toSnapshot(row), colors: rowToColors(row) };
   }
 
   const snapshot = createDefaultPetSnapshot();
   const { data: inserted, error: insertError } = await supabase
     .from("tamagotchi_pets")
     .insert(toRowPatch(snapshot, userId))
-    .select("id, user_id, nickname, energy, condition, last_decay_at, last_interacted_at, last_fed_at, last_trained_at, last_training_key, pending_special_meal_key")
+    .select(PET_COLUMNS)
     .single();
 
   if (insertError) {
     throw new Error(insertError.message);
   }
 
-  return toSnapshot(inserted as TamagotchiPetRow);
+  const insertedRow = inserted as TamagotchiPetRow;
+  return { snapshot: toSnapshot(insertedRow), colors: rowToColors(insertedRow) };
 }
 
-async function persistPet(snapshot: TamagotchiPetSnapshot, userId: string) {
+async function persistPet(snapshot: TamagotchiPetSnapshot, userId: string): Promise<PetWithColors> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("tamagotchi_pets")
     .upsert(toRowPatch(snapshot, userId), { onConflict: "user_id" })
-    .select("id, user_id, nickname, energy, condition, last_decay_at, last_interacted_at, last_fed_at, last_trained_at, last_training_key, pending_special_meal_key")
+    .select(PET_COLUMNS)
     .single();
 
   if (error) {
     throw new Error(error.message);
   }
 
-  return toSnapshot(data as TamagotchiPetRow);
+  const row = data as TamagotchiPetRow;
+  return { snapshot: toSnapshot(row), colors: rowToColors(row) };
 }
 
 async function getPushEnabled(userId: string) {
@@ -221,6 +245,7 @@ async function buildState(
   userId: string,
   displayName: string,
   snapshot: TamagotchiPetSnapshot,
+  colors: TamagotchiPetColors,
   decayed = false,
   reaction: TamagotchiReaction | null = null
 ): Promise<TamagotchiScreenState> {
@@ -238,6 +263,7 @@ async function buildState(
     pet: {
       energy: snapshot.energy,
       condition: snapshot.condition,
+      colors,
     },
     status: {
       decayed,
@@ -250,8 +276,8 @@ async function buildState(
               ? "오늘 할 수 있는 행동은 모두 끝났어요. 나중에 다시 상태를 확인해보세요."
               : "You have finished today's actions. Come back later to check the result.")
           : (locale === "ko"
-              ? "먹이기와 훈련하기를 마치면 다음 리듬을 위한 준비가 끝나요."
-              : "Finish feeding and training to set up the next return loop."),
+              ? "식사하기와 훈련하기를 마치면 다음 리듬을 위한 준비가 끝나요."
+              : "Finish eating and training to set up the next return loop."),
       visitMode: availability.visitMode,
     },
     training: {
@@ -292,14 +318,15 @@ async function buildState(
   };
 }
 
-async function hydratePet(userId: string) {
+async function hydratePet(userId: string): Promise<{ pet: PetWithColors; decayed: boolean }> {
   const pet = await getOrCreatePet(userId);
-  const normalized = normalizePetState(pet);
+  const normalized = normalizePetState(pet.snapshot);
   if (!normalized.changed) {
     return { pet, decayed: false };
   }
 
-  return { pet: await persistPet(normalized.snapshot, userId), decayed: normalized.windows > 0 };
+  const persisted = await persistPet(normalized.snapshot, userId);
+  return { pet: persisted, decayed: normalized.windows > 0 };
 }
 
 export async function getTamagotchiState(locale: string) {
@@ -310,7 +337,14 @@ export async function getTamagotchiState(locale: string) {
   }
 
   const hydrated = await hydratePet(user.id);
-  return buildState(typedLocale, user.id, profile?.full_name || user.email?.split("@")[0] || "Player", hydrated.pet, hydrated.decayed);
+  return buildState(
+    typedLocale,
+    user.id,
+    profile?.full_name || user.email?.split("@")[0] || "Player",
+    hydrated.pet.snapshot,
+    hydrated.pet.colors,
+    hydrated.decayed
+  );
 }
 
 async function performAction(actionType: "feed" | "train", locale: string) {
@@ -321,35 +355,66 @@ async function performAction(actionType: "feed" | "train", locale: string) {
   }
 
   const hydrated = await hydratePet(user.id);
-  const availability = getActionAvailability(hydrated.pet);
+  const availability = getActionAvailability(hydrated.pet.snapshot);
   if ((actionType === "feed" && !availability.canFeed) || (actionType === "train" && !availability.canTrain)) {
     return {
       success: false,
       error: formatActionLockMessage(actionType, typedLocale),
-      state: await buildState(typedLocale, user.id, profile?.full_name || user.email?.split("@")[0] || "Player", hydrated.pet, hydrated.decayed),
+      state: await buildState(
+        typedLocale,
+        user.id,
+        profile?.full_name || user.email?.split("@")[0] || "Player",
+        hydrated.pet.snapshot,
+        hydrated.pet.colors,
+        hydrated.decayed
+      ),
     };
   }
 
   const now = new Date();
   const result = actionType === "feed"
-    ? applyFeedAction({ snapshot: hydrated.pet, locale: typedLocale, now, userId: user.id })
-    : applyTrainAction({ snapshot: hydrated.pet, locale: typedLocale, now, userId: user.id });
+    ? applyFeedAction({ snapshot: hydrated.pet.snapshot, locale: typedLocale, now, userId: user.id })
+    : applyTrainAction({ snapshot: hydrated.pet.snapshot, locale: typedLocale, now, userId: user.id });
 
   const storedPet = await persistPet(result.snapshot, user.id);
   const dateKey = getKstDateKey(now);
-  await logAction(user.id, storedPet.id!, actionType, dateKey, result.reaction);
+  await logAction(user.id, storedPet.snapshot.id!, actionType, dateKey, result.reaction);
 
-  const nextAvailability = getActionAvailability(storedPet);
+  const nextAvailability = getActionAvailability(storedPet.snapshot);
   if (!nextAvailability.canFeed && !nextAvailability.canTrain) {
-    await enqueueReminder(user.id, storedPet.id!, dateKey, typedLocale, now);
+    await enqueueReminder(user.id, storedPet.snapshot.id!, dateKey, typedLocale, now);
   }
+
+  // Audit: notify superusers of tamagotchi engagement (after() — non-blocking)
+  logAndNotify({
+    userId: user.id,
+    action: actionType === "feed" ? "TAMAGOTCHI_FEED" : "TAMAGOTCHI_TRAIN",
+    description:
+      actionType === "feed"
+        ? `다마고치 식사 (에너지 ${storedPet.snapshot.energy}, 컨디션 ${storedPet.snapshot.condition})`
+        : `다마고치 훈련 (에너지 ${storedPet.snapshot.energy}, 컨디션 ${storedPet.snapshot.condition})`,
+    metadata: {
+      pet_id: storedPet.snapshot.id,
+      energy: storedPet.snapshot.energy,
+      condition: storedPet.snapshot.condition,
+      date_key: dateKey,
+    },
+  });
 
   revalidatePath(`/${typedLocale}/mypage`);
   revalidatePath(`/${typedLocale}/mypage/tamagotchi`);
 
   return {
     success: true,
-    state: await buildState(typedLocale, user.id, profile?.full_name || user.email?.split("@")[0] || "Player", storedPet, false, result.reaction),
+    state: await buildState(
+      typedLocale,
+      user.id,
+      profile?.full_name || user.email?.split("@")[0] || "Player",
+      storedPet.snapshot,
+      storedPet.colors,
+      false,
+      result.reaction
+    ),
   };
 }
 
@@ -360,3 +425,50 @@ export async function feedTamagotchi(locale: string) {
 export async function trainTamagotchi(locale: string) {
   return performAction("train", locale);
 }
+
+export async function updateTamagotchiColors(
+  locale: string,
+  colors: TamagotchiPetColors
+): Promise<TamagotchiActionResponse> {
+  const typedLocale = locale === "en" ? "en" : "ko";
+  const { supabase, user, profile } = await getAuthedContext();
+  if (!user) {
+    return { success: false, error: "Not authenticated" };
+  }
+
+  // 클라이언트 측 1차 가드 — 실제 권한은 RPC 가 강제
+  if (
+    !isAllowedColor("helmet", colors.helmet) ||
+    !isAllowedColor("jersey", colors.jersey) ||
+    !isAllowedColor("skate", colors.skate)
+  ) {
+    return { success: false, error: "Invalid color selection" };
+  }
+
+  const { error: rpcError } = await supabase.rpc("update_tamagotchi_colors", {
+    p_helmet: colors.helmet,
+    p_jersey: colors.jersey,
+    p_skate: colors.skate,
+  });
+
+  if (rpcError) {
+    return { success: false, error: rpcError.message };
+  }
+
+  revalidatePath(`/${typedLocale}/mypage`);
+  revalidatePath(`/${typedLocale}/mypage/tamagotchi`);
+
+  // 갱신된 state 재조회 (디스플레이 일관성)
+  const hydrated = await hydratePet(user.id);
+  const state = await buildState(
+    typedLocale,
+    user.id,
+    profile?.full_name || user.email?.split("@")[0] || "Player",
+    hydrated.pet.snapshot,
+    hydrated.pet.colors,
+    hydrated.decayed
+  );
+
+  return { success: true, state };
+}
+

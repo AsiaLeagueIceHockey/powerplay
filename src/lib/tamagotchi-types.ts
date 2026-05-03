@@ -4,6 +4,12 @@ export interface TamagotchiScreenReaction {
   tone: "normal" | "special" | "encouraging";
 }
 
+export interface TamagotchiPetColors {
+  helmet: string;
+  jersey: string;
+  skate: string;
+}
+
 export interface TamagotchiScreenState {
   displayName: string;
   dateKey: string;
@@ -11,6 +17,7 @@ export interface TamagotchiScreenState {
   pet: {
     energy: number;
     condition: number;
+    colors: TamagotchiPetColors;
   };
   status: {
     decayed: boolean;
