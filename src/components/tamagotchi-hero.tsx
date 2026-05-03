@@ -2,8 +2,9 @@
 
 import { useState, useTransition } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { Drumstick, Dumbbell } from "lucide-react";
+import { ChevronRight, Drumstick, Dumbbell } from "lucide-react";
 import { feedTamagotchi, trainTamagotchi } from "@/app/actions/tamagotchi";
 import type { TamagotchiScreenState } from "@/lib/tamagotchi-types";
 
@@ -82,9 +83,18 @@ export function TamagotchiHero({ locale, initialState, displayName }: Tamagotchi
 
   return (
     <section className="mb-6 rounded-2xl border border-sky-200 bg-gradient-to-br from-sky-50 via-white to-violet-50 p-5 shadow-sm transition-colors dark:border-sky-900/60 dark:from-sky-950/40 dark:via-zinc-900 dark:to-violet-950/40">
-      <h2 className="text-lg font-black text-zinc-900 dark:text-white">
-        {t("greeting", { name: heroName })}
-      </h2>
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="truncate text-lg font-black text-zinc-900 dark:text-white">
+          {t("greeting", { name: heroName })}
+        </h2>
+        <Link
+          href={`/${locale}/mypage/tamagotchi`}
+          aria-label={t("detailLink")}
+          className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-zinc-700 transition-colors hover:bg-white/70 dark:text-zinc-200 dark:hover:bg-zinc-800/70"
+        >
+          <ChevronRight className="h-5 w-5" />
+        </Link>
+      </div>
 
       <div className="mt-4 flex items-stretch gap-4">
         <div className="flex h-24 w-24 flex-shrink-0 items-center justify-center rounded-2xl border border-sky-200/80 bg-white/80 dark:border-sky-900/60 dark:bg-zinc-900/70">

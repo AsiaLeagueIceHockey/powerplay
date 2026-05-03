@@ -321,7 +321,19 @@
                 "error": "Please try again in a moment",
                 "feedingAlt": "Hockey rookie eating ramen",
                 "trainingAlt": "Hockey rookie practicing shots",
-                "idleAlt": "Hockey rookie holding stick"
+                "idleAlt": "Hockey rookie holding stick",
+                "detailLink": "View hockey rookie details"
+            },
+            "detail": {
+                "pageSubtitle": "{name}'s growth journal",
+                "characterAlt": "Hockey rookie on the big screen",
+                "feedingAlt": "Hockey rookie eating ramen",
+                "trainingAlt": "Hockey rookie practicing shots",
+                "statsHeading": "Today's Condition",
+                "actionsHeading": "Today's Routine",
+                "closetHeading": "Closet",
+                "closetComingSoon": "Coming soon",
+                "closetDescription": "More outfits and gear are on the way"
             }
         },
         "menu": {
@@ -334,7 +346,8 @@
             "profile": "Profile",
             "matches": "My Matches",
             "language": "Language Settings",
-            "notifications": "Notification Settings"
+            "notifications": "Notification Settings",
+            "tamagotchi": "Hockey Rookie"
         },
         "back": "Back to My Page"
     },

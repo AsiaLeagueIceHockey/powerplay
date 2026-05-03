@@ -321,7 +321,19 @@
                 "error": "잠시 후 다시 시도해주세요",
                 "feedingAlt": "라면을 먹는 하키 루키",
                 "trainingAlt": "슈팅 연습 중인 하키 루키",
-                "idleAlt": "스틱을 든 하키 루키"
+                "idleAlt": "스틱을 든 하키 루키",
+                "detailLink": "하키 루키 자세히 보기"
+            },
+            "detail": {
+                "pageSubtitle": "{name}님의 성장 일지",
+                "characterAlt": "큰 화면으로 본 하키 루키",
+                "feedingAlt": "라면을 먹는 하키 루키",
+                "trainingAlt": "슈팅 연습 중인 하키 루키",
+                "statsHeading": "오늘의 컨디션",
+                "actionsHeading": "오늘의 루틴",
+                "closetHeading": "옷장",
+                "closetComingSoon": "준비 중",
+                "closetDescription": "곧 다양한 옷과 장비를 입혀줄 수 있어요"
             }
         },
         "menu": {
@@ -334,7 +346,8 @@
             "profile": "프로필",
             "matches": "신청한 경기",
             "language": "언어 설정",
-            "notifications": "알림 설정"
+            "notifications": "알림 설정",
+            "tamagotchi": "하키 루키"
         },
         "back": "마이페이지로 돌아가기"
     },
