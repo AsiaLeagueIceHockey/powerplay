@@ -42,9 +42,11 @@ const PARTS: readonly TamagotchiPart[] = ["helmet", "jersey", "skate"] as const;
  * When `onTap` is provided, the avatar renders as a `<button>` with a small
  * switch-cue badge in the corner, signaling that taps cycle through poses.
  */
-// Club logo overlay — jersey 영역 가운데 (avatar size의 ~20%, 픽셀 아트 톤)
-const LOGO_SIZE_RATIO = 0.2;
-const LOGO_TOP_RATIO = 0.5;
+// Club logo overlay — jersey(상의) 가슴 위치.
+// idle 자세에서만 노출. feed/train 은 손·도구에 가려지는 자연스러운 표현.
+// PNG 안에서 캐릭터는 위쪽 정렬이라 얼굴이 ~50% 부근. jersey 중심은 ~68%.
+const LOGO_SIZE_RATIO = 0.15;
+const LOGO_TOP_RATIO = 0.68;
 const LOGO_LEFT_RATIO = 0.5;
 
 export function TamagotchiAvatar({
@@ -93,8 +95,9 @@ export function TamagotchiAvatar({
     );
   });
 
+  // idle 자세에서만 로고 표시 — feed/train 은 손·도구에 가려지는 자연 연출.
   const logoSize = Math.round(size * LOGO_SIZE_RATIO);
-  const clubLogo = clubLogoUrl ? (
+  const clubLogo = clubLogoUrl && action === "idle" ? (
     <div
       aria-hidden="true"
       className="pointer-events-none absolute"
