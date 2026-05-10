@@ -1,5 +1,5 @@
 import { getPublicClubById, getPublicClubIds, getPublicClubNotices } from "@/lib/public-clubs";
-import { getMyClubVoteSummary, isClubMember } from "@/app/actions/clubs";
+import { getMyClubVoteSummary, isClubMember, getClubPlayers } from "@/app/actions/clubs";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { MessageCircle, Users, Calendar, Building2, MapPin, CreditCard, Heart, Medal } from "lucide-react";
@@ -7,6 +7,8 @@ import { ClubVoteButton } from "@/components/club-vote-button";
 import { ClubSubscribeButton } from "@/components/club-subscribe-button";
 import { ClubShareButton } from "@/components/club-share-button";
 import { StartChatButton } from "@/components/start-chat-button";
+import { JoinClubButton } from "@/components/join-club-button";
+import { ClubPlayersGallery } from "@/components/club-players-gallery";
 import {
   clubDetailActionButtonClass,
   clubDetailActionIconClass,
@@ -82,11 +84,12 @@ export default async function ClubDetailPage({
   setRequestLocale(locale);
   const t = await getTranslations("club");
 
-  const [club, notices, clubVoteSummary, isSubscribed] = await Promise.all([
+  const [club, notices, clubVoteSummary, isSubscribed, clubPlayers] = await Promise.all([
     getPublicClubById(id),
     getPublicClubNotices(id),
     getMyClubVoteSummary(),
     isClubMember(id),
+    getClubPlayers(id),
   ]);
 
   if (!club) {
@@ -189,6 +192,17 @@ export default async function ClubDetailPage({
              </div>
           )}
 
+          {/* Join button — visible when logged in and not yet a member */}
+          {clubVoteSummary.isLoggedIn && !isSubscribed && (
+            <div className="mt-4">
+              <JoinClubButton
+                club={club}
+                initialIsMember={false}
+                className={`${clubDetailActionButtonClass} w-full bg-blue-600 text-white transition-colors hover:bg-blue-700`}
+              />
+            </div>
+          )}
+
           {/* Bottom Row: Actions */}
           <div className="mt-4 grid grid-cols-2 gap-3">
              <ClubVoteButton
@@ -285,6 +299,11 @@ export default async function ClubDetailPage({
             ))}
           </div>
         )}
+      </div>
+
+      {/* Club Players Gallery (다마고치 커스텀 멤버 갤러리) */}
+      <div className="mt-8">
+        <ClubPlayersGallery players={clubPlayers} clubLogoUrl={club.logo_url ?? null} />
       </div>
     </div>
   );

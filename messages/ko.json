@@ -330,7 +330,13 @@
                 "statsHeading": "오늘의 컨디션",
                 "actionsHeading": "오늘의 루틴",
                 "closetHeading": "스타일",
-                "closetDescription": "헬멧, 져지, 스케이트 끈 색상을 골라 꾸며보세요"
+                "closetDescription": "헬멧, 져지, 스케이트 끈 색상을 골라 꾸며보세요",
+                "share": {
+                    "cta": "공유",
+                    "preparing": "이미지 만드는 중...",
+                    "error": "이미지 생성에 실패했어요",
+                    "fileNamePrefix": "powerplay-character"
+                }
             },
             "closet": {
                 "modalTitle": "스타일",
@@ -359,21 +365,37 @@
                     "yellow": "노랑",
                     "neonGreen": "네온 그린"
                 },
-                "swatchAria": "{partLabel} {colorLabel} 선택"
+                "swatchAria": "{partLabel} {colorLabel} 선택",
+                "uniform": {
+                    "toggleLabel": "스타일 모드",
+                    "optionDefault": "기본",
+                    "optionUniform": "클럽 유니폼",
+                    "selectClubLabel": "유니폼 클럽",
+                    "noClubsHint": "클럽에 가입하면 유니폼을 입을 수 있어요",
+                    "findClubCta": "클럽 찾기"
+                }
             }
         },
         "menu": {
             "profile": "프로필",
             "matches": "신청한 경기",
             "language": "언어 설정",
-            "notifications": "알림 설정"
+            "notifications": "알림 설정",
+            "clubs": "내 클럽"
         },
         "subpageTitle": {
             "profile": "프로필",
             "matches": "신청한 경기",
             "language": "언어 설정",
             "notifications": "알림 설정",
-            "tamagotchi": "파워 플레이어"
+            "tamagotchi": "파워 플레이어",
+            "clubs": "내 클럽"
+        },
+        "clubs": {
+            "empty": "아직 가입한 클럽이 없어요",
+            "browseCta": "클럽 둘러보기",
+            "leaveConfirm": "이 클럽에서 탈퇴하시겠어요?",
+            "leaveCta": "탈퇴"
         },
         "back": "마이페이지로 돌아가기"
     },
@@ -683,5 +705,16 @@
             "empty": "이 날은 경기 없어요",
             "emptyWeek": "이번 주는 예정된 경기가 없어요"
         }
+    },
+    "clubs": {
+        "players": {
+            "heading": "이 클럽의 파워 플레이어",
+            "count": "{count, plural, other {#명}}",
+            "empty": "아직 다마고치를 키우는 멤버가 없어요"
+        }
+    },
+    "instagramCharacter": {
+        "watermark": "powerplay.kr",
+        "tagline": "내 하키 인생의 미니 자아"
     }
 }

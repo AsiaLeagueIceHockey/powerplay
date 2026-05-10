@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
+import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { X } from "lucide-react";
 import { TamagotchiAvatar } from "@/components/tamagotchi-avatar";
@@ -11,13 +12,28 @@ import {
 } from "@/lib/tamagotchi-palette";
 import type { TamagotchiPetColors } from "@/lib/tamagotchi-types";
 
+interface ClosetClub {
+  id: string;
+  name: string;
+  logoUrl: string | null;
+}
+
 interface TamagotchiClosetProps {
   isOpen: boolean;
   initialColors: TamagotchiPetColors;
   alt: string;
   onSave: (next: TamagotchiPetColors) => Promise<{ success: boolean; error?: string }>;
   onClose: () => void;
+  // v56 — 클럽 유니폼
+  locale: string;
+  initialUniformClubId: string | null;
+  myClubs: ClosetClub[];
+  onSaveUniform: (
+    clubId: string | null
+  ) => Promise<{ success: boolean; error?: string }>;
 }
+
+type StyleMode = "default" | "uniform";
 
 export function TamagotchiCloset({
   isOpen,
@@ -25,10 +41,20 @@ export function TamagotchiCloset({
   alt,
   onSave,
   onClose,
+  locale,
+  initialUniformClubId,
+  myClubs,
+  onSaveUniform,
 }: TamagotchiClosetProps) {
   const t = useTranslations("mypage.tamagotchi.closet");
   const [selectedPart, setSelectedPart] = useState<TamagotchiPart>("helmet");
   const [draft, setDraft] = useState<TamagotchiPetColors>(initialColors);
+  const [styleMode, setStyleMode] = useState<StyleMode>(
+    initialUniformClubId ? "uniform" : "default"
+  );
+  const [draftClubId, setDraftClubId] = useState<string | null>(
+    initialUniformClubId ?? (myClubs[0]?.id ?? null)
+  );
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -37,9 +63,11 @@ export function TamagotchiCloset({
     if (isOpen) {
       setDraft(initialColors);
       setSelectedPart("helmet");
+      setStyleMode(initialUniformClubId ? "uniform" : "default");
+      setDraftClubId(initialUniformClubId ?? (myClubs[0]?.id ?? null));
       setError(null);
     }
-  }, [isOpen, initialColors]);
+  }, [isOpen, initialColors, initialUniformClubId, myClubs]);
 
   // ESC 닫기
   useEffect(() => {
@@ -67,11 +95,19 @@ export function TamagotchiCloset({
     };
   }, [isOpen]);
 
+  const previewLogoUrl = useMemo(() => {
+    if (styleMode !== "uniform" || !draftClubId) {
+      return null;
+    }
+    return myClubs.find((c) => c.id === draftClubId)?.logoUrl ?? null;
+  }, [styleMode, draftClubId, myClubs]);
+
   if (!isOpen) {
     return null;
   }
 
   const partLabel = (part: TamagotchiPart) => t(`parts.${part}`);
+  const hasNoClubs = myClubs.length === 0;
 
   const handleSelectColor = (part: TamagotchiPart, hex: string) => {
     setDraft((prev) => ({ ...prev, [part]: hex }));
@@ -80,12 +116,24 @@ export function TamagotchiCloset({
   const handleSave = () => {
     setError(null);
     startTransition(async () => {
-      const result = await onSave(draft);
-      if (result.success) {
-        onClose();
-      } else {
-        setError(result.error ?? t("error"));
+      const colorResult = await onSave(draft);
+      if (!colorResult.success) {
+        setError(colorResult.error ?? t("error"));
+        return;
       }
+
+      // 유니폼 저장 — mode=default 면 NULL, uniform 이면 draftClubId
+      const targetUniformClubId = styleMode === "uniform" ? draftClubId : null;
+      // 변경 없으면 RPC 스킵 (불필요한 호출 방지)
+      if (targetUniformClubId !== initialUniformClubId) {
+        const uniformResult = await onSaveUniform(targetUniformClubId);
+        if (!uniformResult.success) {
+          setError(uniformResult.error ?? t("error"));
+          return;
+        }
+      }
+
+      onClose();
     });
   };
 
@@ -122,9 +170,86 @@ export function TamagotchiCloset({
               colors={draft}
               action="idle"
               alt={alt}
+              clubLogoUrl={previewLogoUrl}
               className="h-[80%] w-[80%]"
             />
           </div>
+        </section>
+
+        {/* Style Mode toggle */}
+        <section aria-label={t("uniform.toggleLabel")} className="mt-6">
+          <p className="mb-2 text-xs font-bold text-zinc-700 dark:text-zinc-200">
+            {t("uniform.toggleLabel")}
+          </p>
+          <div
+            role="tablist"
+            aria-orientation="horizontal"
+            className="grid grid-cols-2 gap-2 rounded-xl bg-zinc-100 p-1 dark:bg-zinc-900"
+          >
+            <button
+              type="button"
+              role="tab"
+              aria-selected={styleMode === "default"}
+              onClick={() => setStyleMode("default")}
+              className={`whitespace-nowrap rounded-lg px-3 py-2 text-sm font-bold transition-colors ${
+                styleMode === "default"
+                  ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-800 dark:text-white"
+                  : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+              }`}
+            >
+              <span className="truncate">{t("uniform.optionDefault")}</span>
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={styleMode === "uniform"}
+              onClick={() => !hasNoClubs && setStyleMode("uniform")}
+              disabled={hasNoClubs}
+              className={`whitespace-nowrap rounded-lg px-3 py-2 text-sm font-bold transition-colors ${
+                styleMode === "uniform"
+                  ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-800 dark:text-white"
+                  : "text-zinc-600 hover:text-zinc-900 disabled:cursor-not-allowed disabled:opacity-50 dark:text-zinc-400 dark:hover:text-zinc-100"
+              }`}
+            >
+              <span className="truncate">{t("uniform.optionUniform")}</span>
+            </button>
+          </div>
+
+          {hasNoClubs ? (
+            <div className="mt-3 rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 dark:border-zinc-800 dark:bg-zinc-900/60">
+              <p className="text-xs leading-5 text-zinc-600 dark:text-zinc-400">
+                {t("uniform.noClubsHint")}
+              </p>
+              <Link
+                href={`/${locale}/clubs`}
+                className="mt-2 inline-flex items-center gap-1 whitespace-nowrap text-xs font-bold text-sky-600 hover:text-sky-700 dark:text-sky-400 dark:hover:text-sky-300"
+              >
+                <span className="truncate">{t("uniform.findClubCta")}</span>
+              </Link>
+            </div>
+          ) : styleMode === "uniform" ? (
+            <div className="mt-3">
+              <label
+                htmlFor="closet-uniform-club"
+                className="mb-1 block text-xs font-semibold text-zinc-700 dark:text-zinc-200"
+              >
+                {t("uniform.selectClubLabel")}
+              </label>
+              <select
+                id="closet-uniform-club"
+                value={draftClubId ?? ""}
+                onChange={(event) => setDraftClubId(event.target.value || null)}
+                disabled={isPending}
+                className="block w-full rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm font-medium text-zinc-900 transition-colors focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/30 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white"
+              >
+                {myClubs.map((club) => (
+                  <option key={club.id} value={club.id}>
+                    {club.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ) : null}
         </section>
 
         {/* Part tabs */}

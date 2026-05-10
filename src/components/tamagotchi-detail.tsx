@@ -3,9 +3,16 @@
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { ChevronRight, Drumstick, Dumbbell, Shirt } from "lucide-react";
-import { feedTamagotchi, trainTamagotchi, updateTamagotchiColors } from "@/app/actions/tamagotchi";
+import {
+  feedTamagotchi,
+  trainTamagotchi,
+  updateTamagotchiColors,
+  updateTamagotchiUniform,
+  type TamagotchiMyClub,
+} from "@/app/actions/tamagotchi";
 import { TamagotchiAvatar } from "@/components/tamagotchi-avatar";
 import { TamagotchiCloset } from "@/components/tamagotchi-closet";
+import { TamagotchiShareButton } from "@/components/tamagotchi-share-button";
 import type { TamagotchiPetColors, TamagotchiScreenState } from "@/lib/tamagotchi-types";
 
 type TamagotchiActiveImage = "idle" | "feed" | "train";
@@ -13,6 +20,7 @@ type TamagotchiActiveImage = "idle" | "feed" | "train";
 interface TamagotchiDetailProps {
   locale: string;
   initialState: TamagotchiScreenState;
+  myClubs: TamagotchiMyClub[];
 }
 
 const ACTION_CYCLE: readonly TamagotchiActiveImage[] = ["idle", "feed", "train"] as const;
@@ -41,7 +49,7 @@ function StatBar({ label, value, accent }: StatBarProps) {
   );
 }
 
-export function TamagotchiDetail({ locale, initialState }: TamagotchiDetailProps) {
+export function TamagotchiDetail({ locale, initialState, myClubs }: TamagotchiDetailProps) {
   const tHero = useTranslations("mypage.tamagotchi.hero");
   const tDetail = useTranslations("mypage.tamagotchi.detail");
   const tCloset = useTranslations("mypage.tamagotchi.closet");
@@ -100,6 +108,18 @@ export function TamagotchiDetail({ locale, initialState }: TamagotchiDetailProps
     return { success: false, error: result.error ?? tCloset("error") };
   };
 
+  const handleSaveUniform = async (clubId: string | null) => {
+    const result = await updateTamagotchiUniform(locale, clubId);
+    if (result.success && result.state) {
+      setState(result.state);
+      return { success: true };
+    }
+    return { success: false, error: result.error ?? tCloset("error") };
+  };
+
+  const clubLogoUrl = state.pet.uniformClub?.logoUrl ?? null;
+  const clubName = state.pet.uniformClub?.name ?? null;
+
   return (
     <div className="space-y-5">
       {/* Character + Stats card */}
@@ -112,6 +132,7 @@ export function TamagotchiDetail({ locale, initialState }: TamagotchiDetailProps
               action={activeImage}
               alt={tDetail(altKey[activeImage])}
               onTap={cycleActiveImage}
+              clubLogoUrl={clubLogoUrl}
               priority
             />
           </div>
@@ -163,6 +184,16 @@ export function TamagotchiDetail({ locale, initialState }: TamagotchiDetailProps
         {error ? (
           <p className="mt-2 text-xs font-semibold text-rose-500">{error}</p>
         ) : null}
+
+        <div className="mt-4">
+          <TamagotchiShareButton
+            displayName={state.displayName}
+            colors={state.pet.colors}
+            clubName={clubName}
+            clubLogoUrl={clubLogoUrl}
+            alt={tDetail(altKey.idle)}
+          />
+        </div>
       </section>
 
       {/* Closet entry card */}
@@ -203,6 +234,10 @@ export function TamagotchiDetail({ locale, initialState }: TamagotchiDetailProps
         alt={tDetail(altKey.idle)}
         onSave={handleSaveColors}
         onClose={() => setIsClosetOpen(false)}
+        locale={locale}
+        initialUniformClubId={state.pet.uniformClubId}
+        myClubs={myClubs}
+        onSaveUniform={handleSaveUniform}
       />
     </div>
   );

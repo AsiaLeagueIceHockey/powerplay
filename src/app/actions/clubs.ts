@@ -892,6 +892,66 @@ export async function leaveClub(clubId: string) {
 }
 
 // ============================================
+// Club Players Gallery (v56 — 다마고치 활성 멤버 그리드)
+// ============================================
+
+export interface ClubPlayer {
+  userId: string;
+  fullName: string | null;
+  joinedAt: string | null;
+  pet: {
+    helmetColor: string;
+    jerseyColor: string;
+    skateColor: string;
+    uniformClubId: string | null;
+  };
+}
+
+const CLUB_PLAYERS_LIMIT = 60;
+
+/**
+ * 클럽 상세 페이지 그리드용. 가입 순(오래된 → 최신). 최대 60명.
+ *
+ * tamagotchi_pets RLS 가 본인 row 만 SELECT 허용하므로, v56 의
+ * SECURITY DEFINER RPC `get_club_tamagotchi_players` 로 우회한다.
+ * RPC 안에서 멤버십 + 활성 프로필 + 다마고치 INNER JOIN 모두 강제.
+ */
+export async function getClubPlayers(clubId: string): Promise<ClubPlayer[]> {
+  const supabase = await createClient();
+
+  type RpcRow = {
+    user_id: string;
+    full_name: string | null;
+    joined_at: string | null;
+    helmet_color: string | null;
+    jersey_color: string | null;
+    skate_color: string | null;
+    uniform_club_id: string | null;
+  };
+
+  const { data, error } = await supabase.rpc("get_club_tamagotchi_players", {
+    p_club_id: clubId,
+  });
+
+  if (error) {
+    console.error("Error fetching club tamagotchi players:", error);
+    return [];
+  }
+
+  return ((data ?? []) as RpcRow[]).map((row) => ({
+    userId: row.user_id,
+    fullName: row.full_name,
+    joinedAt: row.joined_at,
+    pet: {
+      helmetColor: row.helmet_color ?? "#FFFFFF",
+      jerseyColor: row.jersey_color ?? "#1E3A8A",
+      skateColor: row.skate_color ?? "#000000",
+      uniformClubId: row.uniform_club_id,
+    },
+  })).slice(0, CLUB_PLAYERS_LIMIT);
+}
+
+// ============================================
 // Helper: Check if user is member of a club
 // ============================================
 

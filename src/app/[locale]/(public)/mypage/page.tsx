@@ -6,7 +6,7 @@ import { getTamagotchiState } from "@/app/actions/tamagotchi";
 import { DailyHockeyFortuneBanner } from "@/components/daily-hockey-fortune-banner";
 import { TamagotchiHero } from "@/components/tamagotchi-hero";
 import { MypageMenuRow } from "@/components/mypage-menu-row";
-import { User, ListChecks, Globe, Bell } from "lucide-react";
+import { User, ListChecks, Globe, Bell, Users } from "lucide-react";
 
 export default async function MyPage() {
   const [profile, user, locale] = await Promise.all([getProfile(), getUser(), getLocale()]);
@@ -54,6 +54,13 @@ export default async function MyPage() {
               href={`/${locale}/mypage/matches`}
               icon={<ListChecks className="h-5 w-5" />}
               label={t("mypage.menu.matches")}
+            />
+          </li>
+          <li>
+            <MypageMenuRow
+              href={`/${locale}/mypage/clubs`}
+              icon={<Users className="h-5 w-5" />}
+              label={t("mypage.menu.clubs")}
             />
           </li>
           <li>

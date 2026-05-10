@@ -25,8 +25,18 @@ import {
   buildTamagotchiReminderDedupeKey,
   buildTamagotchiReminderPayload,
 } from "@/lib/tamagotchi-reminders";
-import type { TamagotchiPetColors, TamagotchiScreenState } from "@/lib/tamagotchi-types";
+import type {
+  TamagotchiPetColors,
+  TamagotchiScreenState,
+  TamagotchiUniformClub,
+} from "@/lib/tamagotchi-types";
 import { isAllowedColor, normalizeColors } from "@/lib/tamagotchi-palette";
+
+export interface TamagotchiMyClub {
+  id: string;
+  name: string;
+  logoUrl: string | null;
+}
 
 export type TamagotchiStateResponse = TamagotchiScreenState;
 export interface TamagotchiActionResponse {
@@ -50,10 +60,11 @@ interface TamagotchiPetRow {
   helmet_color: string | null;
   jersey_color: string | null;
   skate_color: string | null;
+  uniform_club_id: string | null;
 }
 
 const PET_COLUMNS =
-  "id, user_id, nickname, energy, condition, last_decay_at, last_interacted_at, last_fed_at, last_trained_at, last_training_key, pending_special_meal_key, helmet_color, jersey_color, skate_color";
+  "id, user_id, nickname, energy, condition, last_decay_at, last_interacted_at, last_fed_at, last_trained_at, last_training_key, pending_special_meal_key, helmet_color, jersey_color, skate_color, uniform_club_id";
 
 function rowToColors(row: TamagotchiPetRow): TamagotchiPetColors {
   return normalizeColors({
@@ -114,6 +125,7 @@ async function getAuthedContext() {
 interface PetWithColors {
   snapshot: TamagotchiPetSnapshot;
   colors: TamagotchiPetColors;
+  uniformClubId: string | null;
 }
 
 async function getOrCreatePet(userId: string): Promise<PetWithColors> {
@@ -130,7 +142,11 @@ async function getOrCreatePet(userId: string): Promise<PetWithColors> {
 
   if (data) {
     const row = data as TamagotchiPetRow;
-    return { snapshot: toSnapshot(row), colors: rowToColors(row) };
+    return {
+      snapshot: toSnapshot(row),
+      colors: rowToColors(row),
+      uniformClubId: row.uniform_club_id,
+    };
   }
 
   const snapshot = createDefaultPetSnapshot();
@@ -145,7 +161,11 @@ async function getOrCreatePet(userId: string): Promise<PetWithColors> {
   }
 
   const insertedRow = inserted as TamagotchiPetRow;
-  return { snapshot: toSnapshot(insertedRow), colors: rowToColors(insertedRow) };
+  return {
+    snapshot: toSnapshot(insertedRow),
+    colors: rowToColors(insertedRow),
+    uniformClubId: insertedRow.uniform_club_id,
+  };
 }
 
 async function persistPet(snapshot: TamagotchiPetSnapshot, userId: string): Promise<PetWithColors> {
@@ -161,7 +181,34 @@ async function persistPet(snapshot: TamagotchiPetSnapshot, userId: string): Prom
   }
 
   const row = data as TamagotchiPetRow;
-  return { snapshot: toSnapshot(row), colors: rowToColors(row) };
+  return {
+    snapshot: toSnapshot(row),
+    colors: rowToColors(row),
+    uniformClubId: row.uniform_club_id,
+  };
+}
+
+async function fetchUniformClub(uniformClubId: string | null): Promise<TamagotchiUniformClub | null> {
+  if (!uniformClubId) {
+    return null;
+  }
+
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("clubs")
+    .select("id, name, logo_url")
+    .eq("id", uniformClubId)
+    .maybeSingle();
+
+  if (error || !data) {
+    return null;
+  }
+
+  return {
+    id: data.id as string,
+    name: data.name as string,
+    logoUrl: (data.logo_url as string | null) ?? null,
+  };
 }
 
 async function getPushEnabled(userId: string) {
@@ -246,6 +293,8 @@ async function buildState(
   displayName: string,
   snapshot: TamagotchiPetSnapshot,
   colors: TamagotchiPetColors,
+  uniformClubId: string | null,
+  uniformClub: TamagotchiUniformClub | null,
   decayed = false,
   reaction: TamagotchiReaction | null = null
 ): Promise<TamagotchiScreenState> {
@@ -264,6 +313,8 @@ async function buildState(
       energy: snapshot.energy,
       condition: snapshot.condition,
       colors,
+      uniformClubId,
+      uniformClub,
     },
     status: {
       decayed,
@@ -337,12 +388,15 @@ export async function getTamagotchiState(locale: string) {
   }
 
   const hydrated = await hydratePet(user.id);
+  const uniformClub = await fetchUniformClub(hydrated.pet.uniformClubId);
   return buildState(
     typedLocale,
     user.id,
     profile?.full_name || user.email?.split("@")[0] || "Player",
     hydrated.pet.snapshot,
     hydrated.pet.colors,
+    hydrated.pet.uniformClubId,
+    uniformClub,
     hydrated.decayed
   );
 }
@@ -357,6 +411,7 @@ async function performAction(actionType: "feed" | "train", locale: string) {
   const hydrated = await hydratePet(user.id);
   const availability = getActionAvailability(hydrated.pet.snapshot);
   if ((actionType === "feed" && !availability.canFeed) || (actionType === "train" && !availability.canTrain)) {
+    const uniformClub = await fetchUniformClub(hydrated.pet.uniformClubId);
     return {
       success: false,
       error: formatActionLockMessage(actionType, typedLocale),
@@ -366,6 +421,8 @@ async function performAction(actionType: "feed" | "train", locale: string) {
         profile?.full_name || user.email?.split("@")[0] || "Player",
         hydrated.pet.snapshot,
         hydrated.pet.colors,
+        hydrated.pet.uniformClubId,
+        uniformClub,
         hydrated.decayed
       ),
     };
@@ -404,6 +461,7 @@ async function performAction(actionType: "feed" | "train", locale: string) {
   revalidatePath(`/${typedLocale}/mypage`);
   revalidatePath(`/${typedLocale}/mypage/tamagotchi`);
 
+  const uniformClub = await fetchUniformClub(storedPet.uniformClubId);
   return {
     success: true,
     state: await buildState(
@@ -412,6 +470,8 @@ async function performAction(actionType: "feed" | "train", locale: string) {
       profile?.full_name || user.email?.split("@")[0] || "Player",
       storedPet.snapshot,
       storedPet.colors,
+      storedPet.uniformClubId,
+      uniformClub,
       false,
       result.reaction
     ),
@@ -460,15 +520,106 @@ export async function updateTamagotchiColors(
 
   // 갱신된 state 재조회 (디스플레이 일관성)
   const hydrated = await hydratePet(user.id);
+  const uniformClub = await fetchUniformClub(hydrated.pet.uniformClubId);
   const state = await buildState(
     typedLocale,
     user.id,
     profile?.full_name || user.email?.split("@")[0] || "Player",
     hydrated.pet.snapshot,
     hydrated.pet.colors,
+    hydrated.pet.uniformClubId,
+    uniformClub,
     hydrated.decayed
   );
 
   return { success: true, state };
+}
+
+// ============================================
+// Uniform (v56): 클럽 유니폼 토글 + 가입 클럽 조회
+// ============================================
+
+export async function updateTamagotchiUniform(
+  locale: string,
+  clubId: string | null
+): Promise<TamagotchiActionResponse> {
+  const typedLocale = locale === "en" ? "en" : "ko";
+  const { supabase, user, profile } = await getAuthedContext();
+  if (!user) {
+    return { success: false, error: "Not authenticated" };
+  }
+
+  const { error: rpcError } = await supabase.rpc("update_tamagotchi_uniform", {
+    p_club_id: clubId,
+  });
+
+  if (rpcError) {
+    return { success: false, error: rpcError.message };
+  }
+
+  revalidatePath(`/${typedLocale}/mypage`);
+  revalidatePath(`/${typedLocale}/mypage/tamagotchi`);
+
+  const hydrated = await hydratePet(user.id);
+  const uniformClub = await fetchUniformClub(hydrated.pet.uniformClubId);
+  const state = await buildState(
+    typedLocale,
+    user.id,
+    profile?.full_name || user.email?.split("@")[0] || "Player",
+    hydrated.pet.snapshot,
+    hydrated.pet.colors,
+    hydrated.pet.uniformClubId,
+    uniformClub,
+    hydrated.decayed
+  );
+
+  return { success: true, state };
+}
+
+/**
+ * 옷장 모달의 유니폼 드롭다운에 채울 가입 클럽 목록.
+ * 가입 순(오래된 순)으로 정렬, 로고 URL 포함.
+ */
+export async function getMyClubsForUniform(): Promise<TamagotchiMyClub[]> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return [];
+  }
+
+  const { data, error } = await supabase
+    .from("club_memberships")
+    .select("created_at, club:club_id(id, name, logo_url)")
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: true });
+
+  if (error) {
+    console.error("Error fetching my clubs for uniform:", error);
+    return [];
+  }
+
+  type Row = {
+    created_at: string | null;
+    club:
+      | { id: string; name: string; logo_url: string | null }
+      | Array<{ id: string; name: string; logo_url: string | null }>
+      | null;
+  };
+
+  const rows = (data || []) as Row[];
+  const clubs: TamagotchiMyClub[] = [];
+  for (const row of rows) {
+    const club = Array.isArray(row.club) ? row.club[0] : row.club;
+    if (!club) continue;
+    clubs.push({
+      id: club.id,
+      name: club.name,
+      logoUrl: club.logo_url ?? null,
+    });
+  }
+  return clubs;
 }
 

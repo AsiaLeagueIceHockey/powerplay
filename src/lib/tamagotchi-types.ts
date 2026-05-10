@@ -10,6 +10,12 @@ export interface TamagotchiPetColors {
   skate: string;
 }
 
+export interface TamagotchiUniformClub {
+  id: string;
+  name: string;
+  logoUrl: string | null;
+}
+
 export interface TamagotchiScreenState {
   displayName: string;
   dateKey: string;
@@ -18,6 +24,8 @@ export interface TamagotchiScreenState {
     energy: number;
     condition: number;
     colors: TamagotchiPetColors;
+    uniformClubId: string | null;
+    uniformClub: TamagotchiUniformClub | null;
   };
   status: {
     decayed: boolean;

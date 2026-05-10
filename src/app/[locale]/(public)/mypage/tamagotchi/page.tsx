@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { getTranslations, getLocale } from "next-intl/server";
 import { getUser } from "@/app/actions/auth";
-import { getTamagotchiState } from "@/app/actions/tamagotchi";
+import { getTamagotchiState, getMyClubsForUniform } from "@/app/actions/tamagotchi";
 import { MypageSubpageHeader } from "@/components/mypage-subpage-header";
 import { TamagotchiDetail } from "@/components/tamagotchi-detail";
 
@@ -12,9 +12,10 @@ export default async function MypageTamagotchiPage() {
     redirect(`/${locale}/login`);
   }
 
-  const [t, tamagotchiState] = await Promise.all([
+  const [t, tamagotchiState, myClubs] = await Promise.all([
     getTranslations(),
     getTamagotchiState(locale),
+    getMyClubsForUniform(),
   ]);
 
   if (!tamagotchiState) {
@@ -28,7 +29,7 @@ export default async function MypageTamagotchiPage() {
         title={t("mypage.subpageTitle.tamagotchi")}
         backLabel={t("mypage.back")}
       />
-      <TamagotchiDetail locale={locale} initialState={tamagotchiState} />
+      <TamagotchiDetail locale={locale} initialState={tamagotchiState} myClubs={myClubs} />
     </div>
   );
 }

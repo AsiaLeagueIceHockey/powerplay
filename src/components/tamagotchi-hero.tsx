@@ -111,6 +111,7 @@ export function TamagotchiHero({ locale, initialState }: TamagotchiHeroProps) {
             action={activeImage}
             alt={t(altKey[activeImage])}
             onTap={cycleActiveImage}
+            clubLogoUrl={state.pet.uniformClub?.logoUrl ?? null}
             priority
           />
         </div>

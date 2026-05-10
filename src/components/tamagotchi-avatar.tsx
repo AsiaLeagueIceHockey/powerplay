@@ -19,6 +19,11 @@ interface TamagotchiAvatarProps {
   /** When provided, the avatar renders as a button. Tap cycles to next action pose. */
   onTap?: () => void;
   className?: string;
+  /**
+   * Optional club logo overlaid on the jersey area (v56 uniform).
+   * Null/undefined → no overlay (default behavior, regression-safe).
+   */
+  clubLogoUrl?: string | null;
 }
 
 const PARTS: readonly TamagotchiPart[] = ["helmet", "jersey", "skate"] as const;
@@ -37,6 +42,11 @@ const PARTS: readonly TamagotchiPart[] = ["helmet", "jersey", "skate"] as const;
  * When `onTap` is provided, the avatar renders as a `<button>` with a small
  * switch-cue badge in the corner, signaling that taps cycle through poses.
  */
+// Club logo overlay — jersey 영역 가운데 (avatar size의 ~20%, 픽셀 아트 톤)
+const LOGO_SIZE_RATIO = 0.2;
+const LOGO_TOP_RATIO = 0.5;
+const LOGO_LEFT_RATIO = 0.5;
+
 export function TamagotchiAvatar({
   size,
   colors,
@@ -44,6 +54,7 @@ export function TamagotchiAvatar({
   alt,
   onTap,
   className,
+  clubLogoUrl,
 }: TamagotchiAvatarProps) {
   const containerStyle: CSSProperties = {
     width: size,
@@ -82,6 +93,30 @@ export function TamagotchiAvatar({
     );
   });
 
+  const logoSize = Math.round(size * LOGO_SIZE_RATIO);
+  const clubLogo = clubLogoUrl ? (
+    <div
+      aria-hidden="true"
+      className="pointer-events-none absolute"
+      style={{
+        width: logoSize,
+        height: logoSize,
+        top: `${LOGO_TOP_RATIO * 100}%`,
+        left: `${LOGO_LEFT_RATIO * 100}%`,
+        transform: "translate(-50%, -50%)",
+      }}
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={clubLogoUrl}
+        alt=""
+        crossOrigin="anonymous"
+        className="h-full w-full object-contain"
+        style={{ imageRendering: "pixelated" }}
+      />
+    </div>
+  ) : null;
+
   if (onTap) {
     // Cue badge size scales gently with avatar size, never below 14px.
     const cueSize = Math.max(14, Math.round(size * 0.1));
@@ -100,6 +135,7 @@ export function TamagotchiAvatar({
           style={baseStyle}
         />
         {masks}
+        {clubLogo}
         <span
           aria-hidden="true"
           className="pointer-events-none absolute bottom-1 right-1 flex items-center justify-center rounded-full bg-white/95 text-zinc-700 shadow-sm ring-1 ring-zinc-200 transition-transform duration-150 ease-out group-hover:scale-110 dark:bg-zinc-800/95 dark:text-zinc-200 dark:ring-zinc-700"
@@ -120,6 +156,7 @@ export function TamagotchiAvatar({
         style={baseStyle}
       />
       {masks}
+      {clubLogo}
     </div>
   );
 }

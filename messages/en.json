@@ -330,7 +330,13 @@
                 "statsHeading": "Today's Condition",
                 "actionsHeading": "Today's Routine",
                 "closetHeading": "Style",
-                "closetDescription": "Pick colors for helmet, jersey and laces"
+                "closetDescription": "Pick colors for helmet, jersey and laces",
+                "share": {
+                    "cta": "Share",
+                    "preparing": "Preparing image...",
+                    "error": "Failed to create image",
+                    "fileNamePrefix": "powerplay-character"
+                }
             },
             "closet": {
                 "modalTitle": "Style",
@@ -359,21 +365,37 @@
                     "yellow": "Yellow",
                     "neonGreen": "Neon Green"
                 },
-                "swatchAria": "Select {colorLabel} for {partLabel}"
+                "swatchAria": "Select {colorLabel} for {partLabel}",
+                "uniform": {
+                    "toggleLabel": "Style Mode",
+                    "optionDefault": "Default",
+                    "optionUniform": "Club Uniform",
+                    "selectClubLabel": "Uniform Club",
+                    "noClubsHint": "Join a club to wear its uniform",
+                    "findClubCta": "Find a Club"
+                }
             }
         },
         "menu": {
             "profile": "Profile",
             "matches": "My Matches",
             "language": "Language",
-            "notifications": "Notifications"
+            "notifications": "Notifications",
+            "clubs": "My Clubs"
         },
         "subpageTitle": {
             "profile": "Profile",
             "matches": "My Matches",
             "language": "Language Settings",
             "notifications": "Notification Settings",
-            "tamagotchi": "Power Player"
+            "tamagotchi": "Power Player",
+            "clubs": "My Clubs"
+        },
+        "clubs": {
+            "empty": "You haven't joined any club yet",
+            "browseCta": "Browse clubs",
+            "leaveConfirm": "Leave this club?",
+            "leaveCta": "Leave"
         },
         "back": "Back to My Page"
     },
@@ -681,5 +703,16 @@
             "empty": "No matches this day",
             "emptyWeek": "No matches scheduled this week"
         }
+    },
+    "clubs": {
+        "players": {
+            "heading": "Power Players in This Club",
+            "count": "{count, plural, one {# player} other {# players}}",
+            "empty": "No active power players yet"
+        }
+    },
+    "instagramCharacter": {
+        "watermark": "powerplay.kr",
+        "tagline": "My mini hockey self"
     }
 }
