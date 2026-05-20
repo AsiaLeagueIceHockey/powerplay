@@ -603,6 +603,50 @@ UPDATE profiles SET role = 'superuser' WHERE email = 'your-email@example.com';
 
 <!-- Add new logs below this line -->
 
+### [2026-05-20] PowerYouth UI Polish: Extracted Write Page & Scaled Post Metadata
+- **Summary**: Refined the writing page layout by moving it from inline collapsible form to its own dedicated `/youth/write` page, added a floating circular Plus compose button, downscaled author metadata size on feeds and details, and updated terminology/placeholders (swapped '필명' for '닉네임', used '리틀하키' example).
+- **Changes**:
+  - Created `/youth/write` page route component at [page.tsx](file:///Users/joelonsw/Desktop/PP/powerplay/src/app/[locale]/(public)/youth/write/page.tsx).
+  - Built the client compose component [youth-write-client.tsx](file:///Users/joelonsw/Desktop/PP/powerplay/src/components/youth-write-client.tsx) with validation, back-links, and WebP compression upload handler.
+  - Replaced the large inline post writing button/form in [youth-client.tsx](file:///Users/joelonsw/Desktop/PP/powerplay/src/components/youth-client.tsx) with a floating `Plus` icon compose button.
+  - Compacted the welcome card in [youth-client.tsx](file:///Users/joelonsw/Desktop/PP/powerplay/src/components/youth-client.tsx).
+  - Swapped delete button texts with simple `Trash2` icons in [post-detail-client.tsx](file:///Users/joelonsw/Desktop/PP/powerplay/src/components/post-detail-client.tsx).
+  - Cleaned up dates/author font sizes to `text-[10px]`.
+  - Harmonized "닉네임" naming and placeholder texts in translations and JS validation messages.
+- **Notes**:
+  - Verified with `npm run typecheck` which passed without compilation warnings.
+
+### [2026-05-20] PowerYouth Perfect Center Toggle, Parent Nickname Settings & Bottom Navbar
+- **Summary**: Polished UI layout and UX in PowerYouth space. Centered header toggle perfectly on all viewports, resolved template literal text bug in subtitle, moved the "Verified Parent" badge to prevent mobile wrapping issues, integrated a custom fixed bottom navbar for PowerYouth tabs, and implemented a persistent parent nickname setting directly in profiles editable inline from the dashboard welcome card.
+- **Changes**:
+  - Added database column `parent_nickname` in `sql/v57_add_parent_nickname.sql`.
+  - Implemented `updateParentNickname` server action in `src/app/actions/parent.ts`.
+  - Updated `src/app/[locale]/(public)/layout.tsx` to center the `BrandToggle` perfectly using absolute positioning.
+  - Refactored `src/components/youth-client.tsx` to:
+    1. Render "인증 학부모" badge above the welcome greeting to fix layout alignment on mobile.
+    2. Correct the literal interpolation bug in the child subtitle.
+    3. Add a profile nickname display and inline pencil editing form.
+    4. Remove local tab selection button headers and replace them with a floating fixed bottom navbar (`Users` and `Newspaper` tabs) mirroring native app UX.
+    5. Clean up post writing form to show static active nickname instead of input.
+  - Refactored `src/components/post-detail-client.tsx` and `src/app/[locale]/(public)/youth/community/[id]/page.tsx` to load and use `parent_nickname` for comments and hide the comment nickname input field.
+- **Notes**:
+  - Applied new SQL changes in `sql/v57_add_parent_nickname.sql` for user profiles.
+  - Verification: Ran `npm run typecheck` which passed cleanly.
+
+### [2026-05-20] PowerYouth (파워유스) Parent Membership & Community
+- **Summary**: Implemented the first phase of the PowerYouth space, a premium private community for youth hockey parents, complete with signup verification, media posts, news notices, and admin workflows. Cleaned up linting and TypeScript compile checks, and validated the server action flow with new unit tests.
+- **Changes**:
+  - Added database tables `parent_applications`, `parent_posts`, `parent_comments`, and `parent_news` in `sql/v56_parent_membership.sql`.
+  - Implemented core server actions in `src/app/actions/parent.ts` (application upsert, post CRUD, comment CRUD, news CRUD, image upload with WebP compression, and push notification triggers).
+  - Built the main public space in `src/app/[locale]/(public)/youth/page.tsx` and `src/components/youth-client.tsx` that changes views based on user verification status (`none` / `pending` / `approved` / `rejected`).
+  - Added post details with comments in `src/app/[locale]/(public)/youth/community/[id]/page.tsx` and `src/components/post-detail-client.tsx`.
+  - Created the admin view in `src/app/[locale]/(admin)/admin/parent-applications/page.tsx` and `src/components/parent-applications-list.tsx` for reviewing and approving/rejecting parents (sends push notification updates on completion).
+  - Integrated [BrandToggle](file:///Users/joelonsw/Desktop/PP/powerplay/src/components/brand-toggle.tsx) and [BrandLogo](file:///Users/joelonsw/Desktop/PP/powerplay/src/components/brand-logo.tsx) into Layouts so users can switch seamlessly between "파워플레이" (Adults) and "파워유스" (Youth).
+  - Added full translation keys in `messages/ko.json` and `messages/en.json` under the `youth` namespace.
+  - Added comprehensive test suite `tests/unit/parent-flow.test.ts` to test parent signup flows and approval/rejection permissions.
+  - Resolved all linting warnings and strict TypeScript typecheck errors in modified files.
+- **Next Steps**: Introduce group lesson matchmaking and coordinate with user feedback regarding profile requirements or feature visibility.
+
 ### [2026-03-30] Superuser Chat Monitoring and Global Unread Chat Signals
 - **Summary**: Added a superuser-only chat monitoring tab for manual follow-up workflows, and strengthened in-app unread chat visibility with a global badge and toast.
 - **Changes**:

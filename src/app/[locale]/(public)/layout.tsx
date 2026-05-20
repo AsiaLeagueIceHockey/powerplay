@@ -5,6 +5,8 @@ import { UserHeaderSkeleton } from "@/components/skeletons";
 import { UserHeaderLoader } from "@/components/user-header-loader";
 import { createClient } from "@/lib/supabase/server";
 import { BottomNav } from "@/components/bottom-nav";
+import { BrandLogo } from "@/components/brand-logo";
+import { BrandToggle } from "@/components/brand-toggle";
 
 export default async function PublicLayout({
   children,
@@ -27,37 +29,23 @@ export default async function PublicLayout({
     <div className="min-h-screen">
       {/* Header / GNB */}
       <header className="sticky top-0 z-50 w-full border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
-        <div className="container mx-auto flex h-16 items-center justify-between px-4 gap-2">
+        <div className="container mx-auto flex h-16 items-center justify-between px-4 relative">
           {/* Logo - Left */}
-          <a
-            href={`/${locale}`}
-            className="flex items-center flex-shrink-0 transition-opacity hover:opacity-80 relative"
-            style={{ marginTop: "5px" }}
-          >
-            {/* Light Mode Logo */}
-            <Image
-              src="/long-logo.jpg"
-              alt="PowerPlay Logo"
-              width={146}
-              height={50}
-              className="h-10 w-auto object-contain rounded-sm dark:hidden"
-              priority
-            />
-            {/* Dark Mode Logo */}
-            <Image
-              src="/long-logo-darkmode.png"
-              alt="PowerPlay Logo"
-              width={146}
-              height={50}
-              className="hidden h-10 w-auto object-contain rounded-sm dark:block"
-              priority
-            />
-          </a>
+          <div className="flex-shrink-0">
+            <BrandLogo locale={locale} />
+          </div>
+
+          {/* Brand Toggle - Center (Perfect Centering) */}
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
+            <BrandToggle locale={locale} />
+          </div>
 
           {/* User Menu - Right (Suspense Streaming) */}
-          <Suspense fallback={<UserHeaderSkeleton />}>
-            <UserHeaderLoader locale={locale} />
-          </Suspense>
+          <div className="flex-shrink-0">
+            <Suspense fallback={<UserHeaderSkeleton />}>
+              <UserHeaderLoader locale={locale} />
+            </Suspense>
+          </div>
         </div>
       </header>
 

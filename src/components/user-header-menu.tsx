@@ -69,7 +69,7 @@ export function UserHeaderMenu({
     return (
       <Link
         href={`/${locale}/login`}
-        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium text-sm"
+        className="px-3 sm:px-4 py-1.5 sm:py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium text-xs sm:text-sm whitespace-nowrap flex-shrink-0"
       >
         {locale === "ko" ? "로그인" : "Login"}
       </Link>
@@ -80,21 +80,21 @@ export function UserHeaderMenu({
 
   return (
     <>
-      <div className="flex items-center gap-2 flex-shrink-0">
+      <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
         <div className="relative" ref={menuRef}>
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="flex items-center gap-2 px-3 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition group"
+            className="flex items-center gap-1 sm:gap-2 p-1 sm:px-3 sm:py-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition group flex-shrink-0"
             title={locale === "ko" ? "마이페이지 / 설정" : "My Page / Settings"}
           >
-            <div className="w-8 h-8 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-full flex items-center justify-center text-zinc-500 dark:text-zinc-400 group-hover:border-zinc-300 dark:group-hover:border-zinc-600 transition">
+            <div className="w-8 h-8 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-full flex items-center justify-center text-zinc-500 dark:text-zinc-400 group-hover:border-zinc-300 dark:group-hover:border-zinc-600 transition flex-shrink-0">
               <UserIcon size={18} />
             </div>
-            <div className="flex items-center gap-1 text-sm font-medium text-zinc-700 dark:text-zinc-200">
+            <div className="hidden sm:flex items-center gap-1 text-sm font-medium text-zinc-700 dark:text-zinc-200 whitespace-nowrap flex-shrink-0">
               <span className="max-w-[100px] truncate">{displayName}</span>
               <span className="text-zinc-400 font-normal">{locale === "ko" ? "님" : ""}</span>
             </div>
-            <ChevronDown size={14} className={`text-zinc-400 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
+            <ChevronDown size={14} className={`text-zinc-400 transition-transform duration-200 flex-shrink-0 ${isOpen ? "rotate-180" : ""}`} />
           </button>
 
           {isOpen && (
@@ -109,6 +109,18 @@ export function UserHeaderMenu({
                   {user.email}
                 </p>
               </div>
+
+              {/* 1. 마이페이지 (사람) */}
+              <Link
+                href={`/${locale}/mypage`}
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-3 px-4 py-2.5 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-700/50 transition-colors"
+              >
+                <div className="w-8 h-8 rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 flex items-center justify-center flex-shrink-0">
+                  <UserIcon size={16} />
+                </div>
+                <span>{locale === "ko" ? "마이페이지" : "My Page"}</span>
+              </Link>
 
               {/* 2. 충전 금액 (동전) */}
               <Link

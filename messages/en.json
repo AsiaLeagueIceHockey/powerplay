@@ -436,7 +436,11 @@
             "pointManagementShort": "Points",
             "chatMonitoring": "Chat monitoring",
             "allMatches": "All Matches",
-            "allMatchesShort": "All Matches"
+            "allMatchesShort": "All Matches",
+            "settings": "Platform Settings",
+            "settingsShort": "Settings",
+            "parentApplications": "Parent Applications",
+            "parentApplicationsShort": "Parent Apps"
         },
         "pointManagement": {
             "title": "Point Management",
@@ -680,6 +684,59 @@
             },
             "empty": "No matches this day",
             "emptyWeek": "No matches scheduled this week"
+        }
+    },
+    "youth": {
+        "title": "PowerYouth",
+        "subtitle": "A space for youth hockey parents",
+        "tabs": {
+            "community": "Parent Community",
+            "news": "Hockey News"
+        },
+        "apply": {
+            "title": "PowerYouth Parent Verification Request",
+            "description": "PowerYouth is a private space exclusively for verified youth hockey parents. Please enter your child's information, and we will approve it after verification.",
+            "childName": "Child's Name",
+            "childNamePlaceholder": "Enter your child's real name",
+            "childBirthYear": "Child's Birth Year",
+            "childBirthYearPlaceholder": "e.g., 2015",
+            "childClub": "Affiliated Club Team",
+            "childClubPlaceholder": "Enter the name of the club team they play for",
+            "descriptionLabel": "Message for application",
+            "descriptionPlaceholder": "Enter any additional details for verification (optional)",
+            "submit": "Submit Application",
+            "submitting": "Submitting...",
+            "success": "Your application has been submitted successfully."
+        },
+        "status": {
+            "pending": "Under Review",
+            "pendingDesc": "We are currently reviewing your parent application. Verification usually takes 1-2 days.",
+            "rejected": "Application Rejected",
+            "rejectionReason": "Reason for rejection:",
+            "reapply": "Submit Again",
+            "notApplied": "Parent verification is required."
+        },
+        "community": {
+            "writePost": "Write Post",
+            "title": "Title",
+            "titlePlaceholder": "Enter title",
+            "content": "Content",
+            "contentPlaceholder": "Share your thoughts with other parents. Profanity or slander may result in service restrictions.",
+            "nickname": "Nickname",
+            "nicknamePlaceholder": "Enter a nickname to display (e.g., LittleHockey)",
+            "attachImage": "Attach Photo",
+            "uploading": "Uploading...",
+            "submit": "Submit",
+            "cancel": "Cancel",
+            "empty": "No posts yet. Be the first to write!",
+            "comments": "Comments",
+            "writeComment": "Write Comment",
+            "commentPlaceholder": "Leave a warm comment.",
+            "deletePostConfirm": "Are you sure you want to delete this post?",
+            "deleteCommentConfirm": "Are you sure you want to delete this comment?"
+        },
+        "news": {
+            "empty": "No hockey news registered yet."
         }
     }
 }

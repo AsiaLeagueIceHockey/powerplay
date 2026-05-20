@@ -25,6 +25,10 @@ function LoungeTrophyFill({ className = "" }: { className?: string }) {
 
 export function BottomNav({ locale }: { locale: string }) {
   const pathname = usePathname();
+  
+  const isYouth = pathname.includes(`/${locale}/youth`) || pathname.endsWith(`/youth`);
+  if (isYouth) return null;
+
   const t = useTranslations("common");
   const { totalUnreadCount } = useChatUnread();
 
