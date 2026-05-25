@@ -288,19 +288,13 @@ export function YouthClient({
       <div className="max-w-4xl mx-auto space-y-10 py-6 px-4">
         {/* Hero Section */}
         <div className="text-center space-y-3">
-          <span className="px-2.5 py-0.5 bg-violet-100 dark:bg-violet-950/50 text-violet-600 dark:text-violet-400 text-[10px] font-bold rounded-full uppercase tracking-wider">
-            PowerYouth Space
-          </span>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-white leading-tight">
-            {locale === "ko" ? "유소년 하키 학부모를 위한" : "For Youth Hockey Parents"}{" "}
-            <span className="bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent">
-              {locale === "ko" ? "파워유스 커뮤니티" : "PowerYouth Space"}
-            </span>
+            {locale === "ko" ? "유소년 하키 학부모님들을 위한 공간" : "Space for Youth Hockey Parents"}
           </h1>
           <p className="text-sm sm:text-base text-zinc-500 dark:text-zinc-400 max-w-xl mx-auto leading-relaxed">
             {locale === "ko" 
-              ? "파워유스는 인증된 학부모들만 함께하는 소통 공간입니다. 유소년 대관 정보, 장비 후기 등 유익한 정보를 함께 나눠보세요."
-              : "PowerYouth is a verified community for youth hockey parents. Share training schedules, gear reviews, and helpful tips."}
+              ? "파워플레이 유스는 인증된 아이스하키 유소년 학부모님들이 함께 소통하는 공간입니다. 서로의 고민을 함께 나눠보세요."
+              : "PowerPlay Youth is a community for verified youth ice hockey parents. Share advice and discuss your challenges together."}
           </p>
           <div className="pt-2">
             <Link
@@ -324,8 +318,8 @@ export function YouthClient({
             </h3>
             <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
               {locale === "ko"
-                ? "자유로운 닉네임으로 학부모님들 간 활발한 정보 교류와 아이스하키 관련 다양한 고민 상담을 나눌 수 있습니다."
-                : "Communicate and share tips comfortably with other hockey parents using a safe nickname."}
+                ? "익명으로 아이스하키 관련 정보 교류와 다양한 고민을 나눌 수 있습니다."
+                : "Share information and discuss concerns anonymously with other parents."}
             </p>
           </div>
 
@@ -334,12 +328,12 @@ export function YouthClient({
               <Newspaper size={20} />
             </div>
             <h3 className="text-base font-bold text-zinc-900 dark:text-white">
-              {locale === "ko" ? "아이스하키 핵심 소식" : "Curated Hockey News"}
+              {locale === "ko" ? "아이스하키 소식" : "Hockey News"}
             </h3>
             <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
               {locale === "ko"
-                ? "장비 리뷰, 신규 유소년 대관 일정 등 유소년 하키에 필수적인 소식들을 한눈에 확인하세요."
-                : "Access youth gear reviews, local rink schedules, training tips, and junior hockey information."}
+                ? "유소년 하키에 필수적인 소식들을 한눈에 확인하세요."
+                : "Access essential news and updates for youth hockey parents."}
             </p>
           </div>
 
@@ -352,8 +346,8 @@ export function YouthClient({
             </h3>
             <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
               {locale === "ko"
-                ? "자녀 정보를 기반으로 운영진이 직접 승인하여, 안심하고 활동할 수 있는 신뢰 공간을 제공합니다."
-                : "Only approved parents are granted access, ensuring a safe, helpful, and trusted community."}
+                ? "자녀 정보를 기반으로 운영진이 직접 승인합니다"
+                : "Verified directly by the administrator based on child information."}
             </p>
           </div>
         </div>
