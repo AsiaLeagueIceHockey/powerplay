@@ -285,75 +285,75 @@ export function YouthClient({
   // ==========================================
   if (!user) {
     return (
-      <div className="max-w-4xl mx-auto space-y-12 py-6">
+      <div className="max-w-4xl mx-auto space-y-10 py-6 px-4">
         {/* Hero Section */}
-        <div className="text-center space-y-4">
-          <span className="px-3 py-1 bg-violet-100 dark:bg-violet-950/50 text-violet-600 dark:text-violet-400 text-xs font-bold rounded-full uppercase tracking-wider">
-            PowerYouth Launch
+        <div className="text-center space-y-3">
+          <span className="px-2.5 py-0.5 bg-violet-100 dark:bg-violet-950/50 text-violet-600 dark:text-violet-400 text-[10px] font-bold rounded-full uppercase tracking-wider">
+            PowerYouth Space
           </span>
-          <h1 className="text-4xl sm:text-5xl font-black tracking-tight text-zinc-900 dark:text-white leading-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-white leading-tight">
             {locale === "ko" ? "유소년 하키 학부모를 위한" : "For Youth Hockey Parents"}{" "}
             <span className="bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent">
-              {locale === "ko" ? "파워유스 개시" : "PowerYouth Space"}
+              {locale === "ko" ? "파워유스 커뮤니티" : "PowerYouth Space"}
             </span>
           </h1>
-          <p className="text-lg text-zinc-500 dark:text-zinc-400 max-w-2xl mx-auto">
+          <p className="text-sm sm:text-base text-zinc-500 dark:text-zinc-400 max-w-xl mx-auto leading-relaxed">
             {locale === "ko" 
-              ? "파워유스는 검증된 학부모들만 함께하는 프라이빗 커뮤니티입니다. 자녀들의 클럽 활동 공유, 대관 및 그룹 레슨 매칭 등 유익한 정보를 나눠보세요."
-              : "PowerYouth is a private premium space for verified youth hockey parents. Exchange club news, organize group lessons, and access expert training tips."}
+              ? "파워유스는 인증된 학부모들만 함께하는 소통 공간입니다. 유소년 대관 정보, 장비 후기 등 유익한 정보를 함께 나눠보세요."
+              : "PowerYouth is a verified community for youth hockey parents. Share training schedules, gear reviews, and helpful tips."}
           </p>
-          <div className="pt-4">
+          <div className="pt-2">
             <Link
               href={`/${locale}/login`}
-              className="inline-flex items-center gap-2 px-8 py-3.5 bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-xl font-bold shadow-lg shadow-violet-500/20 hover:opacity-90 hover:scale-[1.01] active:scale-[0.99] transition"
+              className="inline-flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-xl text-sm font-bold shadow-md shadow-violet-500/10 hover:opacity-95 transition cursor-pointer select-none"
             >
               {locale === "ko" ? "로그인하고 인증 받기" : "Login & Request Verification"}
-              <ChevronRight size={18} />
+              <ChevronRight size={16} />
             </Link>
           </div>
         </div>
 
         {/* Benefits Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6">
-          <div className="p-6 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-100 dark:border-zinc-800 shadow-sm space-y-3">
-            <div className="w-12 h-12 rounded-xl bg-violet-50 dark:bg-violet-950/30 flex items-center justify-center text-violet-600 dark:text-violet-400">
-              <MessageSquare size={24} />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 pt-4">
+          <div className="p-5 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-100 dark:border-zinc-800 shadow-sm space-y-2">
+            <div className="w-10 h-10 rounded-xl bg-violet-50 dark:bg-violet-950/30 flex items-center justify-center text-violet-600 dark:text-violet-400">
+              <MessageSquare size={20} />
             </div>
-            <h3 className="text-lg font-bold text-zinc-900 dark:text-white">
+            <h3 className="text-base font-bold text-zinc-900 dark:text-white">
               {locale === "ko" ? "학부모 전용 소통 게시판" : "Parent Only Board"}
             </h3>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed">
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
               {locale === "ko"
-                ? "클럽팀 눈치 보지 않고, 편안한 닉네임(가명)으로 학부모님들 간 활발한 정보 교류와 고민 상담을 나누실 수 있습니다."
-                : "Ask questions, share advice, and communicate comfortably with other hockey parents using a safe nickname."}
+                ? "자유로운 닉네임으로 학부모님들 간 활발한 정보 교류와 아이스하키 관련 다양한 고민 상담을 나눌 수 있습니다."
+                : "Communicate and share tips comfortably with other hockey parents using a safe nickname."}
             </p>
           </div>
 
-          <div className="p-6 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-100 dark:border-zinc-800 shadow-sm space-y-3">
-            <div className="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-950/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
-              <Newspaper size={24} />
+          <div className="p-5 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-100 dark:border-zinc-800 shadow-sm space-y-2">
+            <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+              <Newspaper size={20} />
             </div>
-            <h3 className="text-lg font-bold text-zinc-900 dark:text-white">
+            <h3 className="text-base font-bold text-zinc-900 dark:text-white">
               {locale === "ko" ? "아이스하키 핵심 소식" : "Curated Hockey News"}
             </h3>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed">
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
               {locale === "ko"
-                ? "장비 리뷰, 신규 유소년 대관 일정, 클럽 훈련 매칭 등 유소년 하키에 필수적인 소식들을 한눈에 확인하세요."
-                : "Stay updated on youth gear reviews, local rink schedules, training tips, and junior tournament information."}
+                ? "장비 리뷰, 신규 유소년 대관 일정 등 유소년 하키에 필수적인 소식들을 한눈에 확인하세요."
+                : "Access youth gear reviews, local rink schedules, training tips, and junior hockey information."}
             </p>
           </div>
 
-          <div className="p-6 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-100 dark:border-zinc-800 shadow-sm space-y-3">
-            <div className="w-12 h-12 rounded-xl bg-fuchsia-50 dark:bg-fuchsia-950/30 flex items-center justify-center text-fuchsia-600 dark:text-fuchsia-400">
-              <Sparkles size={24} />
+          <div className="p-5 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-100 dark:border-zinc-800 shadow-sm space-y-2">
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+              <ShieldCheck size={20} />
             </div>
-            <h3 className="text-lg font-bold text-zinc-900 dark:text-white">
-              {locale === "ko" ? "그룹 레슨 매칭 (준비중)" : "Group Lesson Matching"}
+            <h3 className="text-base font-bold text-zinc-900 dark:text-white">
+              {locale === "ko" ? "안전한 학부모 인증제" : "Verified Parent Space"}
             </h3>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed">
+            <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
               {locale === "ko"
-                ? "팀 구성원 모집이 힘드셨나요? 파워유스에서 성향이 맞고 비슷한 연령의 자녀를 둔 학부모들과 매칭되어 효율적으로 그룹 레슨을 구성할 수 있습니다."
-                : "Find other parents nearby to form kids' group hockey lessons easily, sharing coach fees and rink rentals."}
+                ? "자녀 정보를 기반으로 운영진이 직접 승인하여, 안심하고 활동할 수 있는 신뢰 공간을 제공합니다."
+                : "Only approved parents are granted access, ensuring a safe, helpful, and trusted community."}
             </p>
           </div>
         </div>
