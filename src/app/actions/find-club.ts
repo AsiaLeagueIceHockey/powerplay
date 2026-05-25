@@ -136,9 +136,10 @@ export async function getClubRecommendations(
         : Promise.resolve({ data: [], error: null }),
     ]);
 
-  const clubs = (clubsResult.data || []) as (Club & {
+  // Filter out internal test clubs containing "파워플레이"
+  const clubs = ((clubsResult.data || []) as (Club & {
     club_rinks?: ClubRinkJoin[] | null;
-  })[];
+  })[]).filter((club) => !club.name.includes("파워플레이"));
   const recentMatches = matchesResult.data || [];
 
   // Build member count map
@@ -211,7 +212,10 @@ export async function getClubRecommendations(
       kakao_open_chat_url: string | null;
       category: string;
     };
-    const businesses = loungeResult.data as LoungeBiz[];
+    // Filter out internal test businesses containing "파워플레이"
+    const businesses = (loungeResult.data as LoungeBiz[]).filter(
+      (biz) => !biz.name.includes("파워플레이")
+    );
 
     businesses.forEach((biz) => {
       // 1. Region match — strict equality, same as clubs
