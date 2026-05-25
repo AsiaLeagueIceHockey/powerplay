@@ -12,6 +12,11 @@ const superuserMenuItems = (locale: string) => [
     label: locale === "ko" ? "유저 관리" : "Users",
   },
   {
+    href: `/${locale}/admin/parent-applications`,
+    icon: "👶",
+    label: locale === "ko" ? "학부모 승인" : "Parent Apps",
+  },
+  {
     href: `/${locale}/admin/points`,
     icon: "💰",
     label: locale === "ko" ? "충전 관리" : "Points",

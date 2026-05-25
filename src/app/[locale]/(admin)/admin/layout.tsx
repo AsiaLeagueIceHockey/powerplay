@@ -111,6 +111,12 @@ export default async function AdminLayout({
                   👥 {t("menu.userManagement")}
                 </Link>
                 <Link
+                  href={`/${locale}/admin/parent-applications`}
+                  className="block rounded-lg px-4 py-2.5 text-sm font-medium text-zinc-300 hover:bg-zinc-800 hover:text-white"
+                >
+                  👶 {t("menu.parentApplications")}
+                </Link>
+                <Link
                   href={`/${locale}/admin/admins?tab=chat`}
                   className="block rounded-lg px-4 py-2.5 text-sm font-medium text-zinc-300 hover:bg-zinc-800 hover:text-white"
                 >
