@@ -33,7 +33,9 @@ import {
   Lock,
   Pencil,
   Users,
-  Plus
+  Plus,
+  Heart,
+  Eye
 } from "lucide-react";
 
 interface YouthClientProps {
@@ -43,7 +45,7 @@ interface YouthClientProps {
   myApplication: ParentApplication | null;
   initialPosts: ParentPost[];
   newsList: ParentNews[];
-  isAdmin: boolean;
+  isSuperUser: boolean;
 }
 
 export function YouthClient({
@@ -53,7 +55,7 @@ export function YouthClient({
   myApplication,
   initialPosts,
   newsList,
-  isAdmin,
+  isSuperUser,
 }: YouthClientProps) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<"community" | "news">("community");
@@ -456,7 +458,7 @@ export function YouthClient({
                 onChange={(e) => setChildName(e.target.value)}
                 required
                 placeholder={locale === "ko" ? "자녀분의 실명을 입력해 주세요" : "Enter child's full name"}
-                className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white placeholder-zinc-400 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 focus:outline-none transition"
+                className="w-full px-4 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white placeholder-zinc-400 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 focus:outline-none transition text-sm"
               />
             </div>
 
@@ -471,7 +473,7 @@ export function YouthClient({
                   onChange={(e) => setChildBirthYear(e.target.value)}
                   required
                   placeholder="예: 2015"
-                  className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white placeholder-zinc-400 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 focus:outline-none transition"
+                  className="w-full px-4 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white placeholder-zinc-400 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 focus:outline-none transition text-sm"
                 />
               </div>
 
@@ -485,7 +487,7 @@ export function YouthClient({
                   onChange={(e) => setChildClub(e.target.value)}
                   required
                   placeholder={locale === "ko" ? "소속 클럽명을 입력해 주세요" : "e.g. Incheon Junior"}
-                  className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white placeholder-zinc-400 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 focus:outline-none transition"
+                  className="w-full px-4 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white placeholder-zinc-400 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 focus:outline-none transition text-sm"
                 />
               </div>
             </div>
@@ -499,7 +501,7 @@ export function YouthClient({
                 onChange={(e) => setAppDescription(e.target.value)}
                 rows={3}
                 placeholder={locale === "ko" ? "승인을 돕기 위해 추가로 알리고 싶으신 내용을 적어주세요." : "Add any details that could help verify your application."}
-                className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white placeholder-zinc-400 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 focus:outline-none transition"
+                className="w-full px-4 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white placeholder-zinc-400 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 focus:outline-none transition text-sm"
               />
             </div>
 
@@ -594,6 +596,33 @@ export function YouthClient({
         </div>
       </div>
 
+      {/* Top Tabs (Community / News) */}
+      <nav className="flex border-b border-zinc-200 dark:border-zinc-800 mb-6" aria-label="Youth sections">
+        {[
+          { key: "community" as const, label: locale === "ko" ? "학부모 커뮤니티" : "Community" },
+          { key: "news" as const, label: locale === "ko" ? "하키 소식" : "Hockey News" }
+        ].map((tab) => {
+          const isActive = tab.key === activeTab;
+          return (
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key)}
+              className={`relative flex-1 pb-3 text-center text-base sm:text-lg font-bold transition-colors cursor-pointer focus:outline-none ${
+                isActive
+                  ? "text-violet-600 dark:text-violet-400"
+                  : "text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
+              }`}
+              aria-current={isActive ? "page" : undefined}
+            >
+              <span className="inline-flex items-center justify-center gap-2">{tab.label}</span>
+              {isActive ? (
+                <span className="absolute bottom-0 left-0 h-0.5 w-full bg-violet-600 dark:bg-violet-400" />
+              ) : null}
+            </button>
+          );
+        })}
+      </nav>
+
       {/* ==================================================== */}
       {/* 4A. Parent Community Tab */}
       {/* ==================================================== */}
@@ -610,20 +639,31 @@ export function YouthClient({
               {posts.map((post) => (
                 <div
                   key={post.id}
-                  className="group relative bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 hover:border-violet-500 hover:shadow-md transition-all duration-200 overflow-hidden flex flex-col sm:flex-row"
+                  className="group relative bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 hover:border-violet-500 hover:shadow-md transition-all duration-200 p-5 flex flex-col justify-between cursor-pointer"
                 >
-                  <div className="flex-1 p-5 space-y-3">
-                    <div className="flex justify-between items-start gap-2">
-                      <h3 className="font-bold text-base text-zinc-900 dark:text-white leading-tight group-hover:text-violet-600 dark:group-hover:text-violet-400 transition">
-                        <Link href={`/${locale}/youth/community/${post.id}`}>
-                          {post.title}
-                        </Link>
-                      </h3>
-                      {/* Delete logic */}
-                      {(isAdmin || post.user_id === user.id) && (
+                  <div>
+                    {/* Header (Avatar + Nickname + Date + Delete) */}
+                    <div className="flex items-center justify-between mb-3 text-xs">
+                      <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 rounded-full bg-violet-100 dark:bg-violet-950/40 text-violet-600 dark:text-violet-400 flex items-center justify-center font-bold text-[10px] uppercase">
+                          {post.nickname.charAt(0)}
+                        </div>
+                        <span className="font-semibold text-zinc-700 dark:text-zinc-300">
+                          {post.nickname}
+                        </span>
+                        <span className="text-zinc-300 dark:text-zinc-700">•</span>
+                        <span className="text-zinc-400 dark:text-zinc-500">
+                          {formatDate(post.created_at)}
+                        </span>
+                      </div>
+
+                      {(isSuperUser || post.user_id === user.id) && (
                         <button
-                          onClick={() => handlePostDelete(post.id)}
-                          className="p-1 hover:bg-red-50 dark:hover:bg-red-950/20 text-zinc-400 hover:text-red-500 rounded transition"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handlePostDelete(post.id);
+                          }}
+                          className="relative z-10 p-1 hover:bg-red-50 dark:hover:bg-red-950/20 text-zinc-400 hover:text-red-500 rounded transition animate-in fade-in duration-200 cursor-pointer"
                           title="Delete Post"
                         >
                           <Trash2 size={14} />
@@ -631,36 +671,55 @@ export function YouthClient({
                       )}
                     </div>
 
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400 line-clamp-2 leading-relaxed">
-                      {post.content}
-                    </p>
+                    {/* Middle: Title, Content Snippet & Image Preview (Blind style side-by-side) */}
+                    <div className="flex gap-4 items-start">
+                      <div className="flex-1 space-y-1.5 min-w-0">
+                        <h3 className="font-bold text-base text-zinc-900 dark:text-white leading-snug group-hover:text-violet-600 dark:group-hover:text-violet-400 transition">
+                          <Link 
+                            href={`/${locale}/youth/community/${post.id}`} 
+                            className="block truncate focus:outline-none after:absolute after:inset-0 after:z-0"
+                          >
+                            {post.title}
+                          </Link>
+                        </h3>
+                        <p className="text-sm text-zinc-600 dark:text-zinc-300 line-clamp-2 leading-relaxed">
+                          {post.content}
+                        </p>
+                      </div>
 
-                    <div className="flex items-center gap-3 text-[11px] text-zinc-400">
-                      <span className="font-semibold text-zinc-600 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded">
-                        {post.nickname}
-                      </span>
-                      <span>•</span>
-                      <span>{formatDate(post.created_at)}</span>
-                      <span>•</span>
-                      <Link 
-                        href={`/${locale}/youth/community/${post.id}`} 
-                        className="font-bold text-violet-600 dark:text-violet-400 hover:underline"
-                      >
-                        {locale === "ko" ? `댓글 ${post.comment_count || 0}` : `Comments ${post.comment_count || 0}`}
-                      </Link>
+                      {post.image_url && (
+                        <div className="relative w-20 h-20 rounded-lg overflow-hidden shrink-0 border border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950">
+                          <Image
+                            src={post.image_url}
+                            alt="Post media thumbnail"
+                            fill
+                            className="object-cover group-hover:scale-105 transition duration-300"
+                          />
+                        </div>
+                      )}
                     </div>
                   </div>
 
-                  {post.image_url && (
-                    <div className="relative w-full sm:w-36 h-28 sm:h-auto overflow-hidden shrink-0 border-t sm:border-t-0 sm:border-l border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 flex items-center justify-center">
-                      <Image
-                        src={post.image_url}
-                        alt="Post media"
-                        fill
-                        className="object-cover group-hover:scale-105 transition duration-300"
-                      />
+                  {/* Bottom: Comment, Likes, and Views Count */}
+                  <div className="flex items-center gap-4 text-xs text-zinc-400 pt-3 border-t border-zinc-100 dark:border-zinc-800/60 mt-3">
+                    <div className="flex items-center gap-1.5 text-zinc-500 dark:text-zinc-400">
+                      <MessageSquare size={14} className="text-zinc-400" />
+                      <span className="font-bold text-[11px]">{post.comment_count || 0}</span>
                     </div>
-                  )}
+
+                    <div className="flex items-center gap-1.5 text-zinc-500 dark:text-zinc-400">
+                      <Heart 
+                        size={14} 
+                        className={post.is_liked ? "fill-red-500 text-red-500" : "text-zinc-400"} 
+                      />
+                      <span className="font-bold text-[11px]">{post.likes_count || 0}</span>
+                    </div>
+
+                    <div className="flex items-center gap-1.5 text-zinc-500 dark:text-zinc-400">
+                      <Eye size={14} className="text-zinc-400" />
+                      <span className="font-bold text-[11px]">{post.views_count || 0}</span>
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
@@ -674,7 +733,7 @@ export function YouthClient({
       {activeTab === "news" && (
         <div className="space-y-6">
           {/* Admin News Write Card */}
-          {isAdmin && (
+          {isSuperUser && (
             <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-6 shadow-sm">
               {!showNewsForm ? (
                 <button
@@ -808,49 +867,60 @@ export function YouthClient({
               <p className="text-sm">{locale === "ko" ? "등록된 하키 소식이 없습니다." : "No hockey news yet."}</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-6">
+            <div className="grid grid-cols-1 gap-4">
               {news.map((item) => (
                 <div
                   key={item.id}
-                  className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 overflow-hidden shadow-sm flex flex-col md:flex-row hover:border-amber-500/50 hover:shadow-md transition-all duration-200"
+                  className="group relative bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 hover:border-amber-500/50 hover:shadow-md transition-all duration-200 p-5 flex flex-col justify-between"
                 >
-                  {item.image_url && (
-                    <div className="relative w-full md:w-56 h-48 md:h-auto overflow-hidden shrink-0 bg-zinc-50 dark:bg-zinc-950 flex items-center justify-center">
-                      <Image
-                        src={item.image_url}
-                        alt="News cover"
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
-                  )}
-
-                  <div className="flex-1 p-6 space-y-3 flex flex-col justify-between">
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-start gap-2">
-                        <span className="px-2 py-0.5 bg-amber-100 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400 text-[10px] font-black rounded-md uppercase tracking-wider">
-                          Notice
+                  <div>
+                    {/* Header (Avatar + Notice Label + Date + Delete) */}
+                    <div className="flex items-center justify-between mb-3 text-xs">
+                      <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 rounded-full bg-amber-100 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold text-[10px]">
+                          P
+                        </div>
+                        <span className="font-semibold text-zinc-700 dark:text-zinc-300">
+                          {locale === "ko" ? "공지사항" : "Notice"}
                         </span>
-                        {isAdmin && (
-                          <button
-                            onClick={() => handleNewsDelete(item.id)}
-                            className="p-1 hover:bg-red-50 dark:hover:bg-red-950/20 text-zinc-400 hover:text-red-500 rounded transition"
-                            title="Delete News"
-                          >
-                            <Trash2 size={14} />
-                          </button>
-                        )}
+                        <span className="text-zinc-300 dark:text-zinc-700">•</span>
+                        <span className="text-zinc-400 dark:text-zinc-500">
+                          {formatDate(item.created_at)}
+                        </span>
                       </div>
-                      <h3 className="font-extrabold text-lg text-zinc-900 dark:text-white leading-tight">
-                        {item.title}
-                      </h3>
-                      <p className="text-xs text-zinc-500 dark:text-zinc-400 whitespace-pre-wrap leading-relaxed">
-                        {item.content}
-                      </p>
+
+                      {isSuperUser && (
+                        <button
+                          onClick={() => handleNewsDelete(item.id)}
+                          className="p-1 hover:bg-red-50 dark:hover:bg-red-950/20 text-zinc-400 hover:text-red-500 rounded transition"
+                          title="Delete News"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      )}
                     </div>
 
-                    <div className="text-[10px] text-zinc-400 pt-4 border-t border-zinc-100 dark:border-zinc-800">
-                      Posted: {formatDate(item.created_at)}
+                    {/* Middle: Title, Content & Image Preview (Blind style side-by-side) */}
+                    <div className="flex gap-4 items-start">
+                      <div className="flex-1 space-y-1.5 min-w-0">
+                        <h3 className="font-bold text-base text-zinc-900 dark:text-white leading-snug group-hover:text-amber-600 dark:group-hover:text-amber-400 transition">
+                          {item.title}
+                        </h3>
+                        <p className="text-sm text-zinc-600 dark:text-zinc-300 whitespace-pre-wrap leading-relaxed">
+                          {item.content}
+                        </p>
+                      </div>
+
+                      {item.image_url && (
+                        <div className="relative w-20 h-20 rounded-lg overflow-hidden shrink-0 border border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950">
+                          <Image
+                            src={item.image_url}
+                            alt="News media thumbnail"
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -870,39 +940,6 @@ export function YouthClient({
           <Plus size={28} strokeWidth={2.5} />
         </Link>
       )}
-
-      {/* PowerYouth Fixed Bottom Navbar */}
-      <nav className="fixed bottom-0 left-0 right-0 z-40 w-full border-t border-zinc-200 bg-white/95 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-950/95 pb-safe shadow-lg">
-        <div className="max-w-md mx-auto flex justify-around items-center h-16">
-          <button
-            onClick={() => setActiveTab("community")}
-            className={`flex flex-col items-center justify-center w-full h-full gap-1 transition-colors ${
-              activeTab === "community"
-                ? "text-violet-600 dark:text-violet-400 font-bold"
-                : "text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300 font-medium"
-            }`}
-          >
-            <Users size={22} strokeWidth={activeTab === "community" ? 2.5 : 2} />
-            <span className="text-[10px]">
-              {locale === "ko" ? "커뮤니티" : "Community"}
-            </span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab("news")}
-            className={`flex flex-col items-center justify-center w-full h-full gap-1 transition-colors ${
-              activeTab === "news"
-                ? "text-violet-600 dark:text-violet-400 font-bold"
-                : "text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300 font-medium"
-            }`}
-          >
-            <Newspaper size={22} strokeWidth={activeTab === "news" ? 2.5 : 2} />
-            <span className="text-[10px]">
-              {locale === "ko" ? "하키 소식" : "Hockey News"}
-            </span>
-          </button>
-        </div>
-      </nav>
     </div>
   );
 }

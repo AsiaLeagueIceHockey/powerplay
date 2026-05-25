@@ -38,6 +38,9 @@ export interface ParentPost {
   created_at: string;
   updated_at: string;
   comment_count?: number;
+  likes_count?: number;
+  views_count?: number;
+  is_liked?: boolean;
 }
 
 export interface ParentComment {
@@ -67,7 +70,7 @@ export interface ParentNews {
 /**
  * Checks if the current user is an Admin or Superuser
  */
-export async function checkIsAdminOrSuperUser(): Promise<boolean> {
+export async function checkIsSuperUser(): Promise<boolean> {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return false;
@@ -78,13 +81,13 @@ export async function checkIsAdminOrSuperUser(): Promise<boolean> {
     .eq("id", user.id)
     .single();
 
-  return ["admin", "superuser"].includes(profile?.role ?? "");
+  return profile?.role === "superuser";
 }
 
 /**
- * Checks if the current user has approved parent status OR is admin/superuser
+ * Checks if the current user has approved parent status OR is superuser
  */
-export async function checkIsApprovedParentOrAdmin(): Promise<boolean> {
+export async function checkIsApprovedParentOrSuperUser(): Promise<boolean> {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return false;
@@ -98,9 +101,9 @@ export async function checkIsApprovedParentOrAdmin(): Promise<boolean> {
   if (!profile) return false;
   
   const isApprovedParent = profile.parent_verification_status === "approved";
-  const isAdmin = ["admin", "superuser"].includes(profile.role ?? "");
+  const isSuperUser = profile.role === "superuser";
 
-  return isApprovedParent || isAdmin;
+  return isApprovedParent || isSuperUser;
 }
 
 // ==========================================================
@@ -197,8 +200,8 @@ export async function getMyParentApplication(): Promise<ParentApplication | null
 export async function getPendingParentApplications(): Promise<ParentApplication[]> {
   try {
     const supabase = await createClient();
-    const isAdmin = await checkIsAdminOrSuperUser();
-    if (!isAdmin) return [];
+    const isSuperUser = await checkIsSuperUser();
+    if (!isSuperUser) return [];
 
     const { data, error } = await supabase
       .from("parent_applications")
@@ -234,8 +237,8 @@ export async function reviewParentApplication(
 ): Promise<{ success: boolean; error?: string }> {
   try {
     const supabase = await createClient();
-    const isAdmin = await checkIsAdminOrSuperUser();
-    if (!isAdmin) return { success: false, error: "Unauthorized" };
+    const isSuperUser = await checkIsSuperUser();
+    if (!isSuperUser) return { success: false, error: "Unauthorized" };
 
     // 1. Fetch application to find user_id
     const { data: app, error: fetchError } = await supabase
@@ -303,20 +306,23 @@ export async function reviewParentApplication(
 export async function getParentPosts(page: number = 1, limit: number = 20): Promise<ParentPost[]> {
   try {
     const supabase = await createClient();
-    const isAllowed = await checkIsApprovedParentOrAdmin();
+    const isAllowed = await checkIsApprovedParentOrSuperUser();
     if (!isAllowed) return [];
 
     const from = (page - 1) * limit;
     const to = from + limit - 1;
 
-    // Fetch posts along with comment counts
-    // We can fetch posts first, then count comments or use a left join/rpc.
-    // In Supabase client, we can do: select('*, parent_comments(count)')
+    // Fetch current user session to determine like status
+    const { data: { user } } = await supabase.auth.getUser();
+
+    // Fetch posts along with comments, likes, and creator profiles to fetch latest nickname
     const { data, error } = await supabase
       .from("parent_posts")
       .select(`
         *,
-        parent_comments(count)
+        parent_comments(count),
+        parent_post_likes(count),
+        profiles!parent_posts_user_id_fkey(parent_nickname, full_name)
       `)
       .order("created_at", { ascending: false })
       .range(from, to);
@@ -326,17 +332,40 @@ export async function getParentPosts(page: number = 1, limit: number = 20): Prom
       return [];
     }
 
-    return (data || []).map((post: any) => ({
-      id: post.id,
-      user_id: post.user_id,
-      nickname: post.nickname,
-      title: post.title,
-      content: post.content,
-      image_url: post.image_url,
-      created_at: post.created_at,
-      updated_at: post.updated_at,
-      comment_count: post.parent_comments?.[0]?.count ?? 0,
-    })) as ParentPost[];
+    // Determine posts liked by the current user
+    const likedPostIds = new Set<string>();
+    if (user && data && data.length > 0) {
+      const postIds = data.map((p) => p.id);
+      const { data: likesData } = await supabase
+        .from("parent_post_likes")
+        .select("post_id")
+        .eq("user_id", user.id)
+        .in("post_id", postIds);
+
+      if (likesData) {
+        likesData.forEach((like) => likedPostIds.add(like.post_id));
+      }
+    }
+
+    return (data || []).map((post: any) => {
+      const profile = Array.isArray(post.profiles) ? post.profiles[0] : post.profiles;
+      const nickname = profile?.parent_nickname || profile?.full_name || post.nickname || "Unknown";
+      
+      return {
+        id: post.id,
+        user_id: post.user_id,
+        nickname,
+        title: post.title,
+        content: post.content,
+        image_url: post.image_url,
+        views_count: post.views_count ?? 0,
+        likes_count: post.parent_post_likes?.[0]?.count ?? 0,
+        is_liked: likedPostIds.has(post.id),
+        created_at: post.created_at,
+        updated_at: post.updated_at,
+        comment_count: post.parent_comments?.[0]?.count ?? 0,
+      };
+    }) as ParentPost[];
   } catch (err) {
     console.error("getParentPosts unexpected error:", err);
     return [];
@@ -351,12 +380,26 @@ export async function getParentPostDetail(
 ): Promise<{ post: ParentPost | null; comments: ParentComment[] }> {
   try {
     const supabase = await createClient();
-    const isAllowed = await checkIsApprovedParentOrAdmin();
+    const isAllowed = await checkIsApprovedParentOrSuperUser();
     if (!isAllowed) return { post: null, comments: [] };
 
+    // Get current user session to determine like status and trigger view increment safely
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (user) {
+      // Increment views count using the database RPC
+      await supabase.rpc("increment_parent_post_views", { target_post_id: postId });
+    }
+
+    // Fetch the post details with comments count, likes count, and creator profile
     const { data: post, error: postError } = await supabase
       .from("parent_posts")
-      .select("*")
+      .select(`
+        *,
+        parent_post_likes(count),
+        parent_comments(count),
+        profiles!parent_posts_user_id_fkey(parent_nickname, full_name)
+      `)
       .eq("id", postId)
       .maybeSingle();
 
@@ -365,9 +408,25 @@ export async function getParentPostDetail(
       return { post: null, comments: [] };
     }
 
+    // Determine if the current user has liked this post
+    let isLiked = false;
+    if (user) {
+      const { data: likeData } = await supabase
+        .from("parent_post_likes")
+        .select("post_id")
+        .eq("post_id", postId)
+        .eq("user_id", user.id)
+        .maybeSingle();
+      isLiked = !!likeData;
+    }
+
+    // Fetch comments and join comments' creator profiles for dynamic nickname resolution
     const { data: comments, error: commentError } = await supabase
       .from("parent_comments")
-      .select("*")
+      .select(`
+        *,
+        profiles!parent_comments_user_id_fkey(parent_nickname, full_name)
+      `)
       .eq("post_id", postId)
       .order("created_at", { ascending: true });
 
@@ -375,15 +434,48 @@ export async function getParentPostDetail(
       console.error("Error fetching comments:", commentError);
     }
 
+    const profile = Array.isArray(post.profiles) ? post.profiles[0] : post.profiles;
+    const nickname = profile?.parent_nickname || profile?.full_name || post.nickname || "Unknown";
+
+    const formattedPost: ParentPost = {
+      id: post.id,
+      user_id: post.user_id,
+      nickname,
+      title: post.title,
+      content: post.content,
+      image_url: post.image_url,
+      views_count: post.views_count ?? 0,
+      likes_count: post.parent_post_likes?.[0]?.count ?? 0,
+      is_liked: isLiked,
+      created_at: post.created_at,
+      updated_at: post.updated_at,
+      comment_count: post.parent_comments?.[0]?.count ?? 0,
+    };
+
+    const formattedComments = (comments || []).map((c: any) => {
+      const p = Array.isArray(c.profiles) ? c.profiles[0] : c.profiles;
+      const nick = p?.parent_nickname || p?.full_name || c.nickname || "Unknown";
+      return {
+        id: c.id,
+        post_id: c.post_id,
+        user_id: c.user_id,
+        nickname: nick,
+        content: c.content,
+        created_at: c.created_at,
+        updated_at: c.updated_at,
+      };
+    });
+
     return {
-      post: post as ParentPost,
-      comments: (comments || []) as ParentComment[],
+      post: formattedPost,
+      comments: formattedComments,
     };
   } catch (err) {
     console.error("getParentPostDetail unexpected error:", err);
     return { post: null, comments: [] };
   }
 }
+
 
 /**
  * Create a new parent community post (Requires approved parent/admin)
@@ -396,7 +488,7 @@ export async function createParentPost(
 ): Promise<{ success: boolean; post?: ParentPost; error?: string }> {
   try {
     const supabase = await createClient();
-    const isAllowed = await checkIsApprovedParentOrAdmin();
+    const isAllowed = await checkIsApprovedParentOrSuperUser();
     if (!isAllowed) return { success: false, error: "Unauthorized" };
 
     const { data: { user } } = await supabase.auth.getUser();
@@ -437,7 +529,7 @@ export async function deleteParentPost(postId: string): Promise<{ success: boole
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return { success: false, error: "Unauthorized" };
 
-    const isAdmin = await checkIsAdminOrSuperUser();
+    const isSuperUser = await checkIsSuperUser();
 
     // 1. Fetch post to verify ownership
     const { data: post, error: fetchError } = await supabase
@@ -450,7 +542,7 @@ export async function deleteParentPost(postId: string): Promise<{ success: boole
       return { success: false, error: "Post not found" };
     }
 
-    if (post.user_id !== user.id && !isAdmin) {
+    if (!isSuperUser && post.user_id !== user.id) {
       return { success: false, error: "Unauthorized to delete this post" };
     }
 
@@ -501,7 +593,7 @@ export async function createParentComment(
 ): Promise<{ success: boolean; comment?: ParentComment; error?: string }> {
   try {
     const supabase = await createClient();
-    const isAllowed = await checkIsApprovedParentOrAdmin();
+    const isAllowed = await checkIsApprovedParentOrSuperUser();
     if (!isAllowed) return { success: false, error: "Unauthorized" };
 
     const { data: { user } } = await supabase.auth.getUser();
@@ -559,7 +651,7 @@ export async function deleteParentComment(
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return { success: false, error: "Unauthorized" };
 
-    const isAdmin = await checkIsAdminOrSuperUser();
+    const isSuperUser = await checkIsSuperUser();
 
     // 1. Fetch comment to verify ownership
     const { data: comment, error: fetchError } = await supabase
@@ -572,7 +664,7 @@ export async function deleteParentComment(
       return { success: false, error: "Comment not found" };
     }
 
-    if (comment.user_id !== user.id && !isAdmin) {
+    if (comment.user_id !== user.id && !isSuperUser) {
       return { success: false, error: "Unauthorized to delete this comment" };
     }
 
@@ -606,7 +698,7 @@ export async function deleteParentComment(
 export async function getParentNewsList(): Promise<ParentNews[]> {
   try {
     const supabase = await createClient();
-    const isAllowed = await checkIsApprovedParentOrAdmin();
+    const isAllowed = await checkIsApprovedParentOrSuperUser();
     if (!isAllowed) return [];
 
     const { data, error } = await supabase
@@ -636,8 +728,8 @@ export async function createParentNews(
 ): Promise<{ success: boolean; news?: ParentNews; error?: string }> {
   try {
     const supabase = await createClient();
-    const isAdmin = await checkIsAdminOrSuperUser();
-    if (!isAdmin) return { success: false, error: "Unauthorized" };
+    const isSuperUser = await checkIsSuperUser();
+    if (!isSuperUser) return { success: false, error: "Unauthorized" };
 
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return { success: false, error: "Unauthorized" };
@@ -673,8 +765,8 @@ export async function createParentNews(
 export async function deleteParentNews(newsId: string): Promise<{ success: boolean; error?: string }> {
   try {
     const supabase = await createClient();
-    const isAdmin = await checkIsAdminOrSuperUser();
-    if (!isAdmin) return { success: false, error: "Unauthorized" };
+    const isSuperUser = await checkIsSuperUser();
+    if (!isSuperUser) return { success: false, error: "Unauthorized" };
 
     // Find and delete the news
     const { data: news, error: fetchError } = await supabase
@@ -731,7 +823,7 @@ export async function uploadParentPostImage(
 ): Promise<{ url?: string; error?: string }> {
   try {
     const supabase = await createClient();
-    const isAllowed = await checkIsApprovedParentOrAdmin();
+    const isAllowed = await checkIsApprovedParentOrSuperUser();
     if (!isAllowed) return { error: "Unauthorized" };
 
     const file = formData.get("file") as File;
@@ -783,7 +875,7 @@ export async function updateParentNickname(
 ): Promise<{ success: boolean; error?: string }> {
   try {
     const supabase = await createClient();
-    const isAllowed = await checkIsApprovedParentOrAdmin();
+    const isAllowed = await checkIsApprovedParentOrSuperUser();
     if (!isAllowed) return { success: false, error: "Unauthorized" };
 
     const { data: { user } } = await supabase.auth.getUser();
@@ -810,3 +902,90 @@ export async function updateParentNickname(
     return { success: false, error: err.message || "Unexpected error occurred" };
   }
 }
+
+/**
+ * Toggle like/unlike status for a parent post
+ */
+export async function toggleParentPostLike(
+  postId: string
+): Promise<{ success: boolean; isLiked?: boolean; likesCount?: number; error?: string }> {
+  try {
+    const supabase = await createClient();
+    const isAllowed = await checkIsApprovedParentOrSuperUser();
+    if (!isAllowed) return { success: false, error: "Unauthorized" };
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { success: false, error: "Unauthorized" };
+
+    // 1. Check if like already exists
+    const { data: existingLike, error: checkError } = await supabase
+      .from("parent_post_likes")
+      .select("post_id")
+      .eq("post_id", postId)
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    if (checkError) {
+      console.error("Error checking existing like:", checkError);
+      return { success: false, error: checkError.message };
+    }
+
+    let isLikedNow = false;
+
+    if (existingLike) {
+      // 2. Unlike (Delete)
+      const { error: deleteError } = await supabase
+        .from("parent_post_likes")
+        .delete()
+        .eq("post_id", postId)
+        .eq("user_id", user.id);
+
+      if (deleteError) {
+        console.error("Error deleting like:", deleteError);
+        return { success: false, error: deleteError.message };
+      }
+      isLikedNow = false;
+    } else {
+      // 3. Like (Insert)
+      const { error: insertError } = await supabase
+        .from("parent_post_likes")
+        .insert({
+          post_id: postId,
+          user_id: user.id
+        });
+
+      if (insertError) {
+        console.error("Error inserting like:", insertError);
+        return { success: false, error: insertError.message };
+      }
+      isLikedNow = true;
+    }
+
+    // 4. Fetch updated likes count using efficient head-only exact count query
+    const { count, error: countError } = await supabase
+      .from("parent_post_likes")
+      .select("*", { count: "exact", head: true })
+      .eq("post_id", postId);
+
+    if (countError) {
+      console.error("Error getting updated likes count:", countError);
+    }
+    const likesCount = count ?? 0;
+
+    // 5. Revalidate paths
+    revalidatePath("/youth");
+    revalidatePath(`/youth/community/${postId}`);
+    revalidatePath(`/[locale]/youth`, "page");
+    revalidatePath(`/[locale]/youth/community/${postId}`, "page");
+
+    return {
+      success: true,
+      isLiked: isLikedNow,
+      likesCount,
+    };
+  } catch (err: any) {
+    console.error("toggleParentPostLike unexpected error:", err);
+    return { success: false, error: err.message || "An unexpected error occurred" };
+  }
+}
+

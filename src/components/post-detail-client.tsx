@@ -8,6 +8,7 @@ import {
   createParentComment, 
   deleteParentComment, 
   deleteParentPost,
+  toggleParentPostLike,
   ParentPost, 
   ParentComment 
 } from "@/app/actions/parent";
@@ -17,14 +18,16 @@ import {
   Trash2, 
   Loader2, 
   User, 
-  Clock 
+  Clock,
+  Heart,
+  Eye
 } from "lucide-react";
 
 interface PostDetailClientProps {
   locale: string;
   user: any;
   userProfile?: { parent_nickname?: string | null; full_name?: string | null } | null;
-  isAdmin: boolean;
+  isSuperUser: boolean;
   initialPost: ParentPost;
   initialComments: ParentComment[];
 }
@@ -33,13 +36,18 @@ export function PostDetailClient({
   locale,
   user,
   userProfile,
-  isAdmin,
+  isSuperUser,
   initialPost,
   initialComments,
 }: PostDetailClientProps) {
   const router = useRouter();
   const [comments, setComments] = useState<ParentComment[]>(initialComments);
   
+  // Like states
+  const [isLiked, setIsLiked] = useState(!!initialPost.is_liked);
+  const [likesCount, setLikesCount] = useState(initialPost.likes_count ?? 0);
+  const [isLiking, setIsLiking] = useState(false);
+
   // Comment Form States
   const [commentContent, setCommentContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -109,158 +117,195 @@ export function PostDetailClient({
     }
   };
 
+  // Toggle Post Like
+  const handleLikeToggle = async () => {
+    if (isLiking) return;
+    setIsLiking(true);
+
+    // Optimistic UI update
+    const previousIsLiked = isLiked;
+    const previousLikesCount = likesCount;
+    setIsLiked(!previousIsLiked);
+    setLikesCount(previousIsLiked ? previousLikesCount - 1 : previousLikesCount + 1);
+
+    const res = await toggleParentPostLike(initialPost.id);
+    if (!res.success) {
+      // Revert if error
+      setIsLiked(previousIsLiked);
+      setLikesCount(previousLikesCount);
+      alert(res.error || "Failed to update like status.");
+    } else {
+      if (res.isLiked !== undefined) setIsLiked(res.isLiked);
+      if (res.likesCount !== undefined) setLikesCount(res.likesCount);
+      router.refresh();
+    }
+    setIsLiking(false);
+  };
+
   const isPostOwner = initialPost.user_id === user?.id;
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
-      {/* Back Button */}
-      <div>
-        <Link
-          href={`/${locale}/youth`}
-          className="inline-flex items-center gap-2 text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 text-sm font-bold transition"
-        >
-          <ArrowLeft size={16} />
-          {locale === "ko" ? "파워유스 목록으로" : "Back to PowerYouth"}
-        </Link>
-      </div>
-
-      {/* Post Detail Card */}
-      <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-6 shadow-sm space-y-6">
-        <div className="space-y-4">
-          <div className="flex justify-between items-start gap-4">
-            <div className="space-y-1">
-              <h1 className="text-xl sm:text-2xl font-black text-zinc-950 dark:text-white leading-tight">
-                {initialPost.title}
-              </h1>
-              <div className="flex items-center gap-1.5 text-[10px] text-zinc-400 dark:text-zinc-500 font-medium">
-                <span className="text-zinc-500 dark:text-zinc-400 font-bold">
-                  {initialPost.nickname}
-                </span>
-                <span>•</span>
-                <span>{formatDate(initialPost.created_at)}</span>
-              </div>
+    <div className="max-w-2xl mx-auto bg-white dark:bg-zinc-900 p-1 space-y-6">
+      {/* Post Detail Content (Blind style) */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-3">
+          {/* Avatar Circle */}
+          <div className="w-10 h-10 rounded-full bg-violet-100 dark:bg-violet-950/40 text-violet-600 dark:text-violet-400 flex items-center justify-center font-bold text-sm uppercase">
+            {initialPost.nickname.charAt(0)}
+          </div>
+          <div className="space-y-0.5">
+            <div className="flex items-center gap-1.5 text-sm">
+              <span className="font-bold text-zinc-800 dark:text-zinc-200">
+                {locale === "ko" ? "학부모" : "Parent"}
+              </span>
+              <span className="text-zinc-400 dark:text-zinc-600">•</span>
+              <span className="font-semibold text-zinc-600 dark:text-zinc-400">
+                {initialPost.nickname}
+              </span>
             </div>
-
-            {/* Post actions */}
-            {(isPostOwner || isAdmin) && (
-              <button
-                onClick={handlePostDelete}
-                className="p-2 text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition"
-                title={locale === "ko" ? "삭제" : "Delete"}
-              >
-                <Trash2 size={16} />
-              </button>
-            )}
+            <div className="flex items-center gap-1 text-[11px] text-zinc-400 dark:text-zinc-500 font-medium">
+              <span>{formatDate(initialPost.created_at)}</span>
+              <span>•</span>
+              <span className="flex items-center gap-0.5">
+                <Eye size={11} className="inline text-zinc-400" />
+                <span>{initialPost.views_count}</span>
+              </span>
+            </div>
           </div>
+        </div>
 
-          <div className="border-t border-zinc-100 dark:border-zinc-800 pt-4">
-            <p className="text-sm sm:text-base text-zinc-800 dark:text-zinc-300 whitespace-pre-wrap leading-relaxed">
-              {initialPost.content}
-            </p>
+        <h1 className="text-xl sm:text-2xl font-black text-zinc-950 dark:text-white leading-tight mt-6">
+          {initialPost.title}
+        </h1>
+
+        <p className="text-sm sm:text-base text-zinc-800 dark:text-zinc-200 whitespace-pre-wrap leading-relaxed mt-4 font-normal">
+          {initialPost.content}
+        </p>
+
+        {initialPost.image_url && (
+          <div className="relative w-full rounded-xl overflow-hidden bg-zinc-50 dark:bg-zinc-950 border border-zinc-100 dark:border-zinc-800 max-h-[450px] aspect-[4/3] flex items-center justify-center mt-4">
+            <Image
+              src={initialPost.image_url}
+              alt="Post content picture"
+              fill
+              className="object-contain"
+            />
           </div>
+        )}
 
-          {initialPost.image_url && (
-            <div className="relative w-full rounded-xl overflow-hidden bg-zinc-50 dark:bg-zinc-950 border border-zinc-100 dark:border-zinc-800 max-h-[450px] aspect-[4/3] flex items-center justify-center">
-              <Image
-                src={initialPost.image_url}
-                alt="Post content picture"
-                fill
-                className="object-contain"
+        {/* Action Buttons & Likes/Comments count */}
+        <div className="flex items-center justify-between pt-5 mt-6 border-t border-zinc-100 dark:border-zinc-800/80">
+          <div className="flex items-center gap-5 text-sm font-semibold text-zinc-500">
+            <button
+              onClick={handleLikeToggle}
+              disabled={isLiking}
+              className="flex items-center gap-1.5 hover:text-red-500 transition cursor-pointer select-none"
+            >
+              <Heart 
+                size={18} 
+                className={isLiked ? "fill-red-500 text-red-500" : "text-zinc-400"} 
               />
+              <span>{likesCount}</span>
+            </button>
+            
+            <div className="flex items-center gap-1.5">
+              <MessageSquare size={18} className="text-zinc-400" />
+              <span>{comments.length}</span>
             </div>
+          </div>
+
+          {(isPostOwner || isSuperUser) && (
+            <button
+              onClick={handlePostDelete}
+              className="p-1.5 text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-lg transition cursor-pointer"
+              title={locale === "ko" ? "삭제" : "Delete"}
+            >
+              <Trash2 size={16} />
+            </button>
           )}
         </div>
       </div>
 
-      {/* Comments Section */}
-      <div className="space-y-4">
-        <h3 className="text-lg font-bold text-zinc-900 dark:text-white flex items-center gap-2">
-          <MessageSquare size={18} className="text-violet-500" />
-          <span>{locale === "ko" ? `댓글 ${comments.length}` : `Comments ${comments.length}`}</span>
-        </h3>
+      {/* Spacer (Blind Advertisement / grey spacer style) */}
+      <div className="h-2 bg-zinc-50 dark:bg-zinc-950 -mx-1 my-6 border-y border-zinc-100 dark:border-zinc-800" />
 
-        {/* Comment list */}
+      {/* Flat Comments Section */}
+      <div className="space-y-4">
+        <div className="flex justify-between items-center text-xs font-bold text-zinc-500 mb-2">
+          <span>{locale === "ko" ? `댓글 ${comments.length}` : `Comments ${comments.length}`}</span>
+          <span className="text-zinc-400 font-medium">{locale === "ko" ? "시간순" : "Oldest"}</span>
+        </div>
+
         {comments.length === 0 ? (
-          <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-8 text-center text-zinc-400 text-sm">
-            {locale === "ko" ? "등록된 댓글이 없습니다. 첫 댓글을 남겨보세요!" : "No comments yet. Write the first comment!"}
+          <div className="py-8 text-center text-zinc-400 text-sm">
+            {locale === "ko" ? "등록된 댓글이 없습니다. 첫 댓글을 남겨보세요!" : "No comments yet."}
           </div>
         ) : (
-          <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 divide-y divide-zinc-100 dark:divide-zinc-800 overflow-hidden">
+          <div className="divide-y divide-zinc-100 dark:divide-zinc-800/80">
             {comments.map((comment) => (
-              <div key={comment.id} className="p-4 space-y-2">
+              <div key={comment.id} className="py-4 space-y-1.5 first:pt-0 last:pb-0">
                 <div className="flex justify-between items-center text-xs">
-                  <div className="flex items-center gap-2">
-                    <span className="font-semibold text-zinc-800 dark:text-zinc-200">
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-bold text-zinc-800 dark:text-zinc-200">
+                      {locale === "ko" ? "학부모" : "Parent"}
+                    </span>
+                    <span className="text-zinc-300 dark:text-zinc-700">•</span>
+                    <span className="font-semibold text-zinc-600 dark:text-zinc-400">
                       {comment.nickname}
                     </span>
-                    <span className="text-zinc-400 text-[10px]">
-                      {formatDate(comment.created_at)}
-                    </span>
                   </div>
-
-                  {(isAdmin || comment.user_id === user?.id) && (
+                  
+                  {(isSuperUser || comment.user_id === user?.id) && (
                     <button
                       onClick={() => handleCommentDelete(comment.id)}
-                      className="p-1 text-zinc-400 hover:text-red-500 rounded transition"
+                      className="p-1 text-zinc-400 hover:text-red-500 rounded transition cursor-pointer"
                       title="Delete Comment"
                     >
                       <Trash2 size={13} />
                     </button>
                   )}
                 </div>
-
-                <p className="text-xs sm:text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed pl-1">
+                
+                <p className="text-[13px] sm:text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed pr-1 whitespace-pre-wrap">
                   {comment.content}
                 </p>
+                
+                <div className="text-[10px] text-zinc-400 font-medium">
+                  {formatDate(comment.created_at)}
+                </div>
               </div>
             ))}
           </div>
         )}
 
         {/* Comment Form */}
-        <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-5 shadow-sm space-y-4">
-          <h4 className="text-sm font-bold text-zinc-800 dark:text-zinc-200">
-            {locale === "ko" ? "댓글 쓰기" : "Write Comment"}
-          </h4>
-
-          <form onSubmit={handleCommentSubmit} className="space-y-3">
+        <div className="bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 mt-6">
+          <form onSubmit={handleCommentSubmit} className="space-y-2">
             {commentError && (
               <div className="p-2 bg-red-950/50 text-red-200 rounded-lg text-xs">
                 {commentError}
               </div>
             )}
-
-            <div className="flex flex-col gap-2">
-              <div className="text-xs text-zinc-400 font-semibold pl-1">
-                {locale === "ko" ? "작성자 닉네임: " : "Posting as: "}
-                <span className="text-violet-600 dark:text-violet-400 font-bold">
-                  {userProfile?.parent_nickname || userProfile?.full_name || (locale === "ko" ? "학부모" : "Parent")}
-                </span>
-              </div>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={commentContent}
-                  onChange={(e) => setCommentContent(e.target.value)}
-                  required
-                  placeholder={locale === "ko" ? "따뜻한 댓글을 남겨주세요." : "Write a kind comment."}
-                  className="flex-1 px-3 py-2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-zinc-900 dark:text-white placeholder-zinc-400 focus:border-violet-500 focus:outline-none transition text-xs sm:text-sm"
-                />
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white rounded-lg text-xs font-bold transition flex items-center gap-1 flex-shrink-0"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="w-3.5 h-3.5 animate-spin flex-shrink-0" />
-                      <span>작성 중</span>
-                    </>
-                  ) : (
-                    <span>댓글 등록</span>
-                  )}
-                </button>
-              </div>
+            <div className="flex gap-2 items-center">
+              <input
+                type="text"
+                value={commentContent}
+                onChange={(e) => setCommentContent(e.target.value)}
+                required
+                placeholder={locale === "ko" ? "댓글을 남겨주세요." : "Write a comment."}
+                className="flex-1 bg-transparent border-none text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-0 text-sm py-1.5"
+              />
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white rounded-lg text-xs font-bold transition flex items-center gap-1 flex-shrink-0 cursor-pointer disabled:opacity-50 select-none"
+              >
+                {isSubmitting ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin flex-shrink-0" />
+                ) : (
+                  <span>{locale === "ko" ? "등록" : "Post"}</span>
+                )}
+              </button>
             </div>
           </form>
         </div>

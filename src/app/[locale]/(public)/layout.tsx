@@ -6,7 +6,6 @@ import { UserHeaderLoader } from "@/components/user-header-loader";
 import { createClient } from "@/lib/supabase/server";
 import { BottomNav } from "@/components/bottom-nav";
 import { BrandLogo } from "@/components/brand-logo";
-import { BrandToggle } from "@/components/brand-toggle";
 
 export default async function PublicLayout({
   children,
@@ -33,11 +32,6 @@ export default async function PublicLayout({
           {/* Logo - Left */}
           <div className="flex-shrink-0">
             <BrandLogo locale={locale} />
-          </div>
-
-          {/* Brand Toggle - Center (Perfect Centering) */}
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
-            <BrandToggle locale={locale} />
           </div>
 
           {/* User Menu - Right (Suspense Streaming) */}

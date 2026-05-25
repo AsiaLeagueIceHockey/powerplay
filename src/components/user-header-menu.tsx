@@ -69,7 +69,7 @@ export function UserHeaderMenu({
     return (
       <Link
         href={`/${locale}/login`}
-        className="px-3 sm:px-4 py-1.5 sm:py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium text-xs sm:text-sm whitespace-nowrap flex-shrink-0"
+        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium text-sm"
       >
         {locale === "ko" ? "로그인" : "Login"}
       </Link>
@@ -80,21 +80,21 @@ export function UserHeaderMenu({
 
   return (
     <>
-      <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+      <div className="flex items-center gap-2 flex-shrink-0">
         <div className="relative" ref={menuRef}>
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="flex items-center gap-1 sm:gap-2 p-1 sm:px-3 sm:py-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition group flex-shrink-0"
+            className="flex items-center gap-2 px-3 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition group"
             title={locale === "ko" ? "마이페이지 / 설정" : "My Page / Settings"}
           >
-            <div className="w-8 h-8 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-full flex items-center justify-center text-zinc-500 dark:text-zinc-400 group-hover:border-zinc-300 dark:group-hover:border-zinc-600 transition flex-shrink-0">
+            <div className="w-8 h-8 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-full flex items-center justify-center text-zinc-500 dark:text-zinc-400 group-hover:border-zinc-300 dark:group-hover:border-zinc-600 transition">
               <UserIcon size={18} />
             </div>
-            <div className="hidden sm:flex items-center gap-1 text-sm font-medium text-zinc-700 dark:text-zinc-200 whitespace-nowrap flex-shrink-0">
+            <div className="flex items-center gap-1 text-sm font-medium text-zinc-700 dark:text-zinc-200">
               <span className="max-w-[100px] truncate">{displayName}</span>
               <span className="text-zinc-400 font-normal">{locale === "ko" ? "님" : ""}</span>
             </div>
-            <ChevronDown size={14} className={`text-zinc-400 transition-transform duration-200 flex-shrink-0 ${isOpen ? "rotate-180" : ""}`} />
+            <ChevronDown size={14} className={`text-zinc-400 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
           </button>
 
           {isOpen && (

@@ -1,4 +1,4 @@
-import { getPendingParentApplications, checkIsAdminOrSuperUser } from "@/app/actions/parent";
+import { getPendingParentApplications, checkIsSuperUser } from "@/app/actions/parent";
 import { ParentApplicationsList } from "@/components/parent-applications-list";
 import { setRequestLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
@@ -11,9 +11,9 @@ export default async function AdminParentApplicationsPage({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  // 1. Admin/Superuser Auth Check
-  const isAdmin = await checkIsAdminOrSuperUser();
-  if (!isAdmin) {
+  // 1. Superuser Auth Check
+  const isSuperUser = await checkIsSuperUser();
+  if (!isSuperUser) {
     redirect(`/${locale}/admin`);
   }
 

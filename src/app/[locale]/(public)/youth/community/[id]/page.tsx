@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { getParentPostDetail, checkIsApprovedParentOrAdmin } from "@/app/actions/parent";
+import { getParentPostDetail, checkIsApprovedParentOrSuperUser } from "@/app/actions/parent";
 import { PostDetailClient } from "@/components/post-detail-client";
 import { redirect } from "next/navigation";
 
@@ -18,7 +18,7 @@ export default async function PostDetailPage({
   }
 
   // 2. Parent status check
-  const isAllowed = await checkIsApprovedParentOrAdmin();
+  const isAllowed = await checkIsApprovedParentOrSuperUser();
   if (!isAllowed) {
     redirect(`/${locale}/youth`);
   }
@@ -35,14 +35,14 @@ export default async function PostDetailPage({
     .eq("id", user.id)
     .single();
 
-  const isAdmin = ["admin", "superuser"].includes(profile?.role ?? "");
+  const isSuperUser = profile?.role === "superuser";
 
   return (
     <PostDetailClient
       locale={locale}
       user={user}
       userProfile={profile}
-      isAdmin={isAdmin}
+      isSuperUser={isSuperUser}
       initialPost={post}
       initialComments={comments}
     />

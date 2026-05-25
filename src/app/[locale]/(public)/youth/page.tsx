@@ -33,7 +33,7 @@ export default async function YouthPage({
         myApplication={null}
         initialPosts={[]}
         newsList={[]}
-        isAdmin={false}
+        isSuperUser={false}
       />
     );
   }
@@ -48,12 +48,12 @@ export default async function YouthPage({
   const myApplication = await getMyParentApplication();
 
   const isApproved = profile?.parent_verification_status === "approved";
-  const isAdmin = ["admin", "superuser"].includes(profile?.role ?? "");
+  const isSuperUser = profile?.role === "superuser";
 
   let posts: ParentPost[] = [];
   let newsList: ParentNews[] = [];
 
-  if (isApproved || isAdmin) {
+  if (isApproved || isSuperUser) {
     const [fetchedPosts, fetchedNews] = await Promise.all([
       getParentPosts(1, 40),
       getParentNewsList(),
@@ -70,7 +70,7 @@ export default async function YouthPage({
       myApplication={myApplication}
       initialPosts={posts}
       newsList={newsList}
-      isAdmin={isAdmin}
+      isSuperUser={isSuperUser}
     />
   );
 }
