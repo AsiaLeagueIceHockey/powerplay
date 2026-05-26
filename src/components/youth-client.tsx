@@ -13,6 +13,7 @@ import {
   createParentNews,
   deleteParentNews,
   updateParentNickname,
+  uploadVerificationPhoto,
   ParentApplication,
   ParentPost,
   ParentNews
@@ -71,9 +72,13 @@ export function YouthClient({
   const [childName, setChildName] = useState(myApplication?.child_name || "");
   const [childBirthYear, setChildBirthYear] = useState(myApplication?.child_birth_year ? String(myApplication?.child_birth_year) : "");
   const [childClub, setChildClub] = useState(myApplication?.child_club || "");
+  const [parentType, setParentType] = useState(myApplication?.parent_type || "mother");
+  const [verificationPhotoUrl, setVerificationPhotoUrl] = useState(myApplication?.verification_photo_url || "");
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
   const [appDescription, setAppDescription] = useState(myApplication?.description || "");
   const [isSubmittingApp, setIsSubmittingApp] = useState(false);
   const [appError, setAppError] = useState<string | null>(null);
+  const photoFileRef = useRef<HTMLInputElement>(null);
 
   // Community Post States
   const [posts, setPosts] = useState<ParentPost[]>(initialPosts);
@@ -102,7 +107,7 @@ export function YouthClient({
   // Handle Application Submit
   const handleAppSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!childName || !childBirthYear || !childClub) {
+    if (!childName || !childBirthYear || !childClub || !parentType) {
       setAppError(locale === "ko" ? "필수 항목을 모두 입력해 주세요." : "Please fill in all required fields.");
       return;
     }
@@ -112,16 +117,59 @@ export function YouthClient({
       return;
     }
 
+    if (!verificationPhotoUrl) {
+      setAppError(locale === "ko" ? "자녀 하키 활동 사진을 업로드해 주세요." : "Please upload a child hockey photo.");
+      return;
+    }
+
     setIsSubmittingApp(true);
     setAppError(null);
 
-    const res = await applyForParentMembership(childName, birthYearNum, childClub, appDescription);
+    const res = await applyForParentMembership(
+      childName,
+      birthYearNum,
+      childClub,
+      parentType,
+      verificationPhotoUrl,
+      appDescription
+    );
     setIsSubmittingApp(false);
 
     if (res.success) {
       router.refresh();
     } else {
       setAppError(res.error || "Failed to submit application.");
+    }
+  };
+
+  // Handle Verification Photo Upload
+  const handleVerificationPhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      alert(locale === "ko" ? "이미지 파일만 업로드할 수 있습니다." : "Only image files are allowed.");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert(locale === "ko" ? "파일 크기는 5MB 이하여야 합니다." : "File size must be under 5MB.");
+      return;
+    }
+
+    setIsUploadingPhoto(true);
+    setAppError(null);
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const res = await uploadVerificationPhoto(formData);
+    setIsUploadingPhoto(false);
+
+    if (res.url) {
+      setVerificationPhotoUrl(res.url);
+    } else {
+      setAppError(res.error || (locale === "ko" ? "이미지 업로드에 실패했습니다." : "Upload failed"));
     }
   };
 
@@ -378,6 +426,12 @@ export function YouthClient({
           <div className="border-t border-zinc-100 dark:border-zinc-800 pt-6">
             <div className="text-left space-y-2.5 text-sm bg-zinc-50 dark:bg-zinc-950 p-4 rounded-xl">
               <div className="flex justify-between">
+                <span className="text-zinc-400">{locale === "ko" ? "관계" : "Relationship"}</span>
+                <span className="font-semibold text-zinc-800 dark:text-zinc-200">
+                  {parentType === "mother" ? (locale === "ko" ? "엄마" : "Mother") : (locale === "ko" ? "아빠" : "Father")}
+                </span>
+              </div>
+              <div className="flex justify-between">
                 <span className="text-zinc-400">{locale === "ko" ? "자녀 이름" : "Child Name"}</span>
                 <span className="font-semibold text-zinc-800 dark:text-zinc-200">{childName}</span>
               </div>
@@ -389,6 +443,19 @@ export function YouthClient({
                 <span className="text-zinc-400">{locale === "ko" ? "소속 클럽" : "Club"}</span>
                 <span className="font-semibold text-zinc-800 dark:text-zinc-200">{childClub}</span>
               </div>
+              {verificationPhotoUrl && (
+                <div className="space-y-1.5 pt-2 border-t border-zinc-200 dark:border-zinc-800/80">
+                  <span className="text-zinc-400 text-xs block">{locale === "ko" ? "인증 사진" : "Verification Photo"}</span>
+                  <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950">
+                    <Image
+                      src={verificationPhotoUrl}
+                      alt="Verification photo"
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -444,6 +511,36 @@ export function YouthClient({
 
             <div>
               <label className="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">
+                {locale === "ko" ? "관계 *" : "Relationship *"}
+              </label>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setParentType("mother")}
+                  className={`py-2.5 px-4 rounded-xl border text-sm font-bold transition flex items-center justify-center gap-2 cursor-pointer ${
+                    parentType === "mother"
+                      ? "border-violet-500 bg-violet-50/15 text-violet-600 dark:text-violet-400 font-extrabold"
+                      : "border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
+                  }`}
+                >
+                  {locale === "ko" ? "엄마" : "Mother"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setParentType("father")}
+                  className={`py-2.5 px-4 rounded-xl border text-sm font-bold transition flex items-center justify-center gap-2 cursor-pointer ${
+                    parentType === "father"
+                      ? "border-violet-500 bg-violet-50/15 text-violet-600 dark:text-violet-400 font-extrabold"
+                      : "border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
+                  }`}
+                >
+                  {locale === "ko" ? "아빠" : "Father"}
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">
                 {locale === "ko" ? "자녀 이름 *" : "Child Name *"}
               </label>
               <input
@@ -484,6 +581,56 @@ export function YouthClient({
                   className="w-full px-4 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white placeholder-zinc-400 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 focus:outline-none transition text-sm"
                 />
               </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">
+                {locale === "ko" ? "자녀 하키 활동 사진 *" : "Child Hockey Photo *"}
+              </label>
+              <input
+                type="file"
+                ref={photoFileRef}
+                onChange={handleVerificationPhotoUpload}
+                accept="image/*"
+                className="hidden"
+              />
+              <div className="flex items-center gap-4">
+                <button
+                  type="button"
+                  onClick={() => photoFileRef.current?.click()}
+                  disabled={isUploadingPhoto}
+                  className="px-4 py-2.5 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs font-bold hover:bg-zinc-50 dark:hover:bg-zinc-800 disabled:opacity-50 transition flex items-center gap-1.5 cursor-pointer text-zinc-700 dark:text-zinc-300"
+                >
+                  {isUploadingPhoto ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <ImageIcon size={14} />
+                  )}
+                  {locale === "ko" ? "사진 업로드" : "Upload Photo"}
+                </button>
+                {verificationPhotoUrl && (
+                  <div className="relative w-16 h-16 rounded-xl overflow-hidden border border-zinc-200 dark:border-zinc-700 shrink-0">
+                    <Image
+                      src={verificationPhotoUrl}
+                      alt="Verification photo preview"
+                      fill
+                      className="object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setVerificationPhotoUrl("")}
+                      className="absolute top-0 right-0 bg-red-600/80 text-white rounded-bl p-0.5 hover:bg-red-600 transition"
+                    >
+                      <X size={10} />
+                    </button>
+                  </div>
+                )}
+              </div>
+              <p className="text-[11px] text-zinc-400 mt-1.5 leading-relaxed">
+                {locale === "ko"
+                  ? "아이의 아이스하키 활동 사진을 올려주세요. (승인을 확인하는 용도로만 사용됩니다)"
+                  : "Please upload a photo of your child participating in ice hockey (used for verification only)."}
+              </p>
             </div>
 
             <div>

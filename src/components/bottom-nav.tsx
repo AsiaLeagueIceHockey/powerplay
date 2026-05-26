@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -25,7 +26,38 @@ function LoungeTrophyFill({ className = "" }: { className?: string }) {
 
 export function BottomNav({ locale }: { locale: string }) {
   const pathname = usePathname();
-  
+  const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    if (window.visualViewport) {
+      const visualViewport = window.visualViewport;
+      const handleResize = () => {
+        // If the visual viewport height is less than 85% of screen height, the virtual keyboard is open
+        const isKeyboard = visualViewport.height < window.innerHeight * 0.85;
+        setIsKeyboardOpen(isKeyboard);
+      };
+      visualViewport.addEventListener("resize", handleResize);
+      return () => visualViewport.removeEventListener("resize", handleResize);
+    } else {
+      const handleFocusIn = (e: FocusEvent) => {
+        const target = e.target as HTMLElement;
+        if (target.tagName === "INPUT" || target.tagName === "TEXTAREA") {
+          setIsKeyboardOpen(true);
+        }
+      };
+      const handleFocusOut = () => {
+        setIsKeyboardOpen(false);
+      };
+      document.addEventListener("focusin", handleFocusIn);
+      document.addEventListener("focusout", handleFocusOut);
+      return () => {
+        document.removeEventListener("focusin", handleFocusIn);
+        document.removeEventListener("focusout", handleFocusOut);
+      };
+    }
+  }, []);
 
   const t = useTranslations("common");
   const { totalUnreadCount } = useChatUnread();
@@ -88,7 +120,7 @@ export function BottomNav({ locale }: { locale: string }) {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 w-full border-t border-zinc-200 bg-white/80 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-950/80 pb-safe">
+    <nav className={`fixed bottom-0 left-0 right-0 z-40 w-full border-t border-zinc-200 bg-white/80 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-950/80 pb-safe transition-all duration-300 ${isKeyboardOpen ? "translate-y-full opacity-0 pointer-events-none" : "translate-y-0 opacity-100"}`}>
       <div className="flex justify-around items-center h-14 px-2">
         {tabs.map((tab) => {
           const active = isActive(tab.href);

@@ -3,7 +3,8 @@ import {
   applyForParentMembership, 
   reviewParentApplication,
   getParentPostDetail,
-  toggleParentPostLike
+  toggleParentPostLike,
+  uploadVerificationPhoto
 } from "@/app/actions/parent";
 
 // Mock Supabase Server Client
@@ -63,6 +64,11 @@ vi.mock("@/app/actions/push", () => ({
   sendPushNotification: vi.fn().mockResolvedValue(true),
 }));
 
+// Mock Audit Log Action
+vi.mock("@/lib/audit", () => ({
+  logAndNotify: vi.fn().mockResolvedValue(undefined),
+}));
+
 describe("Parent Membership Flow Actions", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -87,7 +93,7 @@ describe("Parent Membership Flow Actions", () => {
       mockUpdate.mockReturnValue({ error: null });
       mockUpsert.mockReturnValue({ error: null });
 
-      const result = await applyForParentMembership("홍유스", 2016, "목동 주니어", "열심히 하겠습니다.");
+      const result = await applyForParentMembership("홍유스", 2016, "목동 주니어", "mother", "http://image.url/photo.jpg", "열심히 하겠습니다.");
       expect(result.success).toBe(true);
       expect(mockUpdate).toHaveBeenCalledWith({ parent_verification_status: "pending" });
       expect(mockUpsert).toHaveBeenCalled();
@@ -206,7 +212,17 @@ describe("Parent Membership Flow Actions", () => {
       // 2. Mock insert
       mockInsert.mockReturnValue({ error: null });
 
-      // 3. Mock updated count (returns count = 1 via thenable)
+      // 3. Mock post creator query
+      mockSingle.mockResolvedValueOnce({ 
+        data: { user_id: "creator-id" } 
+      });
+
+      // 4. Mock liker profile query
+      mockSingle.mockResolvedValueOnce({ 
+        data: { parent_nickname: "LikerNick", full_name: "Liker Full" } 
+      });
+
+      // 5. Mock updated count (returns count = 1 via thenable)
       mockCountValue = 1;
 
       const result = await toggleParentPostLike("post-123");
@@ -235,6 +251,17 @@ describe("Parent Membership Flow Actions", () => {
       expect(result.success).toBe(true);
       expect(result.isLiked).toBe(false);
       expect(mockDelete).toHaveBeenCalled();
+    });
+  });
+
+  describe("uploadVerificationPhoto", () => {
+    it("should fail upload if not logged in", async () => {
+      mockGetUser.mockResolvedValueOnce({ data: { user: null } });
+      const formData = new FormData();
+      formData.append("file", { size: 100 } as any);
+
+      const result = await uploadVerificationPhoto(formData);
+      expect(result.error).toBe("Unauthorized");
     });
   });
 });

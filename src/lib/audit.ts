@@ -33,6 +33,7 @@ type AuditAction =
   | "FIND_CLUB_COMPLETE"
   | "TAMAGOTCHI_FEED"
   | "TAMAGOTCHI_TRAIN"
+  | "PARENT_APPLICATION_CREATE"
   | "OTHER";
 
 interface AuditLogParams {
