@@ -18,6 +18,7 @@ import {
   ParentPost,
   ParentNews
 } from "@/app/actions/parent";
+import { YouthAccessBanner } from "./youth-access-banner";
 import { 
   Sparkles, 
   MessageSquare, 
@@ -736,6 +737,8 @@ export function YouthClient({
           )}
         </div>
       </div>
+
+      <YouthAccessBanner />
 
       {/* Top Tabs (Community / News) */}
       <nav className="flex border-b border-zinc-200 dark:border-zinc-800 mb-6" aria-label="Youth sections">
