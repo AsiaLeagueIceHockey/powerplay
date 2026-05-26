@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { reviewParentApplication, ParentApplication } from "@/app/actions/parent";
 import { Loader2, Check, X, User, Phone, ShieldAlert, Award, Calendar } from "lucide-react";
 import { CopyButton } from "./copy-button";
@@ -111,6 +112,11 @@ export function ParentApplicationsList({
                   <span className="font-semibold text-white">
                     {app.user?.full_name || "Unknown"}
                   </span>
+                  {app.parent_type && (
+                    <span className="px-1.5 py-0.5 bg-zinc-700 text-zinc-300 text-[10px] font-extrabold rounded">
+                      {app.parent_type === "mother" ? "엄마" : "아빠"}
+                    </span>
+                  )}
                   <span className="text-zinc-500 text-xs">({app.user?.email})</span>
                 </div>
                 {app.user?.phone && (
@@ -156,6 +162,30 @@ export function ParentApplicationsList({
             <div className="bg-zinc-900/30 p-3 rounded-lg border border-zinc-700/50 text-xs text-zinc-300">
               <p className="font-semibold text-zinc-400 mb-1">가입 신청 한마디:</p>
               <p className="italic">"{app.description}"</p>
+            </div>
+          )}
+
+          {/* Verification Photo */}
+          {app.verification_photo_url && (
+            <div className="space-y-2">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-400">자녀 하키 인증 사진</h4>
+              <a
+                href={app.verification_photo_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block relative max-w-sm aspect-[4/3] rounded-lg overflow-hidden border border-zinc-700 bg-zinc-900 group"
+                title="원본 이미지 보기 (새 탭)"
+              >
+                <Image
+                  src={app.verification_photo_url}
+                  alt="Child hockey verification"
+                  fill
+                  className="object-contain group-hover:opacity-90 transition duration-200"
+                />
+                <span className="absolute bottom-2 right-2 bg-zinc-950/80 text-white text-[10px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                  클릭하여 크게 보기
+                </span>
+              </a>
             </div>
           )}
 

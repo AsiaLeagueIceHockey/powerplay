@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { compressImageToWebp } from "@/lib/image-utils";
 import { sendPushNotification } from "@/app/actions/push";
+import { logAndNotify } from "@/lib/audit";
 
 // ==========================================================
 // Types
@@ -15,6 +16,8 @@ export interface ParentApplication {
   child_name: string;
   child_birth_year: number;
   child_club: string;
+  parent_type?: string | null;
+  verification_photo_url?: string | null;
   description: string | null;
   status: "pending" | "approved" | "rejected";
   rejection_reason: string | null;
@@ -117,6 +120,8 @@ export async function applyForParentMembership(
   childName: string,
   childBirthYear: number,
   childClub: string,
+  parentType: string = "mother",
+  photoUrl: string | null = null,
   description?: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
@@ -143,6 +148,8 @@ export async function applyForParentMembership(
         child_name: childName,
         child_birth_year: childBirthYear,
         child_club: childClub,
+        parent_type: parentType,
+        verification_photo_url: photoUrl,
         description: description || null,
         status: "pending",
         rejection_reason: null,
@@ -155,6 +162,14 @@ export async function applyForParentMembership(
       console.error("Error upserting application:", appError);
       return { success: false, error: appError.message };
     }
+
+    // 3. Log and Notify Superusers
+    await logAndNotify({
+      userId: user.id,
+      action: "PARENT_APPLICATION_CREATE",
+      description: `학부모 인증을 신청했습니다. (${parentType === "mother" ? "엄마" : "아빠"}, 자녀: ${childName}, ${childBirthYear}년생, ${childClub})`,
+      url: "/admin/parent-applications",
+    });
 
     // Revalidate paths
     revalidatePath("/youth");
@@ -628,7 +643,7 @@ export async function createParentComment(
       await sendPushNotification(
         post.user_id,
         "새 댓글 알림 💬",
-        `학부모 커뮤니티 게시글에 새 댓글이 달렸습니다: "${content.substring(0, 30)}"`,
+        `${nickname}님이 댓글을 달았어요: "${content.substring(0, 30)}"`,
         `/youth/community/${postId}`
       );
     }
@@ -868,6 +883,58 @@ export async function uploadParentPostImage(
 }
 
 /**
+ * Compress and upload parent verification image to 'parent-verification' storage bucket
+ */
+export async function uploadVerificationPhoto(
+  formData: FormData
+): Promise<{ url?: string; error?: string }> {
+  try {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { error: "Unauthorized" };
+
+    const file = formData.get("file") as File;
+    if (!file || file.size === 0) {
+      return { error: "No file provided" };
+    }
+
+    // Compress using sharpness cover helper
+    let compressed: Buffer;
+    try {
+      const inputBuffer = Buffer.from(await file.arrayBuffer());
+      compressed = await compressImageToWebp(inputBuffer, "cover");
+    } catch (compressError) {
+      console.error("Image compression error:", compressError);
+      return { error: "Failed to process image" };
+    }
+
+    const fileName = `${user.id}-${Date.now()}.webp`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("parent-verification")
+      .upload(fileName, compressed, {
+        cacheControl: "31536000",
+        upsert: true,
+        contentType: "image/webp",
+      });
+
+    if (uploadError) {
+      console.error("Upload error:", uploadError);
+      return { error: uploadError.message };
+    }
+
+    const { data: { publicUrl } } = supabase.storage
+      .from("parent-verification")
+      .getPublicUrl(fileName);
+
+    return { url: publicUrl };
+  } catch (err: any) {
+    console.error("uploadVerificationPhoto unexpected error:", err);
+    return { error: err.message || "Failed to upload image" };
+  }
+}
+
+/**
  * Update the user's parent nickname in profiles (Requires approved parent/admin)
  */
 export async function updateParentNickname(
@@ -959,6 +1026,34 @@ export async function toggleParentPostLike(
         return { success: false, error: insertError.message };
       }
       isLikedNow = true;
+
+      // Send push notification to post author if it is not a self-like
+      try {
+        const { data: post } = await supabase
+          .from("parent_posts")
+          .select("user_id")
+          .eq("id", postId)
+          .single();
+
+        if (post && post.user_id !== user.id) {
+          // Fetch the liker's profile to find their parent_nickname or full_name
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("parent_nickname, full_name")
+            .eq("id", user.id)
+            .single();
+
+          const likerNickname = profile?.parent_nickname || profile?.full_name || "학부모";
+          await sendPushNotification(
+            post.user_id,
+            "하트 알림 ❤️",
+            `${likerNickname}님이 작성한 글에 하트가 추가되었어요.`,
+            `/youth/community/${postId}`
+          );
+        }
+      } catch (pushError) {
+        console.error("Error sending like push notification:", pushError);
+      }
     }
 
     // 4. Fetch updated likes count using efficient head-only exact count query
