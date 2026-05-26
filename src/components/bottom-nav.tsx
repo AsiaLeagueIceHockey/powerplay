@@ -31,20 +31,20 @@ export function BottomNav({ locale }: { locale: string }) {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    // 1. Focusin / Focusout listeners (extremely reliable for text inputs and textareas)
-    const handleFocusIn = (e: FocusEvent) => {
+    // 1. Capture-phase focus/blur listeners (extremely reliable across Safari/Chrome and Webviews)
+    const handleFocus = (e: FocusEvent) => {
       const target = e.target as HTMLElement;
       if (
-        target.tagName === "INPUT" ||
-        target.tagName === "TEXTAREA" ||
-        target.getAttribute("contenteditable") === "true"
+        target &&
+        (target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.getAttribute("contenteditable") === "true")
       ) {
         setIsKeyboardOpen(true);
       }
     };
 
-    const handleFocusOut = () => {
-      // Small delay to allow focus to shift to another input without flickering
+    const handleBlur = () => {
       setTimeout(() => {
         const active = document.activeElement;
         if (
@@ -58,15 +58,19 @@ export function BottomNav({ locale }: { locale: string }) {
       }, 50);
     };
 
-    document.addEventListener("focusin", handleFocusIn);
-    document.addEventListener("focusout", handleFocusOut);
+    window.addEventListener("focus", handleFocus, true); // Capture phase focus
+    window.addEventListener("blur", handleBlur, true);   // Capture phase blur
 
     // 2. VisualViewport Resize listener (secondary check)
     let visualViewportCleanup: (() => void) | undefined;
     if (window.visualViewport) {
       const visualViewport = window.visualViewport;
       const handleResize = () => {
-        const isKeyboard = visualViewport.height < window.innerHeight * 0.85;
+        // Checking against window.screen.height (which is constant) resolves iOS Safari resizing innerHeight
+        const isKeyboard = 
+          visualViewport.height < window.innerHeight * 0.85 || 
+          (window.screen && visualViewport.height < window.screen.height * 0.70);
+
         if (isKeyboard) {
           setIsKeyboardOpen(true);
         } else {
@@ -84,8 +88,8 @@ export function BottomNav({ locale }: { locale: string }) {
     }
 
     return () => {
-      document.removeEventListener("focusin", handleFocusIn);
-      document.removeEventListener("focusout", handleFocusOut);
+      window.removeEventListener("focus", handleFocus, true);
+      window.removeEventListener("blur", handleBlur, true);
       if (visualViewportCleanup) {
         visualViewportCleanup();
       }
@@ -153,7 +157,7 @@ export function BottomNav({ locale }: { locale: string }) {
   ];
 
   return (
-    <nav className={`fixed bottom-0 left-0 right-0 z-40 w-full border-t border-zinc-200 bg-white/80 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-950/80 pb-safe transition-all duration-300 ${isKeyboardOpen ? "translate-y-full opacity-0 pointer-events-none" : "translate-y-0 opacity-100"}`}>
+    <nav className={`fixed bottom-0 left-0 right-0 z-40 w-full border-t border-zinc-200 bg-white/80 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-950/80 pb-safe transition-all duration-300 bottom-navigation-bar ${isKeyboardOpen ? "translate-y-full opacity-0 pointer-events-none" : "translate-y-0 opacity-100"}`}>
       <div className="flex justify-around items-center h-14 px-2">
         {tabs.map((tab) => {
           const active = isActive(tab.href);
@@ -229,6 +233,13 @@ export function BottomNav({ locale }: { locale: string }) {
             -webkit-mask-position: -48% 0;
             mask-position: -48% 0;
           }
+        }
+      `}</style>
+      <style jsx global>{`
+        body:has(input:focus, textarea:focus) .bottom-navigation-bar {
+          transform: translateY(100%) !important;
+          opacity: 0 !important;
+          pointer-events: none !important;
         }
       `}</style>
     </nav>
