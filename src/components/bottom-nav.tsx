@@ -31,32 +31,65 @@ export function BottomNav({ locale }: { locale: string }) {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
+    // 1. Focusin / Focusout listeners (extremely reliable for text inputs and textareas)
+    const handleFocusIn = (e: FocusEvent) => {
+      const target = e.target as HTMLElement;
+      if (
+        target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA" ||
+        target.getAttribute("contenteditable") === "true"
+      ) {
+        setIsKeyboardOpen(true);
+      }
+    };
+
+    const handleFocusOut = () => {
+      // Small delay to allow focus to shift to another input without flickering
+      setTimeout(() => {
+        const active = document.activeElement;
+        if (
+          !active ||
+          (active.tagName !== "INPUT" &&
+            active.tagName !== "TEXTAREA" &&
+            active.getAttribute("contenteditable") !== "true")
+        ) {
+          setIsKeyboardOpen(false);
+        }
+      }, 50);
+    };
+
+    document.addEventListener("focusin", handleFocusIn);
+    document.addEventListener("focusout", handleFocusOut);
+
+    // 2. VisualViewport Resize listener (secondary check)
+    let visualViewportCleanup: (() => void) | undefined;
     if (window.visualViewport) {
       const visualViewport = window.visualViewport;
       const handleResize = () => {
-        // If the visual viewport height is less than 85% of screen height, the virtual keyboard is open
         const isKeyboard = visualViewport.height < window.innerHeight * 0.85;
-        setIsKeyboardOpen(isKeyboard);
-      };
-      visualViewport.addEventListener("resize", handleResize);
-      return () => visualViewport.removeEventListener("resize", handleResize);
-    } else {
-      const handleFocusIn = (e: FocusEvent) => {
-        const target = e.target as HTMLElement;
-        if (target.tagName === "INPUT" || target.tagName === "TEXTAREA") {
+        if (isKeyboard) {
           setIsKeyboardOpen(true);
+        } else {
+          const active = document.activeElement;
+          if (
+            !active ||
+            (active.tagName !== "INPUT" && active.tagName !== "TEXTAREA")
+          ) {
+            setIsKeyboardOpen(false);
+          }
         }
       };
-      const handleFocusOut = () => {
-        setIsKeyboardOpen(false);
-      };
-      document.addEventListener("focusin", handleFocusIn);
-      document.addEventListener("focusout", handleFocusOut);
-      return () => {
-        document.removeEventListener("focusin", handleFocusIn);
-        document.removeEventListener("focusout", handleFocusOut);
-      };
+      visualViewport.addEventListener("resize", handleResize);
+      visualViewportCleanup = () => visualViewport.removeEventListener("resize", handleResize);
     }
+
+    return () => {
+      document.removeEventListener("focusin", handleFocusIn);
+      document.removeEventListener("focusout", handleFocusOut);
+      if (visualViewportCleanup) {
+        visualViewportCleanup();
+      }
+    };
   }, []);
 
   const t = useTranslations("common");
