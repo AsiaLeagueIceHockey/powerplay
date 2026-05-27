@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
-import { getParentPostDetail, checkIsApprovedParentOrSuperUser, generateRandomNickname } from "@/app/actions/parent";
+import { getParentPostDetail, checkIsApprovedParentOrSuperUser } from "@/app/actions/parent";
+import { generateRandomNickname } from "@/lib/nickname";
 import { PostDetailClient } from "@/components/post-detail-client";
 import { redirect } from "next/navigation";
 

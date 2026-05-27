@@ -690,6 +690,7 @@
     "youth": {
         "title": "PowerYouth",
         "subtitle": "A space for youth hockey parents",
+        "writePost": "Write Post",
         "accessBannerTitle": "Install App & Enable Alerts",
         "accessBannerDescAll": "To receive real-time alerts for comments and likes, please install the app and enable push notifications.",
         "accessBannerDescInstall": "To receive real-time alerts for comments and likes, please install the app. Make sure to turn on notifications after installing.",

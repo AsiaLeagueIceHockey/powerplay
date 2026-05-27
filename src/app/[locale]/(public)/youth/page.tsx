@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
-import { getMyParentApplication, getParentPosts, getParentNewsList, ParentPost, ParentNews, generateRandomNickname } from "@/app/actions/parent";
+import { getMyParentApplication, getParentPosts, getParentNewsList, ParentPost, ParentNews } from "@/app/actions/parent";
+import { generateRandomNickname } from "@/lib/nickname";
 import { YouthClient } from "@/components/youth-client";
 import { getTranslations } from "next-intl/server";
 

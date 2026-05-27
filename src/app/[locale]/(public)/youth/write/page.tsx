@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getMyParentApplication, generateRandomNickname } from "@/app/actions/parent";
+import { getMyParentApplication } from "@/app/actions/parent";
+import { generateRandomNickname } from "@/lib/nickname";
 import { YouthWriteClient } from "@/components/youth-write-client";
 import { getTranslations } from "next-intl/server";
 
