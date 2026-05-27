@@ -80,7 +80,7 @@ export function YouthWriteClient({
       return;
     }
 
-    const currentNickname = userProfile?.parent_nickname || userProfile?.full_name || `${myApplication?.child_name || "학부모"} 학부모`;
+    const currentNickname = userProfile?.parent_nickname || `${myApplication?.child_name || "익명"} 학부모`;
 
     setIsSubmitting(true);
     setError(null);
@@ -144,7 +144,7 @@ export function YouthWriteClient({
                 {locale === "ko" ? "작성자 닉네임" : "Posting as"}
               </label>
               <div className="w-full px-4 py-2.5 bg-zinc-100 dark:bg-zinc-800 border border-transparent rounded-xl text-zinc-500 dark:text-zinc-400 text-sm font-bold truncate">
-                {userProfile?.parent_nickname || userProfile?.full_name || (locale === "ko" ? "학부모" : "Parent")}
+                {userProfile?.parent_nickname || (locale === "ko" ? "익명 학부모" : "Anonymous Parent")}
               </div>
             </div>
           </div>

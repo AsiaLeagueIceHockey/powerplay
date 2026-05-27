@@ -393,7 +393,7 @@ export async function getParentPosts(page: number = 1, limit: number = 20): Prom
 
     return (data || []).map((post: any) => {
       const profile = Array.isArray(post.profiles) ? post.profiles[0] : post.profiles;
-      const nickname = profile?.parent_nickname || profile?.full_name || post.nickname || "Unknown";
+      const nickname = profile?.parent_nickname || post.nickname || "익명 학부모";
       
       return {
         id: post.id,
@@ -479,7 +479,7 @@ export async function getParentPostDetail(
     }
 
     const profile = Array.isArray(post.profiles) ? post.profiles[0] : post.profiles;
-    const nickname = profile?.parent_nickname || profile?.full_name || post.nickname || "Unknown";
+    const nickname = profile?.parent_nickname || post.nickname || "익명 학부모";
 
     const formattedPost: ParentPost = {
       id: post.id,
@@ -498,7 +498,7 @@ export async function getParentPostDetail(
 
     const formattedComments = (comments || []).map((c: any) => {
       const p = Array.isArray(c.profiles) ? c.profiles[0] : c.profiles;
-      const nick = p?.parent_nickname || p?.full_name || c.nickname || "Unknown";
+      const nick = p?.parent_nickname || c.nickname || "익명 학부모";
       return {
         id: c.id,
         post_id: c.post_id,
@@ -1080,11 +1080,11 @@ export async function toggleParentPostLike(
             .eq("id", user.id)
             .single();
 
-          const likerNickname = profile?.parent_nickname || profile?.full_name || "학부모";
+          const likerNickname = profile?.parent_nickname || "익명 학부모";
           await sendPushNotification(
             post.user_id,
             "하트 알림 ❤️",
-            `${likerNickname}님이 작성한 글에 하트가 추가되었어요.`,
+            `${likerNickname}님이 작성하신 글에 하트를 눌렀어요.`,
             `/youth/community/${postId}`
           );
         }

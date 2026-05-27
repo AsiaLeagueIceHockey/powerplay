@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getMyParentApplication } from "@/app/actions/parent";
+import { getMyParentApplication, generateRandomNickname } from "@/app/actions/parent";
 import { YouthWriteClient } from "@/components/youth-write-client";
 import { getTranslations } from "next-intl/server";
 
@@ -39,6 +39,15 @@ export default async function YouthWritePage({
 
   if (!isApproved && !isAdmin) {
     redirect(`/${locale}/youth`);
+  }
+
+  if (profile && !profile.parent_nickname) {
+    const newNickname = generateRandomNickname();
+    await supabase
+      .from("profiles")
+      .update({ parent_nickname: newNickname })
+      .eq("id", user.id);
+    profile.parent_nickname = newNickname;
   }
 
   const myApplication = await getMyParentApplication();

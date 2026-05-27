@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { getMyParentApplication, getParentPosts, getParentNewsList, ParentPost, ParentNews } from "@/app/actions/parent";
+import { getMyParentApplication, getParentPosts, getParentNewsList, ParentPost, ParentNews, generateRandomNickname } from "@/app/actions/parent";
 import { YouthClient } from "@/components/youth-client";
 import { getTranslations } from "next-intl/server";
 
@@ -47,8 +47,17 @@ export default async function YouthPage({
 
   const myApplication = await getMyParentApplication();
 
-  const isApproved = profile?.parent_verification_status === "approved";
+  let isApproved = profile?.parent_verification_status === "approved";
   const isSuperUser = profile?.role === "superuser";
+
+  if ((isApproved || isSuperUser) && profile && !profile.parent_nickname) {
+    const newNickname = generateRandomNickname();
+    await supabase
+      .from("profiles")
+      .update({ parent_nickname: newNickname })
+      .eq("id", user.id);
+    profile.parent_nickname = newNickname;
+  }
 
   let posts: ParentPost[] = [];
   let newsList: ParentNews[] = [];

@@ -74,7 +74,7 @@ export function PostDetailClient({
       return;
     }
 
-    const currentNickname = userProfile?.parent_nickname || userProfile?.full_name || (locale === "ko" ? "학부모" : "Parent");
+    const currentNickname = userProfile?.parent_nickname || (locale === "ko" ? "익명 학부모" : "Anonymous Parent");
 
     setIsSubmitting(true);
     setCommentError(null);

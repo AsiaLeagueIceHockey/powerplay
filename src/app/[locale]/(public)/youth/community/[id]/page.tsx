@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { getParentPostDetail, checkIsApprovedParentOrSuperUser } from "@/app/actions/parent";
+import { getParentPostDetail, checkIsApprovedParentOrSuperUser, generateRandomNickname } from "@/app/actions/parent";
 import { PostDetailClient } from "@/components/post-detail-client";
 import { redirect } from "next/navigation";
 
@@ -34,6 +34,15 @@ export default async function PostDetailPage({
     .select("role, parent_nickname, full_name")
     .eq("id", user.id)
     .single();
+
+  if (profile && !profile.parent_nickname) {
+    const newNickname = generateRandomNickname();
+    await supabase
+      .from("profiles")
+      .update({ parent_nickname: newNickname })
+      .eq("id", user.id);
+    profile.parent_nickname = newNickname;
+  }
 
   const isSuperUser = profile?.role === "superuser";
 

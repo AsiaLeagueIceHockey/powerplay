@@ -225,7 +225,7 @@ export function YouthClient({
       return;
     }
 
-    const currentNickname = userProfile?.parent_nickname || userProfile?.full_name || `${myApplication?.child_name || "학부모"} 학부모`;
+    const currentNickname = userProfile?.parent_nickname || `${myApplication?.child_name || "익명"} 학부모`;
 
     setIsSubmittingPost(true);
     setPostError(null);
