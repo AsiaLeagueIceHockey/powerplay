@@ -105,7 +105,7 @@ export function YouthWriteClient({
           className="inline-flex items-center gap-2 text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 text-sm font-bold transition"
         >
           <ArrowLeft size={16} />
-          {locale === "ko" ? "파워유스 목록으로" : "Back to PowerYouth"}
+          {locale === "ko" ? "뒤로가기" : "Back"}
         </Link>
       </div>
 
@@ -224,10 +224,10 @@ export function YouthWriteClient({
               {isSubmitting ? (
                 <span className="flex items-center gap-1">
                   <Loader2 className="w-3 h-3 animate-spin" />
-                  {locale === "ko" ? "등록 중..." : "Posting..."}
+                  {locale === "ko" ? "게시 중..." : "Posting..."}
                 </span>
               ) : (
-                locale === "ko" ? "등록물 게시" : "Submit Post"
+                locale === "ko" ? "게시" : "Post"
               )}
             </button>
           </div>

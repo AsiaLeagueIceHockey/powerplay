@@ -1078,7 +1078,7 @@ export function YouthClient({
       {activeTab === "community" && (
         <Link
           href={`/${locale}/youth/write`}
-          className="fixed bottom-20 right-6 z-50 flex items-center justify-center w-14 h-14 bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-full shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-200"
+          className="fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom))] right-6 z-50 flex items-center justify-center w-14 h-14 bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-full shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-200"
           title={locale === "ko" ? "새 글 작성" : "Write Post"}
         >
           <Plus size={28} strokeWidth={2.5} />
