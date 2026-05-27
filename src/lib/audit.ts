@@ -34,6 +34,7 @@ type AuditAction =
   | "TAMAGOTCHI_FEED"
   | "TAMAGOTCHI_TRAIN"
   | "PARENT_APPLICATION_CREATE"
+  | "PARENT_POST_CREATE"
   | "OTHER";
 
 interface AuditLogParams {

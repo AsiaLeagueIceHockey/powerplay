@@ -4,8 +4,10 @@ import {
   reviewParentApplication,
   getParentPostDetail,
   toggleParentPostLike,
-  uploadVerificationPhoto
+  uploadVerificationPhoto,
+  createParentPost
 } from "@/app/actions/parent";
+import { logAndNotify } from "@/lib/audit";
 
 // Mock Supabase Server Client
 const mockGetUser = vi.fn();
@@ -122,12 +124,51 @@ describe("Parent Membership Flow Actions", () => {
         data: { user_id: "user-abc", child_name: "이유스" } 
       });
 
-      // 3. Mock updates
+      // 3. Mock nickname fetch (returns null nickname)
+      mockSingle.mockResolvedValueOnce({
+        data: { parent_nickname: null }
+      });
+
+      // 4. Mock updates
       mockUpdate.mockReturnValue({ error: null }); // parent_applications
       mockUpdate.mockReturnValue({ error: null }); // profiles update
 
       const result = await reviewParentApplication("app-789", "approved");
       expect(result.success).toBe(true);
+      // Verify that nickname generation was triggered (profiles update was called with parent_nickname)
+      expect(mockUpdate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          parent_nickname: expect.any(String),
+          parent_verification_status: "approved"
+        })
+      );
+    });
+
+    it("should not generate a random nickname if the parent already has one", async () => {
+      // 1. Authenticate as superuser
+      mockGetUser.mockResolvedValueOnce({ data: { user: { id: "admin-123" } } });
+      mockSingle.mockResolvedValueOnce({ data: { role: "superuser" } }); // profiles checkIsSuperUser
+      
+      // 2. Fetch application
+      mockSingle.mockResolvedValueOnce({ 
+        data: { user_id: "user-abc", child_name: "이유스" } 
+      });
+
+      // 3. Mock nickname fetch (returns existing nickname)
+      mockSingle.mockResolvedValueOnce({
+        data: { parent_nickname: "기존닉네임" }
+      });
+
+      // 4. Mock updates
+      mockUpdate.mockReturnValue({ error: null }); // parent_applications
+      mockUpdate.mockReturnValue({ error: null }); // profiles update
+
+      const result = await reviewParentApplication("app-789", "approved");
+      expect(result.success).toBe(true);
+      // Verify that it only updated parent_verification_status without parent_nickname
+      expect(mockUpdate).toHaveBeenCalledWith({
+        parent_verification_status: "approved"
+      });
     });
   });
 
@@ -262,6 +303,42 @@ describe("Parent Membership Flow Actions", () => {
 
       const result = await uploadVerificationPhoto(formData);
       expect(result.error).toBe("Unauthorized");
+    });
+  });
+
+  describe("createParentPost", () => {
+    it("should successfully insert post and call logAndNotify", async () => {
+      // 1. mock auth checks
+      mockGetUser.mockResolvedValue({ data: { user: { id: "user-123" } } });
+      mockSingle.mockResolvedValueOnce({ 
+        data: { role: "user", parent_verification_status: "approved" } 
+      }); // checkIsApprovedParentOrSuperUser profile check
+
+      // 2. Mock insert return value
+      mockSingle.mockResolvedValueOnce({
+        data: { id: "post-999", user_id: "user-123", title: "새로운 글", content: "하키 이야기" }
+      });
+
+      const result = await createParentPost("새로운 글", "하키 이야기", "닉네임");
+      expect(result.success).toBe(true);
+      expect(result.post?.id).toBe("post-999");
+      expect(mockInsert).toHaveBeenCalledWith({
+        user_id: "user-123",
+        nickname: "닉네임",
+        title: "새로운 글",
+        content: "하키 이야기",
+        image_url: null
+      });
+
+      // Verify that audit log and notification were triggered
+      expect(logAndNotify).toHaveBeenCalledWith(
+        expect.objectContaining({
+          userId: "user-123",
+          action: "PARENT_POST_CREATE",
+          description: expect.stringContaining('새 글을 작성했습니다'),
+          url: "/youth/community/post-999"
+        })
+      );
     });
   });
 });

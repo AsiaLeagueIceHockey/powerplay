@@ -109,6 +109,24 @@ export async function checkIsApprovedParentOrSuperUser(): Promise<boolean> {
   return isApprovedParent || isSuperUser;
 }
 
+/**
+ * Generates a random anonymous hockey-themed nickname for parents
+ */
+export function generateRandomNickname(): string {
+  const adjectives = [
+    "신나는", "행복한", "용감한", "멋진", "빠른", "날쌘", "튼튼한", "명랑한", "빛나는", "달리는",
+    "즐거운", "열정적인", "똑똑한", "든든한", "따뜻한", "꿈꾸는", "푸른", "새로운", "강한", "온화한"
+  ];
+  const nouns = [
+    "하키맘", "하키대디", "하키가족", "아이스맘", "아이스대디", "스케이트", "하키러브", "링크러너",
+    "퍽헌터", "슬랩샷", "어시스트", "디펜더", "포워드", "골리맘", "골리대디", "빙상히어로"
+  ];
+  const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
+  const noun = nouns[Math.floor(Math.random() * nouns.length)];
+  const num = Math.floor(100 + Math.random() * 900); // 3 digit number 100-999
+  return `${adj}${noun}${num}`;
+}
+
 // ==========================================================
 // 1. Parent Membership Applications Actions
 // ==========================================================
@@ -281,10 +299,21 @@ export async function reviewParentApplication(
       return { success: false, error: appError.message };
     }
 
-    // 3. Update profile status
+    // 3. Update profile status and assign random nickname if not set
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("parent_nickname")
+      .eq("id", app.user_id)
+      .single();
+
+    const profileUpdate: any = { parent_verification_status: status };
+    if (status === "approved" && profile && !profile.parent_nickname) {
+      profileUpdate.parent_nickname = generateRandomNickname();
+    }
+
     const { error: profileError } = await supabase
       .from("profiles")
-      .update({ parent_verification_status: status })
+      .update(profileUpdate)
       .eq("id", app.user_id);
 
     if (profileError) {
@@ -527,6 +556,14 @@ export async function createParentPost(
     }
 
     revalidatePath("/youth");
+
+    // Log and notify superusers of the new community post
+    await logAndNotify({
+      userId: user.id,
+      action: "PARENT_POST_CREATE",
+      description: `학부모 커뮤니티에 새 글을 작성했습니다. (제목: "${title.substring(0, 30)}")`,
+      url: `/youth/community/${data.id}`,
+    });
 
     return { success: true, post: data as ParentPost };
   } catch (err: any) {
