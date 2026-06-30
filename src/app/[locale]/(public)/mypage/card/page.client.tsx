@@ -20,7 +20,7 @@ interface CardData {
 interface PlayerCardClientProps {
   initialData: {
     profile: CardData;
-    club: { name: string; logo_url: string | null } | null;
+    club: { name: string; logo_url: string | null; logo_base64?: string | null } | null;
   }
 }
 
@@ -29,27 +29,12 @@ export default function PlayerCardClient({ initialData }: PlayerCardClientProps)
   const router = useRouter();
   const cardRef = useRef<HTMLDivElement>(null);
   const [sharing, setSharing] = useState(false);
-  const [logoDataUrl, setLogoDataUrl] = useState<string | null>(null);
   
   const data = initialData.profile;
   const clubName = initialData.club?.name || "";
-  const clubLogo = initialData.club?.logo_url || null;
+  const clubLogoBase64 = initialData.club?.logo_base64 || null;
 
-  // Convert external logo to base64 to avoid cross-origin canvas tainting in html-to-image
-  useEffect(() => {
-    if (clubLogo) {
-      // Proxy through Next.js image optimizer to bypass CORS issues on external images
-      const proxiedUrl = `/_next/image?url=${encodeURIComponent(clubLogo)}&w=64&q=75`;
-      fetch(proxiedUrl)
-        .then((res) => res.blob())
-        .then((blob) => {
-          const reader = new FileReader();
-          reader.onloadend = () => setLogoDataUrl(reader.result as string);
-          reader.readAsDataURL(blob);
-        })
-        .catch((err) => console.error("Failed to convert club logo to base64", err));
-    }
-  }, [clubLogo]);
+
 
   const handleShare = async () => {
     if (!cardRef.current) return;
@@ -165,9 +150,9 @@ export default function PlayerCardClient({ initialData }: PlayerCardClientProps)
           <div className="flex justify-between items-start z-10 w-full mb-6 text-white">
             {/* Club info top-left */}
             <div className="flex items-center gap-2 bg-white/5 backdrop-blur-sm rounded-lg pr-3 pl-1.5 py-1.5 border border-white/10">
-              {clubLogo ? (
+              {clubLogoBase64 ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img crossOrigin="anonymous" src={logoDataUrl || clubLogo} alt="Team" width={24} height={24} className="rounded object-cover bg-white" />
+                <img src={clubLogoBase64} alt="Team" width={24} height={24} className="rounded object-cover bg-white" />
               ) : (
                  <div className="w-6 h-6 bg-zinc-800 text-white rounded flex items-center justify-center font-bold text-xs">
                    {clubName ? clubName.charAt(0) : "P"}
