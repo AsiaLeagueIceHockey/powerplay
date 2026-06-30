@@ -6,6 +6,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, Plus, X, Trash2 } from "lucide-react";
 
+import { useFormatter } from "next-intl";
+
 export function AdminClubNotices({
   clubId,
   notices,
@@ -14,6 +16,7 @@ export function AdminClubNotices({
   notices: ClubPost[];
 }) {
   const router = useRouter();
+  const format = useFormatter();
   const [loading, setLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
 
@@ -108,7 +111,14 @@ export function AdminClubNotices({
                   {notice.content}
                 </p>
                 <div className="text-xs text-zinc-500 mt-3">
-                  {new Date(notice.created_at).toLocaleString("ko-KR")}
+                  {format.dateTime(new Date(notice.created_at), {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: 'numeric',
+                    minute: 'numeric',
+                    second: 'numeric'
+                  })}
                 </div>
               </div>
               

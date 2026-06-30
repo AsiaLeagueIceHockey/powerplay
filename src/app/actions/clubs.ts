@@ -238,11 +238,13 @@ function extractClubRinks(club: ClubWithRinksRow): Rink[] {
   return club.club_rinks?.map((clubRink) => clubRink.rink).filter((rink): rink is Rink => Boolean(rink)) || [];
 }
 
-function extractClubMembers(membersData: ClubMembershipUserRow[] | null | undefined) {
+function extractClubMembers(membersData: any[] | null | undefined) {
   return (membersData || []).map((member) => {
     const user = Array.isArray(member.user) ? member.user[0] : member.user;
 
     return {
+      user_id: member.user_id,
+      role: member.role,
       full_name: user?.full_name || null,
       email: user?.email || "",
     };
@@ -320,7 +322,7 @@ export async function getClubs(): Promise<Club[]> {
       // Fetch detailed member info
       const { data: membersData } = await supabase
         .from("club_memberships")
-        .select("user:profiles(full_name, email)")
+        .select("user_id, role, user:profiles(full_name, email)")
         .eq("club_id", club.id);
 
       const rinks = extractClubRinks(club as ClubWithRinksRow);
@@ -381,7 +383,7 @@ export async function getAdminClubs(): Promise<Club[]> {
       // Fetch detailed member info
       const { data: membersData } = await supabase
         .from("club_memberships")
-        .select("user:profiles(full_name, email)")
+        .select("user_id, role, user:profiles(full_name, email)")
         .eq("club_id", club.id);
 
       const rinks = extractClubRinks(club as ClubWithRinksRow);
@@ -653,7 +655,7 @@ export async function getMyClubs(): Promise<ClubMembership[]> {
       role,
       source,
       created_at,
-      club:club_id(id, name, kakao_open_chat_url)
+      club:club_id(*, club_rinks(rink:rinks(*)))
     `)
     .eq("user_id", user.id);
 
@@ -662,11 +664,19 @@ export async function getMyClubs(): Promise<ClubMembership[]> {
     return [];
   }
 
-  // Transform to handle joined club data
-  return (memberships || []).map((m) => ({
-    ...m,
-    club: Array.isArray(m.club) ? m.club[0] : m.club,
-  })) as ClubMembership[];
+  // Import locally to avoid circular dependencies if any
+  const { getPublicClubs } = await import("@/lib/public-clubs");
+  const publicClubs = await getPublicClubs();
+
+  // Transform to handle joined club data and hydrate with vote/member counts
+  return (memberships || []).map((m) => {
+    const baseClub = Array.isArray(m.club) ? m.club[0] : m.club;
+    const hydratedClub = publicClubs.find(pc => pc.id === m.club_id);
+    return {
+      ...m,
+      club: hydratedClub ? { ...baseClub, ...hydratedClub } : baseClub,
+    };
+  }) as ClubMembership[];
 }
 
 export async function getMyManagedClubs(): Promise<ClubMembership[]> {
@@ -740,7 +750,7 @@ export async function subscribeToClubNews(clubId: string) {
 
   const { data: club, error: clubError } = await supabase
     .from("clubs")
-    .select("id")
+    .select("id, name")
     .eq("id", clubId)
     .maybeSingle();
 
@@ -754,9 +764,77 @@ export async function subscribeToClubNews(clubId: string) {
     return { error: membershipResult.error };
   }
 
+  // If newly created, send push notifications to admins
+  if (membershipResult.created) {
+    const { data: profile } = await supabase.from("profiles").select("full_name").eq("id", user.id).single();
+    const userName = profile?.full_name || "이름 없음";
+
+    const { data: admins } = await supabase
+      .from("club_memberships")
+      .select("user_id")
+      .eq("club_id", clubId)
+      .eq("role", "admin");
+
+    if (admins && admins.length > 0) {
+      const pushTitle = "새 팀원 합류";
+      const pushBody = `${userName}님이 내 소속팀(${club.name})으로 등록했습니다.`;
+      const url = `/ko/clubs/${clubId}`;
+
+      // Use fire-and-forget for push notifications
+      Promise.all(
+        admins.map((admin) => sendPushNotification(admin.user_id, pushTitle, pushBody, url))
+      ).catch((err) => console.error("Error sending push notifications to club admins:", err));
+    }
+  }
+
   revalidateClubPaths(clubId);
 
   return { success: true, alreadySubscribed: !membershipResult.created };
+}
+
+export async function unsubscribeFromClubNews(clubId: string) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "Not authenticated" };
+  }
+
+  // Check if they are the last admin
+  const { data: membership } = await supabase
+    .from("club_memberships")
+    .select("role")
+    .eq("club_id", clubId)
+    .eq("user_id", user.id)
+    .single();
+
+  if (membership?.role === "admin") {
+    const { count } = await supabase
+      .from("club_memberships")
+      .select("id", { count: "exact", head: true })
+      .eq("club_id", clubId)
+      .eq("role", "admin");
+
+    if (count === 1) {
+      return { error: "마지막 운영진은 소속팀을 나갈 수 없습니다." };
+    }
+  }
+
+  const { error } = await supabase
+    .from("club_memberships")
+    .delete()
+    .eq("club_id", clubId)
+    .eq("user_id", user.id);
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  revalidateClubPaths(clubId);
+  return { success: true };
 }
 
 export async function getMyClubVoteSummary(): Promise<ClubVoteSummary> {
@@ -1011,5 +1089,149 @@ export async function createClubNotice(clubId: string, title: string, content: s
 
   revalidateClubPaths(clubId);
 
+  return { success: true };
+}
+
+// ==================== CLUB MEMBERS MANAGEMENT ====================
+
+export async function getClubMembersList(clubId: string) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "Not authenticated" };
+  }
+
+  // Check if caller is superuser or admin of this club
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  const isSuperUser = profile?.role === "superuser";
+
+  if (!isSuperUser) {
+    const { data: membership } = await supabase
+      .from("club_memberships")
+      .select("role")
+      .eq("club_id", clubId)
+      .eq("user_id", user.id)
+      .single();
+
+    if (membership?.role !== "admin") {
+      return { error: "Unauthorized" };
+    }
+  }
+
+  const { data, error } = await supabase
+    .from("club_memberships")
+    .select(`
+      id,
+      user_id,
+      role,
+      created_at,
+      profiles:user_id (
+        full_name,
+        email,
+        position
+      )
+    `)
+    .eq("club_id", clubId)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Error fetching club members:", error);
+    return { error: error.message };
+  }
+
+  return { members: data };
+}
+
+export async function updateClubMemberRole(clubId: string, targetUserId: string, newRole: "admin" | "member") {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "Not authenticated" };
+  }
+
+  // Check if caller is superuser or admin of this club
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  const isSuperUser = profile?.role === "superuser";
+
+  const { error } = await supabase.rpc("update_club_member_role", {
+    p_club_id: clubId,
+    p_target_user_id: targetUserId,
+    p_new_role: newRole
+  });
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  if (newRole === "admin") {
+    const { data: clubData } = await supabase
+      .from("clubs")
+      .select("name")
+      .eq("id", clubId)
+      .single();
+
+    if (clubData) {
+      // Send asynchronously without awaiting to avoid blocking the response
+      sendPushNotification(
+        targetUserId,
+        "동호회 운영진 승격",
+        `${clubData.name}의 운영진으로 승격되었습니다. 이제 경기를 생성하고 멤버를 관리할 수 있습니다!`,
+        `/ko/admin/clubs`
+      ).catch(err => console.error("Failed to send push notification:", err));
+    }
+  }
+
+  revalidateClubPaths(clubId);
+  return { success: true };
+}
+
+export async function removeClubMember(clubId: string, targetUserId: string) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "Not authenticated" };
+  }
+
+  // Check if caller is superuser or admin of this club
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  const isSuperUser = profile?.role === "superuser";
+
+  const { error } = await supabase.rpc("remove_club_member", {
+    p_club_id: clubId,
+    p_target_user_id: targetUserId
+  });
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  revalidateClubPaths(clubId);
   return { success: true };
 }

@@ -173,8 +173,8 @@
             "ratioPost": "게시물 4:5"
         },
         "subscription": {
-            "subscribe": "소식 받기",
-            "subscribed": "소식 받는 중"
+            "subscribe": "내 소속팀으로 등록",
+            "subscribed": "소속팀 등록됨"
         }
     },
     "chat": {
@@ -365,12 +365,14 @@
         },
         "menu": {
             "profile": "프로필",
+            "clubs": "내 소속팀",
             "matches": "신청한 경기",
             "language": "언어 설정",
             "notifications": "알림 설정"
         },
         "subpageTitle": {
             "profile": "프로필",
+            "clubs": "내 소속팀",
             "matches": "신청한 경기",
             "language": "언어 설정",
             "notifications": "알림 설정",

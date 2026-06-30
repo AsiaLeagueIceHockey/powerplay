@@ -25,7 +25,7 @@ export interface Club {
   monthly_rank?: number;
   monthly_rank_tied?: boolean;
   rinks?: Rink[];
-  members?: { full_name: string | null; email: string; }[];
+  members?: { user_id: string; role: string; full_name: string | null; email: string; }[];
 }
 
 export interface ClubMembership {

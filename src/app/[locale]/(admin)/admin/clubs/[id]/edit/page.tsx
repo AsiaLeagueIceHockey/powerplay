@@ -3,6 +3,7 @@ import { getClub, getClubNotices } from "@/app/actions/clubs";
 import { getRinks } from "@/app/actions/rink";
 import { ClubForm } from "@/components/club-form";
 import { AdminClubNotices } from "@/components/admin-club-notices";
+import { AdminClubMembers } from "@/components/admin-club-members";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -39,7 +40,14 @@ export default async function EditClubPage({
 
       <ClubForm locale={locale} club={club} allRinks={rinks} />
 
-      <AdminClubNotices clubId={club.id} notices={notices} />
+      <div className="mt-12">
+        <h2 className="text-xl font-bold mb-6">멤버 관리</h2>
+        <AdminClubMembers clubId={club.id} />
+      </div>
+
+      <div className="mt-12">
+        <AdminClubNotices clubId={club.id} notices={notices} />
+      </div>
     </div>
   );
 }

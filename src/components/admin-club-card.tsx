@@ -4,8 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Club } from "@/app/actions/types";
-import { deleteClub, getClubDeleteImpact } from "@/app/actions/clubs";
-import { Users, MessageCircle, ChevronDown, ChevronUp, Trash2 } from "lucide-react";
+import { deleteClub, getClubDeleteImpact, updateClubMemberRole } from "@/app/actions/clubs";
+import { Users, MessageCircle, ChevronDown, ChevronUp, Trash2, ChevronRight, Shield, ArrowUpCircle, Loader2 } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
 
 interface AdminClubCardProps {
@@ -16,6 +16,7 @@ interface AdminClubCardProps {
 export function AdminClubCard({ club, canDelete = false }: AdminClubCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
   const t = useTranslations("admin.clubs");
   const locale = useLocale();
   const router = useRouter();
@@ -85,20 +86,39 @@ export function AdminClubCard({ club, canDelete = false }: AdminClubCardProps) {
     setIsDeleting(false);
   };
 
+  const handlePromote = async (userId: string) => {
+    const msg = locale === "ko" 
+      ? "이 멤버를 운영진으로 승격하시겠습니까?\n승격된 멤버는 동호회 경기를 생성할 수 있게 됩니다."
+      : "Promote this member to admin?\nThey will be able to create club matches.";
+      
+    if (!confirm(msg)) return;
+    
+    setActionLoadingId(userId);
+    const result = await updateClubMemberRole(club.id, userId, "admin");
+    if (result.error) {
+      alert(result.error);
+    } else {
+      router.refresh();
+    }
+    setActionLoadingId(null);
+  };
+
   return (
-    <div className="bg-zinc-800 rounded-lg overflow-hidden">
-      <div className="p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <div className="flex-1">
-          <div className="font-medium text-lg flex items-center gap-2">
+    <div className="bg-zinc-800 hover:bg-zinc-700/80 transition-colors rounded-xl overflow-hidden relative group shadow-sm border border-zinc-700/50">
+      <Link href={`/${locale}/admin/clubs/${club.id}/edit`} className="absolute inset-0 z-0" aria-label={t("edit")} />
+      
+      <div className="p-4 flex flex-row items-center justify-between gap-3 relative z-10 pointer-events-none">
+        <div className="flex-1 min-w-0">
+          <div className="font-medium text-lg flex items-center gap-2 text-white group-hover:text-blue-400 transition-colors truncate">
             {club.name}
           </div>
-          <div className="flex items-center gap-4 text-sm text-zinc-400 mt-1">
+          <div className="flex items-center gap-4 text-sm text-zinc-400 mt-1 pointer-events-auto overflow-hidden">
             <button 
-              onClick={() => setIsExpanded(!isExpanded)}
-              className="flex items-center gap-1 hover:text-white transition-colors"
+              onClick={(e) => { e.preventDefault(); setIsExpanded(!isExpanded); }}
+              className="flex items-center gap-1 hover:text-white transition-colors shrink-0"
             >
               <Users className="w-4 h-4" />
-              {t("members", { count: club.member_count || 0 })}
+              {t("members", { count: club.members?.length ?? club.member_count ?? 0 })}
               {isExpanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
             </button>
             
@@ -107,32 +127,30 @@ export function AdminClubCard({ club, canDelete = false }: AdminClubCardProps) {
                 href={club.kakao_open_chat_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1 text-yellow-400 hover:underline"
+                onClick={(e) => e.stopPropagation()}
+                className="flex items-center gap-1 text-yellow-400 hover:underline relative z-10 shrink-0 truncate"
               >
-                <MessageCircle className="w-4 h-4" />
-                {t("openChat")}
+                <MessageCircle className="w-4 h-4 shrink-0" />
+                <span className="truncate">{t("openChat")}</span>
               </a>
             )}
           </div>
         </div>
-        <div className="flex items-center gap-3">
-          <Link
-            href={`/${locale}/admin/clubs/${club.id}/edit`}
-            className="text-sm text-blue-400 hover:underline whitespace-nowrap"
-          >
-            {t("edit")}
-          </Link>
+        <div className="flex items-center gap-2 pointer-events-auto shrink-0">
           {canDelete ? (
             <button
               type="button"
-              onClick={handleDelete}
+              onClick={(e) => { e.preventDefault(); handleDelete(); }}
               disabled={isDeleting}
-              className="inline-flex items-center gap-1 text-sm text-red-400 hover:text-red-300 disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex items-center justify-center p-2 rounded-lg text-zinc-400 hover:bg-red-500/10 hover:text-red-400 disabled:cursor-not-allowed disabled:opacity-50 transition-colors relative z-10"
+              title={t("delete")}
             >
               <Trash2 className="h-4 w-4" />
-              {isDeleting ? t("deleting") : t("delete")}
             </button>
           ) : null}
+          <div className="w-8 h-8 rounded-full bg-zinc-700/50 flex items-center justify-center text-zinc-400 group-hover:bg-blue-500 group-hover:text-white transition-colors pointer-events-none">
+            <ChevronRight className="w-4 h-4" />
+          </div>
         </div>
       </div>
 
@@ -140,20 +158,44 @@ export function AdminClubCard({ club, canDelete = false }: AdminClubCardProps) {
       {isExpanded && (
         <div className="bg-zinc-900/50 border-t border-zinc-700 p-4 animate-in slide-in-from-top-2 duration-200">
           <h4 className="text-sm font-semibold text-zinc-400 mb-3">
-            {t("membersTitle", { count: club.member_count || 0 })}
+            {t("membersTitle", { count: club.members?.length ?? club.member_count ?? 0 })}
           </h4>
           
           {club.members && club.members.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
               {club.members.map((member, idx) => (
-                <div key={idx} className="bg-zinc-800 border border-zinc-700 rounded p-2 text-sm flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-zinc-700 flex items-center justify-center text-xs text-zinc-400 shrink-0">
-                    {member.full_name?.[0] || "?"}
+                <div key={idx} className="bg-zinc-800 border border-zinc-700 rounded p-2 text-sm flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 overflow-hidden">
+                    <div className="w-8 h-8 rounded-full bg-zinc-700 flex items-center justify-center text-xs text-zinc-400 shrink-0">
+                      {member.full_name?.[0] || "?"}
+                    </div>
+                    <div className="overflow-hidden">
+                      <div className="font-medium text-white flex items-center gap-1.5 truncate">
+                        {member.full_name || "Unknown"}
+                        {member.role === "admin" && (
+                          <span className="px-1.5 py-0.5 rounded bg-blue-900/30 text-blue-400 text-[10px] font-bold border border-blue-900/50 shrink-0">운영진</span>
+                        )}
+                      </div>
+                      <div className="text-xs text-zinc-500 truncate">{member.email}</div>
+                    </div>
                   </div>
-                  <div className="overflow-hidden">
-                    <div className="font-medium text-white truncate">{member.full_name || "Unknown"}</div>
-                    <div className="text-xs text-zinc-500 truncate">{member.email}</div>
-                  </div>
+                  {member.role === "member" && member.user_id && (
+                    <div className="shrink-0">
+                      {actionLoadingId === member.user_id ? (
+                        <div className="p-1.5">
+                          <Loader2 className="w-4 h-4 animate-spin text-zinc-400" />
+                        </div>
+                      ) : (
+                        <button 
+                          onClick={() => handlePromote(member.user_id)}
+                          className="text-xs flex items-center gap-1 px-2 py-1 rounded bg-blue-900/30 text-blue-400 hover:bg-blue-900/50 transition border border-blue-900/50"
+                        >
+                          <ArrowUpCircle className="w-3.5 h-3.5" />
+                          운영진 승격
+                        </button>
+                      )}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

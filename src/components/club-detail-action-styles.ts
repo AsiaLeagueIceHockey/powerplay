@@ -2,7 +2,7 @@
 // Icon + label must always stay on one line. If width gets tight, truncate instead of wrapping.
 
 export const clubDetailActionButtonClass =
-  "flex min-w-0 w-full items-center justify-center gap-1.5 whitespace-nowrap rounded-xl px-3 py-3.5 text-[13px] font-bold leading-none tracking-[-0.01em] sm:px-4";
+  "flex min-w-0 w-full h-[46px] items-center justify-center gap-1.5 whitespace-nowrap rounded-xl px-3 text-[13px] font-bold leading-none tracking-[-0.01em] sm:px-4";
 
 export const clubDetailActionIconClass = "h-[18px] w-[18px] shrink-0";
 

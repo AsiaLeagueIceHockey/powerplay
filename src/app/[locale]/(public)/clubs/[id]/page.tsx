@@ -96,8 +96,8 @@ export default async function ClubDetailPage({
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <SportsTeamJsonLd club={club} locale={locale} />
-      <div className="flex justify-between items-start mb-6">
-        <div className="flex items-center gap-4">
+      <div className="flex justify-between items-start mb-6 gap-4">
+        <div className="flex items-start gap-4 min-w-0">
           {/* Club Logo */}
           <div className="w-16 h-16 rounded-2xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center overflow-hidden shrink-0 border border-zinc-200 dark:border-zinc-700 shadow-sm">
             {club.logo_url ? (
@@ -113,29 +113,27 @@ export default async function ClubDetailPage({
             )}
           </div>
           
-          {/* Club Name & Member Count */}
-          <div className="flex flex-col gap-1.5">
-            <h1 className="text-2xl font-black text-zinc-900 dark:text-white tracking-tight break-keep">
+          {/* Club Name & Badges */}
+          <div className="flex flex-col gap-1.5 min-w-0">
+            <h1 className="text-2xl font-black text-zinc-900 dark:text-white tracking-tight break-keep truncate">
               {club.name}
             </h1>
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2 mt-0.5">
               {club.member_count !== undefined && (
-                <span className="inline-flex items-center text-xs font-medium text-zinc-500 bg-zinc-100 dark:bg-zinc-800 px-2.5 py-1 rounded-full w-fit">
-                <Users className="w-3.5 h-3.5 mr-1" />
-                {club.member_count} {locale === "ko" ? "명" : "Members"}
+                <span className="inline-flex items-center text-xs font-medium text-zinc-500 bg-zinc-100 dark:bg-zinc-800 px-2.5 py-1 rounded-full shrink-0">
+                  <Users className="w-3.5 h-3.5 mr-1" />
+                  {club.member_count} {locale === "ko" ? "명" : "Members"}
                 </span>
               )}
-            </div>
-            <div className="flex flex-wrap items-center gap-2">
               {club.monthly_rank && (club.monthly_vote_count ?? 0) > 0 ? (
-                <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700 ring-1 ring-amber-200 dark:bg-amber-950/30 dark:text-amber-300 dark:ring-amber-900">
+                <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700 ring-1 ring-amber-200 dark:bg-amber-950/30 dark:text-amber-300 dark:ring-amber-900 shrink-0">
                   <Medal className="h-3.5 w-3.5" />
                   {locale === "ko"
                     ? `${club.monthly_rank_tied ? "공동 " : ""}${club.monthly_rank}위`
                     : `${club.monthly_rank_tied ? "T-" : "#"}${club.monthly_rank}`}
                 </span>
               ) : null}
-              <span className="inline-flex items-center gap-1 rounded-full bg-rose-50 px-2.5 py-1 text-xs font-semibold text-rose-600 ring-1 ring-rose-200 dark:bg-rose-950/30 dark:text-rose-300 dark:ring-rose-900">
+              <span className="inline-flex items-center gap-1 rounded-full bg-rose-50 px-2.5 py-1 text-xs font-semibold text-rose-600 ring-1 ring-rose-200 dark:bg-rose-950/30 dark:text-rose-300 dark:ring-rose-900 shrink-0">
                 <Heart className="h-3.5 w-3.5 fill-current" />
                 {locale === "ko"
                   ? `이번 달 응원 ${(club.monthly_vote_count ?? 0).toLocaleString()}표`
@@ -145,8 +143,17 @@ export default async function ClubDetailPage({
           </div>
         </div>
 
-        {/* Share Button */}
-        <ClubShareButton club={club} />
+        {/* Actions (Card & Share) */}
+        <div className="flex items-center gap-1 shrink-0">
+          <Link
+            href={`/${locale}/clubs/${club.id}/card`}
+            className="p-2.5 text-zinc-500 hover:text-blue-600 hover:bg-blue-50 dark:text-zinc-400 dark:hover:text-blue-400 dark:hover:bg-blue-900/20 rounded-full transition-colors flex items-center justify-center"
+            title={t("card.view", { fallback: "카드 보기" })}
+          >
+            <CreditCard className="w-5 h-5" />
+          </Link>
+          <ClubShareButton club={club} />
+        </div>
       </div>
 
       <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 mb-8 shadow-sm">
@@ -191,57 +198,53 @@ export default async function ClubDetailPage({
 
           {/* Bottom Row: Actions */}
           <div className="mt-4 grid grid-cols-2 gap-3">
-             <ClubVoteButton
-               clubId={club.id}
-               isLoggedIn={clubVoteSummary.isLoggedIn}
-               didVoteToday={clubVoteSummary.votedClubIdsToday.includes(club.id)}
-             />
-
-             <Link
-               href={`/${locale}/clubs/${club.id}/card`}
-               className={`${clubDetailActionButtonClass} border border-zinc-200 bg-zinc-900 text-white transition-colors hover:bg-zinc-800 dark:border-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200`}
-             >
-               <CreditCard className={clubDetailActionIconClass} />
-               <span className={clubDetailActionLabelClass}>{t("card.view", { fallback: "카드 보기" })}</span>
-             </Link>
-
-             <ClubSubscribeButton
-               clubId={club.id}
-               isLoggedIn={clubVoteSummary.isLoggedIn}
-               isSubscribed={isSubscribed}
-               className={club.kakao_open_chat_url ? "" : "col-span-2"}
-             />
+             <div className={club.kakao_open_chat_url ? "col-span-1" : "col-span-2"}>
+               <ClubVoteButton
+                 clubId={club.id}
+                 isLoggedIn={clubVoteSummary.isLoggedIn}
+                 didVoteToday={clubVoteSummary.votedClubIdsToday.includes(club.id)}
+               />
+             </div>
 
              {club.kakao_open_chat_url && (
-               <a
-                 href={club.kakao_open_chat_url}
-                 target="_blank"
-                 rel="noreferrer"
-                 className={`${clubDetailActionButtonClass} bg-[#FAE100] text-[#371D1E] transition-colors hover:bg-[#FCE620]`}
-               >
-                 <MessageCircle className={`${clubDetailActionIconClass} fill-current`} />
-                 <span className={clubDetailActionLabelClass}>
-                   {locale === "ko" ? "오픈채팅 참여" : "KakaoTalk Open Chat"}
-                 </span>
-               </a>
+               <div className="col-span-1">
+                 <a
+                   href={club.kakao_open_chat_url}
+                   target="_blank"
+                   rel="noreferrer"
+                   className={`${clubDetailActionButtonClass} bg-[#FAE100] text-[#371D1E] transition-colors hover:bg-[#FCE620]`}
+                 >
+                   <MessageCircle className={`${clubDetailActionIconClass} fill-current`} />
+                   <span className={clubDetailActionLabelClass}>
+                     {locale === "ko" ? "오픈채팅 참여" : "KakaoTalk Open Chat"}
+                   </span>
+                 </a>
+               </div>
              )}
 
-             {club.created_by && (
-               <StartChatButton
-                 targetUserId={club.created_by}
-                 label={locale === "ko" ? "동호회 문의하기" : "Contact Club"}
-                 className={`${clubDetailActionButtonClass} col-span-2 bg-[#1e3a6e] text-white hover:bg-[#162d58] dark:bg-[#1e3a6e] dark:hover:bg-[#162d58]`}
-                 origin={{
-                   type: "club",
-                   id: club.id,
-                   metadata: {
-                     // Single `name` column; same value used regardless of
-                     // recipient locale. clubNameKo/clubNameEn collapse onto
-                     // this when only one is populated.
-                     clubName: club.name,
-                   },
-                 }}
+             <div className="col-span-2">
+               <ClubSubscribeButton
+                 clubId={club.id}
+                 isLoggedIn={clubVoteSummary.isLoggedIn}
+                 isSubscribed={isSubscribed}
                />
+             </div>
+
+             {club.created_by && (
+               <div className="col-span-2">
+                 <StartChatButton
+                   targetUserId={club.created_by}
+                   label={locale === "ko" ? "동호회 문의하기" : "Contact Club"}
+                   className={`${clubDetailActionButtonClass} bg-[#1e3a6e] text-white hover:bg-[#162d58] dark:bg-[#1e3a6e] dark:hover:bg-[#162d58]`}
+                   origin={{
+                     type: "club",
+                     id: club.id,
+                     metadata: {
+                       clubName: club.name,
+                     },
+                   }}
+                 />
+               </div>
              )}
           </div>
         </div>

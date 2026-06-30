@@ -173,8 +173,8 @@
             "ratioPost": "Post 4:5"
         },
         "subscription": {
-            "subscribe": "Get Updates",
-            "subscribed": "Subscribed"
+            "subscribe": "Register as My Team",
+            "subscribed": "Registered as My Team"
         }
     },
     "chat": {
@@ -365,12 +365,14 @@
         },
         "menu": {
             "profile": "Profile",
+            "clubs": "My Teams",
             "matches": "My Matches",
             "language": "Language",
             "notifications": "Notifications"
         },
         "subpageTitle": {
             "profile": "Profile",
+            "clubs": "My Teams",
             "matches": "My Matches",
             "language": "Language Settings",
             "notifications": "Notification Settings",

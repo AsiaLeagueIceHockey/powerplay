@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { Bell } from "lucide-react";
+import { UserPlus, Check, UserMinus } from "lucide-react";
 
-import { subscribeToClubNews } from "@/app/actions/clubs";
+import { subscribeToClubNews, unsubscribeFromClubNews } from "@/app/actions/clubs";
 import {
   clubDetailActionButtonClass,
   clubDetailActionIconClass,
@@ -31,13 +31,36 @@ export function ClubSubscribeButton({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [subscribed, setSubscribed] = useState(isSubscribed);
 
-  const handleSubscribe = async () => {
+  const handleToggle = async () => {
     if (!isLoggedIn) {
       router.push(`/${locale}/login`);
       return;
     }
 
     if (subscribed) {
+      const confirmLeave = window.confirm(
+        locale === "ko"
+          ? "정말 소속팀에서 나가시겠습니까?"
+          : "Are you sure you want to leave this team?"
+      );
+      if (!confirmLeave) return;
+
+      setIsSubmitting(true);
+      const result = await unsubscribeFromClubNews(clubId);
+      setIsSubmitting(false);
+
+      if (!result.success) {
+        alert(
+          result.error ||
+          (locale === "ko"
+            ? "팀에서 나가는 중 문제가 발생했어요."
+            : "Something went wrong while leaving.")
+        );
+        return;
+      }
+
+      setSubscribed(false);
+      router.refresh();
       return;
     }
 
@@ -53,8 +76,8 @@ export function ClubSubscribeButton({
 
       alert(
         locale === "ko"
-          ? "소식 구독 처리 중 문제가 발생했어요. 잠시 후 다시 시도해주세요."
-          : "Something went wrong while subscribing. Please try again."
+          ? "소속팀 등록 처리 중 문제가 발생했어요. 잠시 후 다시 시도해주세요."
+          : "Something went wrong while registering. Please try again."
       );
       return;
     }
@@ -66,25 +89,29 @@ export function ClubSubscribeButton({
   return (
     <button
       type="button"
-      onClick={handleSubscribe}
-      disabled={subscribed || isSubmitting}
-      className={`${clubDetailActionButtonClass} border border-zinc-200 transition-all ${
-        subscribed || isSubmitting
-          ? "bg-zinc-100 text-zinc-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400"
-          : "bg-white text-zinc-900 hover:border-zinc-300 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white dark:hover:border-zinc-600 dark:hover:bg-zinc-800"
+      onClick={handleToggle}
+      disabled={isSubmitting}
+      className={`${clubDetailActionButtonClass} border transition-all ${
+        subscribed
+          ? "border-red-200 bg-red-50 text-red-600 hover:border-red-300 hover:bg-red-100 dark:border-red-900/50 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/40"
+          : "border-zinc-200 bg-white text-zinc-900 hover:border-zinc-300 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white dark:hover:border-zinc-600 dark:hover:bg-zinc-800"
       } ${className}`}
     >
-      <Bell
-        strokeWidth={2.25}
-        className={`${clubDetailActionIconClass} ${subscribed || isSubmitting ? "" : "text-zinc-900 dark:text-white"}`}
-      />
+      {isSubmitting ? (
+        <span className="w-5 h-5 block opacity-50" />
+      ) : subscribed ? (
+        <UserMinus strokeWidth={2.25} className={`${clubDetailActionIconClass}`} />
+      ) : (
+        <UserPlus
+          strokeWidth={2.25}
+          className={`${clubDetailActionIconClass} text-zinc-900 dark:text-white`}
+        />
+      )}
       <span className={clubDetailActionLabelClass}>
         {isSubmitting
           ? "..."
           : subscribed
-          ? locale === "ko"
-            ? t("subscribed")
-            : t("subscribed")
+          ? (locale === "ko" ? "팀에서 나가기" : "Leave Team")
           : locale === "ko"
           ? t("subscribe")
           : t("subscribe")}
