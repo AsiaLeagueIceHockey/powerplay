@@ -115,7 +115,7 @@ export default async function ClubDetailPage({
           
           {/* Club Name & Badges */}
           <div className="flex flex-col gap-1.5 min-w-0">
-            <h1 className="text-2xl font-black text-zinc-900 dark:text-white tracking-tight break-keep truncate">
+            <h1 className="text-2xl font-black text-zinc-900 dark:text-white tracking-tight break-keep">
               {club.name}
             </h1>
             <div className="flex flex-wrap items-center gap-2 mt-0.5">
