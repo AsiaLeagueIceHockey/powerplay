@@ -367,19 +367,31 @@ export async function getAdminClubs(): Promise<Club[]> {
   // Re-reading request: "Among admins... creator... and admin users who are joined".
   // It suggests visibility. I will include all joined clubs.
 
-  // 1. Created clubs
-  const { data: createdClubs } = await supabase
+  // Find clubs where user is an admin
+  const { data: adminMemberships } = await supabase
+    .from("club_memberships")
+    .select("club_id")
+    .eq("user_id", user.id)
+    .eq("role", "admin");
+
+  const adminClubIds = adminMemberships?.map((m) => m.club_id) || [];
+
+  let query = supabase
     .from("clubs")
     .select("*, club_rinks(rink:rinks(*))")
-    .eq("created_by", user.id)
     .order("name", { ascending: true });
 
-  // For regular admins, ONLY show clubs they created (as per user request)
-  // No longer showing clubs they joined.
+  if (adminClubIds.length > 0) {
+    query = query.or(`created_by.eq.${user.id},id.in.(${adminClubIds.join(',')})`);
+  } else {
+    query = query.eq("created_by", user.id);
+  }
+
+  const { data: managedClubs } = await query;
 
   const memberCountMap = await memberCountMapPromise;
   const clubsWithCounts = await Promise.all(
-    (createdClubs || []).map(async (club) => {
+    (managedClubs || []).map(async (club) => {
       // Fetch detailed member info
       const { data: membersData } = await supabase
         .from("club_memberships")

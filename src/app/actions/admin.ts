@@ -909,7 +909,16 @@ export async function getAdminMatches() {
     return [];
   }
 
-  const { data: matches, error } = await supabase
+  // Find clubs where user is an admin
+  const { data: adminMemberships } = await supabase
+    .from("club_memberships")
+    .select("club_id")
+    .eq("user_id", user.id)
+    .eq("role", "admin");
+
+  const adminClubIds = adminMemberships?.map((m) => m.club_id) || [];
+
+  let query = supabase
     .from("matches")
     .select(
       `
@@ -927,8 +936,15 @@ export async function getAdminMatches() {
       created_by
     `
     )
-    .eq("created_by", user.id)
     .order("start_time", { ascending: true });
+
+  if (adminClubIds.length > 0) {
+    query = query.or(`created_by.eq.${user.id},club_id.in.(${adminClubIds.join(',')})`);
+  } else {
+    query = query.eq("created_by", user.id);
+  }
+
+  const { data: matches, error } = await query;
 
   if (error) {
     console.error("Error fetching admin matches:", error);
