@@ -15,6 +15,7 @@ interface ProfileEditorProps {
   phone: string | null;
   fullName: string | null;
   clubs: { id: string; name: string }[];
+  myClubIds: string[];
   cardIssuedAt?: string | null;
   updatedAt?: string | null;
 }
@@ -28,6 +29,7 @@ export function ProfileEditor({
   phone,
   fullName,
   clubs,
+  myClubIds,
   cardIssuedAt,
   updatedAt
 }: ProfileEditorProps) {
@@ -68,6 +70,17 @@ export function ProfileEditor({
   }, [bio, initialBio, startYear, initialYear, startMonth, initialMonth, primaryClubIdState, primaryClubId, positions, detailedPositions, stick, stickDirection, phoneState, phone, nameState, fullName]);
 
   const handleSave = async () => {
+    if (primaryClubIdState && primaryClubIdState !== primaryClubId) {
+      if (!myClubIds.includes(primaryClubIdState)) {
+        const confirmJoin = window.confirm(
+          t("profile.confirmJoinClub", { fallback: "선택하신 동호회의 소속 멤버가 아닙니다. 해당 동호회를 내 소속팀으로 등록(가입)하시겠습니까?" })
+        );
+        if (!confirmJoin) {
+          return;
+        }
+      }
+    }
+
     setLoading(true);
     const fd = new FormData();
     fd.set("bio", bio);

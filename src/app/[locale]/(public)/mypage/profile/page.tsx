@@ -12,8 +12,13 @@ export default async function MypageProfilePage() {
     redirect(`/${locale}/login`);
   }
 
-  const [t, clubsData] = await Promise.all([getTranslations(), getClubs()]);
+  const [t, clubsData, myClubs] = await Promise.all([
+    getTranslations(), 
+    getClubs(),
+    import('@/app/actions/clubs').then(m => m.getMyClubs())
+  ]);
   const clubs = clubsData.map((c) => ({ id: c.id, name: c.name }));
+  const myClubIds = myClubs.map((m) => m.club_id);
 
   return (
     <div className="container mx-auto max-w-2xl px-4">
@@ -31,6 +36,7 @@ export default async function MypageProfilePage() {
         phone={profile?.phone || null}
         fullName={profile?.full_name || null}
         clubs={clubs}
+        myClubIds={myClubIds}
         cardIssuedAt={profile?.card_issued_at || null}
         updatedAt={profile?.updated_at || null}
       />
