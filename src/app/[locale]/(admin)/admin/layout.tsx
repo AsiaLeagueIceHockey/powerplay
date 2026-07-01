@@ -153,6 +153,12 @@ export default async function AdminLayout({
                   ✉️ Email Test
                 </Link>
                 <Link
+                  href={`/${locale}/admin/marketing`}
+                  className="block rounded-lg px-4 py-2.5 text-sm font-medium text-zinc-300 hover:bg-zinc-800 hover:text-white"
+                >
+                  📱 인스타 카드뉴스
+                </Link>
+                <Link
                   href={`/${locale}/admin/audit-logs`}
                   className="block rounded-lg px-4 py-2.5 text-sm font-medium text-zinc-300 hover:bg-zinc-800 hover:text-white"
                 >
