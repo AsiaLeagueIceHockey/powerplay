@@ -554,7 +554,11 @@ export function SchedulePatternCard({
                 <div className="relative">
                   <input
                     type="text"
-                    value={pattern.rentalFee ? pattern.rentalFee.toLocaleString() : ""}
+                    value={
+                      pattern.rentalFee !== undefined && pattern.rentalFee !== null
+                        ? pattern.rentalFee.toLocaleString()
+                        : ""
+                    }
                     onChange={(e) => {
                       const raw = e.target.value.replace(/[^0-9]/g, "");
                       update({ rentalFee: raw ? parseInt(raw) : 0 });

@@ -212,6 +212,23 @@ function InfoItem({
   );
 }
 
+function SortIcon({
+  field,
+  sortField,
+  sortAsc,
+}: {
+  field: keyof UserProfile;
+  sortField: keyof UserProfile;
+  sortAsc: boolean;
+}) {
+  if (sortField !== field) return null;
+  return sortAsc ? (
+    <ChevronUp className="w-3.5 h-3.5 inline ml-1" />
+  ) : (
+    <ChevronDown className="w-3.5 h-3.5 inline ml-1" />
+  );
+}
+
 export function UserManagementTab({ initialUsers }: UserManagementTabProps) {
   const [search, setSearch] = useState("");
   const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
@@ -247,15 +264,6 @@ export function UserManagementTab({ initialUsers }: UserManagementTabProps) {
       setSortField(field);
       setSortAsc(true);
     }
-  }
-
-  function SortIcon({ field }: { field: keyof UserProfile }) {
-    if (sortField !== field) return null;
-    return sortAsc ? (
-      <ChevronUp className="w-3.5 h-3.5 inline ml-1" />
-    ) : (
-      <ChevronDown className="w-3.5 h-3.5 inline ml-1" />
-    );
   }
 
   return (
@@ -302,7 +310,7 @@ export function UserManagementTab({ initialUsers }: UserManagementTabProps) {
                   className="px-5 py-3.5 font-medium text-zinc-400 cursor-pointer hover:text-zinc-200 transition-colors whitespace-nowrap"
                   onClick={() => handleSort("full_name")}
                 >
-                  이름 <SortIcon field="full_name" />
+                  이름 <SortIcon field="full_name" sortField={sortField} sortAsc={sortAsc} />
                 </th>
                 <th className="px-5 py-3.5 font-medium text-zinc-400 whitespace-nowrap">이메일</th>
                 <th className="px-5 py-3.5 font-medium text-zinc-400 whitespace-nowrap">전화번호</th>
@@ -310,19 +318,19 @@ export function UserManagementTab({ initialUsers }: UserManagementTabProps) {
                   className="px-5 py-3.5 font-medium text-zinc-400 cursor-pointer hover:text-zinc-200 transition-colors whitespace-nowrap"
                   onClick={() => handleSort("role")}
                 >
-                  역할 <SortIcon field="role" />
+                  역할 <SortIcon field="role" sortField={sortField} sortAsc={sortAsc} />
                 </th>
                 <th
                   className="px-5 py-3.5 font-medium text-zinc-400 cursor-pointer hover:text-zinc-200 transition-colors whitespace-nowrap"
                   onClick={() => handleSort("points")}
                 >
-                  충전금액 <SortIcon field="points" />
+                  충전금액 <SortIcon field="points" sortField={sortField} sortAsc={sortAsc} />
                 </th>
                 <th
                   className="px-5 py-3.5 font-medium text-zinc-400 cursor-pointer hover:text-zinc-200 transition-colors whitespace-nowrap"
                   onClick={() => handleSort("created_at")}
                 >
-                  가입일 <SortIcon field="created_at" />
+                  가입일 <SortIcon field="created_at" sortField={sortField} sortAsc={sortAsc} />
                 </th>
               </tr>
             </thead>
