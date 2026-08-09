@@ -934,7 +934,7 @@ export function CardNewsStudio() {
                           <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-xl border border-sky-900/60 bg-zinc-900/90 shadow-inner overflow-hidden">
                             <TamagotchiAvatar
                               size={58}
-                              colors={{ helmet: "#ffffff", jersey: "#1e3a8a", pants: "#0f172a", skates: "#334155" }}
+                              colors={{ helmet: "#ffffff", jersey: "#1e3a8a", skate: "#334155" }}
                               action="train"
                               alt="Power Player Character"
                             />
