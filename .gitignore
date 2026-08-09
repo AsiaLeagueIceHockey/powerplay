@@ -47,3 +47,9 @@ public/sw*
 # Claude Code harness — 중간 산출물
 /_workspace/
 /_workspace_prev/
+
+# OMX runtime artifacts (durable specs and plans remain tracked)
+/.omx/logs/
+/.omx/state/
+/.omx/metrics.json
+/.omx/notepad.md
