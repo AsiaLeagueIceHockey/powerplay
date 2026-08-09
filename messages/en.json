@@ -86,7 +86,8 @@
     "passwordMismatch": "Passwords do not match",
     "signInWithGoogle": "Continue with Google",
     "signInWithKakao": "Continue with Kakao",
-    "loginNote": "PowerPlay Social Login"
+    "loginNote": "PowerPlay Social Login",
+    "oauthFailed": "We couldn't complete sign-in. Please try again."
   },
   "profile": {
     "title": "Profile",
@@ -688,6 +689,29 @@
       },
       "empty": "No matches this day",
       "emptyWeek": "No matches scheduled this week"
+    }
+  },
+  "loungeNotices": {
+    "title": "Notices",
+    "description": "See the latest notices and important updates from {businessName}.",
+    "empty": "No notices have been posted yet.",
+    "emptyDescription": "New notices will appear here when they are published.",
+    "subscription": {
+      "login": "Log in for notice alerts",
+      "subscribe": "Get notice alerts",
+      "unsubscribe": "Turn off notice alerts",
+      "processing": "Updating...",
+      "deviceGuide": "Set up device alerts",
+      "activeDescription": "This account is subscribed to new notice alerts.",
+      "deviceDescription": "Your account is subscribed. Finish notification setup to receive push alerts on this device.",
+      "error": "We couldn't update your notice alerts. Please try again shortly."
+    },
+    "detail": {
+      "back": "Back to business page",
+      "from": "Posted by",
+      "label": "Lounge notice",
+      "share": "Share notice",
+      "shareText": "📢 Notice from {businessName}\n{title}\nRead it on PowerPlay Lounge!"
     }
   },
   "youth": {

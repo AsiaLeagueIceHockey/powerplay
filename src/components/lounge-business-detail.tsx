@@ -1,16 +1,20 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { CalendarDays, Globe, Instagram, List, MessageCircle, Phone, Trophy } from "lucide-react";
+import { BellRing, CalendarDays, ChevronRight, Globe, Instagram, List, MessageCircle, Phone, Trophy } from "lucide-react";
+import { useTranslations } from "next-intl";
 import type { LoungeBusiness, LoungeEvent } from "@/app/actions/lounge";
 import { getLoungeBusinessCategoryLabel } from "@/lib/lounge-business-category";
+import type { LoungeNotice } from "@/lib/lounge-notices";
 import { DateFilter } from "./date-filter";
 import { LoungeCalendarView } from "./lounge-calendar-view";
 import { LoungeCtaButton } from "./lounge-cta-button";
 import { LoungeEventCard } from "./lounge-event-card";
 import { LoungeImpressionTracker } from "./lounge-impression-tracker";
 import { LoungeLocationMap } from "./lounge-location-map";
+import { LoungeNoticeSubscribeButton } from "./lounge-notice-subscribe-button";
 import { LoungeShareButton } from "./lounge-share-button";
 import { getLoungeBusinessCategoryTheme, loungeIceGoldTheme } from "./lounge-theme";
 
@@ -21,6 +25,9 @@ interface LoungeBusinessDetailProps {
   source?: string;
   selectedEventId?: string;
   initialDate?: string;
+  notices: LoungeNotice[];
+  isLoggedIn: boolean;
+  isNoticeSubscribed: boolean;
 }
 
 const SCROLL_TO_ALL_DELAY = 180;
@@ -48,7 +55,11 @@ export function LoungeBusinessDetail({
   source,
   selectedEventId,
   initialDate,
+  notices,
+  isLoggedIn,
+  isNoticeSubscribed,
 }: LoungeBusinessDetailProps) {
+  const t = useTranslations("loungeNotices");
   const categoryLabel = getLoungeBusinessCategoryLabel(locale, business.category);
   const categoryTheme = getLoungeBusinessCategoryTheme(business.category);
 
@@ -69,6 +80,19 @@ export function LoungeBusinessDetail({
     if (!selectedDate) return events;
     return events.filter((event) => toDateKeyKst(event.start_time) === selectedDate);
   }, [events, selectedDate]);
+
+  const sortedNotices = useMemo(
+    () => [...notices].sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at)),
+    [notices]
+  );
+
+  const formatNoticeDate = (date: string) =>
+    new Intl.DateTimeFormat(locale === "ko" ? "ko-KR" : "en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      timeZone: "Asia/Seoul",
+    }).format(new Date(date));
 
   useEffect(() => {
     if (!selectedEventId && !initialDate) return;
@@ -242,6 +266,72 @@ export function LoungeBusinessDetail({
             </div>
           </div>
         </div>
+      </section>
+
+      <section
+        aria-labelledby="lounge-notices-heading"
+        className="space-y-4 rounded-[28px] border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-950 md:p-6"
+      >
+        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
+          <div>
+            <div className="flex items-center gap-2">
+              <BellRing className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+              <h2
+                id="lounge-notices-heading"
+                className="text-xl font-black text-zinc-900 dark:text-zinc-100"
+              >
+                {t("title")}
+              </h2>
+            </div>
+            <p className="mt-1.5 text-sm leading-6 text-zinc-500 dark:text-zinc-400">
+              {t("description", { businessName: business.name })}
+            </p>
+          </div>
+
+          <LoungeNoticeSubscribeButton
+            businessId={business.id}
+            businessSlug={business.slug}
+            isLoggedIn={isLoggedIn}
+            initialSubscribed={isNoticeSubscribed}
+          />
+        </div>
+
+        {sortedNotices.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-zinc-300 bg-zinc-50/70 px-5 py-8 text-center dark:border-zinc-700 dark:bg-zinc-900/60">
+            <p className="text-sm font-semibold text-zinc-600 dark:text-zinc-300">
+              {t("empty")}
+            </p>
+            <p className="mt-1 text-xs leading-5 text-zinc-500 dark:text-zinc-400">
+              {t("emptyDescription")}
+            </p>
+          </div>
+        ) : (
+          <div className="divide-y divide-zinc-200 overflow-hidden rounded-2xl border border-zinc-200 dark:divide-zinc-800 dark:border-zinc-800">
+            {sortedNotices.map((notice) => (
+              <Link
+                key={notice.id}
+                href={`/${locale}/lounge/${business.slug}/notices/${notice.id}`}
+                className="group flex items-start justify-between gap-4 bg-white p-4 transition hover:bg-amber-50/70 dark:bg-zinc-950 dark:hover:bg-amber-950/20 md:p-5"
+              >
+                <div className="min-w-0">
+                  <p className="line-clamp-1 font-bold text-zinc-900 group-hover:text-amber-800 dark:text-zinc-100 dark:group-hover:text-amber-300">
+                    {notice.title}
+                  </p>
+                  <p className="mt-1.5 line-clamp-2 whitespace-pre-line text-sm leading-6 text-zinc-500 dark:text-zinc-400">
+                    {notice.body}
+                  </p>
+                  <time
+                    dateTime={notice.created_at}
+                    className="mt-2 block text-xs font-medium text-zinc-400 dark:text-zinc-500"
+                  >
+                    {formatNoticeDate(notice.created_at)} · KST
+                  </time>
+                </div>
+                <ChevronRight className="mt-1 h-5 w-5 shrink-0 text-zinc-400 transition-transform group-hover:translate-x-0.5 group-hover:text-amber-600" />
+              </Link>
+            ))}
+          </div>
+        )}
       </section>
 
       <section id="all-schedules" ref={allSchedulesRef} className="space-y-4 pt-8">

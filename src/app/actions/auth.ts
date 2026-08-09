@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { logAndNotify } from "@/lib/audit";
+import { buildOAuthCallbackUrl } from "@/lib/auth-return-path";
 
 const CLUB_LOCALES = ["ko", "en"] as const;
 
@@ -79,6 +80,24 @@ function resolveOriginFromHeaders(headersList: Headers) {
   return process.env.SITE_URL || "https://powerplay.kr";
 }
 
+function resolveOAuthOriginFromHeaders(headersList: Headers) {
+  if (process.env.SITE_URL) {
+    return new URL(process.env.SITE_URL).origin;
+  }
+
+  if (process.env.NODE_ENV !== "production") {
+    const requestOrigin = headersList.get("origin");
+    if (requestOrigin) {
+      const parsedOrigin = new URL(requestOrigin);
+      if (["localhost", "127.0.0.1"].includes(parsedOrigin.hostname)) {
+        return parsedOrigin.origin;
+      }
+    }
+  }
+
+  return "https://powerplay.kr";
+}
+
 export async function signUp(formData: FormData) {
   const supabase = await createClient();
   const headersList = await headers();
@@ -133,13 +152,17 @@ export async function signOut() {
   redirect("/");
 }
 
-export async function signInWithGoogle(origin: string) {
+export async function signInWithGoogle(
+  next?: string | null,
+  locale: string = "ko"
+) {
   const supabase = await createClient();
+  const origin = resolveOAuthOriginFromHeaders(await headers());
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
     options: {
-      redirectTo: `${origin}/ko/auth/callback`,
+      redirectTo: buildOAuthCallbackUrl(origin, next, locale),
       queryParams: {
         access_type: "offline",
         prompt: "consent",
@@ -158,13 +181,17 @@ export async function signInWithGoogle(origin: string) {
   return { error: "Failed to get OAuth URL" };
 }
 
-export async function signInWithKakao(origin: string) {
+export async function signInWithKakao(
+  next?: string | null,
+  locale: string = "ko"
+) {
   const supabase = await createClient();
+  const origin = resolveOAuthOriginFromHeaders(await headers());
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "kakao",
     options: {
-      redirectTo: `${origin}/ko/auth/callback`,
+      redirectTo: buildOAuthCallbackUrl(origin, next, locale),
     },
   });
 

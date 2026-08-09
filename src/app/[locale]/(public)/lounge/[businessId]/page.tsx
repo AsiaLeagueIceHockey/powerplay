@@ -2,7 +2,12 @@ import { notFound } from "next/navigation";
 import { setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
 import { getPublicLoungeBusinessDetail } from "@/app/actions/lounge";
+import {
+  getMyLoungeNoticeSubscription,
+  getPublicLoungeNotices,
+} from "@/app/actions/lounge-notices";
 import { LoungeBusinessDetail } from "@/components/lounge-business-detail";
+import { createClient } from "@/lib/supabase/server";
 
 const siteUrl = "https://powerplay.kr";
 
@@ -81,6 +86,13 @@ export default async function LoungeBusinessDetailPage({
     notFound();
   }
 
+  const supabase = await createClient();
+  const [notices, isNoticeSubscribed, authResult] = await Promise.all([
+    getPublicLoungeNotices(data.business.id),
+    getMyLoungeNoticeSubscription(data.business.id),
+    supabase.auth.getUser(),
+  ]);
+
   return (
     <LoungeBusinessDetail
       business={data.business}
@@ -89,6 +101,9 @@ export default async function LoungeBusinessDetailPage({
       source={source}
       selectedEventId={eventId}
       initialDate={date}
+      notices={notices}
+      isLoggedIn={Boolean(authResult.data.user)}
+      isNoticeSubscribed={isNoticeSubscribed}
     />
   );
 }

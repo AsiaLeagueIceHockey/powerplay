@@ -1,11 +1,16 @@
 "use client";
 
-import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { Suspense, useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
+import { useSearchParams } from "next/navigation";
 import { signInWithGoogle, signInWithKakao } from "@/app/actions/auth";
 
-export default function LoginPage() {
+function LoginContent() {
   const t = useTranslations("auth");
+  const locale = useLocale();
+  const searchParams = useSearchParams();
+  const next = searchParams.get("next");
+  const oauthError = searchParams.get("error") === "oauth" ? t("oauthFailed") : null;
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<"google" | "kakao" | null>(null);
 
@@ -13,7 +18,7 @@ export default function LoginPage() {
     setIsLoading("google");
     setError(null);
 
-    const result = await signInWithGoogle(window.location.origin);
+    const result = await signInWithGoogle(next, locale);
 
     if (result?.error) {
       setError(result.error);
@@ -25,7 +30,7 @@ export default function LoginPage() {
     setIsLoading("kakao");
     setError(null);
 
-    const result = await signInWithKakao(window.location.origin);
+    const result = await signInWithKakao(next, locale);
 
     if (result?.error) {
       setError(result.error);
@@ -38,9 +43,9 @@ export default function LoginPage() {
       <div className="rounded-lg border border-zinc-200 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
         <h1 className="mb-6 text-center text-2xl font-bold">{t("login")}</h1>
 
-        {error && (
+        {(error || oauthError) && (
           <div className="mb-4 rounded-lg bg-red-50 p-4 text-sm text-red-600 dark:bg-red-900/20 dark:text-red-400">
-            {error}
+            {error || oauthError}
           </div>
         )}
 
@@ -133,5 +138,13 @@ export default function LoginPage() {
           )}
         </div>
       </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="mx-auto min-h-72 max-w-md" aria-hidden="true" />}>
+      <LoginContent />
+    </Suspense>
   );
 }

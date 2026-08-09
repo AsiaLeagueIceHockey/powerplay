@@ -7,12 +7,14 @@ import type {
   LoungeMembership,
   LoungeMetricRow,
 } from "@/app/actions/lounge";
+import type { LoungeNotice } from "@/app/actions/lounge-notices";
 import { LoungeBusinessForm } from "./lounge-business-form";
 import { LoungeEventForm } from "./lounge-event-form";
 import { LoungeFeatureManager } from "./lounge-feature-manager";
+import { LoungeNoticeManager } from "./lounge-notice-manager";
 import { LoungePerformancePanel } from "./lounge-performance-panel";
 
-type LoungeAdminTab = "performance" | "business" | "events" | "operations";
+type LoungeAdminTab = "performance" | "business" | "events" | "notices" | "operations";
 
 export function LoungeAdminDashboard({
   locale,
@@ -20,6 +22,9 @@ export function LoungeAdminDashboard({
   events,
   rawMetrics,
   membership,
+  membershipActive,
+  notices,
+  noticesLoadError,
   isSuperUser,
   featuredBusinesses,
 }: {
@@ -28,6 +33,9 @@ export function LoungeAdminDashboard({
   events: LoungeEvent[];
   rawMetrics: LoungeMetricRow[];
   membership: LoungeMembership | null;
+  membershipActive: boolean;
+  notices: LoungeNotice[];
+  noticesLoadError?: boolean;
   isSuperUser: boolean;
   featuredBusinesses: LoungeBusiness[];
 }) {
@@ -38,6 +46,7 @@ export function LoungeAdminDashboard({
       { id: "performance" as const, label: locale === "ko" ? "성과" : "Performance" },
       { id: "business" as const, label: locale === "ko" ? "비즈니스" : "Business" },
       { id: "events" as const, label: locale === "ko" ? "일정 관리" : "Events" },
+      { id: "notices" as const, label: locale === "ko" ? "공지사항" : "Notices" },
     ];
 
     if (isSuperUser) {
@@ -86,6 +95,17 @@ export function LoungeAdminDashboard({
       {activeTab === "performance" ? renderPerformance() : null}
       {activeTab === "business" ? <LoungeBusinessForm locale={locale} business={business} /> : null}
       {activeTab === "events" ? <LoungeEventForm locale={locale} events={events} membership={membership} /> : null}
+      {activeTab === "notices" ? (
+        <LoungeNoticeManager
+          locale={locale}
+          business={business}
+          membership={membership}
+          membershipActive={membershipActive}
+          notices={notices}
+          initialLoadError={noticesLoadError}
+          onCreateBusiness={() => setActiveTab("business")}
+        />
+      ) : null}
       {activeTab === "operations" && isSuperUser ? (
         <div className="space-y-6">
           <LoungeFeatureManager locale={locale} businesses={featuredBusinesses} />

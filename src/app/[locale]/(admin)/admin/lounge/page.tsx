@@ -2,6 +2,8 @@ import { setRequestLocale } from "next-intl/server";
 import Link from "next/link";
 import { getLoungeAdminPageData } from "@/app/actions/lounge";
 import { submitLoungeMembershipApplication } from "@/app/actions/lounge";
+import { getManagedLoungeNotices } from "@/app/actions/lounge-notices";
+import type { LoungeNotice } from "@/app/actions/lounge-notices";
 import { LoungeAdminDashboard } from "@/components/lounge-admin-dashboard";
 
 const inquiryLinks = {
@@ -59,6 +61,17 @@ export default async function AdminLoungePage({
 
   const showGate = data.membershipStatus !== "active";
   const latestApplication = data.latestApplication;
+  let notices: LoungeNotice[] = [];
+  let noticesLoadError = false;
+
+  if (!showGate && data.business) {
+    try {
+      notices = await getManagedLoungeNotices(data.business.id);
+    } catch (error) {
+      console.error("[lounge-notices] failed to load managed notices:", error);
+      noticesLoadError = true;
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -195,6 +208,9 @@ export default async function AdminLoungePage({
           events={data.events}
           rawMetrics={data.rawMetrics}
           membership={data.membership}
+          membershipActive={data.membershipStatus === "active"}
+          notices={notices}
+          noticesLoadError={noticesLoadError}
           isSuperUser={data.isSuperUser}
           featuredBusinesses={data.featuredBusinesses}
         />

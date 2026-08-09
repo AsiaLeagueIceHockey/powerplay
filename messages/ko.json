@@ -86,7 +86,8 @@
     "passwordMismatch": "비밀번호가 일치하지 않습니다",
     "signInWithGoogle": "Google로 계속하기",
     "signInWithKakao": "카카오로 계속하기",
-    "loginNote": "파워플레이 소셜 로그인입니다"
+    "loginNote": "파워플레이 소셜 로그인입니다",
+    "oauthFailed": "로그인을 완료하지 못했습니다. 다시 시도해주세요."
   },
   "profile": {
     "title": "프로필",
@@ -688,6 +689,29 @@
       },
       "empty": "이 날은 경기 없어요",
       "emptyWeek": "이번 주는 예정된 경기가 없어요"
+    }
+  },
+  "loungeNotices": {
+    "title": "공지",
+    "description": "{businessName}의 새로운 공지와 중요한 소식을 확인하세요.",
+    "empty": "아직 등록된 공지가 없습니다.",
+    "emptyDescription": "새 공지가 올라오면 이곳에서 바로 확인할 수 있어요.",
+    "subscription": {
+      "login": "로그인하고 공지 알림 받기",
+      "subscribe": "공지 알림 받기",
+      "unsubscribe": "공지 알림 끄기",
+      "processing": "처리 중...",
+      "deviceGuide": "기기 알림 설정",
+      "activeDescription": "이 계정으로 새 공지 알림을 받고 있어요.",
+      "deviceDescription": "계정 구독은 완료됐어요. 이 기기에서 푸시를 받으려면 알림 설정도 완료해 주세요.",
+      "error": "공지 알림 설정을 변경하지 못했습니다. 잠시 후 다시 시도해 주세요."
+    },
+    "detail": {
+      "back": "업체 페이지로 돌아가기",
+      "from": "소식을 전한 곳",
+      "label": "라운지 공지",
+      "share": "공지 공유하기",
+      "shareText": "📢 {businessName} 공지\n{title}\n파워플레이 라운지에서 확인해보세요!"
     }
   },
   "youth": {

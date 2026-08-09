@@ -16,6 +16,7 @@ import { LoungeApplicationManager } from "./lounge-application-manager";
 import { LoungeFeatureManager } from "./lounge-feature-manager";
 import { LoungeMembershipManager } from "./lounge-membership-manager";
 import { LoungePerformancePanel } from "./lounge-performance-panel";
+import { LoungeSuperuserNoticeManager } from "./lounge-superuser-notice-manager";
 
 interface AdminOption {
   id: string;
@@ -25,7 +26,7 @@ interface AdminOption {
   role?: "admin" | "superuser" | null;
 }
 
-type LoungeManagementTab = "overview" | "register" | "applications" | "performance" | "featured" | "banner";
+type LoungeManagementTab = "overview" | "register" | "applications" | "performance" | "notices" | "featured" | "banner";
 
 type LoungeMembershipPhase = "upcoming" | "active" | "expired" | "canceled";
 
@@ -143,6 +144,7 @@ export function LoungeSuperuserManagementDashboard({
     { id: "register" as const, label: locale === "ko" ? "구독 등록" : "Register" },
     { id: "applications" as const, label: locale === "ko" ? "신청 문의" : "Applications" },
     { id: "performance" as const, label: locale === "ko" ? "성과 확인" : "Performance" },
+    { id: "notices" as const, label: locale === "ko" ? "공지 관리" : "Notices" },
     { id: "featured" as const, label: locale === "ko" ? "추천 비즈니스" : "Featured" },
     { id: "banner" as const, label: locale === "ko" ? "배너 관리" : "Banner" },
   ];
@@ -343,6 +345,10 @@ export function LoungeSuperuserManagementDashboard({
 
       {activeTab === "featured" ? (
         <LoungeFeatureManager locale={locale} businesses={businesses} />
+      ) : null}
+
+      {activeTab === "notices" ? (
+        <LoungeSuperuserNoticeManager locale={locale} businesses={businesses} />
       ) : null}
 
       {activeTab === "performance" ? (
