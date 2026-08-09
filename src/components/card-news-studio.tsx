@@ -2,7 +2,8 @@
 
 import React, { useRef, useState } from "react";
 import { toPng } from "html-to-image";
-import { Download, Check, Sparkles, ShieldCheck, ArrowRight, Copy, Users, Zap, Trophy, MapPin, Heart, Share2, Smile, UserPlus, ArrowUpCircle } from "lucide-react";
+import { Download, Check, Sparkles, ShieldCheck, ArrowRight, Copy, Users, Zap, Trophy, MapPin, Heart, Share2, Smile, UserPlus, ArrowUpCircle, ChevronRight } from "lucide-react";
+import { TamagotchiAvatar } from "@/components/tamagotchi-avatar";
 
 interface SlideData {
   id: string;
@@ -226,9 +227,9 @@ const INSTAGRAM_CAPTIONS: Record<string, { title: string; target: string; theme:
 이제 파워플레이 유소년 라운지에서 전국 유소년 팀 정보를 비교하고
 검증된 하키 맘·대디들과 실시간으로 유익한 정보와 고민을 나눠보세요!
 
-1️⃣ 전국 유소년 하키 클럽 & 디비전 탐색
-- U-8, U-10, U-12 연령별 디비전 및 훈련 링장 정보 한눈에 비교!
-- 우리 아이에게 딱 맞는 최적의 유소년 하키 팀을 쉽게 찾을 수 있어요.
+1️⃣ 주니어 클럽 & 유소년 레슨 탐색
+- 전국 유소년 아이스하키 팀, 레슨, 정기 훈련 링크장 정보 한눈에 비교!
+- 우리 아이에게 딱 맞는 최적의 주니어 클럽과 레슨을 쉽게 찾을 수 있어요.
 
 2️⃣ 하키 맘·대디 실시간 Q&A 커뮤니티
 - 스케이트 사이즈 조언, 중고 장비 팁, 대회 후기까지 자유로운 소통!
@@ -278,12 +279,24 @@ export function CardNewsStudio() {
     if (!el) return;
     try {
       setDownloadingIndex(index);
-      const ratio = 1080 / el.offsetWidth;
+      const size = el.offsetWidth;
+      const ratio = 1080 / size;
       const dataUrl = await toPng(el, {
         quality: 1,
+        width: size,
+        height: size,
         pixelRatio: ratio,
         cacheBust: true,
-        style: { transform: "none", margin: "0" },
+        style: {
+          transform: "none",
+          margin: "0",
+          width: `${size}px`,
+          height: `${size}px`,
+          maxHeight: `${size}px`,
+          maxWidth: `${size}px`,
+          overflow: "hidden",
+          borderRadius: "16px",
+        },
       });
       const link = document.createElement("a");
       link.download = `powerplay-cardnews-${activeTab}-slide-${index + 1}.png`;
@@ -305,12 +318,24 @@ export function CardNewsStudio() {
       for (let i = 0; i < currentSlides.length; i++) {
         const el = slideRefs.current[i];
         if (!el) continue;
-        const ratio = 1080 / el.offsetWidth;
+        const size = el.offsetWidth;
+        const ratio = 1080 / size;
         const dataUrl = await toPng(el, {
           quality: 1,
+          width: size,
+          height: size,
           pixelRatio: ratio,
           cacheBust: true,
-          style: { transform: "none", margin: "0" },
+          style: {
+            transform: "none",
+            margin: "0",
+            width: `${size}px`,
+            height: `${size}px`,
+            maxHeight: `${size}px`,
+            maxWidth: `${size}px`,
+            overflow: "hidden",
+            borderRadius: "16px",
+          },
         });
         const link = document.createElement("a");
         link.download = `powerplay-cardnews-${activeTab}-slide-${i + 1}.png`;
@@ -658,29 +683,27 @@ export function CardNewsStudio() {
 
                   {/* S1 - SLIDE 5: CTA */}
                   {idx === 4 && (
-                    <div className="flex flex-col justify-between items-center h-full text-center py-1 w-full z-10">
-                      <div className="mt-auto pt-2">
-                        <h2 className="text-[26px] font-black leading-[1.3] tracking-tight text-white mb-4 flex flex-col items-center">
+                    <div className="flex flex-col justify-center items-center my-auto text-center w-full z-10 gap-7 py-2">
+                      <div>
+                        <h2 className="text-[24px] md:text-[26px] font-black leading-[1.3] tracking-tight text-white flex flex-col items-center">
                           <span className="whitespace-nowrap">올리는 건 <span className="text-[#E8FF00]">30초</span>,</span>
                           <span className="whitespace-nowrap">동호회 관리는 <span className="text-[#E8FF00]">10배</span></span>
                           <span className="whitespace-nowrap">쉬워지는 곳.</span>
                         </h2>
                       </div>
 
-                      <div className="my-auto py-2 flex flex-col items-center w-full">
-                        <div className="mb-3">
-                          <img
-                            src="/long-logo-darkmode.png"
-                            alt="PowerPlay Official Logo"
-                            className="h-12 w-auto mx-auto object-contain drop-shadow-lg"
-                          />
-                        </div>
-                        <div className="text-[15px] font-black text-[#E8FF00] tracking-wide drop-shadow-[0_0_10px_rgba(232,255,0,0.3)] whitespace-nowrap">
+                      <div className="flex flex-col items-center w-full gap-3">
+                        <img
+                          src="/long-logo-darkmode.png"
+                          alt="PowerPlay Official Logo"
+                          className="h-11 md:h-12 w-auto mx-auto object-contain drop-shadow-lg mix-blend-screen"
+                        />
+                        <div className="text-[14px] md:text-[15px] font-black text-[#E8FF00] tracking-wide drop-shadow-[0_0_10px_rgba(232,255,0,0.3)] whitespace-nowrap">
                           &quot;아이스하키를 더 쉽게, 더 가깝게&nbsp;&nbsp;🏒&quot;
                         </div>
                       </div>
 
-                      <div className="w-full mb-1 pb-4 pt-2">
+                      <div className="w-full pt-1">
                         <div className="w-full py-3.5 rounded-xl bg-[#E8FF00] text-black font-black text-xs shadow-xl flex items-center justify-center gap-2 hover:bg-yellow-300 transition cursor-pointer whitespace-nowrap">
                           <span>프로필 링크에서 7월 일정 간편 등록하기</span> <ArrowRight className="w-4 h-4 flex-shrink-0" />
                         </div>
@@ -834,29 +857,27 @@ export function CardNewsStudio() {
 
                   {/* S2 - SLIDE 5: CTA */}
                   {idx === 4 && (
-                    <div className="flex flex-col justify-between items-center h-full text-center py-1 w-full z-10">
-                      <div className="mt-auto pt-2">
-                        <h2 className="text-[26px] font-black leading-[1.3] tracking-tight text-white mb-4 flex flex-col items-center">
+                    <div className="flex flex-col justify-center items-center my-auto text-center w-full z-10 gap-7 py-2">
+                      <div>
+                        <h2 className="text-[24px] md:text-[26px] font-black leading-[1.3] tracking-tight text-white flex flex-col items-center">
                           <span className="whitespace-nowrap">아이스하키를 즐기는</span>
                           <span className="whitespace-nowrap">가장 스마트한 방법,</span>
                           <span className="text-[#00FFCC] whitespace-nowrap">지금 파워플레이에서.</span>
                         </h2>
                       </div>
 
-                      <div className="my-auto py-2 flex flex-col items-center w-full">
-                        <div className="mb-3">
-                          <img
-                            src="/long-logo-darkmode.png"
-                            alt="PowerPlay Official Logo"
-                            className="h-12 w-auto mx-auto object-contain drop-shadow-[0_0_15px_rgba(0,255,204,0.3)]"
-                          />
-                        </div>
-                        <div className="text-[15px] font-black text-[#00FFCC] tracking-wide drop-shadow-[0_0_10px_rgba(0,255,204,0.3)] whitespace-nowrap">
+                      <div className="flex flex-col items-center w-full gap-3">
+                        <img
+                          src="/long-logo-darkmode.png"
+                          alt="PowerPlay Official Logo"
+                          className="h-11 md:h-12 w-auto mx-auto object-contain drop-shadow-[0_0_15px_rgba(0,255,204,0.3)] mix-blend-screen"
+                        />
+                        <div className="text-[14px] md:text-[15px] font-black text-[#00FFCC] tracking-wide drop-shadow-[0_0_10px_rgba(0,255,204,0.3)] whitespace-nowrap">
                           &quot;아이스하키를 더 쉽게, 더 가깝게&nbsp;&nbsp;🏒&quot;
                         </div>
                       </div>
 
-                      <div className="w-full mb-1 pb-4 pt-2">
+                      <div className="w-full pt-1">
                         <div className="w-full py-3.5 rounded-xl bg-[#00FFCC] text-black font-black text-xs shadow-[0_0_20px_rgba(0,255,204,0.3)] flex items-center justify-center gap-2 hover:bg-teal-300 transition cursor-pointer whitespace-nowrap">
                           <span>프로필 링크에서 우리 동호회 찾기</span> <ArrowRight className="w-4 h-4 flex-shrink-0" />
                         </div>
@@ -891,7 +912,7 @@ export function CardNewsStudio() {
 
                   {/* S3 - SLIDE 2: POWER PLAYER (AUTHENTIC TAMAGOTCHI REPLICA) */}
                   {idx === 1 && (
-                    <div className="flex flex-col justify-center my-auto w-full z-10 gap-2.5">
+                    <div className="flex flex-col justify-center my-auto w-full z-10 gap-3">
                       <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-pink-500/20 border border-pink-400/40 text-pink-300 font-extrabold text-[11px] w-fit whitespace-nowrap shrink-0">
                         <span>✨ 마이페이지 &gt; 파워 플레이어</span>
                       </div>
@@ -900,53 +921,57 @@ export function CardNewsStudio() {
                         <span className="whitespace-nowrap"><span className="text-[#FF007F]">나만의 파워 플레이어!</span></span>
                       </h2>
 
-                      {/* 100% Authentic tamagotchi-hero.tsx Replica */}
-                      <div className="p-4 rounded-2xl border border-sky-900/60 bg-gradient-to-br from-sky-950/40 via-zinc-900 to-violet-950/40 shadow-xl flex flex-col gap-3 w-full shrink-0">
-                        <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-black text-white">🏒 파워 플레이어</span>
-                            <span className="text-[10px] bg-sky-500/20 text-sky-300 font-bold px-2 py-0.5 rounded-full border border-sky-500/30">루틴 진행 중</span>
+                      {/* 100% Authentic tamagotchi-hero.tsx Replica with Cute Avatar (Compact) */}
+                      <div className="p-3.5 rounded-2xl border border-sky-800/60 bg-gradient-to-br from-sky-950/80 via-zinc-900 to-violet-950/80 shadow-xl flex flex-col gap-3 w-full shrink-0 my-1">
+                        <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                          <span className="text-sm font-black text-white">파워 플레이어</span>
+                          <div className="flex h-5 w-5 items-center justify-center rounded-full text-zinc-400">
+                            <ChevronRight className="h-4 w-4" />
                           </div>
-                          <span className="text-[11px] font-bold text-sky-400 bg-white/5 px-2.5 py-1 rounded-full border border-white/10">자세히 보기</span>
                         </div>
                         
-                        <div className="grid grid-cols-2 gap-3 pt-0.5">
-                          <div className="space-y-1">
-                            <div className="flex items-center justify-between text-xs font-semibold text-zinc-300">
-                              <span>에너지</span>
-                              <span className="font-black tabular-nums text-white">80</span>
-                            </div>
-                            <div className="h-2 overflow-hidden rounded-full bg-zinc-800">
-                              <div className="h-full rounded-full bg-emerald-500" style={{ width: "80%" }} />
-                            </div>
+                        <div className="flex items-center gap-3 pt-0.5">
+                          <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-xl border border-sky-900/60 bg-zinc-900/90 shadow-inner overflow-hidden">
+                            <TamagotchiAvatar
+                              size={58}
+                              colors={{ helmet: "#ffffff", jersey: "#1e3a8a", pants: "#0f172a", skates: "#334155" }}
+                              action="train"
+                              alt="Power Player Character"
+                            />
                           </div>
-                          <div className="space-y-1">
-                            <div className="flex items-center justify-between text-xs font-semibold text-zinc-300">
-                              <span>컨디션</span>
-                              <span className="font-black tabular-nums text-white">90</span>
+                          <div className="flex flex-1 flex-col justify-center gap-2">
+                            <div className="space-y-1">
+                              <div className="flex items-center justify-between text-[11px] font-bold text-zinc-300">
+                                <span>에너지</span>
+                                <span className="font-black tabular-nums text-white">56</span>
+                              </div>
+                              <div className="h-1.5 overflow-hidden rounded-full bg-zinc-800">
+                                <div className="h-full rounded-full bg-emerald-500" style={{ width: "56%" }} />
+                              </div>
                             </div>
-                            <div className="h-2 overflow-hidden rounded-full bg-zinc-800">
-                              <div className="h-full rounded-full bg-blue-500" style={{ width: "90%" }} />
+                            <div className="space-y-1">
+                              <div className="flex items-center justify-between text-[11px] font-bold text-zinc-300">
+                                <span>컨디션</span>
+                                <span className="font-black tabular-nums text-white">60</span>
+                              </div>
+                              <div className="h-1.5 overflow-hidden rounded-full bg-zinc-800">
+                                <div className="h-full rounded-full bg-sky-500" style={{ width: "60%" }} />
+                              </div>
                             </div>
                           </div>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-2 pt-1">
-                          <div className="py-2 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm">
-                            <span>🍚 식사하기</span>
+                        <div className="grid grid-cols-2 gap-2 pt-0.5">
+                          <div className="py-2 rounded-xl bg-zinc-800 text-zinc-400 font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm">
+                            <span>🍗 오늘 식사 완료</span>
                           </div>
-                          <div className="py-2 rounded-xl bg-sky-500/20 border border-sky-500/40 text-sky-300 font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm">
-                            <span>🏋️ 훈련하기</span>
+                          <div className="py-2 rounded-xl bg-zinc-800 text-zinc-400 font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm">
+                            <span>🏋️ 오늘 훈련 완료</span>
                           </div>
-                        </div>
-                        
-                        <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[11px] text-zinc-400">
-                          <span>💡 식사와 훈련 완료 시 오늘 루틴 완료</span>
-                          <span className="text-pink-400 font-bold">[스타일] 커스텀 가능 🎨</span>
                         </div>
                       </div>
 
-                      <div className="px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-[11px] font-semibold flex items-center justify-center gap-1 text-zinc-300 w-fit mx-auto whitespace-nowrap shrink-0 mt-0.5">
+                      <div className="px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-[11px] font-semibold flex items-center justify-center gap-1 text-zinc-300 w-fit mx-auto whitespace-nowrap shrink-0 mt-1">
                         <span className="text-[#FF007F] font-bold flex-shrink-0">💡 방법:</span>
                         <span className="text-white flex-shrink-0">[마이페이지]</span>
                         <span className="text-zinc-500 flex-shrink-0">➔</span>
@@ -959,39 +984,33 @@ export function CardNewsStudio() {
 
                   {/* S3 - SLIDE 3: TODAY'S HOCKEY FORTUNE (AUTHENTIC UI REPLICA) */}
                   {idx === 2 && (
-                    <div className="flex flex-col justify-center my-auto w-full z-10 gap-2.5">
+                    <div className="flex flex-col justify-center items-center my-auto w-full z-10 gap-3 text-center">
                       <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-purple-500/30 border border-purple-400/40 text-purple-200 font-extrabold text-[11px] w-fit whitespace-nowrap shrink-0">
                         <span>🔮 마이페이지 &gt; 오늘의 하키 운세</span>
                       </div>
-                      <h2 className="text-[20px] md:text-[22px] font-black leading-[1.3] tracking-tight text-white flex flex-col shrink-0">
+                      <h2 className="text-[18px] md:text-[20px] font-black leading-[1.35] tracking-tight text-white flex flex-col items-center shrink-0">
                         <span className="whitespace-nowrap">경기 전날 꼭 확인하는 재미!</span>
-                        <span className="whitespace-nowrap">오늘 퍽이 붙는 <span className="text-[#FF007F]">행운의 링크장은?</span></span>
+                        <span className="whitespace-nowrap"><span className="text-[#FF007F]">오늘의 하키 운세를 확인해볼까요?</span></span>
                       </h2>
 
                       {/* 100% Authentic daily-hockey-fortune-screen.tsx Replica */}
-                      <div className="p-4 rounded-2xl bg-gradient-to-br from-blue-950/40 via-zinc-900 to-zinc-900 border border-blue-500/30 shadow-xl flex flex-col gap-3 w-full shrink-0">
-                        <div className="flex items-center justify-between border-b border-zinc-800 pb-2.5">
-                          <div className="flex items-center gap-1.5 text-blue-300">
-                            <Sparkles className="h-4 w-4 flex-shrink-0 text-[#FF007F]" />
-                            <span className="text-sm font-black text-white">✨ 오늘의 하키 운세</span>
+                      <div className="flex flex-col gap-2.5 w-full shrink-0 my-2">
+                        <div className="p-4.5 rounded-2xl bg-gradient-to-br from-blue-950/60 via-zinc-900 to-zinc-900 border border-blue-500/40 shadow-xl flex items-center justify-between gap-3 w-full text-left">
+                          <div className="flex flex-col gap-1 text-left">
+                            <div className="flex items-center gap-1.5 text-blue-400 font-bold text-xs">
+                              <span>✨ 오늘의 하키 운세</span>
+                            </div>
+                            <div className="text-sm md:text-base font-black text-white leading-snug">
+                              시야와 판단이 또렷한 날
+                            </div>
                           </div>
-                          <span className="flex-shrink-0 rounded-full bg-zinc-800 border border-white/10 px-3 py-0.5 text-xs font-black text-white shadow-sm">
-                            98점 🔥
-                          </span>
-                        </div>
-                        
-                        <div className="flex flex-col gap-2 pt-0.5">
-                          <p className="text-sm font-bold text-white leading-snug">
-                            &quot;오늘 퍽 컨트롤이 완벽한 날! 날카로운 리바운드 골 기회를 노려보세요.&quot;
-                          </p>
-                          <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between text-xs">
-                            <span className="text-zinc-400 font-medium">📍 행운의 링크장</span>
-                            <span className="text-blue-300 font-black">제니스 아이스링크 고척</span>
+                          <div className="flex-shrink-0 rounded-xl bg-zinc-800 border border-white/10 px-3.5 py-2.5 text-sm md:text-base font-black text-white shadow-md">
+                            96점
                           </div>
                         </div>
                       </div>
 
-                      <div className="px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-[11px] font-semibold flex items-center justify-center gap-1 text-zinc-300 w-fit mx-auto whitespace-nowrap shrink-0 mt-0.5">
+                      <div className="px-3 py-1 rounded-xl bg-white/5 border border-white/10 text-[10px] font-semibold flex items-center justify-center gap-1 text-zinc-300 w-fit mx-auto whitespace-nowrap shrink-0 mt-0.5">
                         <span className="text-[#FF007F] font-bold flex-shrink-0">💡 방법:</span>
                         <span className="text-white flex-shrink-0">[마이페이지]</span>
                         <span className="text-zinc-500 flex-shrink-0">➔</span>
@@ -1004,66 +1023,66 @@ export function CardNewsStudio() {
 
                   {/* S3 - SLIDE 4: PLAYER DIGITAL CARD (AUTHENTIC UI REPLICA) */}
                   {idx === 3 && (
-                    <div className="flex flex-col justify-center my-auto w-full z-10 gap-2.5">
+                    <div className="flex flex-col justify-center items-center my-auto w-full z-10 gap-2 text-center">
                       <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-pink-500/20 border border-pink-400/30 text-pink-300 font-extrabold text-[11px] w-fit whitespace-nowrap shrink-0">
                         <span>🃏 프로필 &gt; 선수 디지털 카드</span>
                       </div>
-                      <h2 className="text-[20px] md:text-[22px] font-black leading-[1.3] tracking-tight text-white flex flex-col shrink-0">
-                        <span className="whitespace-nowrap">프로 선수처럼 멋지게! 나만의</span>
-                        <span className="whitespace-nowrap"><span className="text-[#FF007F]">선수 디지털 카드</span> 발급 &amp; 공유</span>
+                      <h2 className="text-[17px] md:text-[19px] font-black leading-tight tracking-tight text-white shrink-0 mb-0.5">
+                        <span className="whitespace-nowrap">당신의 프로필을 <span className="text-[#FF007F]">디지털 카드</span>로 만나보세요!</span>
                       </h2>
 
-                      {/* 100% Authentic Player Card Replica (mypage/card/page.client.tsx) */}
-                      <div className="p-4 rounded-[20px] bg-gradient-to-br from-[#18181b] to-[#09090b] border border-zinc-700 shadow-2xl flex flex-col gap-3 w-full shrink-0 relative overflow-hidden">
-                        <div className="absolute top-0 right-0 w-40 h-40 bg-blue-500/10 rounded-full blur-2xl pointer-events-none -mr-10 -mt-10" />
+                      {/* 100% Authentic Player Card Replica (Left-Right Side-by-Side Layout) */}
+                      <div className="p-3 rounded-[18px] bg-gradient-to-br from-[#18181b] to-[#09090b] border border-zinc-700 shadow-2xl flex flex-col gap-1.5 w-full shrink-0 relative overflow-hidden my-0.5">
+                        <div className="absolute top-0 right-0 w-28 h-28 bg-blue-500/10 rounded-full blur-xl pointer-events-none -mr-6 -mt-6" />
                         
-                        <div className="flex justify-between items-center z-10 w-full border-b border-white/10 pb-2.5">
-                          <div className="flex items-center gap-2 bg-white/5 backdrop-blur-sm rounded-lg px-2.5 py-1 border border-white/10">
-                            <div className="w-5 h-5 bg-blue-600 text-white rounded flex items-center justify-center font-bold text-[10px]">
-                              P
-                            </div>
-                            <span className="font-bold text-xs tracking-wide text-white">POWERPLAY HOCKEY CLUB</span>
+                        <div className="flex justify-between items-center z-10 w-full border-b border-white/10 pb-1.5">
+                          <div className="flex items-center gap-1.5 bg-white/5 backdrop-blur-sm rounded-md pr-2 pl-1.5 py-0.5 border border-white/10">
+                            <img src="/favicon.png" alt="PowerPlay" className="w-3.5 h-3.5 object-contain rounded-sm bg-white/10" />
+                            <span className="font-bold text-[10px] tracking-wide text-white">파워플레이 아이스하키</span>
                           </div>
                           <div className="text-right">
-                            <span className="text-[9px] text-zinc-400 font-medium uppercase tracking-wider block">SERIAL</span>
-                            <span className="text-xs font-bold tracking-widest text-white">#0088</span>
+                            <span className="text-[7px] text-zinc-400 font-medium uppercase tracking-wider block">SERIAL</span>
+                            <span className="text-[10px] font-bold tracking-widest text-white">#1016</span>
                           </div>
                         </div>
 
-                        <div className="z-10 flex items-center justify-between px-1 py-1">
-                          <div className="flex flex-col">
-                            <span className="text-xl font-black text-white tracking-wide">김하키</span>
-                            <span className="text-xs font-semibold text-[#FF007F] mt-0.5">FORWARD (FW)</span>
+                        {/* Side-by-Side: Title on Left, Player Graphic on Right */}
+                        <div className="z-10 flex items-center justify-between w-full px-3 py-1 my-0.5">
+                          <div className="text-left flex flex-col justify-center">
+                            <h3 className="text-[18px] md:text-[22px] font-black text-white tracking-wide">
+                              파워플레이어
+                            </h3>
                           </div>
-                          <div className="px-3 py-1.5 rounded-lg bg-blue-600/20 border border-blue-500/40 text-blue-300 font-black text-xs">
-                            🏒 RIGHT SHOT
-                          </div>
-                        </div>
-
-                        <div className="z-10 w-full bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-2.5 grid grid-cols-3 gap-2 text-center">
-                          <div className="bg-zinc-900/50 p-1.5 rounded-lg">
-                            <div className="text-[9px] text-zinc-400 uppercase">Position</div>
-                            <div className="text-xs font-bold text-white mt-0.5">FW, DF</div>
-                          </div>
-                          <div className="bg-zinc-900/50 p-1.5 rounded-lg">
-                            <div className="text-[9px] text-zinc-400 uppercase">Experience</div>
-                            <div className="text-xs font-bold text-white mt-0.5">3년 5개월</div>
-                          </div>
-                          <div className="bg-zinc-900/50 p-1.5 rounded-lg">
-                            <div className="text-[9px] text-zinc-400 uppercase">Issued</div>
-                            <div className="text-xs font-bold text-white mt-0.5">2026.07.05</div>
+                          <div className="relative flex-shrink-0 drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]">
+                            <img 
+                              src="/player.svg" 
+                              alt="Player Graphic"
+                              className="w-16 h-16 md:w-20 md:h-20 object-contain brightness-0 invert opacity-90"
+                            />
                           </div>
                         </div>
 
-                        <div className="z-10 w-full pt-1">
-                          <div className="w-full py-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md">
-                            <Share2 className="w-3.5 h-3.5" />
-                            <span>나의 선수 디지털 카드 공유하기</span>
+                        <div className="z-10 w-full bg-zinc-900/90 border border-zinc-800 rounded-xl p-2 grid grid-cols-2 gap-y-1 gap-x-2 text-left">
+                          <div>
+                            <div className="text-[8px] text-zinc-400 uppercase font-semibold">POSITION</div>
+                            <div className="text-[10px] font-bold text-white mt-0.5">RW</div>
+                          </div>
+                          <div>
+                            <div className="text-[8px] text-zinc-400 uppercase font-semibold">SHOT</div>
+                            <div className="text-[10px] font-bold text-white mt-0.5">라이트</div>
+                          </div>
+                          <div>
+                            <div className="text-[8px] text-zinc-400 uppercase font-semibold">EXPERIENCE</div>
+                            <div className="text-[10px] font-bold text-white mt-0.5">1년 7개월</div>
+                          </div>
+                          <div>
+                            <div className="text-[8px] text-zinc-400 uppercase font-semibold">ISSUED DATE</div>
+                            <div className="text-[10px] font-bold text-white mt-0.5">2026-06-30</div>
                           </div>
                         </div>
                       </div>
 
-                      <div className="px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-[11px] font-semibold flex items-center justify-center gap-1 text-zinc-300 w-fit mx-auto whitespace-nowrap shrink-0 mt-0.5">
+                      <div className="px-2.5 py-1 rounded-xl bg-white/5 border border-white/10 text-[10px] font-semibold flex items-center justify-center gap-1 text-zinc-300 w-fit mx-auto whitespace-nowrap shrink-0 mt-0.5">
                         <span className="text-[#FF007F] font-bold flex-shrink-0">💡 방법:</span>
                         <span className="text-white flex-shrink-0">[마이페이지]</span>
                         <span className="text-zinc-500 flex-shrink-0">➔</span>
@@ -1076,29 +1095,26 @@ export function CardNewsStudio() {
 
                   {/* S3 - SLIDE 5: CTA */}
                   {idx === 4 && (
-                    <div className="flex flex-col justify-between items-center h-full text-center py-1 w-full z-10">
-                      <div className="mt-auto pt-2">
-                        <h2 className="text-[26px] font-black leading-[1.3] tracking-tight text-white mb-4 flex flex-col items-center">
+                    <div className="flex flex-col justify-center items-center my-auto text-center w-full z-10 gap-7 py-2">
+                      <div>
+                        <h2 className="text-[24px] md:text-[26px] font-black leading-[1.35] tracking-tight text-white flex flex-col items-center">
                           <span className="whitespace-nowrap">파워플레이와 함께</span>
-                          <span className="whitespace-nowrap">하키 라이프를 10배 더</span>
-                          <span className="text-[#FF007F] whitespace-nowrap">즐겁게 경험해보세요.</span>
+                          <span className="text-[#FF007F] whitespace-nowrap">하키 라이프를 10배 더 즐겁게!</span>
                         </h2>
                       </div>
 
-                      <div className="my-auto py-2 flex flex-col items-center w-full">
-                        <div className="mb-3">
-                          <img
-                            src="/long-logo-darkmode.png"
-                            alt="PowerPlay Official Logo"
-                            className="h-12 w-auto mx-auto object-contain drop-shadow-[0_0_15px_rgba(255,0,127,0.3)]"
-                          />
-                        </div>
-                        <div className="text-[15px] font-black text-[#FF007F] tracking-wide drop-shadow-[0_0_10px_rgba(255,0,127,0.3)] whitespace-nowrap">
+                      <div className="flex flex-col items-center w-full gap-3">
+                        <img
+                          src="/long-logo-darkmode.png"
+                          alt="PowerPlay Official Logo"
+                          className="h-11 md:h-12 w-auto mx-auto object-contain drop-shadow-[0_0_15px_rgba(255,0,127,0.3)] mix-blend-screen"
+                        />
+                        <div className="text-[14px] md:text-[15px] font-black text-[#FF007F] tracking-wide drop-shadow-[0_0_10px_rgba(255,0,127,0.3)] whitespace-nowrap">
                           &quot;아이스하키를 더 쉽게, 더 가깝게&nbsp;&nbsp;🏒&quot;
                         </div>
                       </div>
 
-                      <div className="w-full mb-1 pb-4 pt-2">
+                      <div className="w-full pt-1">
                         <div className="w-full py-3.5 rounded-xl bg-[#FF007F] text-white font-black text-xs shadow-[0_0_20px_rgba(255,0,127,0.3)] flex items-center justify-center gap-2 hover:bg-pink-600 transition cursor-pointer whitespace-nowrap">
                           <span>마이페이지에서 내 하키 라이프 확인하기</span> <ArrowRight className="w-4 h-4 flex-shrink-0" />
                         </div>
@@ -1266,29 +1282,27 @@ export function CardNewsStudio() {
 
                   {/* S4 - SLIDE 5: CTA (LIGHT MODE) */}
                   {idx === 4 && (
-                    <div className="flex flex-col justify-between items-center h-full text-center py-1 w-full z-10">
-                      <div className="mt-auto pt-2">
-                        <h2 className="text-[26px] font-black leading-[1.3] tracking-tight text-slate-900 mb-4 flex flex-col items-center">
+                    <div className="flex flex-col justify-center items-center my-auto text-center w-full z-10 gap-7 py-2">
+                      <div>
+                        <h2 className="text-[24px] md:text-[26px] font-black leading-[1.3] tracking-tight text-slate-900 flex flex-col items-center">
                           <span className="whitespace-nowrap">전국 아이스링크 지도,</span>
                           <span className="whitespace-nowrap">지금 파워플레이에서</span>
                           <span className="text-[#0066FF] whitespace-nowrap">탐색해보세요.</span>
                         </h2>
                       </div>
 
-                      <div className="my-auto py-2 flex flex-col items-center w-full">
-                        <div className="mb-3">
-                          <img
-                            src="/long-logo.jpg"
-                            alt="PowerPlay Official Logo"
-                            className="h-12 w-auto mx-auto object-contain drop-shadow-sm"
-                          />
-                        </div>
-                        <div className="text-[15px] font-black text-[#0066FF] tracking-wide whitespace-nowrap">
+                      <div className="flex flex-col items-center w-full gap-3">
+                        <img
+                          src="/long-logo.jpg"
+                          alt="PowerPlay Official Logo"
+                          className="h-11 md:h-12 w-auto mx-auto object-contain drop-shadow-sm mix-blend-multiply"
+                        />
+                        <div className="text-[14px] md:text-[15px] font-black text-[#0066FF] tracking-wide whitespace-nowrap">
                           &quot;아이스하키를 더 쉽게, 더 가깝게&nbsp;&nbsp;🏒&quot;
                         </div>
                       </div>
 
-                      <div className="w-full mb-1 pb-4 pt-2">
+                      <div className="w-full pt-1">
                         <div className="w-full py-3.5 rounded-xl bg-[#0066FF] text-white font-black text-xs shadow-lg flex items-center justify-center gap-2 hover:bg-blue-700 transition cursor-pointer whitespace-nowrap">
                           <span>프로필 링크에서 우리 동호회 시작하기</span> <ArrowRight className="w-4 h-4 flex-shrink-0" />
                         </div>
@@ -1443,29 +1457,27 @@ export function CardNewsStudio() {
 
                   {/* S5 - SLIDE 5: CTA */}
                   {idx === 4 && (
-                    <div className="flex flex-col justify-between items-center h-full text-center py-1 w-full z-10">
-                      <div className="mt-auto pt-2">
-                        <h2 className="text-[26px] font-black leading-[1.3] tracking-tight text-white mb-4 flex flex-col items-center">
+                    <div className="flex flex-col justify-center items-center my-auto text-center w-full z-10 gap-7 py-2">
+                      <div>
+                        <h2 className="text-[24px] md:text-[26px] font-black leading-[1.3] tracking-tight text-white flex flex-col items-center">
                           <span className="whitespace-nowrap">단톡방 공지 스트레스 제로,</span>
                           <span className="whitespace-nowrap">지금 파워플레이에서</span>
                           <span className="text-[#FEE500] whitespace-nowrap">원링크로 관리하세요.</span>
                         </h2>
                       </div>
 
-                      <div className="my-auto py-2 flex flex-col items-center w-full">
-                        <div className="mb-3">
-                          <img
-                            src="/long-logo-darkmode.png"
-                            alt="PowerPlay Official Logo"
-                            className="h-12 w-auto mx-auto object-contain drop-shadow-[0_0_15px_rgba(254,229,0,0.3)]"
-                          />
-                        </div>
-                        <div className="text-[15px] font-black text-[#FEE500] tracking-wide drop-shadow-[0_0_10px_rgba(254,229,0,0.3)] whitespace-nowrap">
+                      <div className="flex flex-col items-center w-full gap-3">
+                        <img
+                          src="/long-logo-darkmode.png"
+                          alt="PowerPlay Official Logo"
+                          className="h-11 md:h-12 w-auto mx-auto object-contain drop-shadow-[0_0_15px_rgba(254,229,0,0.3)] mix-blend-screen"
+                        />
+                        <div className="text-[14px] md:text-[15px] font-black text-[#FEE500] tracking-wide drop-shadow-[0_0_10px_rgba(254,229,0,0.3)] whitespace-nowrap">
                           &quot;아이스하키를 더 쉽게, 더 가깝게&nbsp;&nbsp;🏒&quot;
                         </div>
                       </div>
 
-                      <div className="w-full mb-1 pb-4 pt-2">
+                      <div className="w-full pt-1">
                         <div className="w-full py-3.5 rounded-xl bg-[#FEE500] text-zinc-950 font-black text-xs shadow-[0_0_20px_rgba(254,229,0,0.3)] flex items-center justify-center gap-2 hover:bg-yellow-400 transition cursor-pointer whitespace-nowrap">
                           <span>프로필 링크에서 우리 동호회 시작하기</span> <ArrowRight className="w-4 h-4 flex-shrink-0" />
                         </div>
@@ -1512,7 +1524,7 @@ export function CardNewsStudio() {
 
                       <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 shadow-md flex flex-col gap-2.5 w-full shrink-0">
                         <div className="flex items-center gap-2 text-xs font-bold text-slate-700 whitespace-nowrap">
-                          <span className="text-rose-500">❌</span> <span>전국 유소년 클럽 연령별 디비전 비교가 어려움</span>
+                          <span className="text-rose-500">❌</span> <span>전국 주니어 클럽 정보, 레슨, 훈련 시간 비교가 어려움</span>
                         </div>
                         <div className="flex items-center gap-2 text-xs font-bold text-slate-700 whitespace-nowrap">
                           <span className="text-rose-500">❌</span> <span>스케이트 사이즈, 레슨 정보를 물어볼 학부모 소통 공간 부재</span>
@@ -1530,10 +1542,10 @@ export function CardNewsStudio() {
                   {idx === 2 && (
                     <div className="flex flex-col justify-center my-auto w-full z-10 gap-2.5">
                       <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-700 font-extrabold text-[11px] w-fit whitespace-nowrap shrink-0">
-                        <span>1️⃣ 전국 유소년 하키 클럽 탐색</span>
+                        <span>1️⃣ 주니어 클럽 & 유소년 레슨 탐색</span>
                       </div>
                       <h2 className="text-[20px] md:text-[22px] font-black leading-[1.3] tracking-tight text-slate-900 flex flex-col shrink-0">
-                        <span className="whitespace-nowrap">U-8 / U-10 / U-12 디비전 및</span>
+                        <span className="whitespace-nowrap">전국 유소년 하키 팀, 레슨 정보 및</span>
                         <span className="whitespace-nowrap">정기 훈련 링크장 <span className="text-[#F59E0B]">한눈에 비교!</span></span>
                       </h2>
 
@@ -1547,7 +1559,7 @@ export function CardNewsStudio() {
                               </div>
                               <div className="flex flex-col">
                                 <span className="text-sm font-black text-slate-900 leading-snug">파워플레이 유소년 하키단</span>
-                                <span className="text-[11px] text-amber-600 font-bold leading-snug">U-8 / U-10 / U-12 연령별 디비전</span>
+                                <span className="text-[11px] text-amber-600 font-bold leading-snug">주니어 클럽 & 유소년 전문 레슨</span>
                               </div>
                             </div>
                             <span className="inline-flex items-center gap-1 rounded-full bg-rose-50 px-2.5 py-1 text-[11px] font-semibold text-rose-600 ring-1 ring-rose-200">
@@ -1630,29 +1642,27 @@ export function CardNewsStudio() {
 
                   {/* S6 - SLIDE 5: CTA (LIGHT MODE) */}
                   {idx === 4 && (
-                    <div className="flex flex-col justify-between items-center h-full text-center py-1 w-full z-10">
-                      <div className="mt-auto pt-2">
-                        <h2 className="text-[26px] font-black leading-[1.3] tracking-tight text-slate-900 mb-4 flex flex-col items-center">
+                    <div className="flex flex-col justify-center items-center my-auto text-center w-full z-10 gap-7 py-2">
+                      <div>
+                        <h2 className="text-[24px] md:text-[26px] font-black leading-[1.3] tracking-tight text-slate-900 flex flex-col items-center">
                           <span className="whitespace-nowrap">우리 아이 하키 라이프,</span>
                           <span className="whitespace-nowrap">지금 파워플레이에서</span>
                           <span className="text-[#F59E0B] whitespace-nowrap">함께 시작하세요.</span>
                         </h2>
                       </div>
 
-                      <div className="my-auto py-2 flex flex-col items-center w-full">
-                        <div className="mb-3">
-                          <img
-                            src="/long-logo.jpg"
-                            alt="PowerPlay Official Logo"
-                            className="h-12 w-auto mx-auto object-contain drop-shadow-sm"
-                          />
-                        </div>
-                        <div className="text-[15px] font-black text-[#F59E0B] tracking-wide whitespace-nowrap">
+                      <div className="flex flex-col items-center w-full gap-3">
+                        <img
+                          src="/long-logo.jpg"
+                          alt="PowerPlay Official Logo"
+                          className="h-11 md:h-12 w-auto mx-auto object-contain drop-shadow-sm mix-blend-multiply"
+                        />
+                        <div className="text-[14px] md:text-[15px] font-black text-[#F59E0B] tracking-wide whitespace-nowrap">
                           &quot;아이스하키를 더 쉽게, 더 가깝게&nbsp;&nbsp;🏒&quot;
                         </div>
                       </div>
 
-                      <div className="w-full mb-1 pb-4 pt-2">
+                      <div className="w-full pt-1">
                         <div className="w-full py-3.5 rounded-xl bg-[#F59E0B] text-white font-black text-xs shadow-lg flex items-center justify-center gap-2 hover:bg-amber-600 transition cursor-pointer whitespace-nowrap">
                           <span>프로필 링크에서 유소년 라운지 가기</span> <ArrowRight className="w-4 h-4 flex-shrink-0" />
                         </div>
