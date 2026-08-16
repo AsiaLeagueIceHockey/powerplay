@@ -1659,6 +1659,7 @@ export interface ParticipantProfile {
   full_name: string | null;
   avatar_url: string | null;
   phone: string | null;
+  birth_date: string | null;
   bio: string | null;
   hockey_start_date: string | null;
   primary_club_id: string | null;
@@ -1698,6 +1699,7 @@ export async function getParticipantProfile(userId: string): Promise<Participant
       full_name,
       avatar_url,
       phone,
+      birth_date,
       bio,
       hockey_start_date,
       primary_club_id,

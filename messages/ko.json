@@ -95,7 +95,10 @@
     "email": "이메일",
     "fullName": "이름",
     "phone": "휴대폰 번호",
-    "birthDate": "생년월일 (예: 1990-01-01)",
+    "birthDate": "생년월일",
+    "birthDatePicker": {
+      "selectYear": "연도 선택"
+    },
     "position": "포지션",
     "preferredLang": "선호 언어",
     "save": "저장",

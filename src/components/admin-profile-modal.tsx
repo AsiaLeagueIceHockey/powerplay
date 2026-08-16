@@ -150,6 +150,10 @@ export function AdminProfileModal({
 
               <div className="grid grid-cols-2 gap-4">
                 <ProfileItem
+                  label={t("profile.birthDate")}
+                  value={profile.birth_date || "-"}
+                />
+                <ProfileItem
                   label={t("profile.experience.title", { fallback: "구력" })}
                   value={formatExperience(profile.hockey_start_date)}
                 />
@@ -164,7 +168,6 @@ export function AdminProfileModal({
                   }
                 />
                 <ProfileItem
-                  className="col-span-2"
                   label={t("profile.team.title", { fallback: "소속팀" })}
                   value={profile.club_name || t("profile.team.none", { fallback: "소속팀 없음" })}
                 />

@@ -10,6 +10,7 @@ import {
   prepareProfileImage,
   PROFILE_IMAGE_SOURCE_MAX_BYTES,
 } from "@/lib/profile-image-client";
+import { BirthDatePicker } from "@/components/birth-date-picker";
 
 interface ProfileEditorProps {
   initialAvatarUrl: string | null;
@@ -19,6 +20,7 @@ interface ProfileEditorProps {
   detailedPositions: string[] | null;
   stickDirection: string | null;
   phone: string | null;
+  birthDate: string | null;
   fullName: string | null;
   clubs: { id: string; name: string }[];
   myClubIds: string[];
@@ -34,6 +36,7 @@ export function ProfileEditor({
   detailedPositions, 
   stickDirection,
   phone,
+  birthDate,
   fullName,
   clubs,
   myClubIds,
@@ -54,6 +57,7 @@ export function ProfileEditor({
   const [positions, setPositions] = useState<string[]>(detailedPositions || []);
   const [stick, setStick] = useState(stickDirection || "");
   const [phoneState, setPhoneState] = useState(phone || "");
+  const [birthDateState, setBirthDateState] = useState(birthDate || "");
   const [nameState, setNameState] = useState(fullName || "");
   const [avatarUrl, setAvatarUrl] = useState(initialAvatarUrl || "");
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
@@ -84,11 +88,12 @@ export function ProfileEditor({
     
     const isStickChanged = stick !== (stickDirection || "");
     const isPhoneChanged = phoneState !== (phone || "");
+    const isBirthDateChanged = birthDateState !== (birthDate || "");
     const isNameChanged = nameState !== (fullName || "");
     const isAvatarChanged = Boolean(avatarFile) || avatarUrl !== (initialAvatarUrl || "");
     
-    return isBioChanged || isYearChanged || isMonthChanged || isClubChanged || isPosChanged || isStickChanged || isPhoneChanged || isNameChanged || isAvatarChanged;
-  }, [bio, initialBio, startYear, initialYear, startMonth, initialMonth, primaryClubIdState, primaryClubId, positions, detailedPositions, stick, stickDirection, phoneState, phone, nameState, fullName, avatarFile, avatarUrl, initialAvatarUrl]);
+    return isBioChanged || isYearChanged || isMonthChanged || isClubChanged || isPosChanged || isStickChanged || isPhoneChanged || isBirthDateChanged || isNameChanged || isAvatarChanged;
+  }, [bio, initialBio, startYear, initialYear, startMonth, initialMonth, primaryClubIdState, primaryClubId, positions, detailedPositions, stick, stickDirection, phoneState, phone, birthDateState, birthDate, nameState, fullName, avatarFile, avatarUrl, initialAvatarUrl]);
 
   const handleAvatarSelect = async (file: File) => {
     if (!file.type.startsWith("image/")) {
@@ -148,6 +153,7 @@ export function ProfileEditor({
     fd.set("detailedPositions", JSON.stringify(positions));
     fd.set("stickDirection", stick);
     fd.set("phone", phoneState);
+    fd.set("birthDate", birthDateState);
     fd.set("fullName", nameState);
     fd.set("avatarUrl", avatarUrl);
     if (avatarFile) fd.set("avatarFile", avatarFile);
@@ -347,6 +353,18 @@ export function ProfileEditor({
             onChange={(e) => setPhoneState(e.target.value)}
             placeholder={t("profile.placeholder.phone")}
             className="w-full px-3 py-2 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-transparent text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        {/* Birth Date */}
+        <div className="space-y-3">
+          <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            {t("profile.birthDate")}
+          </label>
+          <BirthDatePicker
+            value={birthDateState}
+            onChange={setBirthDateState}
+            placeholder={t("profile.placeholder.birthDate")}
           />
         </div>
 

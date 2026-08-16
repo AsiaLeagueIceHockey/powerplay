@@ -95,7 +95,10 @@
     "email": "Email",
     "fullName": "Full Name",
     "phone": "Phone Number",
-    "birthDate": "Birth Date (YYYY-MM-DD)",
+    "birthDate": "Birth date",
+    "birthDatePicker": {
+      "selectYear": "Select year"
+    },
     "position": "Position",
     "preferredLang": "Preferred Language",
     "save": "Save",

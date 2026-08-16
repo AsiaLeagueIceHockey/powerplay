@@ -35,6 +35,7 @@ export default async function MypageProfilePage() {
         detailedPositions={profile?.detailed_positions || null}
         stickDirection={profile?.stick_direction || null}
         phone={profile?.phone || null}
+        birthDate={profile?.birth_date || null}
         fullName={profile?.full_name || null}
         clubs={clubs}
         myClubIds={myClubIds}
