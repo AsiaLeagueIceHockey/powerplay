@@ -1,12 +1,18 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { updateProfile, issuePlayerCard } from "@/app/actions/auth";
-import { Loader2, Save, CreditCard } from "lucide-react";
+import { Camera, CreditCard, Loader2, Save, Trash2, UserRound } from "lucide-react";
 import { useRouter } from "next/navigation";
+import {
+  prepareProfileImage,
+  PROFILE_IMAGE_SOURCE_MAX_BYTES,
+} from "@/lib/profile-image-client";
 
 interface ProfileEditorProps {
+  initialAvatarUrl: string | null;
   initialBio: string | null;
   hockeyStartDate: string | null;
   primaryClubId: string | null;
@@ -21,6 +27,7 @@ interface ProfileEditorProps {
 }
 
 export function ProfileEditor({ 
+  initialAvatarUrl,
   initialBio, 
   hockeyStartDate, 
   primaryClubId, 
@@ -35,6 +42,7 @@ export function ProfileEditor({
 }: ProfileEditorProps) {
   const t = useTranslations();
   const router = useRouter();
+  const avatarInputRef = useRef<HTMLInputElement>(null);
   
   const initialYear = hockeyStartDate ? hockeyStartDate.split("-")[0] : "";
   const initialMonth = hockeyStartDate ? hockeyStartDate.split("-")[1] : "";
@@ -47,9 +55,21 @@ export function ProfileEditor({
   const [stick, setStick] = useState(stickDirection || "");
   const [phoneState, setPhoneState] = useState(phone || "");
   const [nameState, setNameState] = useState(fullName || "");
+  const [avatarUrl, setAvatarUrl] = useState(initialAvatarUrl || "");
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreviewUrl, setAvatarPreviewUrl] = useState(initialAvatarUrl || "");
   const [loading, setLoading] = useState(false);
   const [cardLoading, setCardLoading] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (avatarPreviewUrl.startsWith("blob:")) {
+        URL.revokeObjectURL(avatarPreviewUrl);
+      }
+    };
+  }, [avatarPreviewUrl]);
 
   // Check if anything changed
   const isChanged = useMemo(() => {
@@ -65,9 +85,41 @@ export function ProfileEditor({
     const isStickChanged = stick !== (stickDirection || "");
     const isPhoneChanged = phoneState !== (phone || "");
     const isNameChanged = nameState !== (fullName || "");
+    const isAvatarChanged = Boolean(avatarFile) || avatarUrl !== (initialAvatarUrl || "");
     
-    return isBioChanged || isYearChanged || isMonthChanged || isClubChanged || isPosChanged || isStickChanged || isPhoneChanged || isNameChanged;
-  }, [bio, initialBio, startYear, initialYear, startMonth, initialMonth, primaryClubIdState, primaryClubId, positions, detailedPositions, stick, stickDirection, phoneState, phone, nameState, fullName]);
+    return isBioChanged || isYearChanged || isMonthChanged || isClubChanged || isPosChanged || isStickChanged || isPhoneChanged || isNameChanged || isAvatarChanged;
+  }, [bio, initialBio, startYear, initialYear, startMonth, initialMonth, primaryClubIdState, primaryClubId, positions, detailedPositions, stick, stickDirection, phoneState, phone, nameState, fullName, avatarFile, avatarUrl, initialAvatarUrl]);
+
+  const handleAvatarSelect = async (file: File) => {
+    if (!file.type.startsWith("image/")) {
+      setSaveError(t("profile.photo.invalidType"));
+      if (avatarInputRef.current) avatarInputRef.current.value = "";
+      return;
+    }
+    if (file.size > PROFILE_IMAGE_SOURCE_MAX_BYTES) {
+      setSaveError(t("profile.photo.tooLarge"));
+      if (avatarInputRef.current) avatarInputRef.current.value = "";
+      return;
+    }
+
+    setSaveError(null);
+    try {
+      const preparedFile = await prepareProfileImage(file);
+      setAvatarFile(preparedFile);
+      setAvatarPreviewUrl(URL.createObjectURL(preparedFile));
+    } catch {
+      setSaveError(t("profile.photo.processError"));
+    }
+    if (avatarInputRef.current) avatarInputRef.current.value = "";
+  };
+
+  const handleAvatarRemove = () => {
+    setSaveError(null);
+    setAvatarFile(null);
+    setAvatarUrl("");
+    setAvatarPreviewUrl("");
+    if (avatarInputRef.current) avatarInputRef.current.value = "";
+  };
 
   const handleSave = async () => {
     if (primaryClubIdState && primaryClubIdState !== primaryClubId) {
@@ -82,6 +134,7 @@ export function ProfileEditor({
     }
 
     setLoading(true);
+    setSaveError(null);
     const fd = new FormData();
     fd.set("bio", bio);
     
@@ -96,11 +149,25 @@ export function ProfileEditor({
     fd.set("stickDirection", stick);
     fd.set("phone", phoneState);
     fd.set("fullName", nameState);
+    fd.set("avatarUrl", avatarUrl);
+    if (avatarFile) fd.set("avatarFile", avatarFile);
     
-    await updateProfile(fd);
+    const result = await updateProfile(fd);
+
+    if (result.error) {
+      setLoading(false);
+      setSaveError(t("profile.saveError"));
+      return;
+    }
+
+    const savedAvatarUrl = result.avatarUrl ?? avatarUrl;
+    setAvatarUrl(savedAvatarUrl || "");
+    setAvatarPreviewUrl(savedAvatarUrl || "");
+    setAvatarFile(null);
     
     setLoading(false);
     setSaved(true);
+    router.refresh();
     setTimeout(() => setSaved(false), 2000);
   };
 
@@ -189,6 +256,72 @@ export function ProfileEditor({
       )}
 
       <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-6 space-y-8">
+        <section className="flex items-center gap-4 border-b border-zinc-200 pb-6 dark:border-zinc-800">
+          <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-full border-4 border-white bg-zinc-100 shadow-md ring-1 ring-zinc-200 dark:border-zinc-900 dark:bg-zinc-800 dark:ring-zinc-700">
+            {avatarPreviewUrl ? (
+              <Image
+                src={avatarPreviewUrl}
+                alt={t("profile.photo.alt")}
+                fill
+                sizes="96px"
+                className="object-cover"
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center text-zinc-400 dark:text-zinc-500">
+                <UserRound className="h-12 w-12" strokeWidth={1.6} aria-hidden="true" />
+              </div>
+            )}
+          </div>
+
+          <div className="min-w-0 flex-1">
+            <h2 className="text-base font-bold text-zinc-900 dark:text-zinc-100">
+              {t("profile.photo.title")}
+            </h2>
+            <input
+              ref={avatarInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(event) => {
+                const file = event.target.files?.[0];
+                if (file) handleAvatarSelect(file);
+              }}
+            />
+            <div className="mt-3 flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => avatarInputRef.current?.click()}
+                disabled={loading}
+                className="inline-flex min-h-10 items-center gap-2 whitespace-nowrap rounded-xl border border-zinc-300 bg-white px-3.5 py-2 text-sm font-semibold text-zinc-700 transition hover:border-blue-500 hover:text-blue-600 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:border-blue-500 dark:hover:text-blue-400"
+              >
+                <Camera className="h-4 w-4" />
+                {t("profile.photo.choose")}
+              </button>
+              {avatarPreviewUrl ? (
+                <button
+                  type="button"
+                  onClick={handleAvatarRemove}
+                  disabled={loading}
+                  aria-label={t("profile.photo.remove")}
+                  title={t("profile.photo.remove")}
+                  className="inline-flex min-h-10 min-w-10 items-center justify-center rounded-xl text-red-600 transition hover:bg-red-50 disabled:opacity-50 dark:text-red-400 dark:hover:bg-red-950/30"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              ) : null}
+            </div>
+          </div>
+        </section>
+
+        {saveError ? (
+          <p
+            role="alert"
+            className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-300"
+          >
+            {saveError}
+          </p>
+        ) : null}
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Full Name */}
         <div className="space-y-3">

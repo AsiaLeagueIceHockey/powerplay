@@ -1653,8 +1653,22 @@ export async function getAdminDetail(targetUserId: string): Promise<{
   };
 }
 
+export interface ParticipantProfile {
+  id: string;
+  email: string;
+  full_name: string | null;
+  avatar_url: string | null;
+  phone: string | null;
+  bio: string | null;
+  hockey_start_date: string | null;
+  primary_club_id: string | null;
+  stick_direction: string | null;
+  detailed_positions: string[] | null;
+  club_name: string | null;
+}
+
 // Get detailed profile of a participant (for Admin/Superuser)
-export async function getParticipantProfile(userId: string) {
+export async function getParticipantProfile(userId: string): Promise<ParticipantProfile | null> {
   const supabase = await createClient();
 
   const {
@@ -1682,6 +1696,7 @@ export async function getParticipantProfile(userId: string) {
       id,
       email,
       full_name,
+      avatar_url,
       phone,
       bio,
       hockey_start_date,
@@ -1698,11 +1713,11 @@ export async function getParticipantProfile(userId: string) {
     return null;
   }
 
-  const clubObj = profile.club as any;
+  const clubObj = profile.club as { name: string } | Array<{ name: string }> | null;
   const clubName = Array.isArray(clubObj) ? clubObj[0]?.name : clubObj?.name;
 
   return {
     ...profile,
     club_name: clubName || null,
-  };
+  } as ParticipantProfile;
 }

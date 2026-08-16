@@ -12,8 +12,9 @@ import sharp from "sharp";
  *   - logo  (256x256, q80) → 5~20KB
  *   - cover (1280x720, q75) → 80~200KB
  *   - notice (최대 1600x2000, q82) → 포스터의 가독성을 유지하는 WebP
+ *   - avatar (512x512, q82) → 프로필용 정사각형 WebP
  */
-export type ImageKind = "logo" | "cover" | "notice";
+export type ImageKind = "logo" | "cover" | "notice" | "avatar";
 
 const PRESETS: Record<ImageKind, { width: number; height: number; quality: number }> = {
   // 표시 위치 최대 크기(96x96) × 2배 DPR + 여유
@@ -22,6 +23,8 @@ const PRESETS: Record<ImageKind, { width: number; height: number; quality: numbe
   cover: { width: 1280, height: 720, quality: 75 },
   // 공지 포스터/세로 사진의 작은 글자도 읽을 수 있도록 커버보다 높은 해상도를 유지한다.
   notice: { width: 1600, height: 2000, quality: 82 },
+  // 사용자 프로필. 원본 중앙을 기준으로 정사각형 크롭한다.
+  avatar: { width: 512, height: 512, quality: 82 },
 };
 
 export async function compressImageToWebp(
@@ -33,7 +36,7 @@ export async function compressImageToWebp(
   return sharp(buffer)
     .rotate() // EXIF 회전 정보 적용
     .resize(width, height, {
-      fit: kind === "logo" ? "cover" : "inside",
+      fit: kind === "logo" || kind === "avatar" ? "cover" : "inside",
       withoutEnlargement: true,
     })
     .webp({ quality })
@@ -51,7 +54,7 @@ export async function recompressInPlace(
 ): Promise<Buffer> {
   const { width, height, quality } = PRESETS[kind];
   const pipeline = sharp(buffer).rotate().resize(width, height, {
-    fit: kind === "logo" ? "cover" : "inside",
+    fit: kind === "logo" || kind === "avatar" ? "cover" : "inside",
     withoutEnlargement: true,
   });
 

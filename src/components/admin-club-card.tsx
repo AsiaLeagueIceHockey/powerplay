@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Club } from "@/app/actions/types";
 import { deleteClub, getClubDeleteImpact, updateClubMemberRole } from "@/app/actions/clubs";
-import { Users, MessageCircle, ChevronDown, ChevronUp, Trash2, ChevronRight, Shield, ArrowUpCircle, Loader2 } from "lucide-react";
+import { Users, MessageCircle, ChevronDown, ChevronUp, Trash2, ChevronRight, ArrowUpCircle, Loader2 } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
+import { AdminProfileModal } from "@/components/admin-profile-modal";
 
 interface AdminClubCardProps {
   club: Club;
@@ -17,6 +19,7 @@ export function AdminClubCard({ club, canDelete = false }: AdminClubCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
+  const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null);
   const t = useTranslations("admin.clubs");
   const locale = useLocale();
   const router = useRouter();
@@ -104,6 +107,7 @@ export function AdminClubCard({ club, canDelete = false }: AdminClubCardProps) {
   };
 
   return (
+    <>
     <div className="bg-zinc-800 hover:bg-zinc-700/80 transition-colors rounded-xl overflow-hidden relative group shadow-sm border border-zinc-700/50">
       <Link href={`/${locale}/admin/clubs/${club.id}/edit`} className="absolute inset-0 z-0" aria-label={t("edit")} />
       
@@ -156,18 +160,32 @@ export function AdminClubCard({ club, canDelete = false }: AdminClubCardProps) {
 
       {/* Member List Dropdown */}
       {isExpanded && (
-        <div className="bg-zinc-900/50 border-t border-zinc-700 p-4 animate-in slide-in-from-top-2 duration-200">
+        <div className="relative z-20 bg-zinc-900/50 border-t border-zinc-700 p-4 animate-in slide-in-from-top-2 duration-200">
           <h4 className="text-sm font-semibold text-zinc-400 mb-3">
             {t("membersTitle", { count: club.members?.length ?? club.member_count ?? 0 })}
           </h4>
           
           {club.members && club.members.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-              {club.members.map((member, idx) => (
-                <div key={idx} className="bg-zinc-800 border border-zinc-700 rounded p-2 text-sm flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2 overflow-hidden">
-                    <div className="w-8 h-8 rounded-full bg-zinc-700 flex items-center justify-center text-xs text-zinc-400 shrink-0">
-                      {member.full_name?.[0] || "?"}
+              {club.members.map((member) => (
+                <div key={member.user_id} className="bg-zinc-800 border border-zinc-700 rounded-xl p-2 text-sm flex items-center justify-between gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedMemberId(member.user_id)}
+                    className="flex min-w-0 flex-1 items-center gap-2 overflow-hidden rounded-lg text-left transition hover:bg-zinc-700/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                  >
+                    <div className="relative w-10 h-10 overflow-hidden rounded-full bg-zinc-700 flex items-center justify-center text-xs text-zinc-400 shrink-0">
+                      {member.avatar_url ? (
+                        <Image
+                          src={member.avatar_url}
+                          alt={member.full_name || "프로필 사진"}
+                          fill
+                          sizes="40px"
+                          className="object-cover"
+                        />
+                      ) : (
+                        member.full_name?.[0] || "?"
+                      )}
                     </div>
                     <div className="overflow-hidden">
                       <div className="font-medium text-white flex items-center gap-1.5 truncate">
@@ -178,7 +196,7 @@ export function AdminClubCard({ club, canDelete = false }: AdminClubCardProps) {
                       </div>
                       <div className="text-xs text-zinc-500 truncate">{member.email}</div>
                     </div>
-                  </div>
+                  </button>
                   {member.role === "member" && member.user_id && (
                     <div className="shrink-0">
                       {actionLoadingId === member.user_id ? (
@@ -207,5 +225,12 @@ export function AdminClubCard({ club, canDelete = false }: AdminClubCardProps) {
         </div>
       )}
     </div>
+    {selectedMemberId ? (
+      <AdminProfileModal
+        userId={selectedMemberId}
+        onClose={() => setSelectedMemberId(null)}
+      />
+    ) : null}
+    </>
   );
 }

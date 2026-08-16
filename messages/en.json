@@ -12,6 +12,7 @@
     "youth": "Youth",
     "admin": "Admin",
     "save": "Save",
+    "close": "Close",
     "feedback": {
       "title": "PowerPlay Open Chat",
       "description": "Join to ask questions and share feedback.",
@@ -99,6 +100,16 @@
     "preferredLang": "Preferred Language",
     "save": "Save",
     "saving": "Saving...",
+    "saveError": "We couldn't save your profile. Please try again.",
+    "photo": {
+      "title": "Profile photo",
+      "choose": "Choose photo",
+      "remove": "Remove photo",
+      "alt": "My profile photo",
+      "invalidType": "Choose an image file.",
+      "tooLarge": "This photo is too large. Choose another photo.",
+      "processError": "We couldn't process this photo. Choose another photo."
+    },
     "terms": {
       "title": "Terms Agreement",
       "agree": "I agree to the collection and use of personal information",

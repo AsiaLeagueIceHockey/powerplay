@@ -18,10 +18,12 @@ type ClubMembershipUserRow = {
     | {
         full_name: string | null;
         email: string | null;
+        avatar_url: string | null;
       }
     | Array<{
         full_name: string | null;
         email: string | null;
+        avatar_url: string | null;
       }>
     | null;
 };
@@ -247,6 +249,7 @@ function extractClubMembers(membersData: any[] | null | undefined) {
       role: member.role,
       full_name: user?.full_name || null,
       email: user?.email || "",
+      avatar_url: user?.avatar_url || null,
     };
   });
 }
@@ -322,7 +325,7 @@ export async function getClubs(): Promise<Club[]> {
       // Fetch detailed member info
       const { data: membersData } = await supabase
         .from("club_memberships")
-        .select("user_id, role, user:profiles(full_name, email)")
+        .select("user_id, role, user:profiles(full_name, email, avatar_url)")
         .eq("club_id", club.id);
 
       const rinks = extractClubRinks(club as ClubWithRinksRow);
@@ -395,7 +398,7 @@ export async function getAdminClubs(): Promise<Club[]> {
       // Fetch detailed member info
       const { data: membersData } = await supabase
         .from("club_memberships")
-        .select("user_id, role, user:profiles(full_name, email)")
+        .select("user_id, role, user:profiles(full_name, email, avatar_url)")
         .eq("club_id", club.id);
 
       const rinks = extractClubRinks(club as ClubWithRinksRow);
@@ -1149,7 +1152,8 @@ export async function getClubMembersList(clubId: string) {
       profiles:user_id (
         full_name,
         email,
-        position
+        position,
+        avatar_url
       )
     `)
     .eq("club_id", clubId)

@@ -1,9 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import Image from "next/image";
 import { getClubMembersList, updateClubMemberRole, removeClubMember } from "@/app/actions/clubs";
 import { Shield, User, Trash2, ArrowUpCircle, ArrowDownCircle, Loader2 } from "lucide-react";
 import { useLocale } from "next-intl";
+import { AdminProfileModal } from "@/components/admin-profile-modal";
 
 interface AdminClubMembersProps {
   clubId: string;
@@ -18,6 +20,7 @@ type ClubMember = {
     full_name: string | null;
     email: string;
     position: string | null;
+    avatar_url: string | null;
   } | null;
 };
 
@@ -25,20 +28,53 @@ export function AdminClubMembers({ clubId }: AdminClubMembersProps) {
   const [members, setMembers] = useState<ClubMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
+  const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null);
   const locale = useLocale();
 
-  useEffect(() => {
-    loadMembers();
-  }, [clubId]);
-
-  const loadMembers = async () => {
-    setLoading(true);
-    const result = await getClubMembersList(clubId);
+  const applyMembersResult = useCallback(
+    (result: Awaited<ReturnType<typeof getClubMembersList>>) => {
     if (result.members) {
-      setMembers(result.members as any);
+      setMembers(
+        result.members.map((member) => {
+          const profile = Array.isArray(member.profiles)
+            ? member.profiles[0] || null
+            : member.profiles;
+
+          return {
+            id: String(member.id),
+            user_id: String(member.user_id),
+            role: member.role === "admin" ? "admin" : "member",
+            created_at: String(member.created_at),
+            profiles: profile
+              ? {
+                  full_name: profile.full_name || null,
+                  email: profile.email || "",
+                  position: profile.position || null,
+                  avatar_url: profile.avatar_url || null,
+                }
+              : null,
+          } satisfies ClubMember;
+        })
+      );
     }
     setLoading(false);
-  };
+    },
+    []
+  );
+
+  const loadMembers = useCallback(async () => {
+    applyMembersResult(await getClubMembersList(clubId));
+  }, [applyMembersResult, clubId]);
+
+  useEffect(() => {
+    let active = true;
+    getClubMembersList(clubId).then((result) => {
+      if (active) applyMembersResult(result);
+    });
+    return () => {
+      active = false;
+    };
+  }, [applyMembersResult, clubId]);
 
   const handleRoleChange = async (userId: string, newRole: "admin" | "member") => {
     const isPromoting = newRole === "admin";
@@ -105,6 +141,7 @@ export function AdminClubMembers({ clubId }: AdminClubMembersProps) {
               key={member.id} 
               member={member} 
               actionLoading={actionLoadingId === member.user_id}
+              onOpen={() => setSelectedMemberId(member.user_id)}
               onDemote={() => handleRoleChange(member.user_id, "member")}
             />
           ))}
@@ -125,6 +162,7 @@ export function AdminClubMembers({ clubId }: AdminClubMembersProps) {
                 key={member.id} 
                 member={member} 
                 actionLoading={actionLoadingId === member.user_id}
+                onOpen={() => setSelectedMemberId(member.user_id)}
                 onPromote={() => handleRoleChange(member.user_id, "admin")}
                 onRemove={() => handleRemove(member.user_id)}
               />
@@ -132,6 +170,13 @@ export function AdminClubMembers({ clubId }: AdminClubMembersProps) {
           </div>
         )}
       </div>
+
+      {selectedMemberId ? (
+        <AdminProfileModal
+          userId={selectedMemberId}
+          onClose={() => setSelectedMemberId(null)}
+        />
+      ) : null}
     </div>
   );
 }
@@ -139,31 +184,56 @@ export function AdminClubMembers({ clubId }: AdminClubMembersProps) {
 function MemberRow({ 
   member, 
   actionLoading, 
+  onOpen,
   onPromote, 
   onDemote, 
   onRemove 
 }: { 
   member: ClubMember; 
   actionLoading: boolean;
+  onOpen: () => void;
   onPromote?: () => void;
   onDemote?: () => void;
   onRemove?: () => void;
 }) {
   return (
     <div className="flex items-center justify-between p-3 bg-zinc-800 border border-zinc-700 rounded-xl shadow-sm">
-      <div className="flex flex-col">
-        <div className="flex items-center gap-2">
-          <span className="font-medium text-white">
-            {member.profiles?.full_name || "이름 없음"}
-          </span>
-          {member.profiles?.position && (
-            <span className="text-xs px-2 py-0.5 rounded bg-zinc-700 text-zinc-300">
-              {member.profiles.position}
-            </span>
+      <button
+        type="button"
+        onClick={onOpen}
+        className="flex min-w-0 items-center gap-3 rounded-lg text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+      >
+        <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full bg-zinc-700">
+          {member.profiles?.avatar_url ? (
+            <Image
+              src={member.profiles.avatar_url}
+              alt={member.profiles.full_name || "프로필 사진"}
+              fill
+              sizes="40px"
+              className="object-cover"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center text-xs text-zinc-400">
+              {member.profiles?.full_name?.[0] || "?"}
+            </div>
           )}
         </div>
-        <span className="text-xs text-zinc-400 mt-0.5">{member.profiles?.email}</span>
-      </div>
+        <div className="min-w-0">
+          <div className="flex items-center gap-2">
+            <span className="truncate font-medium text-white">
+              {member.profiles?.full_name || "이름 없음"}
+            </span>
+            {member.profiles?.position && (
+              <span className="rounded bg-zinc-700 px-2 py-0.5 text-xs text-zinc-300">
+                {member.profiles.position}
+              </span>
+            )}
+          </div>
+          <span className="mt-0.5 block truncate text-xs text-zinc-400">
+            {member.profiles?.email}
+          </span>
+        </div>
+      </button>
 
       <div className="flex items-center gap-2">
         {actionLoading ? (

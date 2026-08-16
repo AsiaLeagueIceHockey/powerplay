@@ -6,8 +6,32 @@ import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { logAndNotify } from "@/lib/audit";
 import { buildOAuthCallbackUrl } from "@/lib/auth-return-path";
+import { compressImageToWebp } from "@/lib/image-utils";
+import {
+  buildProfileImagePath,
+  extractProfileImagePath,
+  PROFILE_IMAGE_MAX_BYTES,
+} from "@/lib/profile-images";
 
 const CLUB_LOCALES = ["ko", "en"] as const;
+
+async function removeProfileImage(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string,
+  imageUrl: string | null | undefined
+) {
+  const imagePath = extractProfileImagePath(imageUrl, userId);
+  if (!imagePath) return;
+
+  const { error } = await supabase.storage.from("profile-images").remove([imagePath]);
+  if (error) {
+    console.error("[PROFILE_IMAGE] delete-failed", {
+      userId,
+      imagePath,
+      error: error.message,
+    });
+  }
+}
 
 async function syncPrimaryClubMembership(
   supabase: Awaited<ReturnType<typeof createClient>>,
@@ -245,11 +269,16 @@ export async function updateProfile(formData: FormData) {
   const updateData: Record<string, unknown> = {};
   let previousPrimaryClubId: string | null = null;
   let nextPrimaryClubId: string | null = null;
+  let previousAvatarUrl: string | null = null;
+  let nextAvatarUrl: string | null = null;
+  let uploadedAvatarUrl: string | null = null;
+  const avatarFileEntry = formData.get("avatarFile");
+  const hasAvatarUpdate = formData.has("avatarUrl") || formData.has("avatarFile");
 
-  if (formData.has("primaryClubId")) {
+  if (formData.has("primaryClubId") || hasAvatarUpdate) {
     const { data: currentProfile, error: currentProfileError } = await supabase
       .from("profiles")
-      .select("primary_club_id")
+      .select("primary_club_id, avatar_url")
       .eq("id", user.id)
       .single();
 
@@ -257,8 +286,71 @@ export async function updateProfile(formData: FormData) {
       return { error: currentProfileError.message };
     }
 
-    previousPrimaryClubId = currentProfile?.primary_club_id ?? null;
-    nextPrimaryClubId = (formData.get("primaryClubId") as string) || null;
+    if (formData.has("primaryClubId")) {
+      previousPrimaryClubId = currentProfile?.primary_club_id ?? null;
+      nextPrimaryClubId = (formData.get("primaryClubId") as string) || null;
+    }
+    previousAvatarUrl = currentProfile?.avatar_url ?? null;
+  }
+
+  if (hasAvatarUpdate) {
+    const requestedAvatarUrl = String(formData.get("avatarUrl") ?? "").trim() || null;
+    const avatarFile =
+      avatarFileEntry instanceof File && avatarFileEntry.size > 0
+        ? avatarFileEntry
+        : null;
+
+    if (avatarFile) {
+      if (!avatarFile.type.startsWith("image/")) {
+        return { error: "Only image files are allowed" };
+      }
+      if (avatarFile.size > PROFILE_IMAGE_MAX_BYTES) {
+        return { error: "File size must be 5MB or less" };
+      }
+
+      let compressed: Buffer;
+      try {
+        compressed = await compressImageToWebp(
+          Buffer.from(await avatarFile.arrayBuffer()),
+          "avatar"
+        );
+      } catch (error) {
+        console.error("[PROFILE_IMAGE] compression-failed", {
+          userId: user.id,
+          error: error instanceof Error ? error.message : "Unknown error",
+        });
+        return { error: "Failed to process image" };
+      }
+
+      const imagePath = buildProfileImagePath(user.id);
+      const { error: uploadError } = await supabase.storage
+        .from("profile-images")
+        .upload(imagePath, compressed, {
+          cacheControl: "31536000",
+          contentType: "image/webp",
+          upsert: false,
+        });
+
+      if (uploadError) {
+        console.error("[PROFILE_IMAGE] upload-failed", {
+          userId: user.id,
+          error: uploadError.message,
+        });
+        return { error: uploadError.message };
+      }
+
+      uploadedAvatarUrl = supabase.storage
+        .from("profile-images")
+        .getPublicUrl(imagePath).data.publicUrl;
+      nextAvatarUrl = uploadedAvatarUrl;
+    } else {
+      if (requestedAvatarUrl && requestedAvatarUrl !== previousAvatarUrl) {
+        return { error: "Invalid profile image URL" };
+      }
+      nextAvatarUrl = requestedAvatarUrl;
+    }
+
+    updateData.avatar_url = nextAvatarUrl;
   }
 
   if (formData.has("fullName")) updateData.full_name = formData.get("fullName");
@@ -293,7 +385,14 @@ export async function updateProfile(formData: FormData) {
     .eq("id", user.id);
 
   if (error) {
+    if (uploadedAvatarUrl) {
+      await removeProfileImage(supabase, user.id, uploadedAvatarUrl);
+    }
     return { error: error.message };
+  }
+
+  if (hasAvatarUpdate && previousAvatarUrl !== nextAvatarUrl) {
+    await removeProfileImage(supabase, user.id, previousAvatarUrl);
   }
 
   if (formData.has("primaryClubId")) {
@@ -312,6 +411,9 @@ export async function updateProfile(formData: FormData) {
 
   revalidatePath("/profile", "page");
   revalidatePath("/onboarding", "page");
+  for (const locale of CLUB_LOCALES) {
+    revalidatePath(`/${locale}/mypage/profile`, "page");
+  }
 
   // 새 사용자 온보딩 완료 시 SuperUser에게 알림 발송
   if (updateData.onboarding_completed === true) {
@@ -339,7 +441,10 @@ export async function updateProfile(formData: FormData) {
     });
   }
 
-  return { success: true };
+  return {
+    success: true,
+    avatarUrl: hasAvatarUpdate ? nextAvatarUrl : undefined,
+  };
 }
 
 export async function issuePlayerCard() {

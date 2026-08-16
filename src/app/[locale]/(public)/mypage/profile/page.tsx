@@ -28,6 +28,7 @@ export default async function MypageProfilePage() {
         backLabel={t("mypage.back")}
       />
       <ProfileEditor
+        initialAvatarUrl={profile?.avatar_url || null}
         initialBio={profile?.bio || null}
         hockeyStartDate={profile?.hockey_start_date || null}
         primaryClubId={profile?.primary_club_id || null}
