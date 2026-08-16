@@ -36,6 +36,8 @@ Use `npm run <command>` to execute the following scripts:
 
 **Note:** Manual verification is still required for UI and data flows even when lint/tests pass.
 
+**Mandatory UI completion gate:** After every frontend, UI, responsive, or i18n change, run `$powerplay-ui-final-check` before reporting completion, committing, or pushing. If the skill is unavailable, perform its runtime, translation, mobile, console, and automated checks manually and report the gap.
+
 ## 🤖 Codex Bootstrap Sources
 
 When starting work, treat these as the fastest reliable context sources:

@@ -2,7 +2,7 @@ import { setRequestLocale, getTranslations } from "next-intl/server";
 import { getAdminClubs } from "@/app/actions/clubs";
 import { getAdminInfo } from "@/app/actions/admin-check";
 import Link from "next/link";
-import { AdminClubCard } from "@/components/admin-club-card";
+import { AdminClubList } from "@/components/admin-club-list";
 
 export default async function AdminClubsPage({
   params,
@@ -53,11 +53,12 @@ export default async function AdminClubsPage({
           </Link>
         </div>
       ) : (
-        <div className="space-y-3">
-          {clubs.map((club) => (
-            <AdminClubCard key={club.id} club={club} canDelete={adminInfo.isSuperuser} />
-          ))}
-        </div>
+        <AdminClubList
+          clubs={clubs}
+          canDelete={adminInfo.isSuperuser}
+          searchPlaceholder={locale === "ko" ? "동호회 이름 검색" : "Search club names"}
+          noSearchResults={locale === "ko" ? "검색 결과가 없습니다." : "No clubs found."}
+        />
       )}
     </div>
   );
