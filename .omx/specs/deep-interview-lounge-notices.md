@@ -18,7 +18,7 @@
 |---|---:|---|
 | Intent | 90% | Give premium Lounge businesses a durable audience channel rather than a static listing only. |
 | Desired outcome | 90% | Owner CRUD, public list/detail/share, explicit notice-only push subscription. |
-| Scope | 90% | Text notice CRUD and immediate publication; rich publishing explicitly excluded. |
+| Scope | 90% | Notice CRUD with one optional image and immediate publication; rich publishing remains excluded. |
 | Constraints | 85% | Existing membership/ownership, RLS, i18n, KST, push RPC, and design patterns apply. |
 | Success criteria | 75% | Testable behavior is specified below; visual QA details remain for planning. |
 | Brownfield context | 95% | Existing club notices, Lounge admin/detail/share, membership RLS, and push path were inspected. |
@@ -29,7 +29,7 @@ Turn each paid Lounge business page into an ongoing communication channel. Owner
 
 ## Desired outcome
 
-1. An active Lounge owner manages text notices inside Admin > Lounge.
+1. An active Lounge owner manages notices with text and an optional image inside Admin > Lounge.
 2. A published Lounge page displays its notices newest first.
 3. Every notice opens on a dedicated, shareable, localized detail page.
 4. A signed-in user can explicitly subscribe or unsubscribe to notice pushes for that one Lounge business.
@@ -50,7 +50,9 @@ Turn each paid Lounge business page into an ongoing communication channel. Owner
 
 - Add a localized `공지사항` / `Notices` tab to `LoungeAdminDashboard` alongside the existing performance, business, and event tools.
 - Show an empty state until the owner has a business profile.
-- Support title and multiline body creation with immediate publication.
+- Support title, multiline body, and one optional image with immediate publication.
+- Accept image files up to 5MB, compress them to a web-friendly format on the server, and show a preview before publication.
+- Editing can retain, replace, or remove the image while preserving the notice ID and direct link.
 - List existing notices newest first with edit and delete actions.
 - Editing preserves the notice ID/direct link and updates `updated_at`.
 - Deleting requires confirmation and makes the former public URL return not found.
@@ -62,10 +64,10 @@ Turn each paid Lounge business page into an ongoing communication channel. Owner
 - The section remains visible when it has zero notices, so a user can subscribe before the first post.
 - Place `공지 알림받기` / `Get notice alerts` in the notice-section header, visually distinct from contact CTAs.
 - Show the active state clearly and allow one-action unsubscribe. Anonymous clicks redirect to localized login and preserve a return path.
-- List notice cards newest first; cards show title and KST publication date and link to the dedicated notice detail page.
+- List notice cards newest first; cards show an image thumbnail when present, title, and KST publication date and link to the dedicated notice detail page.
 - Dedicated route shape: `/{locale}/lounge/{businessSlug}/notices/{noticeId}`.
-- Notice detail includes a back link, Lounge identity, title, KST publication date, body with preserved line breaks, and share action.
-- Generate localized metadata/Open Graph values for the notice detail using the business cover image or existing Lounge fallback.
+- Notice detail includes a back link, Lounge identity, title, KST publication date, attached image when present, body with preserved line breaks, and share action.
+- Generate localized metadata/Open Graph values for the notice detail using the notice image first, then the business cover image or existing Lounge fallback.
 
 ### Sharing
 
@@ -91,7 +93,7 @@ Turn each paid Lounge business page into an ongoing communication channel. Owner
 - Drafts or publish/unpublish controls per notice.
 - Scheduled publication.
 - Pinned/important notices.
-- Images, cover images, rich text, or file attachments in notice content.
+- Multiple images, rich text, or non-image file attachments in notice content.
 - Event or business-profile update notifications.
 - Retroactive pushes for existing notices.
 - Email delivery for Lounge notice subscriptions.
@@ -139,12 +141,15 @@ User confirmation is required if a proposed change would:
 17. The notice subscription control accurately guides users whose current browser/PWA push permission is not enabled.
 18. Public and admin UI remain responsive, localized, keyboard accessible, and consistent with existing Lounge styling.
 19. Typecheck, lint, relevant tests, full test suite, and production build pass before completion; Lounge public/admin flows receive manual visual verification on mobile and desktop.
+20. An owner can optionally upload one image of at most 5MB, preview it, and publish it with a notice; the server stores a compressed WebP version.
+21. An existing notice image can be retained, replaced, or removed during editing without changing the notice URL.
+22. Attached images appear in the public notice list and detail page, and the notice image is preferred for social sharing metadata.
 
 ## Assumptions exposed and resolved
 
 - **Assumption:** `알림받기` would naturally mean notice-only alerts. **Resolution:** Rejected; label it `공지 알림받기` and place it inside the notice section.
 - **Assumption:** Club membership can double as the Lounge subscription model. **Resolution:** Rejected; Lounge interest is an independent explicit subscription and must not imply club/team membership.
-- **Assumption:** Premium means a rich CMS. **Resolution:** Rejected for the first release; premium value comes from durable detail links, sharing, and opt-in reach, while content remains text-only CRUD.
+- **Assumption:** Premium means a rich CMS. **Resolution:** Rejected; this release adds one optional image for practical visual notices while drafts, rich text, galleries, and files remain outside the lightweight CRUD model.
 - **Assumption:** Delivery success should gate notice publication. **Resolution:** Rejected; persistence is authoritative and individual push delivery is best-effort with logging.
 
 ## Pressure-pass finding

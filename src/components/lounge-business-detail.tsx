@@ -313,19 +313,30 @@ export function LoungeBusinessDetail({
                 href={`/${locale}/lounge/${business.slug}/notices/${notice.id}`}
                 className="group flex items-start justify-between gap-4 bg-white p-4 transition hover:bg-amber-50/70 dark:bg-zinc-950 dark:hover:bg-amber-950/20 md:p-5"
               >
-                <div className="min-w-0">
-                  <p className="line-clamp-1 font-bold text-zinc-900 group-hover:text-amber-800 dark:text-zinc-100 dark:group-hover:text-amber-300">
-                    {notice.title}
-                  </p>
-                  <p className="mt-1.5 line-clamp-2 whitespace-pre-line text-sm leading-6 text-zinc-500 dark:text-zinc-400">
-                    {notice.body}
-                  </p>
-                  <time
-                    dateTime={notice.created_at}
-                    className="mt-2 block text-xs font-medium text-zinc-400 dark:text-zinc-500"
-                  >
-                    {formatNoticeDate(notice.created_at)} · KST
-                  </time>
+                <div className="flex min-w-0 items-start gap-3 md:gap-4">
+                  {notice.image_url ? (
+                    <Image
+                      src={notice.image_url}
+                      alt=""
+                      width={112}
+                      height={112}
+                      className="h-20 w-20 shrink-0 rounded-xl border border-zinc-200 object-cover dark:border-zinc-800 md:h-24 md:w-24"
+                    />
+                  ) : null}
+                  <div className="min-w-0">
+                    <p className="line-clamp-1 font-bold text-zinc-900 group-hover:text-amber-800 dark:text-zinc-100 dark:group-hover:text-amber-300">
+                      {notice.title}
+                    </p>
+                    <p className="mt-1.5 line-clamp-2 whitespace-pre-line text-sm leading-6 text-zinc-500 dark:text-zinc-400">
+                      {notice.body}
+                    </p>
+                    <time
+                      dateTime={notice.created_at}
+                      className="mt-2 block text-xs font-medium text-zinc-400 dark:text-zinc-500"
+                    >
+                      {formatNoticeDate(notice.created_at)} · KST
+                    </time>
+                  </div>
                 </div>
                 <ChevronRight className="mt-1 h-5 w-5 shrink-0 text-zinc-400 transition-transform group-hover:translate-x-0.5 group-hover:text-amber-600" />
               </Link>

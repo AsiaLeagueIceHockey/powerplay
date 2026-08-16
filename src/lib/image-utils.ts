@@ -11,14 +11,17 @@ import sharp from "sharp";
  * 일반 사진(2~5MB) 기준 결과:
  *   - logo  (256x256, q80) → 5~20KB
  *   - cover (1280x720, q75) → 80~200KB
+ *   - notice (최대 1600x2000, q82) → 포스터의 가독성을 유지하는 WebP
  */
-export type ImageKind = "logo" | "cover";
+export type ImageKind = "logo" | "cover" | "notice";
 
 const PRESETS: Record<ImageKind, { width: number; height: number; quality: number }> = {
   // 표시 위치 최대 크기(96x96) × 2배 DPR + 여유
   logo: { width: 256, height: 256, quality: 80 },
   // 라운지 비즈니스 커버. 모바일 풀폭 + 데스크톱 카드용
   cover: { width: 1280, height: 720, quality: 75 },
+  // 공지 포스터/세로 사진의 작은 글자도 읽을 수 있도록 커버보다 높은 해상도를 유지한다.
+  notice: { width: 1600, height: 2000, quality: 82 },
 };
 
 export async function compressImageToWebp(

@@ -10,6 +10,7 @@ export interface LoungeNotice {
   business_id: string;
   title: string;
   body: string;
+  image_url: string | null;
   created_by: string;
   request_id: string;
   created_at: string;

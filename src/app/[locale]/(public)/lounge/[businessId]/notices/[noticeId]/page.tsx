@@ -27,7 +27,8 @@ export async function generateMetadata({
   const pageUrl = `${siteUrl}/${locale}/lounge/${business.slug}/notices/${notice.id}`;
   const title = `${notice.title} | ${business.name}`;
   const description = notice.body.replace(/\s+/g, " ").trim().slice(0, 160);
-  const imageUrl = business.cover_image_url || business.logo_url || `${siteUrl}/og-new.png`;
+  const imageUrl =
+    notice.image_url || business.cover_image_url || business.logo_url || `${siteUrl}/og-new.png`;
 
   return {
     title,
@@ -41,7 +42,7 @@ export async function generateMetadata({
       type: "article",
       publishedTime: notice.created_at,
       modifiedTime: notice.updated_at,
-      images: [{ url: imageUrl, alt: business.name }],
+      images: [{ url: imageUrl, alt: notice.image_url ? notice.title : business.name }],
     },
     twitter: {
       card: "summary_large_image",
@@ -151,6 +152,19 @@ export default async function LoungeNoticeDetailPage({
             </div>
           </div>
         </header>
+
+        {notice.image_url ? (
+          <div className="border-b border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900/60 md:p-6">
+            <Image
+              src={notice.image_url}
+              alt={notice.title}
+              width={1600}
+              height={2000}
+              priority
+              className="mx-auto max-h-[75vh] w-auto max-w-full rounded-2xl object-contain"
+            />
+          </div>
+        ) : null}
 
         <div className="p-6 md:p-8">
           <div className="whitespace-pre-wrap break-words text-[15px] leading-8 text-zinc-700 dark:text-zinc-200 md:text-base">

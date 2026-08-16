@@ -1,15 +1,18 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   BellRing,
   ExternalLink,
   FileText,
+  ImageIcon,
   Loader2,
   Pencil,
   Trash2,
+  Upload,
   X,
 } from "lucide-react";
 import type { LoungeBusiness, LoungeMembership } from "@/app/actions/lounge";
@@ -17,6 +20,7 @@ import type { LoungeNotice } from "@/app/actions/lounge-notices";
 import {
   createLoungeNotice,
   deleteLoungeNotice,
+  uploadLoungeNoticeImage,
   updateLoungeNotice,
 } from "@/app/actions/lounge-notices";
 
@@ -62,9 +66,12 @@ export function LoungeNoticeManager({
 }) {
   const router = useRouter();
   const requestIdRef = useRef("");
+  const imageInputRef = useRef<HTMLInputElement>(null);
   const [managedNotices, setManagedNotices] = useState(notices);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [pendingAction, setPendingAction] = useState<"save" | `delete:${string}` | null>(null);
   const [feedback, setFeedback] = useState<Feedback | null>(
@@ -96,13 +103,63 @@ export function LoungeNoticeManager({
     setEditingId(null);
     setTitle("");
     setBody("");
+    setImageUrl("");
+    if (imageInputRef.current) imageInputRef.current.value = "";
   };
 
   const beginEdit = (notice: LoungeNotice) => {
     setEditingId(notice.id);
     setTitle(notice.title);
     setBody(notice.body);
+    setImageUrl(notice.image_url ?? "");
     setFeedback(null);
+  };
+
+  const handleImageUpload = async (file: File) => {
+    if (!business) return;
+    if (!file.type.startsWith("image/")) {
+      setFeedback({
+        type: "error",
+        message: locale === "ko" ? "이미지 파일만 업로드할 수 있습니다." : "Only image files are allowed.",
+      });
+      if (imageInputRef.current) imageInputRef.current.value = "";
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setFeedback({
+        type: "error",
+        message: locale === "ko" ? "이미지는 5MB 이하만 첨부할 수 있습니다." : "Images must be 5MB or less.",
+      });
+      if (imageInputRef.current) imageInputRef.current.value = "";
+      return;
+    }
+
+    setIsUploadingImage(true);
+    setFeedback(null);
+    const formData = new FormData();
+    formData.set("business_id", business.id);
+    formData.set("file", file);
+
+    try {
+      const result = await uploadLoungeNoticeImage(formData);
+      if (!result.url) {
+        setFeedback({
+          type: "error",
+          message: result.error || (locale === "ko" ? "이미지 업로드에 실패했습니다." : "Image upload failed."),
+        });
+        return;
+      }
+      setImageUrl(result.url);
+    } catch (error) {
+      console.error("[lounge-notices] failed to upload image:", error);
+      setFeedback({
+        type: "error",
+        message: locale === "ko" ? "이미지 업로드에 실패했습니다." : "Image upload failed.",
+      });
+    } finally {
+      setIsUploadingImage(false);
+      if (imageInputRef.current) imageInputRef.current.value = "";
+    }
   };
 
   const validate = () => {
@@ -124,7 +181,7 @@ export function LoungeNoticeManager({
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!business || pendingAction) return;
+    if (!business || pendingAction || isUploadingImage) return;
 
     const validationError = validate();
     if (validationError) {
@@ -135,6 +192,7 @@ export function LoungeNoticeManager({
     const formData = new FormData();
     formData.set("title", title.trim());
     formData.set("body", body.trim());
+    formData.set("image_url", imageUrl);
     setPendingAction("save");
     setFeedback(null);
 
@@ -414,10 +472,87 @@ export function LoungeNoticeManager({
           </span>
         </label>
 
+        <div className="space-y-3 text-sm">
+          <div>
+            <p className="font-semibold text-zinc-100">
+              {locale === "ko" ? "이미지 첨부 (선택)" : "Attach image (optional)"}
+            </p>
+            <p className="mt-1 text-xs leading-5 text-zinc-500">
+              {locale === "ko"
+                ? "공지당 1장, 최대 5MB까지 등록할 수 있습니다. 세로형 안내문도 선명하게 압축됩니다."
+                : "Attach one image up to 5MB. Portrait flyers are compressed at a readable resolution."}
+            </p>
+          </div>
+
+          <input
+            ref={imageInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              if (file) void handleImageUpload(file);
+            }}
+          />
+
+          {imageUrl ? (
+            <div className="relative overflow-hidden rounded-2xl border border-zinc-700 bg-zinc-950 p-2">
+              <Image
+                src={imageUrl}
+                alt={locale === "ko" ? "공지 이미지 미리보기" : "Notice image preview"}
+                width={1600}
+                height={2000}
+                className="max-h-96 w-full rounded-xl object-contain"
+              />
+              <button
+                type="button"
+                onClick={() => setImageUrl("")}
+                disabled={isUploadingImage || isSaving}
+                aria-label={locale === "ko" ? "첨부 이미지 제거" : "Remove attached image"}
+                className="absolute right-4 top-4 inline-flex h-9 w-9 items-center justify-center rounded-full bg-zinc-950/85 text-white shadow-lg transition hover:bg-red-600 disabled:opacity-50"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => imageInputRef.current?.click()}
+              disabled={isUploadingImage || isSaving}
+              className="flex w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-zinc-700 bg-zinc-950/60 px-4 py-8 font-semibold text-zinc-300 transition hover:border-amber-400/70 hover:text-amber-300 disabled:opacity-50"
+            >
+              {isUploadingImage ? (
+                <Loader2 className="h-5 w-5 animate-spin" />
+              ) : (
+                <ImageIcon className="h-5 w-5" />
+              )}
+              {isUploadingImage
+                ? locale === "ko"
+                  ? "이미지 처리 중..."
+                  : "Processing image..."
+                : locale === "ko"
+                  ? "이미지 선택"
+                  : "Choose image"}
+            </button>
+          )}
+
+          {imageUrl ? (
+            <button
+              type="button"
+              onClick={() => imageInputRef.current?.click()}
+              disabled={isUploadingImage || isSaving}
+              className="inline-flex items-center gap-2 rounded-xl border border-zinc-700 px-3 py-2 text-xs font-semibold text-zinc-300 transition hover:border-amber-400/60 hover:text-amber-300 disabled:opacity-50"
+            >
+              {isUploadingImage ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+              {locale === "ko" ? "다른 이미지로 교체" : "Replace image"}
+            </button>
+          ) : null}
+        </div>
+
         <div className="flex justify-end">
           <button
             type="submit"
-            disabled={isSaving || Boolean(pendingAction)}
+            disabled={isSaving || isUploadingImage || Boolean(pendingAction)}
             className="inline-flex min-w-28 items-center justify-center gap-2 rounded-xl bg-amber-400 px-4 py-2.5 text-sm font-semibold text-zinc-950 transition hover:bg-amber-300 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
@@ -484,14 +619,25 @@ export function LoungeNoticeManager({
                 }`}
               >
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                  <div className="min-w-0">
-                    <h4 className="break-words text-base font-bold text-zinc-100">{notice.title}</h4>
-                    <p className="mt-1 text-xs text-zinc-500">
-                      {formatNoticeDate(notice.created_at, locale)} KST
-                    </p>
-                    <p className="mt-3 line-clamp-4 whitespace-pre-wrap break-words text-sm leading-6 text-zinc-300">
-                      {notice.body}
-                    </p>
+                  <div className="flex min-w-0 gap-3">
+                    {notice.image_url ? (
+                      <Image
+                        src={notice.image_url}
+                        alt=""
+                        width={96}
+                        height={96}
+                        className="h-20 w-20 shrink-0 rounded-xl border border-zinc-700 object-cover"
+                      />
+                    ) : null}
+                    <div className="min-w-0">
+                      <h4 className="break-words text-base font-bold text-zinc-100">{notice.title}</h4>
+                      <p className="mt-1 text-xs text-zinc-500">
+                        {formatNoticeDate(notice.created_at, locale)} KST
+                      </p>
+                      <p className="mt-3 line-clamp-4 whitespace-pre-wrap break-words text-sm leading-6 text-zinc-300">
+                        {notice.body}
+                      </p>
+                    </div>
                   </div>
                   <div className="flex shrink-0 flex-wrap gap-2">
                     <Link

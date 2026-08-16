@@ -28,6 +28,7 @@ import {
   subscribeToLoungeNotices,
   unsubscribeFromLoungeNotices,
   updateLoungeNotice,
+  uploadLoungeNoticeImage,
 } from "../lounge-notices";
 
 const USER_ID = "11111111-1111-4111-8111-111111111111";
@@ -61,6 +62,7 @@ function notice(overrides: Record<string, unknown> = {}) {
     business_id: BUSINESS_ID,
     title: "New notice",
     body: "Notice body",
+    image_url: null,
     created_by: USER_ID,
     request_id: REQUEST_ID,
     created_at: "2026-08-09T00:00:00.000Z",
@@ -108,6 +110,13 @@ function setupClient(options?: {
   const memberships = chain();
   const notices = chain();
   const subscriptions = chain();
+  const storageBucket = {
+    remove: vi.fn().mockResolvedValue({ error: null }),
+    upload: vi.fn().mockResolvedValue({ error: null }),
+    getPublicUrl: vi.fn((path: string) => ({
+      data: { publicUrl: `https://example.supabase.co/storage/v1/object/public/club-logos/${path}` },
+    })),
+  };
   const user = options?.user === undefined ? { id: USER_ID } : options.user;
 
   profiles.maybeSingle.mockResolvedValue({ data: { role: options?.role ?? "admin" }, error: null });
@@ -131,10 +140,11 @@ function setupClient(options?: {
       throw new Error(`Unexpected table: ${table}`);
     }),
     rpc: vi.fn().mockResolvedValue({ data: true, error: null }),
+    storage: { from: vi.fn(() => storageBucket) },
   };
   mockCreateClient.mockResolvedValue(client);
 
-  return { client, profiles, businesses, memberships, notices, subscriptions };
+  return { client, profiles, businesses, memberships, notices, subscriptions, storageBucket };
 }
 
 describe("Lounge notice actions", () => {
@@ -299,9 +309,70 @@ describe("Lounge notice actions", () => {
     const result = await updateLoungeNotice(updateForm());
 
     expect(result).toMatchObject({ success: true, notice: { id: NOTICE_ID, title: "Updated" } });
-    expect(notices.update).toHaveBeenCalledWith({ title: "Updated", body: "Updated body" });
+    expect(notices.update).toHaveBeenCalledWith({
+      title: "Updated",
+      body: "Updated body",
+      image_url: null,
+    });
     expect(mockSendPushNotification).not.toHaveBeenCalled();
     expect(mockSendPushToSuperUsers).not.toHaveBeenCalled();
+  });
+
+  it("replaces a notice image and removes the prior stored object after the update", async () => {
+    const oldImage = `https://example.supabase.co/storage/v1/object/public/club-logos/lounge/notices/${BUSINESS_ID}/old.webp`;
+    const newImage = `https://example.supabase.co/storage/v1/object/public/club-logos/lounge/notices/${BUSINESS_ID}/new.webp`;
+    const { notices, storageBucket } = setupClient();
+    notices.maybeSingle.mockResolvedValue({ data: notice({ image_url: oldImage }), error: null });
+    notices.single.mockResolvedValue({
+      data: notice({ title: "Updated", body: "Updated body", image_url: newImage }),
+      error: null,
+    });
+    const formData = updateForm();
+    formData.set("image_url", newImage);
+
+    const result = await updateLoungeNotice(formData);
+
+    expect(result).toMatchObject({ success: true, notice: { image_url: newImage } });
+    expect(notices.update).toHaveBeenCalledWith(
+      expect.objectContaining({ image_url: newImage })
+    );
+    expect(storageBucket.remove).toHaveBeenCalledWith([
+      `lounge/notices/${BUSINESS_ID}/old.webp`,
+    ]);
+  });
+
+  it("rejects an image URL outside the authorized Lounge notice storage path", async () => {
+    const { notices } = setupClient();
+    const formData = createForm();
+    formData.set(
+      "image_url",
+      "https://example.supabase.co/storage/v1/object/public/club-logos/lounge/notices/another-business/image.webp"
+    );
+
+    await expect(createLoungeNotice(formData)).resolves.toEqual({
+      success: false,
+      error: "Invalid Lounge notice image URL",
+    });
+    expect(notices.insert).not.toHaveBeenCalled();
+  });
+
+  it("compresses an authorized image upload into the business-scoped notice path", async () => {
+    const { storageBucket } = setupClient();
+    const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8"><rect width="8" height="8" fill="red"/></svg>';
+    const formData = new FormData();
+    formData.set("business_id", BUSINESS_ID);
+    formData.set("file", new File([svg], "notice.svg", { type: "image/svg+xml" }));
+
+    const result = await uploadLoungeNoticeImage(formData);
+
+    expect(result.url).toMatch(
+      new RegExp(`/club-logos/lounge/notices/${BUSINESS_ID}/.+\\.webp$`)
+    );
+    expect(storageBucket.upload).toHaveBeenCalledWith(
+      expect.stringMatching(new RegExp(`^lounge/notices/${BUSINESS_ID}/.+\\.webp$`)),
+      expect.any(Buffer),
+      expect.objectContaining({ contentType: "image/webp", upsert: false })
+    );
   });
 
   it("rejects update and delete when the caller does not own the notice business", async () => {

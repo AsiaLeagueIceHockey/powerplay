@@ -15,6 +15,13 @@ import {
   type LoungeNotice,
   type LoungeNoticeFanoutSummary,
 } from "@/lib/lounge-notices";
+import {
+  buildLoungeNoticeImagePrefix,
+  extractLoungeNoticeImagePath,
+  LOUNGE_NOTICE_IMAGE_MAX_BYTES,
+  normalizeLoungeNoticeImageUrl,
+} from "@/lib/lounge-notice-images";
+import { compressImageToWebp } from "@/lib/image-utils";
 import { createClient } from "@/lib/supabase/server";
 
 export type { LoungeNotice, LoungeNoticeFanoutSummary } from "@/lib/lounge-notices";
@@ -47,7 +54,23 @@ interface AuthorizedBusiness {
 }
 
 const NOTICE_COLUMNS =
-  "id, business_id, title, body, created_by, request_id, created_at, updated_at";
+  "id, business_id, title, body, image_url, created_by, request_id, created_at, updated_at";
+
+async function removeLoungeNoticeImage(
+  supabase: SupabaseServerClient,
+  imageUrl: string | null | undefined
+) {
+  const imagePath = extractLoungeNoticeImagePath(imageUrl);
+  if (!imagePath) return;
+
+  const { error } = await supabase.storage.from("club-logos").remove([imagePath]);
+  if (error) {
+    console.error("[LOUNGE_NOTICE] image-delete-failed", {
+      imagePath,
+      error: error.message,
+    });
+  }
+}
 
 function revalidateLoungeNoticePaths(businessSlug: string, noticeId: string) {
   for (const locale of ["ko", "en"] as const) {
@@ -218,12 +241,20 @@ export async function createLoungeNotice(
   const authorization = await getAuthorizedBusiness(supabase, businessId);
   if (!authorization) return { success: false, error: "Unauthorized" };
 
+  const image = normalizeLoungeNoticeImageUrl(
+    String(formData.get("image_url") ?? ""),
+    businessId,
+    supabase.storage.from("club-logos").getPublicUrl("").data.publicUrl
+  );
+  if (image.error) return { success: false, error: image.error };
+
   const { data, error } = await supabase
     .from("lounge_notices")
     .insert({
       business_id: businessId,
       title: input.title,
       body: input.body,
+      image_url: image.imageUrl,
       created_by: authorization.userId,
       request_id: requestId,
     })
@@ -239,6 +270,7 @@ export async function createLoungeNotice(
       .maybeSingle();
 
     if (existingError || !existing) {
+      await removeLoungeNoticeImage(supabase, image.imageUrl);
       console.error("[LOUNGE_NOTICE] retry-lookup-failed", {
         businessId,
         error: existingError?.message ?? "Notice not found after unique conflict",
@@ -246,10 +278,15 @@ export async function createLoungeNotice(
       return { success: false, error: "Could not recover the existing notice" };
     }
 
+    if (existing.image_url !== image.imageUrl) {
+      await removeLoungeNoticeImage(supabase, image.imageUrl);
+    }
+
     return { success: true, notice: existing as LoungeNotice, created: false };
   }
 
   if (error || !data) {
+    await removeLoungeNoticeImage(supabase, image.imageUrl);
     console.error("[LOUNGE_NOTICE] create-failed", {
       businessId,
       error: error?.message ?? "No notice returned",
@@ -356,16 +393,30 @@ export async function updateLoungeNotice(
   const authorization = await getAuthorizedBusiness(supabase, current.business_id);
   if (!authorization) return { success: false, error: "Unauthorized" };
 
+  const image = normalizeLoungeNoticeImageUrl(
+    String(formData.get("image_url") ?? ""),
+    current.business_id,
+    supabase.storage.from("club-logos").getPublicUrl("").data.publicUrl
+  );
+  if (image.error) return { success: false, error: image.error };
+
   const { data, error } = await supabase
     .from("lounge_notices")
-    .update({ title: input.title, body: input.body })
+    .update({ title: input.title, body: input.body, image_url: image.imageUrl })
     .eq("id", noticeId)
     .eq("business_id", current.business_id)
     .select(NOTICE_COLUMNS)
     .single();
 
   if (error || !data) {
+    if (image.imageUrl !== current.image_url) {
+      await removeLoungeNoticeImage(supabase, image.imageUrl);
+    }
     return { success: false, error: error?.message ?? "Failed to update notice" };
+  }
+
+  if (image.imageUrl !== current.image_url) {
+    await removeLoungeNoticeImage(supabase, current.image_url);
   }
 
   revalidateLoungeNoticePaths(authorization.business.slug, noticeId);
@@ -398,9 +449,70 @@ export async function deleteLoungeNotice(
 
   if (error) return { success: false, error: error.message };
 
+  await removeLoungeNoticeImage(supabase, current.image_url);
+
   revalidateLoungeNoticePaths(authorization.business.slug, noticeId);
 
   return { success: true };
+}
+
+export async function uploadLoungeNoticeImage(
+  formData: FormData
+): Promise<{ url?: string; error?: string }> {
+  const businessId = String(formData.get("business_id") ?? "").trim();
+  if (!businessId) return { error: "Business is required" };
+
+  const supabase = await createClient();
+  const authorization = await getAuthorizedBusiness(supabase, businessId);
+  if (!authorization) return { error: "Unauthorized" };
+
+  const file = formData.get("file");
+  if (!(file instanceof File) || file.size === 0) {
+    return { error: "No file provided" };
+  }
+  if (!file.type.startsWith("image/")) {
+    return { error: "Only image files are allowed" };
+  }
+  if (file.size > LOUNGE_NOTICE_IMAGE_MAX_BYTES) {
+    return { error: "File size must be 5MB or less" };
+  }
+
+  let compressed: Buffer;
+  try {
+    compressed = await compressImageToWebp(
+      Buffer.from(await file.arrayBuffer()),
+      "notice"
+    );
+  } catch (error) {
+    console.error("[LOUNGE_NOTICE] image-compression-failed", {
+      businessId,
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+    return { error: "Failed to process image" };
+  }
+
+  const fileName = `${buildLoungeNoticeImagePrefix(businessId)}${crypto.randomUUID()}.webp`;
+  const { error: uploadError } = await supabase.storage
+    .from("club-logos")
+    .upload(fileName, compressed, {
+      cacheControl: "31536000",
+      contentType: "image/webp",
+      upsert: false,
+    });
+
+  if (uploadError) {
+    console.error("[LOUNGE_NOTICE] image-upload-failed", {
+      businessId,
+      error: uploadError.message,
+    });
+    return { error: uploadError.message };
+  }
+
+  const {
+    data: { publicUrl },
+  } = supabase.storage.from("club-logos").getPublicUrl(fileName);
+
+  return { url: publicUrl };
 }
 
 export async function getMyLoungeNoticeSubscription(

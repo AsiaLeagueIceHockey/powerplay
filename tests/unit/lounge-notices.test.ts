@@ -5,6 +5,10 @@ import {
   isValidRequestId,
   validateLoungeNoticeInput,
 } from "@/lib/lounge-notices";
+import {
+  extractLoungeNoticeImagePath,
+  normalizeLoungeNoticeImageUrl,
+} from "@/lib/lounge-notice-images";
 
 describe("Lounge notice helpers", () => {
   it("trims valid input and rejects empty or oversized values", () => {
@@ -22,6 +26,32 @@ describe("Lounge notice helpers", () => {
   it("validates UUID request IDs", () => {
     expect(isValidRequestId("018f4f3c-1f6a-7abc-8def-1234567890ab")).toBe(true);
     expect(isValidRequestId("not-a-uuid")).toBe(false);
+  });
+
+  it("accepts only notice images stored under the matching Lounge business path", () => {
+    const businessId = "22222222-2222-4222-8222-222222222222";
+    const validUrl = `https://project.supabase.co/storage/v1/object/public/club-logos/lounge/notices/${businessId}/poster.webp`;
+
+    expect(extractLoungeNoticeImagePath(validUrl)).toBe(
+      `lounge/notices/${businessId}/poster.webp`
+    );
+    expect(normalizeLoungeNoticeImageUrl(validUrl, businessId, "https://project.supabase.co/storage/v1/object/public/club-logos/")).toEqual({
+      imageUrl: validUrl,
+    });
+    expect(
+      normalizeLoungeNoticeImageUrl(
+        validUrl,
+        businessId,
+        "https://another-project.supabase.co/storage/v1/object/public/club-logos/"
+      )
+    ).toEqual({ imageUrl: null, error: "Invalid Lounge notice image URL" });
+    expect(
+      normalizeLoungeNoticeImageUrl(
+        "https://project.supabase.co/storage/v1/object/public/club-logos/lounge/notices/other/poster.webp",
+        businessId
+      )
+    ).toEqual({ imageUrl: null, error: "Invalid Lounge notice image URL" });
+    expect(normalizeLoungeNoticeImageUrl("", businessId)).toEqual({ imageUrl: null });
   });
 
   it("deduplicates, excludes the publisher, and classifies delivery outcomes", async () => {
