@@ -6,6 +6,7 @@ import { MessageCircle, Users, Calendar, Building2, MapPin, CreditCard, Heart, M
 import { ClubVoteButton } from "@/components/club-vote-button";
 import { ClubSubscribeButton } from "@/components/club-subscribe-button";
 import { ClubShareButton } from "@/components/club-share-button";
+import { LinkifiedText } from "@/components/linkified-text";
 import { StartChatButton } from "@/components/start-chat-button";
 import {
   clubDetailActionButtonClass,
@@ -282,7 +283,7 @@ export default async function ClubDetailPage({
                   </span>
                 </div>
                 <p className="text-zinc-600 dark:text-zinc-400 whitespace-pre-wrap text-sm leading-relaxed">
-                  {notice.content}
+                  <LinkifiedText text={notice.content} />
                 </p>
               </div>
             ))}

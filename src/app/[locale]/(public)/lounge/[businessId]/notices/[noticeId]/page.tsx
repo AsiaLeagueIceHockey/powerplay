@@ -6,6 +6,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 
 import { getPublicLoungeNoticeDetail } from "@/app/actions/lounge-notices";
+import { LinkifiedText } from "@/components/linkified-text";
 import { LoungeShareButton } from "@/components/lounge-share-button";
 
 const siteUrl = "https://powerplay.kr";
@@ -168,7 +169,7 @@ export default async function LoungeNoticeDetailPage({
 
         <div className="p-6 md:p-8">
           <div className="whitespace-pre-wrap break-words text-[15px] leading-8 text-zinc-700 dark:text-zinc-200 md:text-base">
-            {notice.body}
+            <LinkifiedText text={notice.body} />
           </div>
         </div>
       </article>
