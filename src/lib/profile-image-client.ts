@@ -22,12 +22,15 @@ function loadImage(file: File): Promise<HTMLImageElement> {
   });
 }
 
-function canvasToWebp(canvas: HTMLCanvasElement): Promise<Blob> {
+function canvasToUploadBlob(canvas: HTMLCanvasElement): Promise<Blob> {
   return new Promise((resolve, reject) => {
     canvas.toBlob(
       (blob) => {
-        if (!blob || blob.type !== "image/webp") {
-          reject(new Error("WebP encoding is not supported"));
+        // Safari versions without Canvas WebP encoding support return PNG.
+        // The server always re-encodes the upload to WebP, so any image blob
+        // produced by the browser is a valid compact upload source.
+        if (!blob || !blob.type.startsWith("image/")) {
+          reject(new Error("Failed to encode image"));
           return;
         }
         resolve(blob);
@@ -36,6 +39,13 @@ function canvasToWebp(canvas: HTMLCanvasElement): Promise<Blob> {
       AVATAR_QUALITY
     );
   });
+}
+
+function getFileExtension(mimeType: string): string {
+  if (mimeType === "image/webp") return "webp";
+  if (mimeType === "image/jpeg") return "jpg";
+  if (mimeType === "image/png") return "png";
+  return "image";
 }
 
 export async function prepareProfileImage(file: File): Promise<File> {
@@ -63,11 +73,12 @@ export async function prepareProfileImage(file: File): Promise<File> {
     outputSize
   );
 
-  const blob = await canvasToWebp(canvas);
+  const blob = await canvasToUploadBlob(canvas);
   if (blob.size > PROFILE_IMAGE_MAX_BYTES) {
     throw new Error("Compressed image is too large");
   }
 
   const baseName = file.name.replace(/\.[^.]+$/, "") || "profile";
-  return new File([blob], `${baseName}.webp`, { type: "image/webp" });
+  const extension = getFileExtension(blob.type);
+  return new File([blob], `${baseName}.${extension}`, { type: blob.type });
 }
