@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "concurrently -p none \"serwist inject-manifest serwist.config.mjs --watch\" \"next dev\"",
-    "build": "next build && serwist inject-manifest serwist.config.mjs",
+    "dev": "concurrently -p none \"esbuild src/app/sw.ts --bundle --outfile=public/sw.js --platform=browser --format=iife --target=safari16.4,chrome80 --watch\" \"next dev\"",
+    "build": "next build && esbuild src/app/sw.ts --bundle --outfile=public/sw.js --platform=browser --format=iife --target=safari16.4,chrome80 --minify",
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
