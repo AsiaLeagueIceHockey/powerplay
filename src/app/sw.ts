@@ -2,6 +2,8 @@ import { defaultCache } from "@serwist/next/worker";
 import type { PrecacheEntry, SerwistGlobalConfig } from "serwist";
 import { ExpirationPlugin, NetworkFirst, Serwist } from "serwist";
 
+import { matchesLocaleStartPath } from "@/lib/pwa-start-path";
+
 declare global {
   interface WorkerGlobalScope extends SerwistGlobalConfig {
     __SW_MANIFEST: (PrecacheEntry | string)[] | undefined;
@@ -13,8 +15,6 @@ declare const self: ServiceWorkerGlobalScope;
 // Keep Serwist's inject-manifest placeholder available for the build step
 // without re-enabling install-time precaching on iOS PWA.
 void self.__SW_MANIFEST;
-
-const localeStartPath = /^\/(ko|en)\/?$/;
 
 const startPageRuntimeCaching = [
   {
@@ -29,7 +29,7 @@ const startPageRuntimeCaching = [
     }) =>
       sameOrigin &&
       request.method === "GET" &&
-      localeStartPath.test(url.pathname) &&
+      matchesLocaleStartPath(url.pathname) &&
       request.headers.get("RSC") !== "1",
     handler: new NetworkFirst({
       cacheName: "app-start-page",
@@ -54,7 +54,7 @@ const startPageRuntimeCaching = [
     }) =>
       sameOrigin &&
       request.method === "GET" &&
-      localeStartPath.test(url.pathname) &&
+      matchesLocaleStartPath(url.pathname) &&
       request.headers.get("RSC") === "1",
     handler: new NetworkFirst({
       cacheName: "app-start-rsc",
