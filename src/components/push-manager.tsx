@@ -6,6 +6,7 @@ import {
   ensurePushSubscription,
   serializePushSubscription,
 } from "@/lib/push-subscription";
+import { captureClientOperationalError } from "@/lib/monitoring/client";
 
 const SUPPORTED_LOCALES = new Set(["ko", "en"]);
 
@@ -60,6 +61,10 @@ export function PushServiceWorkerRegister() {
         })
         .catch((error) => {
           console.error("Service Worker registration failed:", error);
+          void captureClientOperationalError(error, {
+            domain: "push-client",
+            operation: "register",
+          });
         });
 
       const handleControllerChange = () => {
@@ -127,6 +132,10 @@ export function PushPermissionButton({
       }
     } catch (error) {
       console.error("Subscription failed:", error);
+      void captureClientOperationalError(error, {
+        domain: "push-client",
+        operation: "subscribe",
+      });
       alert(
         error instanceof Error
           ? `알림 설정 실패: ${error.message}`

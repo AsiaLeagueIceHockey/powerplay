@@ -8,6 +8,7 @@ import {
   urlBase64ToUint8Array,
   serializePushSubscription,
 } from "@/lib/push-subscription";
+import { captureClientOperationalError } from "@/lib/monitoring/client";
 
 interface NotificationContextType {
   isOpen: boolean;
@@ -142,6 +143,10 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
           }
         } catch (err) {
           console.error("[Notification] Sync/Repair failed:", err);
+          void captureClientOperationalError(err, {
+            domain: "push-client",
+            operation: "self-repair",
+          });
         }
         // If granted, we are done. No need to show modal.
         return;

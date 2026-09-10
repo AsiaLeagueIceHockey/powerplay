@@ -8,6 +8,7 @@ import {
   ensurePushSubscription,
   serializePushSubscription,
 } from "@/lib/push-subscription";
+import { captureClientOperationalError } from "@/lib/monitoring/client";
 import { X, Bell, Share, PlusSquare, CheckCircle, Download, RefreshCw, Compass } from "lucide-react";
 
 export function NotificationGuideModal() {
@@ -86,6 +87,10 @@ export function NotificationGuideModal() {
       }
     } catch (error) {
       console.error("Subscription failed:", error);
+      void captureClientOperationalError(error, {
+        domain: "push-client",
+        operation: "guide-subscribe",
+      });
       const errMsg = error instanceof Error ? error.message : "";
       const isSwError = errMsg.includes("서비스 워커") || errMsg.includes("service worker") || errMsg.includes("Timed out");
       const isUnsupported = errMsg.includes("푸시 알림이 지원") || errMsg.includes("push notifications");

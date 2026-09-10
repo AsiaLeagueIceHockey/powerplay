@@ -39,3 +39,12 @@ jobs:
           TARGET_WEEK_START: ${{ github.event.inputs.target_week_start }}
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: npx tsx scripts/capture-instagram-weekly.ts
+
+      - name: Ping Better Stack heartbeat
+        if: ${{ success() }}
+        env:
+          BETTER_STACK_HEARTBEAT_URL: ${{ secrets.BETTER_STACK_HEARTBEAT_WEEKLY_MATCHES_URL }}
+        run: |
+          if [ -n "$BETTER_STACK_HEARTBEAT_URL" ]; then
+            curl --fail --silent --show-error --max-time 10 --retry 2 "$BETTER_STACK_HEARTBEAT_URL"
+          fi

@@ -35,3 +35,12 @@ jobs:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           DELETE_OLD_LOGS: ${{ github.event.inputs.delete_old_logs || 'false' }}
         run: npx tsx scripts/aggregate-lounge-metrics.ts
+
+      - name: Ping Better Stack heartbeat
+        if: ${{ success() }}
+        env:
+          BETTER_STACK_HEARTBEAT_URL: ${{ secrets.BETTER_STACK_HEARTBEAT_LOUNGE_AGGREGATION_URL }}
+        run: |
+          if [ -n "$BETTER_STACK_HEARTBEAT_URL" ]; then
+            curl --fail --silent --show-error --max-time 10 --retry 2 "$BETTER_STACK_HEARTBEAT_URL"
+          fi

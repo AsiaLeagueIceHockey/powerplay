@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import webpush from "web-push";
 import { sendEmailNotification } from "@/lib/notifications/dispatch";
+import { captureOperationalError } from "@/lib/monitoring/server";
 
 // ============================================
 // VAPID Key Validation (Task 4)
@@ -54,6 +55,10 @@ async function logNotification(
   } catch (err) {
     // Don't let logging errors affect main flow
     console.error("[PUSH] Failed to log notification:", err);
+    captureOperationalError(new Error("Notification log write failed"), {
+      domain: "push",
+      operation: "log-notification",
+    });
   }
 }
 
@@ -94,19 +99,33 @@ async function sendWithRetry(
     }
   }
   
-  // Enhanced Logging for Debugging Vercel Issues
+  // Keep diagnostics useful without emitting a tokenized push endpoint or body.
   if (lastError) {
     const errorDetails = {
       message: lastError.message,
       statusCode: lastError.statusCode,
-      headers: lastError.headers,
-      body: lastError.body, // Contains specific error info from FCM/APNs
-      endpoint: subscription.endpoint.substring(0, 60) + "..."
+      endpointHost: getEndpointHost(subscription.endpoint),
     };
     console.error("[PUSH_FAIL] WebPush Error Details:", JSON.stringify(errorDetails, null, 2));
+    captureOperationalError(new Error("Web push delivery failed"), {
+      domain: "push",
+      operation: "send",
+      tags: {
+        endpointHost: getEndpointHost(subscription.endpoint),
+        statusCode: lastError.statusCode ?? "unknown",
+      },
+    });
   }
   
   throw lastError;
+}
+
+function getEndpointHost(endpoint: string) {
+  try {
+    return new URL(endpoint).hostname;
+  } catch {
+    return "invalid";
+  }
 }
 
 // ============================================
@@ -150,6 +169,10 @@ export async function saveSubscription(subscription: PushSubscriptionData) {
 
   if (error) {
     console.error("Error saving subscription:", error);
+    captureOperationalError(new Error("Push subscription save failed"), {
+      domain: "push",
+      operation: "save-subscription",
+    });
     return { error: error.message };
   }
 
@@ -326,6 +349,14 @@ export async function sendPushNotification(
   const status = successCount > 0 ? "sent" : "failed";
   const errorMessage = errors.length > 0 ? errors.join("; ") : undefined;
   await logNotification(userId, title, body, url, status, successCount, errorMessage);
+
+  if (status === "failed") {
+    captureOperationalError(new Error("All push delivery attempts failed"), {
+      domain: "push",
+      operation: "send",
+      extra: { subscriptionCount: subscriptions.length },
+    });
+  }
 
   return { success: successCount > 0, sent: successCount };
 }

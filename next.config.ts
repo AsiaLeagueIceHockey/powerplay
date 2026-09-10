@@ -27,6 +27,11 @@ const nextConfig: NextConfig = {
 
 import { withSentryConfig } from "@sentry/nextjs";
 
+const sentryOrg = process.env.SENTRY_ORG;
+const sentryProject = process.env.SENTRY_PROJECT;
+const sentryUrl = process.env.SENTRY_URL;
+const sentryAuthToken = process.env.SENTRY_AUTH_TOKEN;
+
 export default withSentryConfig(
   withNextIntl(nextConfig),
   {
@@ -35,13 +40,18 @@ export default withSentryConfig(
 
     // Suppresses source map uploading logs during build
     silent: true,
-    org: "asia-league-ice-hockey",
-    project: "powerplay-next",
+    org: sentryOrg,
+    project: sentryProject,
+    sentryUrl,
+    authToken: sentryAuthToken,
 
     // For all available options, see:
     // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
 
     // Upload a larger set of source maps for prettier stack traces (increases build time)
     widenClientFileUpload: true,
+    sourcemaps: {
+      deleteSourcemapsAfterUpload: true,
+    },
   }
 );

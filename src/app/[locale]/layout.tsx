@@ -15,6 +15,7 @@ import { OnboardingGuard } from "@/components/onboarding-guard";
 import { LocalePreferenceRedirect } from "@/components/locale-preference-redirect";
 import NextTopLoader from "nextjs-toploader";
 import { Analytics } from "@vercel/analytics/next";
+import { MonitoringRuntime } from "@/components/monitoring-runtime";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -148,6 +149,7 @@ export default async function LocaleLayout({
           </NotificationProvider>
         </NextIntlClientProvider>
         <WebSiteJsonLd locale={locale} />
+        <MonitoringRuntime />
         <Analytics />
       </body>
     </html>

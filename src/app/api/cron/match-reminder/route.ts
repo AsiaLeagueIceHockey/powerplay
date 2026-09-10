@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { sendEmailNotification } from "@/lib/notifications/dispatch";
+import { captureOperationalError } from "@/lib/monitoring/server";
 
 /**
  * D-1 경기 리마인더 발송 API
@@ -47,6 +48,10 @@ export async function GET(request: NextRequest) {
 
     if (matchError) {
       console.error("[REMINDER] 경기 조회 실패:", matchError);
+      captureOperationalError(new Error("Match reminder query failed"), {
+        domain: "cron",
+        operation: "match-reminder",
+      });
       return NextResponse.json({ error: matchError.message }, { status: 500 });
     }
 
@@ -96,6 +101,10 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ sent, errors, matches: matches.length });
   } catch (err) {
     console.error("[REMINDER] 예외:", err);
+    captureOperationalError(new Error("Match reminder failed"), {
+      domain: "cron",
+      operation: "match-reminder",
+    });
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
