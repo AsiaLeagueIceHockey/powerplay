@@ -1,10 +1,13 @@
 import { getTranslations } from "next-intl/server";
-import { getPublicHomeBannerBusinesses } from "@/app/actions/lounge";
+import { getPublicLoungeData } from "@/lib/seo/public-lounge";
 import { FeedbackBannerClient, type FeedbackBannerItem } from "./feedback-banner-client";
 
 export async function FeedbackBanner({ locale }: { locale: string }) {
   const t = await getTranslations();
-  const businessBanners = await getPublicHomeBannerBusinesses();
+  const { businesses } = await getPublicLoungeData();
+  const businessBanners = businesses
+    .filter((business) => business.home_banner_enabled && business.home_banner_title?.trim() && business.home_banner_description?.trim())
+    .sort((a, b) => a.home_banner_order - b.home_banner_order || a.name.localeCompare(b.name, "ko", { sensitivity: "base" }));
 
   const banners: FeedbackBannerItem[] = [
     ...businessBanners.map((business) => ({
