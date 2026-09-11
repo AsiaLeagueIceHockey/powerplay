@@ -103,6 +103,7 @@ export function MatchCard({ match }: { match: Match }) {
         <h3 className="text-lg font-bold text-[#172554] group-hover:text-blue-600 dark:text-zinc-100 dark:group-hover:text-blue-400 leading-tight transition-colors">
           <Link
             href={`/match/${match.id}`}
+            prefetch={false}
             className="relative z-10"
             onClick={(event) => event.stopPropagation()}
           >
@@ -177,6 +178,7 @@ export function MatchCard({ match }: { match: Match }) {
           {match.club ? (
             <Link
               href={`/clubs/${match.club.id}`}
+              prefetch={false}
               className="relative z-10 flex items-center gap-1.5 text-xs font-bold text-[#172554] dark:text-blue-400 bg-blue-50/50 dark:bg-blue-900/10 px-2 py-0.5 rounded-lg border border-blue-100/50 dark:border-blue-900/20 truncate hover:border-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20"
               onClick={(e) => e.stopPropagation()}
             >

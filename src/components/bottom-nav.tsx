@@ -167,6 +167,7 @@ export function BottomNav({ locale }: { locale: string }) {
             <Link
               key={tab.href}
               href={tab.href}
+              prefetch={false}
               className={`flex flex-col items-center justify-center w-full h-full gap-0.5 transition-colors ${
                 active
                   ? "text-blue-600 dark:text-blue-400"

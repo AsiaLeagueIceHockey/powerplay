@@ -23,6 +23,7 @@ export function PublicSectionTabs({
           <Link
             key={tab.key}
             href={tab.href}
+            prefetch={false}
             className={`relative flex-1 pb-3 text-center text-lg font-bold transition-colors ${
               isActive
                 ? "text-zinc-900 dark:text-white"
