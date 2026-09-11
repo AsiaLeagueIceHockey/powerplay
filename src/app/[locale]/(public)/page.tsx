@@ -1,5 +1,5 @@
 import { setRequestLocale } from "next-intl/server";
-import { getCachedMatches } from "@/app/actions/cache";
+import { getPublicHomeMatches } from "@/lib/public-matches";
 import { FeedbackBanner } from "@/components/feedback-banner";
 import { HomeClient } from "@/components/home-client";
 import { PublicSectionTabs } from "@/components/public-section-tabs";
@@ -44,7 +44,7 @@ export async function generateMetadata({
 
 // Separate async component for data fetching (enables streaming)
 async function HomeContent({ selectedDate }: { selectedDate?: string }) {
-  const allMatches = await getCachedMatches();
+  const allMatches = await getPublicHomeMatches();
   const rinks = Array.from(
     new Map(allMatches.flatMap((match) => match.rink ? [[match.rink.id, match.rink] as const] : [])).values()
   );
