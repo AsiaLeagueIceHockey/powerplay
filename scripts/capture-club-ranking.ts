@@ -142,7 +142,10 @@ async function run() {
     const url = `${SITE_URL}/ko/instagram/club-ranking?month=${targetMonth}`;
     console.log(`Navigating to: ${url}`);
 
-    await page.goto(url, { waitUntil: "networkidle", timeout: 30000 });
+    await page.goto(url, { waitUntil: "load", timeout: 60000 });
+    await page.evaluate(async () => {
+      await document.fonts.ready;
+    });
 
     const screenshotBuffer = await page.screenshot({
       type: "png",
