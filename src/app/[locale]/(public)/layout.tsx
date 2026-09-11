@@ -1,11 +1,7 @@
-import { Suspense } from "react";
-import Image from "next/image";
 import { setRequestLocale } from "next-intl/server";
-import { UserHeaderSkeleton } from "@/components/skeletons";
-import { UserHeaderLoader } from "@/components/user-header-loader";
-import { createClient } from "@/lib/supabase/server";
 import { BottomNav } from "@/components/bottom-nav";
 import { BrandLogo } from "@/components/brand-logo";
+import { UserHeaderClient } from "@/components/user-header-client";
 
 export default async function PublicLayout({
   children,
@@ -34,11 +30,9 @@ export default async function PublicLayout({
             <BrandLogo locale={locale} />
           </div>
 
-          {/* User Menu - Right (Suspense Streaming) */}
+          {/* User Menu - client-side so public pages stay cookie-free. */}
           <div className="flex-shrink-0">
-            <Suspense fallback={<UserHeaderSkeleton />}>
-              <UserHeaderLoader locale={locale} />
-            </Suspense>
+            <UserHeaderClient locale={locale} />
           </div>
         </div>
       </header>
