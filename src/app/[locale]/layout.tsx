@@ -2,7 +2,6 @@ import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing, type Locale } from "@/i18n/routing";
-import { Geist, Geist_Mono } from "next/font/google";
 import { Metadata } from "next";
 import { ScrollToTop } from "@/components/scroll-to-top";
 import { WebSiteJsonLd } from "@/components/json-ld";
@@ -16,16 +15,6 @@ import { LocalePreferenceRedirect } from "@/components/locale-preference-redirec
 import NextTopLoader from "nextjs-toploader";
 import { Analytics } from "@vercel/analytics/next";
 import { MonitoringRuntime } from "@/components/monitoring-runtime";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -132,7 +121,7 @@ export default async function LocaleLayout({
   return (
     <html lang={locale}>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100`}
+        className="antialiased bg-white text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100"
       >
         <NextIntlClientProvider messages={messages}>
           <NextTopLoader color="#2563EB" showSpinner={false} />
