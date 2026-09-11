@@ -97,7 +97,7 @@ export default async function ClubDetailPage({
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <SportsTeamJsonLd club={club} locale={locale} />
-      <div className="flex justify-between items-start mb-6 gap-4">
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
         <div className="flex items-start gap-4 min-w-0">
           {/* Club Logo */}
           <div className="w-16 h-16 rounded-2xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center overflow-hidden shrink-0 border border-zinc-200 dark:border-zinc-700 shadow-sm">
@@ -116,7 +116,7 @@ export default async function ClubDetailPage({
           
           {/* Club Name & Badges */}
           <div className="flex flex-col gap-1.5 min-w-0">
-            <h1 className="text-2xl font-black text-zinc-900 dark:text-white tracking-tight break-keep">
+            <h1 className="text-2xl font-black tracking-tight text-zinc-900 break-words dark:text-white">
               {club.name}
             </h1>
             <div className="flex flex-wrap items-center gap-2 mt-0.5">
@@ -145,7 +145,7 @@ export default async function ClubDetailPage({
         </div>
 
         {/* Actions (Card & Share) */}
-        <div className="flex items-center gap-1 shrink-0">
+        <div className="flex shrink-0 self-end items-center gap-1 sm:self-auto">
           <Link
             href={`/${locale}/clubs/${club.id}/card`}
             className="p-2.5 text-zinc-500 hover:text-blue-600 hover:bg-blue-50 dark:text-zinc-400 dark:hover:text-blue-400 dark:hover:bg-blue-900/20 rounded-full transition-colors flex items-center justify-center"
