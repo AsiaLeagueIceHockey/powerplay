@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { calculateRefundPercent } from "./points";
 import { sendPushNotification } from "@/app/actions/push";
 import { logAndNotify } from "@/lib/audit";
+import { revalidateTag } from "next/cache";
 
 // Type definitions for match data
 export interface MatchRink {
@@ -422,6 +423,7 @@ export async function joinMatch(
     metadata: { matchId, rinkName, status: participantStatus, amount: totalPoints, rental: isRentalOptIn },
   });
 
+  revalidateTag("matches", "max");
   return { success: true, status: participantStatus };
 }
 
@@ -471,6 +473,7 @@ export async function cancelJoin(matchId: string) {
       .delete()
       .eq("match_id", matchId)
       .eq("user_id", user.id);
+    revalidateTag("matches", "max");
     return { success: true, refundAmount: 0 };
   }
 
@@ -639,6 +642,7 @@ export async function cancelJoin(matchId: string) {
     metadata: { matchId, refundAmount },
   });
 
+  revalidateTag("matches", "max");
   return { success: true, refundAmount };
 }
 
@@ -897,5 +901,6 @@ export async function joinWaitlist(
     }
   }
 
+  revalidateTag("matches", "max");
   return { success: true };
 }

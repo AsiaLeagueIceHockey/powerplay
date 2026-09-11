@@ -224,6 +224,7 @@ export async function createMatch(formData: FormData) {
   }
 
   revalidatePath("/admin/matches");
+  revalidateTag("matches", "max");
 
   // Fetch Club Name (if clubId exists)
   let clubName = "";
@@ -364,6 +365,7 @@ export async function updateMatch(matchId: string, formData: FormData) {
 
   revalidatePath("/admin/matches");
   revalidatePath(`/admin/matches/${matchId}/edit`);
+  revalidateTag("matches", "max");
   // 알림 발송 및 환불 처리 (Trigger 5: 경기 취소)
   if (status === "canceled") {
     // 1. Get all participants with status
@@ -475,6 +477,7 @@ export async function updateMatch(matchId: string, formData: FormData) {
   }
 
   revalidatePath("/admin/matches");
+  revalidateTag("matches", "max");
   revalidatePath(`/admin/matches/${matchId}/edit`);
   return { success: true };
 }
@@ -599,6 +602,7 @@ export async function cancelMatchByAdmin(matchId: string) {
   }
 
   revalidatePath("/admin/matches");
+  revalidateTag("matches", "max");
   return { success: true };
 }
 
