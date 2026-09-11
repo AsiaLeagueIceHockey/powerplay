@@ -68,7 +68,7 @@ export function HomeClient({
   const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
 
   // Client-side filtering state
-  const [selectedDate, setSelectedDate] = useState<string | null>(initialDate || null);
+  const [selectedDate, setSelectedDate] = useState<string | null>(initialDate ?? searchParams.get("date"));
   const [activeFilters, setActiveFilters] = useState<Set<string>>(new Set());
   
   // Rink Filter State

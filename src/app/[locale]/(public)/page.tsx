@@ -43,7 +43,7 @@ export async function generateMetadata({
 }
 
 // Separate async component for data fetching (enables streaming)
-async function HomeContent({ selectedDate }: { selectedDate?: string }) {
+async function HomeContent() {
   const allMatches = await getPublicHomeMatches();
   const rinks = Array.from(
     new Map(allMatches.flatMap((match) => match.rink ? [[match.rink.id, match.rink] as const] : [])).values()
@@ -54,7 +54,6 @@ async function HomeContent({ selectedDate }: { selectedDate?: string }) {
       matches={allMatches} // Pass all matches, filtering will happen on client
       rinks={rinks}
       clubs={[]}
-      initialDate={selectedDate}
       forcedTab="match"
     />
   );
@@ -62,13 +61,10 @@ async function HomeContent({ selectedDate }: { selectedDate?: string }) {
 
 export default async function HomePage({
   params,
-  searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ date?: string }>;
 }) {
   const { locale } = await params;
-  const { date: selectedDate } = await searchParams;
   setRequestLocale(locale);
 
   return (
@@ -83,7 +79,7 @@ export default async function HomePage({
 
       {/* Main Content - streamed with Suspense */}
       <Suspense fallback={<HomePageSkeleton />}>
-        <HomeContent selectedDate={selectedDate} />
+        <HomeContent />
       </Suspense>
 
       <div className="border-t border-zinc-200 pt-3 text-center text-[11px] text-zinc-400 dark:border-zinc-800 dark:text-zinc-500">
