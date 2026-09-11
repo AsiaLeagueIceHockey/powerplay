@@ -103,8 +103,13 @@ async function run() {
       const url = `${SITE_URL}/ko/instagram/matches?date=${targetDateStr}&page=${pageNum}`;
       console.log(`Navigating to: ${url}`);
 
-      // Wait for network idle to ensure everything (fonts, images) is loaded
-      await page.goto(url, { waitUntil: "networkidle", timeout: 30000 });
+      // The public layout opens persistent analytics and navigation requests,
+      // so networkidle can never settle in GitHub Actions. The capture route is
+      // server-rendered; wait for its document and fonts instead.
+      await page.goto(url, { waitUntil: "load", timeout: 60000 });
+      await page.evaluate(async () => {
+        await document.fonts.ready;
+      });
 
       // Take screenshot
       const screenshotBuffer = await page.screenshot({
