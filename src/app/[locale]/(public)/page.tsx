@@ -1,5 +1,5 @@
 import { setRequestLocale } from "next-intl/server";
-import { getCachedMatches, getCachedRinks, getCachedClubs } from "@/app/actions/cache";
+import { getCachedMatches } from "@/app/actions/cache";
 import { FeedbackBanner } from "@/components/feedback-banner";
 import { HomeClient } from "@/components/home-client";
 import { PublicSectionTabs } from "@/components/public-section-tabs";
@@ -44,18 +44,16 @@ export async function generateMetadata({
 
 // Separate async component for data fetching (enables streaming)
 async function HomeContent({ selectedDate }: { selectedDate?: string }) {
-  // 병렬 데이터 페칭 (캐싱 적용)
-  const [allMatches, rinks, clubs] = await Promise.all([
-    getCachedMatches(),  // Cached (15s)
-    getCachedRinks(),    // Cached (5min)
-    getCachedClubs(),    // Cached (30s)
-  ]);
+  const allMatches = await getCachedMatches();
+  const rinks = Array.from(
+    new Map(allMatches.flatMap((match) => match.rink ? [[match.rink.id, match.rink] as const] : [])).values()
+  );
 
   return (
     <HomeClient
       matches={allMatches} // Pass all matches, filtering will happen on client
       rinks={rinks}
-      clubs={clubs}
+      clubs={[]}
       initialDate={selectedDate}
       forcedTab="match"
     />

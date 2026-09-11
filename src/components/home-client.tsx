@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useState, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { castClubVote, type ClubVoteSummary } from "@/app/actions/clubs";
@@ -7,7 +8,10 @@ import { Match } from "@/app/actions/match";
 import { Rink } from "@/app/actions/types";
 import { DateFilter } from "@/components/date-filter";
 import { MatchCard } from "@/components/match-card";
-import { CalendarView } from "@/components/calendar-view";
+const CalendarView = dynamic(
+  () => import("@/components/calendar-view").then((module) => module.CalendarView),
+  { loading: () => <div className="min-h-80 animate-pulse rounded-xl bg-zinc-100 dark:bg-zinc-800" /> }
+);
 import { RinkExplorer } from "@/components/rink-explorer";
 import { useTranslations, useLocale } from "next-intl";
 import { RinkFilterDrawer } from "@/components/rink-filter-drawer";
