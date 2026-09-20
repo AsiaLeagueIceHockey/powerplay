@@ -17,7 +17,6 @@ async function fetchPublicMatches(): Promise<Match[]> {
     .from("matches")
     .select(`id, start_time, fee, duration_minutes, max_skaters, max_goalies, status, entry_points, rental_fee, rental_available, match_type, max_guests, description, rink:rink_id(id, name_ko, name_en, address, lat, lng, rink_type), club:club_id(id, name, kakao_open_chat_url, logo_url)`)
     .neq("status", "canceled")
-    .gte("start_time", new Date().toISOString())
     .order("start_time", { ascending: true });
 
   if (error || !matches?.length) return [];
@@ -47,6 +46,6 @@ async function fetchPublicMatches(): Promise<Match[]> {
 
 export const getPublicHomeMatches = unstable_cache(
   fetchPublicMatches,
-  ["public-home-matches-v1"],
+  ["public-home-matches-v2"],
   { revalidate: 15, tags: ["matches"] }
 );

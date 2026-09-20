@@ -19,16 +19,10 @@ export function MatchCard({ match }: { match: Match }) {
     weekday: "short",
     timeZone: "Asia/Seoul",
   });
-  const timeFormatter = new Intl.DateTimeFormat(locale, {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-    timeZone: "Asia/Seoul",
-  });
-
   const startDate = new Date(match.start_time);
   const formattedDate = dateFormatter.format(startDate);
-  const formattedTime = timeFormatter.format(startDate);
+  const kstStartDate = new Date(startDate.getTime() + 9 * 60 * 60 * 1000);
+  const formattedTime = `${String(kstStartDate.getUTCHours()).padStart(2, "0")}:${String(kstStartDate.getUTCMinutes()).padStart(2, "0")}`;
 
   // KST 기준 과거 경기 체크
   const now = new Date();
