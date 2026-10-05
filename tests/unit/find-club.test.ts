@@ -16,9 +16,9 @@ vi.mock("next/cache", () => ({
 }));
 
 describe("find-club recommendations", () => {
-  let clubsMock: any;
-  let matchesMock: any;
-  let loungeMock: any;
+  let clubsMock: ReturnType<typeof createChainableMock>;
+  let matchesMock: ReturnType<typeof createChainableMock>;
+  let loungeMock: ReturnType<typeof createChainableMock>;
 
   beforeEach(() => {
     resetSupabaseMock();
@@ -39,19 +39,21 @@ describe("find-club recommendations", () => {
       }
     });
 
-    (mockSupabase as any).rpc = vi.fn().mockImplementation((fn: string) => {
-      if (fn === "get_public_club_member_counts") {
+    Object.assign(mockSupabase, {
+      rpc: vi.fn().mockImplementation((fn: string) => {
+        if (fn === "get_public_club_member_counts") {
+          return Promise.resolve({ data: [] });
+        }
         return Promise.resolve({ data: [] });
-      }
-      return Promise.resolve({ data: [] });
-    }) as any;
+      }),
+    });
 
     mockSupabase.auth.getUser.mockResolvedValue({ data: { user: null } });
   });
 
-  it("filters out clubs whose name contains '파워플레이'", async () => {
+  it("filters out clubs whose name contains an internal-only marker", async () => {
     // 1. Setup mock data
-    // Two clubs: one normal, one test club with '파워플레이'
+    // One public club plus internal-only clubs.
     clubsMock.order.mockResolvedValue({
       data: [
         {
@@ -82,6 +84,34 @@ describe("find-club recommendations", () => {
             },
           ],
         },
+        {
+          id: "club-awio",
+          name: "Seoul AWIO Hockey",
+          description: "검색 제외 대상 클럽",
+          club_rinks: [
+            {
+              rink: {
+                id: "rink-1",
+                name_ko: "안양아이스링크",
+                address: "경기 안양시 동안구 평촌대로",
+              },
+            },
+          ],
+        },
+        {
+          id: "club-awio-lowercase",
+          name: "awio juniors",
+          description: "소문자도 검색 제외 대상",
+          club_rinks: [
+            {
+              rink: {
+                id: "rink-1",
+                name_ko: "안양아이스링크",
+                address: "경기 안양시 동안구 평촌대로",
+              },
+            },
+          ],
+        },
       ],
     });
 
@@ -95,7 +125,7 @@ describe("find-club recommendations", () => {
     });
 
     // 3. Verify
-    // The "파워플레이 테스트" club should be excluded
+    // Internal-only clubs should be excluded from recommendations and totals.
     expect(result.recommendations).toHaveLength(1);
     expect(result.recommendations[0].id).toBe("club-1");
     expect(result.recommendations[0].name).toBe("안양 타이거즈");
@@ -127,7 +157,7 @@ describe("find-club recommendations", () => {
     ];
 
     // Handle multiple eq calls by returning this for first, and resolving data for the second (category check)
-    loungeMock.eq.mockImplementation(function (key: string, value: any) {
+    loungeMock.eq.mockImplementation(function (key: string) {
       if (key === "category") {
         return Promise.resolve({ data: mockLoungeData });
       }

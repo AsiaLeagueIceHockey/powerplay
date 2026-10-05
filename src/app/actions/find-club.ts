@@ -48,6 +48,10 @@ export interface FindClubResult {
 // Scoring
 // ============================================
 
+function isInternalOnlyName(name: string): boolean {
+  return name.includes("파워플레이") || name.toUpperCase().includes("AWIO");
+}
+
 function scoreClub(
   club: Club,
   prefs: FindClubPreferences,
@@ -136,10 +140,10 @@ export async function getClubRecommendations(
         : Promise.resolve({ data: [], error: null }),
     ]);
 
-  // Filter out internal test clubs containing "파워플레이"
+  // Keep internal-only clubs out of public recommendations and result totals.
   const clubs = ((clubsResult.data || []) as (Club & {
     club_rinks?: ClubRinkJoin[] | null;
-  })[]).filter((club) => !club.name.includes("파워플레이"));
+  })[]).filter((club) => !isInternalOnlyName(club.name));
   const recentMatches = matchesResult.data || [];
 
   // Build member count map
@@ -212,9 +216,9 @@ export async function getClubRecommendations(
       kakao_open_chat_url: string | null;
       category: string;
     };
-    // Filter out internal test businesses containing "파워플레이"
+    // Apply the same public-result exclusion to youth-club businesses.
     const businesses = (loungeResult.data as LoungeBiz[]).filter(
-      (biz) => !biz.name.includes("파워플레이")
+      (biz) => !isInternalOnlyName(biz.name)
     );
 
     businesses.forEach((biz) => {
