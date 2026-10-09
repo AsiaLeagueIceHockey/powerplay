@@ -92,7 +92,21 @@ export default async function SeoBotLayout({
                   ? "파워플레이 — 한국 아이스하키 커뮤니티 플랫폼"
                   : "PowerPlay — Korea's Ice Hockey Community Platform"}
               </p>
-              <div className="flex items-center justify-center gap-3">
+              <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2">
+                <Link
+                  href={`/${locale}/about`}
+                  className="hover:text-zinc-700 dark:hover:text-zinc-300"
+                >
+                  {isKo ? "회사 소개" : "About"}
+                </Link>
+                <span aria-hidden="true">|</span>
+                <a
+                  href={`/${locale}/about#contact`}
+                  className="hover:text-zinc-700 dark:hover:text-zinc-300"
+                >
+                  {isKo ? "문의" : "Contact"}
+                </a>
+                <span aria-hidden="true">|</span>
                 <Link
                   href={`/${locale}/privacy`}
                   className="hover:text-zinc-700 dark:hover:text-zinc-300"

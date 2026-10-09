@@ -14,6 +14,7 @@ const BOT_INDEXABLE_TOP_LEVEL = new Set([
   "/rinks",
   "/find-club",
   "/lounge",
+  "/about",
 ]);
 
 function isBot(request: NextRequest): boolean {
