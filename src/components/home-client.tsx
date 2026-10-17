@@ -19,6 +19,7 @@ import { MatchTypeFilterDrawer } from "@/components/match-type-filter-drawer";
 import { RegionFilterDrawer } from "@/components/region-filter-drawer";
 import { List, CalendarDays, Loader2, ChevronDown, Search } from "lucide-react";
 import { Club } from "@/app/actions/types";
+import { FindClubBanner } from "@/components/find-club-banner";
 import { ClubCard } from "@/components/club-card";
 import { CLUB_VOTE_DAILY_LIMIT, POWERPLAY_INSTAGRAM_URL, applyClubVoteRanking } from "@/lib/club-voting";
 import { extractRegion, getUniqueRegions } from "@/lib/rink-utils";
@@ -61,8 +62,8 @@ export function HomeClient({
   const [activeTabState, setActiveTabState] = useState<"match" | "rink" | "club">(() => {
     const tabParam = searchParams.get("tab");
     if (tabParam === "rink") return "rink";
-    if (tabParam === "club") return "club";
-    return "match";
+    if (tabParam === "match") return "match";
+    return "club";
   });
   const activeTab = forcedTab ?? activeTabState;
   const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
@@ -256,16 +257,16 @@ export function HomeClient({
       {!forcedTab ? (
         <div className="flex border-b border-zinc-200 dark:border-zinc-800">
           <button
-            onClick={() => setActiveTab("match")}
-            className={`flex-1 pb-3 text-lg font-bold transition-all relative ${activeTab === "match"
+            onClick={() => setActiveTab("club")}
+            className={`flex-1 pb-3 text-lg font-bold transition-all relative ${activeTab === "club"
               ? "text-zinc-900 dark:text-white"
               : "text-zinc-400 hover:text-zinc-600"
               }`}
           >
             <span className="flex items-center justify-center gap-2">
-              {t("tabs.match")}
+              {t("tabs.club")}
             </span>
-            {activeTab === "match" && (
+            {activeTab === "club" && (
               <span className="absolute bottom-0 left-0 w-full h-0.5 bg-zinc-900 dark:bg-white" />
             )}
           </button>
@@ -284,16 +285,16 @@ export function HomeClient({
             )}
           </button>
           <button
-            onClick={() => setActiveTab("club")}
-            className={`flex-1 pb-3 text-lg font-bold transition-all relative ${activeTab === "club"
+            onClick={() => setActiveTab("match")}
+            className={`flex-1 pb-3 text-lg font-bold transition-all relative ${activeTab === "match"
               ? "text-zinc-900 dark:text-white"
               : "text-zinc-400 hover:text-zinc-600"
               }`}
           >
             <span className="flex items-center justify-center gap-2">
-              {t("tabs.club")}
+              {t("tabs.match")}
             </span>
-            {activeTab === "club" && (
+            {activeTab === "match" && (
               <span className="absolute bottom-0 left-0 w-full h-0.5 bg-zinc-900 dark:bg-white" />
             )}
           </button>
@@ -457,21 +458,9 @@ export function HomeClient({
           <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
             {/* Club Tab */}
             <div className="mb-6">
-              <a
-                href={POWERPLAY_INSTAGRAM_URL}
-                target="_blank"
-                rel="noreferrer"
-                className="mb-4 block rounded-xl border border-rose-200 bg-gradient-to-r from-rose-50 via-white to-amber-50 px-4 py-2.5 shadow-sm transition-opacity hover:opacity-80 dark:border-rose-900/40 dark:from-rose-950/30 dark:via-zinc-950 dark:to-amber-950/20"
-              >
-                <div>
-                  <h2 className="text-sm font-bold tracking-tight text-zinc-900 dark:text-white">
-                    {t("clubRanking.bannerTitle")}
-                  </h2>
-                  <p className="mt-0.5 text-[11px] text-zinc-500 dark:text-zinc-400">
-                    {t("clubRanking.bannerSubdescription")}
-                  </p>
-                </div>
-              </a>
+              <div className="mb-4">
+                <FindClubBanner />
+              </div>
 
               {/* Search Input */}
               <div className="relative mb-3">
@@ -513,6 +502,32 @@ export function HomeClient({
                 </button>
               </div>
             </div>
+
+            <details className="group mb-6 rounded-xl bg-zinc-50 px-4 py-3 text-zinc-600 dark:bg-zinc-900 dark:text-zinc-300">
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-3 [&::-webkit-details-marker]:hidden">
+                <div className="min-w-0">
+                  <p className="text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
+                    {t("clubRanking.badge")}
+                  </p>
+                  <h2 className="mt-0.5 text-sm font-semibold text-zinc-800 dark:text-zinc-100">
+                    {t("clubRanking.bannerTitle")}
+                  </h2>
+                </div>
+                <ChevronDown className="h-4 w-4 shrink-0 transition-transform group-open:rotate-180" aria-hidden="true" />
+              </summary>
+              <div className="mt-3 border-t border-zinc-200 pt-3 text-xs leading-relaxed dark:border-zinc-800">
+                <p>{t("clubRanking.voteHint")}</p>
+                <p className="mt-1 text-zinc-500 dark:text-zinc-400">{t("clubRanking.bannerSubdescription")}</p>
+                <a
+                  href={POWERPLAY_INSTAGRAM_URL}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-2 inline-flex min-h-8 items-center font-medium underline underline-offset-4 hover:text-blue-600 dark:hover:text-blue-400"
+                >
+                  {t("clubRanking.instagramAction")}
+                </a>
+              </div>
+            </details>
 
             {filteredClubs.length === 0 ? (
               <div className="text-center py-20 bg-zinc-50 dark:bg-zinc-900 rounded-xl border border-zinc-100 dark:border-zinc-800">

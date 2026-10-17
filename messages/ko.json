@@ -54,6 +54,8 @@
       "bannerTitle": "우리 팀을 1위로 만들어주세요! 🏆",
       "bannerDescription": "이번 달 가장 많은 응원을 받은 동호회는 어디일까요?",
       "bannerSubdescription": "하루 3번(같은 동호회는 1번) 투표 가능, 랭킹은 매월 1일 갱신",
+      "voteHint": "아래 동호회 카드의 ‘응원 투표’를 눌러주세요.",
+      "instagramAction": "인스타그램에서 소식 보기",
       "voteErrors": {
         "alreadyVotedToday": "이 동호회에는 오늘 이미 투표했어요.",
         "dailyLimitReached": "오늘 사용할 수 있는 3표를 모두 사용했어요.",
@@ -634,6 +636,7 @@
   },
   "findClub": {
     "title": "나에게 맞는 하키클럽 찾기",
+    "bannerHint": "3가지 질문으로 추천받기",
     "subtitle": "3가지 질문으로 딱 맞는 클럽을 추천해드려요",
     "meta": {
       "title": "나에게 맞는 하키클럽 찾기 | 파워플레이",

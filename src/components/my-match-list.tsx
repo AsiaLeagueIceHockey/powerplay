@@ -119,7 +119,7 @@ export function MyMatchList({ matches }: MyMatchListProps) {
             </p>
             {activeTab === "upcoming" && (
               <Link
-                href="/"
+                href={`/${locale}?tab=match`}
                 className="inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition font-medium text-sm"
               >
                 {locale === "ko" ? "경기 둘러보기" : "Browse Matches"}

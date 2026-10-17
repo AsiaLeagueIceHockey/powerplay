@@ -64,7 +64,7 @@ export default async function RinksDirectoryPage({
     <div className="mx-auto max-w-6xl flex flex-col gap-6 -mt-2">
       <FeedbackBanner locale={locale} />
       <PublicSectionTabs locale={locale} activeTab="rink" />
-      <FindClubBanner locale={locale} />
+      <FindClubBanner />
 
       <section className="sr-only">
         <h1>{isKo ? "전국 아이스하키 링크장" : "Ice hockey rinks across Korea"}</h1>

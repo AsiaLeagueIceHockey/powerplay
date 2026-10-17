@@ -54,6 +54,8 @@
       "bannerTitle": "Help our team reach #1! 🏆",
       "bannerDescription": "Which club will get the most support this month?",
       "bannerSubdescription": "* 3 votes per day, 1 per club. Ranking refreshes on the 1st of each month.",
+      "voteHint": "Tap Vote on a club card below to cheer for your team.",
+      "instagramAction": "See updates on Instagram",
       "voteErrors": {
         "alreadyVotedToday": "You already voted for this club today.",
         "dailyLimitReached": "You already used all 3 votes for today.",
@@ -634,6 +636,7 @@
   },
   "findClub": {
     "title": "Find Your Hockey Club",
+    "bannerHint": "3 questions",
     "subtitle": "Answer 3 simple questions to get personalized club recommendations",
     "meta": {
       "title": "Find Your Hockey Club | PowerPlay",

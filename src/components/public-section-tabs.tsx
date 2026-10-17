@@ -10,9 +10,9 @@ export function PublicSectionTabs({
   activeTab: PublicSectionTab;
 }) {
   const tabs = [
-    { key: "match" as const, href: `/${locale}`, label: locale === "ko" ? "경기" : "Matches" },
-    { key: "rink" as const, href: `/${locale}/rinks`, label: locale === "ko" ? "링크장" : "Rinks" },
     { key: "club" as const, href: `/${locale}/clubs`, label: locale === "ko" ? "동호회" : "Clubs" },
+    { key: "rink" as const, href: `/${locale}/rinks`, label: locale === "ko" ? "링크장" : "Rinks" },
+    { key: "match" as const, href: `/${locale}?tab=match`, label: locale === "ko" ? "경기" : "Matches" },
   ];
 
   return (

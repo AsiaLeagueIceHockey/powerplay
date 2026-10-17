@@ -8,6 +8,7 @@ import { HomePageSkeleton } from "@/components/skeletons";
 import { Metadata } from "next";
 import { FindClubBanner } from "@/components/find-club-banner";
 import { Link } from "@/i18n/navigation";
+import { redirect } from "next/navigation";
 
 const siteUrl = "https://powerplay.kr";
 
@@ -61,11 +62,22 @@ async function HomeContent() {
 
 export default async function HomePage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ tab?: string; date?: string }>;
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  const { tab, date } = await searchParams;
+
+  if (tab === "rink") {
+    redirect(`/${locale}/rinks`);
+  }
+  // Keep shared match/date links working while normal home visits open Clubs.
+  if (tab !== "match" && !date) {
+    redirect(`/${locale}/clubs`);
+  }
 
   return (
     <div className="flex flex-col gap-6 -mt-2">
@@ -75,7 +87,7 @@ export default async function HomePage({
       <PublicSectionTabs locale={locale} activeTab="match" />
 
       {/* Find Club CTA */}
-      <FindClubBanner locale={locale} />
+      <FindClubBanner />
 
       {/* Main Content - streamed with Suspense */}
       <Suspense fallback={<HomePageSkeleton />}>
