@@ -10,7 +10,12 @@ const { redirect } = vi.hoisted(() => ({
 }));
 
 vi.mock("next/navigation", () => ({ redirect }));
-vi.mock("@/i18n/navigation", () => ({ Link: (props: ComponentProps<"a">) => <a {...props} /> }));
+vi.mock("@/i18n/navigation", () => ({
+  Link: ({ locale = "ko", href, prefetch, ...props }: ComponentProps<"a"> & { locale?: string; prefetch?: boolean }) => {
+    void prefetch;
+    return <a {...props} href={`/${locale}${href === "/" ? "" : href?.startsWith("/?") ? href.slice(1) : href}`} />;
+  },
+}));
 vi.mock("next-intl/server", () => ({ setRequestLocale: vi.fn() }));
 vi.mock("@/lib/public-matches", () => ({ getPublicHomeMatches: vi.fn() }));
 vi.mock("@/components/home-client", () => ({ HomeClient: () => null }));

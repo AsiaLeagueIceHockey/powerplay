@@ -20,7 +20,7 @@ async function InstagramStoryContent({ locale, date, page = "1" }: { locale: str
   const pageNum = parseInt(page, 10) || 1;
   const ITEMS_PER_PAGE = 5;
   const totalPages = Math.ceil(matches.length / ITEMS_PER_PAGE);
-  
+
   // Slice matches for current page
   const startIndex = (pageNum - 1) * ITEMS_PER_PAGE;
   const pageMatches = matches.slice(startIndex, startIndex + ITEMS_PER_PAGE);
@@ -36,7 +36,7 @@ async function InstagramStoryContent({ locale, date, page = "1" }: { locale: str
   const formattedDate = dateFormatter.format(targetDate);
 
   return (
-    <div 
+    <div
       className="flex flex-col bg-[#ffffff] text-[#172554] relative items-center justify-start overflow-hidden mx-auto font-sans"
       style={{
         width: "1080px",
@@ -46,7 +46,7 @@ async function InstagramStoryContent({ locale, date, page = "1" }: { locale: str
     >
       {/* Background is pure white now */}
       <div className="absolute top-0 left-0 w-full h-2 bg-[#172554]" />
-      
+
       {/* Header */}
       <div className="w-full flex-none mb-16 z-10 flex flex-col items-center">
         <div className="flex items-center justify-center mb-6">
@@ -63,7 +63,7 @@ async function InstagramStoryContent({ locale, date, page = "1" }: { locale: str
         <h2 className="text-[46px] font-black text-[#172554] tracking-tight leading-tight">
           {formattedDate} <span className="text-zinc-300 font-light mx-2">|</span> 경기 일정
         </h2>
-        
+
         {totalPages > 1 && (
           <div className="mt-8 flex items-center gap-3 bg-zinc-50 px-6 py-2 rounded-full text-zinc-400 font-bold text-xl border border-zinc-100">
             <span className="text-sm uppercase tracking-widest opacity-60">Listing</span>
@@ -99,7 +99,6 @@ async function InstagramStoryContent({ locale, date, page = "1" }: { locale: str
   );
 }
 
-
 export default async function InstagramStoryPage({
   params,
   searchParams,
@@ -109,7 +108,7 @@ export default async function InstagramStoryPage({
 }) {
   const { locale } = await params;
   const { date, page } = await searchParams;
-  
+
   setRequestLocale(locale);
 
   // Default to tomorrow if no date is provided

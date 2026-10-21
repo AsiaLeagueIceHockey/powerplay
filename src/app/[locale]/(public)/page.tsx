@@ -94,24 +94,24 @@ export default async function HomePage({
         <HomeContent />
       </Suspense>
 
-      <div className="border-t border-zinc-200 pt-3 text-center text-[11px] text-zinc-400 dark:border-zinc-800 dark:text-zinc-500">
+      <div className="border-t border-pp-border pt-3 text-center text-[11px] text-pp-muted ">
         <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2">
-          <Link href="/about" className="transition-colors hover:text-zinc-600 dark:hover:text-zinc-300">
+          <Link href="/about" className="transition-colors hover:text-pp-muted ">
             {locale === "ko" ? "회사 소개" : "About"}
           </Link>
           <span aria-hidden="true">|</span>
           <a
             href={`/${locale}/about#contact`}
-            className="transition-colors hover:text-zinc-600 dark:hover:text-zinc-300"
+            className="transition-colors hover:text-pp-muted "
           >
             {locale === "ko" ? "문의" : "Contact"}
           </a>
           <span aria-hidden="true">|</span>
-          <Link href="/privacy" className="transition-colors hover:text-zinc-600 dark:hover:text-zinc-300">
+          <Link href="/privacy" className="transition-colors hover:text-pp-muted ">
             {locale === "ko" ? "개인정보처리방침" : "Privacy Policy"}
           </Link>
           <span aria-hidden="true">|</span>
-          <Link href="/terms" className="transition-colors hover:text-zinc-600 dark:hover:text-zinc-300">
+          <Link href="/terms" className="transition-colors hover:text-pp-muted ">
             {locale === "ko" ? "이용약관" : "Terms of Service"}
           </Link>
         </div>

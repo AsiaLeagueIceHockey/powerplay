@@ -1,7 +1,7 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
 import { useLocale } from "next-intl";
+import { filterChipStyles } from "@/components/ui/styles";
 import { loungeIceGoldTheme } from "./lounge-theme";
 
 interface DateFilterProps {
@@ -47,8 +47,6 @@ export function DateFilter({ selectedDate, onSelect, tone = "default" }: DateFil
     return date.getDay() === 0;
   };
 
-  const selectedTone =
-    tone === "ice-gold" ? loungeIceGoldTheme.dateFilterSelected : "bg-blue-600 text-white shadow-lg";
   const selectedSubtextTone =
     tone === "ice-gold" ? loungeIceGoldTheme.dateFilterSelectedSubtext : "text-blue-100";
   const todayTextTone =
@@ -76,12 +74,10 @@ export function DateFilter({ selectedDate, onSelect, tone = "default" }: DateFil
         }
       `}</style>
       {/* 'All' Button */}
-      <button
+      <button type="button"
         onClick={() => onSelect(null)}
-        className={`flex flex-col items-center justify-center min-w-[52px] py-2 px-3 rounded-xl transition-all ${!selectedDate
-            ? "bg-zinc-900 text-white shadow-lg dark:bg-white dark:text-zinc-900"
-            : "bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700"
-          }`}
+        aria-pressed={!selectedDate}
+        className={filterChipStyles({ selected: !selectedDate, shape: "date" })}
       >
         <span className="text-sm font-bold whitespace-nowrap">
           {locale === "ko" ? "전체" : "All"}
@@ -96,21 +92,19 @@ export function DateFilter({ selectedDate, onSelect, tone = "default" }: DateFil
         const sunday = isSunday(date);
 
         return (
-          <button
+          <button type="button"
             key={dateStr}
             onClick={() => handleDateClick(date)}
-            className={`flex flex-col items-center min-w-[52px] py-2 px-3 rounded-xl transition-all ${selected
-                ? selectedTone
-                : "bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700"
-              }`}
+            aria-pressed={selected}
+            className={filterChipStyles({ selected, shape: "date" })}
           >
-            <span className={`text-lg font-bold ${selected ? (tone === "ice-gold" ? "text-[#111827]" : "text-white") : ""}`}>
+            <span className={`text-lg font-bold ${selected ? ("text-inherit") : ""}`}>
               {formatDay(date)}
             </span>
             <span className={`text-xs ${selected
                 ? selectedSubtextTone
                 : sunday
-                  ? "text-red-500 dark:text-red-400 font-semibold"
+                  ? "text-pp-danger-text font-semibold"
                   : today
                     ? todayTextTone
                     : ""

@@ -1,5 +1,7 @@
 "use client";
 
+import { surfaceStyles, segmentedItemStyles } from "@/components/ui/styles";
+
 import { useState } from "react";
 import { Match } from "@/app/actions/match";
 import { Rink } from "../app/actions/types";
@@ -31,39 +33,31 @@ export function ScheduleView({ matches, rinks }: ScheduleViewProps) {
   return (
     <div className="flex flex-col gap-6">
       {/* View Toggle */}
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 bg-white p-4 rounded-2xl border border-zinc-200 shadow-sm dark:bg-zinc-900 dark:border-zinc-800">
+      <div className={`${surfaceStyles({ interactive: false, density: "compact" })} flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3`}>
         {viewMode === 'list' && (
-          <label className="flex items-center gap-2 text-sm text-zinc-600 cursor-pointer dark:text-zinc-400">
+          <label className="flex items-center gap-2 text-sm text-pp-muted cursor-pointer ">
             <input 
               type="checkbox" 
               checked={groupByRink} 
               onChange={(e) => setGroupByRink(e.target.checked)}
-              className="rounded border-zinc-300 text-blue-600 focus:ring-blue-500"
+              className="rounded border-pp-border text-pp-accent-text focus:ring-pp-accent"
             />
             링크장별 보기
           </label>
         )}
         {viewMode === 'map' && <div />}
 
-        <div className="flex items-center bg-zinc-100 p-1 rounded-lg dark:bg-zinc-800 self-end sm:self-auto">
-          <button
+        <div className="flex items-center bg-pp-surface-muted p-1 rounded-lg self-end sm:self-auto">
+          <button type="button"
             onClick={() => setViewMode("list")}
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-              viewMode === "list"
-                ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-700 dark:text-white"
-                : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
-            }`}
+            className={`${segmentedItemStyles({ selected: viewMode === "list" })} flex items-center gap-2 `}
           >
             <List className="w-4 h-4" />
             {t("viewList")}
           </button>
-          <button
+          <button type="button"
             onClick={() => setViewMode("map")}
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-              viewMode === "map"
-                ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-700 dark:text-white"
-                : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
-            }`}
+            className={`${segmentedItemStyles({ selected: viewMode === "map" })} flex items-center gap-2 `}
           >
             <MapIcon className="w-4 h-4" />
             {t("viewMap")}
@@ -78,7 +72,7 @@ export function ScheduleView({ matches, rinks }: ScheduleViewProps) {
             <div className="space-y-6">
                 {Object.entries(groupedMatches).map(([rinkName, rinkMatches]) => (
                     <div key={rinkName}>
-                        <h3 className="text-xl font-black mb-4 px-2 text-[#172554] dark:text-zinc-200">{rinkName}</h3>
+                        <h3 className="text-xl font-black mb-4 px-2 text-pp-navy dark:text-pp-text">{rinkName}</h3>
                         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                             {rinkMatches.map((match) => <MatchCard key={match.id} match={match} />)}
                         </div>
@@ -88,8 +82,8 @@ export function ScheduleView({ matches, rinks }: ScheduleViewProps) {
           ) : (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {matches.length === 0 ? (
-                <div className="col-span-full rounded-2xl border border-zinc-200 p-10 bg-zinc-50/50 dark:bg-zinc-900/50 dark:border-zinc-800">
-                    <p className="text-center font-bold text-zinc-400 dark:text-zinc-500 italic">
+                <div className={`${surfaceStyles({ interactive: false, density: "default" })} col-span-full`}>
+                    <p className="text-center font-bold text-pp-muted italic">
                     {t("noMatches")}
                     </p>
                 </div>

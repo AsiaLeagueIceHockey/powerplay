@@ -1,3 +1,5 @@
+
+import { badgeStyles, buttonStyles, surfaceStyles } from "@/components/ui/styles";
 import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { getMatch } from "@/app/actions/match";
@@ -242,18 +244,18 @@ export default async function MatchPage({
           <div className="flex flex-wrap items-center gap-2">
             <span
               className={`px-2.5 py-1 rounded-md text-xs font-bold whitespace-nowrap ${match.status === "open"
-                  ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                  : "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"
+                  ? "bg-pp-success-soft text-pp-success-text "
+                  : "bg-pp-surface-muted text-pp-muted "
                 }`}
             >
               {t(`match.status.${match.status}`)}
             </span>
             <span
               className={`px-2.5 py-1 rounded-md text-xs font-bold whitespace-nowrap ${match.match_type === "game"
-                  ? "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300"
+                  ? "bg-pp-accent-soft text-pp-accent-text "
                   : match.match_type === "team_match"
-                  ? "bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-300"
-                  : "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"
+                  ? "bg-pp-info-soft text-pp-info-text "
+                  : "bg-pp-surface-muted text-pp-muted "
                 }`}
             >
               {t(`match.types.${match.match_type || 'training'}`)}
@@ -261,7 +263,7 @@ export default async function MatchPage({
             {match.club && (
               <Link
                 href={`/clubs/${match.club.id}`}
-                className="px-2.5 py-1 rounded-md text-xs font-bold bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 flex items-center gap-1.5 whitespace-nowrap hover:bg-blue-200 dark:hover:bg-blue-900/50"
+                className={`${buttonStyles({ variant: "ghost", size: "compact" })} flex items-center gap-1.5 whitespace-nowrap`}
               >
                 {match.club.logo_url ? (
                   <Image
@@ -269,7 +271,7 @@ export default async function MatchPage({
                     alt={match.club.name}
                     width={16}
                     height={16}
-                    className="h-4 w-4 rounded object-cover bg-white"
+                    className="h-4 w-4 rounded object-cover bg-pp-surface"
                   />
                 ) : (
                   <Building2 className="h-3.5 w-3.5" />
@@ -287,22 +289,21 @@ export default async function MatchPage({
             ? match.rink?.name_ko
             : match.rink?.name_en || match.rink?.name_ko}
         </h1>
-        <p className="text-zinc-600 dark:text-zinc-400 text-lg">
+        <p className="text-pp-muted text-lg">
           {dateStr} · {timeStr}
         </p>
       </div>
 
       {/* Match Details Card */}
-      <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-sm">
+      <div className={surfaceStyles({ interactive: false, density: "roomy" })}>
         <h2 className="text-lg font-bold mb-4">{t("match.details")}</h2>
 
         <div className="space-y-3">
 
-
           <div className="flex justify-between items-center text-sm">
-            <span className="text-zinc-500">{t("match.fee")}</span>
+            <span className="text-pp-muted">{t("match.fee")}</span>
             {isTeamMatch ? (
-              <span className="font-semibold text-lg text-teal-600 dark:text-teal-400">
+              <span className="font-semibold text-lg text-pp-info-text ">
                 {t("match.feeDescriptionRef")}
               </span>
             ) : (
@@ -312,43 +313,43 @@ export default async function MatchPage({
             )}
           </div>
 
-          <div className="border-t border-zinc-100 dark:border-zinc-800 my-2"></div>
+          <div className="border-t border-pp-border my-2"></div>
 
           {!isTeamMatch && match.rental_available && (
             <>
               <div className="flex justify-between items-center text-sm">
-                <span className="text-zinc-500">{t("match.rentalFee")}</span>
+                <span className="text-pp-muted">{t("match.rentalFee")}</span>
                 <div className="text-right">
-                  <span className="font-semibold text-lg text-blue-600 dark:text-blue-400">
+                  <span className="font-semibold text-lg text-pp-accent-text ">
                     +{match.rental_fee.toLocaleString()}{locale === "ko" ? "원" : "KRW"}
                   </span>
-                  <p className="text-xs text-zinc-400">
+                  <p className="text-xs text-pp-muted">
                     {locale === "ko" ? "선택 가능" : "Optional"}
                   </p>
                 </div>
               </div>
-              <div className="border-t border-zinc-100 dark:border-zinc-800 my-2"></div>
+              <div className="border-t border-pp-border my-2"></div>
             </>
           )}
 
           {isTeamMatch ? (
             <div className="flex justify-between items-center text-sm">
-              <span className="text-zinc-500">{t("match.teamParticipants")}</span>
+              <span className="text-pp-muted">{t("match.teamParticipants")}</span>
               <span className={`font-semibold ${
                 isFull
-                  ? "text-teal-600 dark:text-teal-400"
-                  : "text-amber-600 dark:text-amber-400"
+                  ? "text-pp-info-text "
+                  : "text-pp-warning-text "
               }`}>
                 {isFull ? t("match.teamJoined") : t("match.teamMatchWaiting")}
               </span>
             </div>
           ) : isTraining ? (
             <div className="flex justify-between items-center text-sm">
-              <span className="text-zinc-500">{t("match.guestSpots")}</span>
+              <span className="text-pp-muted">{t("match.guestSpots")}</span>
               <span className={`font-semibold ${
                 match.max_guests
-                  ? (remaining.skaters <= 0 ? 'text-red-500' : 'text-green-600 dark:text-green-400')
-                  : 'text-green-600 dark:text-green-400'
+                  ? (remaining.skaters <= 0 ? 'text-pp-danger-text' : 'text-pp-success-text ')
+                  : 'text-pp-success-text '
               }`}>
                 {match.max_guests
                   ? (remaining.skaters <= 0
@@ -361,22 +362,22 @@ export default async function MatchPage({
           ) : (
             <>
               <div className="flex justify-between items-center text-sm">
-                <span className="text-zinc-500">{t("match.skater")}</span>
-                <span className={`font-semibold ${remaining.skaters === 0 ? 'text-red-500' : 'text-green-600 dark:text-green-400'}`}>
+                <span className="text-pp-muted">{t("match.skater")}</span>
+                <span className={`font-semibold ${remaining.skaters === 0 ? 'text-pp-danger-text' : 'text-pp-success-text '}`}>
                   {remaining.skaters <= 0
                     ? (locale === 'ko' ? '마감' : 'Full')
                     : (locale === 'ko' ? `${remaining.skaters}자리 남음` : `${remaining.skaters} spots left`)}
                 </span>
               </div>
               <div className="flex justify-between items-center text-sm">
-                <span className="text-zinc-500">{t("match.position.G")}</span>
+                <span className="text-pp-muted">{t("match.position.G")}</span>
                 <div className="flex items-center gap-2">
                   {match.goalie_free && (
-                    <span className="px-2 py-0.5 text-xs font-bold bg-green-100 text-green-700 rounded-full dark:bg-green-900/30 dark:text-green-400">
+                    <span className={`${badgeStyles({ tone: "success" })} `}>
                       {t("match.goalieFree")}
                     </span>
                   )}
-                  <span className={`font-semibold ${remaining.g === 0 ? 'text-red-500' : 'text-green-600 dark:text-green-400'}`}>
+                  <span className={`font-semibold ${remaining.g === 0 ? 'text-pp-danger-text' : 'text-pp-success-text '}`}>
                     {remaining.g <= 0
                       ? (locale === 'ko' ? '마감' : 'Full')
                       : (locale === 'ko' ? `${remaining.g}자리 남음` : `${remaining.g} spots left`)}
@@ -388,10 +389,10 @@ export default async function MatchPage({
 
           {match.duration_minutes && (
             <>
-              <div className="border-t border-zinc-100 dark:border-zinc-800 my-2"></div>
+              <div className="border-t border-pp-border my-2"></div>
               <div className="flex justify-between items-center text-sm">
-                <span className="text-zinc-500">{t("admin.bulk.duration")}</span>
-                <span className="font-semibold text-lg text-zinc-900 dark:text-zinc-100">
+                <span className="text-pp-muted">{t("admin.bulk.duration")}</span>
+                <span className="font-semibold text-lg text-pp-text ">
                   {match.duration_minutes}{locale === "ko" ? "분" : " Minutes"}
                 </span>
               </div>
@@ -401,16 +402,16 @@ export default async function MatchPage({
           {/* Manager / 담당자 Contact (Moved between Goalie and Map) */}
           {match.created_by && match.created_by !== user?.id && (
             <div className="pt-2">
-              <div className="border-t border-zinc-100 dark:border-zinc-800 mb-4"></div>
+              <div className="border-t border-pp-border mb-4"></div>
               <div className="flex justify-between items-center text-sm py-1">
-                <span className="text-zinc-500">{t("match.manager")}</span>
+                <span className="text-pp-muted">{t("match.manager")}</span>
                 <div className="flex items-center gap-2">
-                  <span className="font-semibold text-zinc-900 dark:text-zinc-100">
+                  <span className="font-semibold text-pp-text ">
                     {creatorName || (locale === "ko" ? "운영진" : "Admin")}
                   </span>
                   <StartChatButton
                     targetUserId={match.created_by}
-                    className="p-1.5 text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 dark:text-blue-400 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 rounded-full"
+                    variant="ghost" size="compact"
                     iconOnly
                     label={t("match.contactManager")}
                     origin={matchOrigin}
@@ -425,21 +426,21 @@ export default async function MatchPage({
               href={match.rink?.map_url || "#"}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-600 hover:underline text-sm flex items-center mb-4"
+              className="text-pp-accent-text hover:underline text-sm flex items-center mb-4"
             >
               📍 {t("match.viewMap")}
             </a>
 
             {/* Embedded Map */}
             {match.rink && match.rink.lat && match.rink.lng && (
-              <div className="w-full h-48 rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-800 relative z-0">
+              <div className="w-full h-48 rounded-lg overflow-hidden border border-pp-border relative z-0">
                 <DynamicRinkMap rinks={[match.rink]} isCompact={true} />
               </div>
             )}
 
             {/* Address */}
             {match.rink?.address && (
-              <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">
+              <p className="mt-3 text-sm text-pp-muted ">
                 {match.rink.address}
               </p>
             )}
@@ -450,9 +451,9 @@ export default async function MatchPage({
 
       {/* Notice */}
       {match.description && (
-        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-sm">
+        <div className={surfaceStyles({ interactive: false, density: "roomy" })}>
           <h2 className="text-lg font-bold mb-2">{t("admin.form.description")}</h2>
-          <p className="text-zinc-600 dark:text-zinc-300 whitespace-pre-wrap">
+          <p className="text-pp-muted whitespace-pre-wrap">
             {match.description}
           </p>
         </div>
@@ -460,11 +461,11 @@ export default async function MatchPage({
 
       {/* Refund Policy Section - hide for team match */}
       {!isTeamMatch && (
-      <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-sm">
+      <div className={surfaceStyles({ interactive: false, density: "roomy" })}>
         <h2 className="text-lg font-bold mb-3">{locale === "ko" ? "취소 및 환불 규정" : "Cancellation & Refund Policy"}</h2>
-        <div className="space-y-2 text-sm text-zinc-600 dark:text-zinc-300">
+        <div className="space-y-2 text-sm text-pp-muted ">
           <div className="flex items-start gap-2">
-            <span className="text-green-600 dark:text-green-400 font-bold mt-0.5">✓</span>
+            <span className="text-pp-success-text font-bold mt-0.5">✓</span>
             <p>
               {locale === "ko"
                 ? "경기 전일 23:59까지 취소 시: 100% 환불"
@@ -472,7 +473,7 @@ export default async function MatchPage({
             </p>
           </div>
           <div className="flex items-start gap-2">
-            <span className="text-red-500 font-bold mt-0.5">!</span>
+            <span className="text-pp-danger-text font-bold mt-0.5">!</span>
             <p>
               {locale === "ko"
                 ? "경기 당일 취소 시: 환불 불가 (또는 운영진 문의)"
@@ -518,20 +519,20 @@ export default async function MatchPage({
           </h2>
           <div className="space-y-4">
             {/* Host Team Card */}
-            <div className="bg-white dark:bg-zinc-900 border border-teal-200 dark:border-teal-800 rounded-2xl p-5 shadow-sm">
+            <div className={surfaceStyles({ interactive: false, density: "default" })}>
               <div className="flex items-center space-x-2 mb-3">
-                <span className="px-2 py-1 bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-300 rounded text-xs font-bold">
+                <span className={`${badgeStyles({ tone: "success" })} `}>
                   {t("match.teamHost")}
                 </span>
               </div>
-              <div className="flex items-center space-x-3 text-sm p-3 bg-teal-50 dark:bg-teal-950/30 rounded-lg">
-                <div className="w-6 h-6 bg-teal-200 dark:bg-teal-700 rounded-full flex items-center justify-center text-xs font-bold text-teal-700 dark:text-teal-200">
+              <div className="flex items-center space-x-3 text-sm p-3 bg-pp-info-soft rounded-lg">
+                <div className="w-6 h-6 bg-pp-info-soft rounded-full flex items-center justify-center text-xs font-bold text-pp-info-text ">
                   1
                 </div>
                 {match.club ? (
                   <Link
                     href={`/clubs/${match.club.id}`}
-                    className="flex items-center gap-2 font-medium hover:text-blue-600 dark:hover:text-blue-400"
+                    className="flex items-center gap-2 font-medium hover:text-pp-accent-text "
                   >
                     {match.club.logo_url ? (
                       <Image
@@ -539,7 +540,7 @@ export default async function MatchPage({
                         alt={match.club.name}
                         width={20}
                         height={20}
-                        className="h-5 w-5 rounded object-cover bg-white"
+                        className="h-5 w-5 rounded object-cover bg-pp-surface"
                       />
                     ) : (
                       <Building2 className="h-4 w-4" />
@@ -555,17 +556,17 @@ export default async function MatchPage({
             </div>
 
             {/* Opponent Team Card */}
-            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-sm">
+            <div className={surfaceStyles({ interactive: false, density: "default" })}>
               <div className="flex items-center space-x-2 mb-3">
-                <span className="px-2 py-1 bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300 rounded text-xs font-bold">
+                <span className={`${badgeStyles({ tone: "warning" })} `}>
                   {t("match.teamOpponent")}
                 </span>
               </div>
               {players.fw.length === 0 ? (
-                <p className="text-sm text-zinc-400 pl-1">{t("match.teamMatchWaiting")}</p>
+                <p className="text-sm text-pp-muted pl-1">{t("match.teamMatchWaiting")}</p>
               ) : (
-                <div className="flex items-center space-x-3 text-sm p-3 bg-zinc-50 dark:bg-zinc-950/50 rounded-lg">
-                  <div className="w-6 h-6 bg-zinc-200 dark:bg-zinc-700 rounded-full flex items-center justify-center text-xs font-bold text-zinc-500">
+                <div className="flex items-center space-x-3 text-sm p-3 bg-pp-surface-muted rounded-lg">
+                  <div className="w-6 h-6 bg-pp-surface-muted rounded-full flex items-center justify-center text-xs font-bold text-pp-muted">
                     2
                   </div>
                   <span className="font-medium">
@@ -575,7 +576,7 @@ export default async function MatchPage({
                     <div className="ml-auto">
                       <StartChatButton
                         targetUserId={players.fw[0].user.id}
-                        className="p-1.5 text-zinc-400 hover:text-blue-600 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full"
+                        className="p-1.5 text-pp-muted hover:text-pp-accent-text hover:bg-pp-surface-muted rounded-full"
                         iconOnly
                         label={t("match.contactParticipant")}
                         origin={matchOrigin}
@@ -583,7 +584,7 @@ export default async function MatchPage({
                     </div>
                   )}
                   {players.fw[0]?.id === userParticipant?.id && (
-                    <span className="ml-auto text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">Me</span>
+                    <span className={`${badgeStyles({ tone: "success" })} ml-auto `}>Me</span>
                   )}
                 </div>
               )}
@@ -597,39 +598,39 @@ export default async function MatchPage({
             {t("match.guestParticipants")}
           </h2>
           <div className="space-y-4">
-            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-sm">
+            <div className={surfaceStyles({ interactive: false, density: "default" })}>
               <div className="flex items-center space-x-2 mb-4">
-                <span className="px-2 py-1 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 rounded text-xs font-bold">
+                <span className={`${badgeStyles({ tone: "brand" })} `}>
                   {t("match.guest")}
                 </span>
-                <span className="text-zinc-500 text-sm">({skaterCount})</span>
+                <span className="text-pp-muted text-sm">({skaterCount})</span>
                 {match.max_guests ? (
-                  <span className="text-zinc-400 text-xs">/ {match.max_guests}</span>
+                  <span className="text-pp-muted text-xs">/ {match.max_guests}</span>
                 ) : (
-                  <span className="text-zinc-400 text-xs">/ {t("match.guestUnlimited")}</span>
+                  <span className="text-pp-muted text-xs">/ {t("match.guestUnlimited")}</span>
                 )}
               </div>
 
               {skaterCount === 0 ? (
-                <p className="text-sm text-zinc-400 pl-1">{t("match.noParticipants")}</p>
+                <p className="text-sm text-pp-muted pl-1">{t("match.noParticipants")}</p>
               ) : (
                 <ul className="space-y-3">
                   {[...players.fw, ...players.df].map((p, i) => (
-                    <li key={p.id} className="flex items-center space-x-3 text-sm p-3 bg-zinc-50 dark:bg-zinc-950/50 rounded-lg">
-                      <div className="w-6 h-6 bg-zinc-200 dark:bg-zinc-700 rounded-full flex items-center justify-center text-xs font-bold text-zinc-500">
+                    <li key={p.id} className="flex items-center space-x-3 text-sm p-3 bg-pp-surface-muted rounded-lg">
+                      <div className="w-6 h-6 bg-pp-surface-muted rounded-full flex items-center justify-center text-xs font-bold text-pp-muted">
                         {i + 1}
                       </div>
                       <span className="font-medium">
                         {p.user?.full_name || p.user?.email?.split('@')[0]}
                       </span>
                       {p.status === "pending_payment" && (
-                        <span className="text-xs bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 px-2 py-0.5 rounded">{t("participant.status.pending_payment")}</span>
+                        <span className={`${badgeStyles({ tone: "warning" })} `}>{t("participant.status.pending_payment")}</span>
                       )}
                       {p.user?.id && p.user.id !== user?.id && (
                         <div className="ml-auto">
                           <StartChatButton
                             targetUserId={p.user.id}
-                            className="p-1.5 text-zinc-400 hover:text-blue-600 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full"
+                            className="p-1.5 text-pp-muted hover:text-pp-accent-text hover:bg-pp-surface-muted rounded-full"
                             iconOnly
                             label={t("match.contactParticipant")}
                             origin={matchOrigin}
@@ -637,7 +638,7 @@ export default async function MatchPage({
                         </div>
                       )}
                       {p.id === userParticipant?.id && (
-                        <span className="ml-auto text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">Me</span>
+                        <span className={`${badgeStyles({ tone: "success" })} ml-auto `}>Me</span>
                       )}
                     </li>
                   ))}
@@ -647,17 +648,17 @@ export default async function MatchPage({
 
             {/* Waitlist Section */}
             {waitlist.length > 0 && (
-              <div className="bg-white dark:bg-zinc-900 border border-blue-200 dark:border-blue-800 rounded-2xl p-5 shadow-sm">
+              <div className={surfaceStyles({ interactive: false, density: "default" })}>
                 <div className="flex items-center space-x-2 mb-4">
-                  <span className="px-2 py-1 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 rounded text-xs font-bold">
+                  <span className={`${badgeStyles({ tone: "brand" })} `}>
                     {locale === "ko" ? "대기자" : "Waitlist"}
                   </span>
-                  <span className="text-zinc-500 text-sm">({waitlist.length})</span>
+                  <span className="text-pp-muted text-sm">({waitlist.length})</span>
                 </div>
                 <ul className="space-y-3">
                   {waitlist.map((p, i) => (
-                    <li key={p.id} className="flex items-center space-x-3 text-sm p-3 bg-blue-50 dark:bg-blue-950/50 rounded-lg">
-                      <div className="w-6 h-6 bg-blue-200 dark:bg-blue-700 rounded-full flex items-center justify-center text-xs font-bold text-blue-700 dark:text-blue-200">
+                    <li key={p.id} className="flex items-center space-x-3 text-sm p-3 bg-pp-accent-soft rounded-lg">
+                      <div className="w-6 h-6 bg-pp-accent-soft rounded-full flex items-center justify-center text-xs font-bold text-pp-accent-text ">
                         {i + 1}
                       </div>
                       <span className="font-medium">
@@ -667,7 +668,7 @@ export default async function MatchPage({
                         <div className="ml-auto">
                           <StartChatButton
                             targetUserId={p.user.id}
-                            className="p-1.5 text-zinc-400 hover:text-blue-600 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full"
+                            className="p-1.5 text-pp-muted hover:text-pp-accent-text hover:bg-pp-surface-muted rounded-full"
                             iconOnly
                             label={t("match.contactParticipant")}
                             origin={matchOrigin}
@@ -675,7 +676,7 @@ export default async function MatchPage({
                         </div>
                       )}
                       {p.id === userParticipant?.id && (
-                        <span className="ml-auto text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded">Me</span>
+                        <span className={`${badgeStyles({ tone: "brand" })} ml-auto `}>Me</span>
                       )}
                     </li>
                   ))}
@@ -693,34 +694,34 @@ export default async function MatchPage({
 
       <div className="space-y-4">
         {/* FW Card */}
-        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-sm">
+        <div className={surfaceStyles({ interactive: false, density: "default" })}>
           <div className="flex items-center space-x-2 mb-4">
-            <span className="px-2 py-1 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 rounded text-xs font-bold">
+            <span className={`${badgeStyles({ tone: "brand" })} `}>
               {t("match.position.FW")}
             </span>
-            <span className="text-zinc-500 text-sm">({players.fw?.length || 0})</span>
+            <span className="text-pp-muted text-sm">({players.fw?.length || 0})</span>
           </div>
 
           {players.fw?.length === 0 ? (
-            <p className="text-sm text-zinc-400 pl-1">{t("match.noParticipants")}</p>
+            <p className="text-sm text-pp-muted pl-1">{t("match.noParticipants")}</p>
           ) : (
             <ul className="space-y-3">
               {players.fw?.map((p, i) => (
-                <li key={p.id} className="flex items-center space-x-3 text-sm p-3 bg-zinc-50 dark:bg-zinc-950/50 rounded-lg">
-                  <div className="w-6 h-6 bg-zinc-200 dark:bg-zinc-700 rounded-full flex items-center justify-center text-xs font-bold text-zinc-500">
+                <li key={p.id} className="flex items-center space-x-3 text-sm p-3 bg-pp-surface-muted rounded-lg">
+                  <div className="w-6 h-6 bg-pp-surface-muted rounded-full flex items-center justify-center text-xs font-bold text-pp-muted">
                     {i + 1}
                   </div>
                   <span className="font-medium">
                     {p.user?.full_name || p.user?.email?.split('@')[0]}
                   </span>
                   {p.status === "pending_payment" && (
-                    <span className="text-xs bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 px-2 py-0.5 rounded">{t("participant.status.pending_payment")}</span>
+                    <span className={`${badgeStyles({ tone: "warning" })} `}>{t("participant.status.pending_payment")}</span>
                   )}
                   {p.user?.id && p.user.id !== user?.id && (
                     <div className="ml-auto">
                       <StartChatButton
                         targetUserId={p.user.id}
-                        className="p-1.5 text-zinc-400 hover:text-blue-600 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full"
+                        className="p-1.5 text-pp-muted hover:text-pp-accent-text hover:bg-pp-surface-muted rounded-full"
                         iconOnly
                         label={t("match.contactParticipant")}
                         origin={matchOrigin}
@@ -728,7 +729,7 @@ export default async function MatchPage({
                     </div>
                   )}
                   {p.id === userParticipant?.id && (
-                    <span className="ml-auto text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">Me</span>
+                    <span className={`${badgeStyles({ tone: "success" })} ml-auto `}>Me</span>
                   )}
                 </li>
               ))}
@@ -737,34 +738,34 @@ export default async function MatchPage({
         </div>
 
         {/* DF Card */}
-        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-sm">
+        <div className={surfaceStyles({ interactive: false, density: "default" })}>
           <div className="flex items-center space-x-2 mb-4">
-            <span className="px-2 py-1 bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300 rounded text-xs font-bold">
+            <span className={`${badgeStyles({ tone: "warning" })} `}>
               {t("match.position.DF")}
             </span>
-            <span className="text-zinc-500 text-sm">({players.df?.length || 0})</span>
+            <span className="text-pp-muted text-sm">({players.df?.length || 0})</span>
           </div>
 
           {players.df?.length === 0 ? (
-            <p className="text-sm text-zinc-400 pl-1">{t("match.noParticipants")}</p>
+            <p className="text-sm text-pp-muted pl-1">{t("match.noParticipants")}</p>
           ) : (
             <ul className="space-y-3">
               {players.df?.map((p, i) => (
-                <li key={p.id} className="flex items-center space-x-3 text-sm p-3 bg-zinc-50 dark:bg-zinc-950/50 rounded-lg">
-                  <div className="w-6 h-6 bg-zinc-200 dark:bg-zinc-700 rounded-full flex items-center justify-center text-xs font-bold text-zinc-500">
+                <li key={p.id} className="flex items-center space-x-3 text-sm p-3 bg-pp-surface-muted rounded-lg">
+                  <div className="w-6 h-6 bg-pp-surface-muted rounded-full flex items-center justify-center text-xs font-bold text-pp-muted">
                     {i + 1}
                   </div>
                   <span className="font-medium">
                     {p.user?.full_name || p.user?.email?.split('@')[0]}
                   </span>
                   {p.status === "pending_payment" && (
-                    <span className="text-xs bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 px-2 py-0.5 rounded">{t("participant.status.pending_payment")}</span>
+                    <span className={`${badgeStyles({ tone: "warning" })} `}>{t("participant.status.pending_payment")}</span>
                   )}
                   {p.user?.id && p.user.id !== user?.id && (
                     <div className="ml-auto">
                       <StartChatButton
                         targetUserId={p.user.id}
-                        className="p-1.5 text-zinc-400 hover:text-blue-600 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full"
+                        className="p-1.5 text-pp-muted hover:text-pp-accent-text hover:bg-pp-surface-muted rounded-full"
                         iconOnly
                         label={t("match.contactParticipant")}
                         origin={matchOrigin}
@@ -772,7 +773,7 @@ export default async function MatchPage({
                     </div>
                   )}
                   {p.id === userParticipant?.id && (
-                    <span className="ml-auto text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">Me</span>
+                    <span className={`${badgeStyles({ tone: "success" })} ml-auto `}>Me</span>
                   )}
                 </li>
               ))}
@@ -781,34 +782,34 @@ export default async function MatchPage({
         </div>
 
         {/* G Card */}
-        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-sm">
+        <div className={surfaceStyles({ interactive: false, density: "default" })}>
           <div className="flex items-center space-x-2 mb-4">
-            <span className="px-2 py-1 bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 rounded text-xs font-bold">
+            <span className={`${badgeStyles({ tone: "neutral" })} `}>
               {t("match.position.G")}
             </span>
-            <span className="text-zinc-500 text-sm">({players.g?.length || 0})</span>
+            <span className="text-pp-muted text-sm">({players.g?.length || 0})</span>
           </div>
 
           {players.g?.length === 0 ? (
-            <p className="text-sm text-zinc-400 pl-1">{t("match.noParticipants")}</p>
+            <p className="text-sm text-pp-muted pl-1">{t("match.noParticipants")}</p>
           ) : (
             <ul className="space-y-3">
               {players.g?.map((p, i) => (
-                <li key={p.id} className="flex items-center space-x-3 text-sm p-3 bg-zinc-50 dark:bg-zinc-950/50 rounded-lg">
-                  <div className="w-6 h-6 bg-zinc-200 dark:bg-zinc-700 rounded-full flex items-center justify-center text-xs font-bold text-zinc-500">
+                <li key={p.id} className="flex items-center space-x-3 text-sm p-3 bg-pp-surface-muted rounded-lg">
+                  <div className="w-6 h-6 bg-pp-surface-muted rounded-full flex items-center justify-center text-xs font-bold text-pp-muted">
                     {i + 1}
                   </div>
                   <span className="font-medium">
                     {p.user?.full_name || p.user?.email?.split('@')[0]}
                   </span>
                   {p.status === "pending_payment" && (
-                    <span className="text-xs bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 px-2 py-0.5 rounded">{t("participant.status.pending_payment")}</span>
+                    <span className={`${badgeStyles({ tone: "warning" })} `}>{t("participant.status.pending_payment")}</span>
                   )}
                   {p.user?.id && p.user.id !== user?.id && (
                     <div className="ml-auto">
                       <StartChatButton
                         targetUserId={p.user.id}
-                        className="p-1.5 text-zinc-400 hover:text-blue-600 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full"
+                        className="p-1.5 text-pp-muted hover:text-pp-accent-text hover:bg-pp-surface-muted rounded-full"
                         iconOnly
                         label={t("match.contactParticipant")}
                         origin={matchOrigin}
@@ -816,7 +817,7 @@ export default async function MatchPage({
                     </div>
                   )}
                   {p.id === userParticipant?.id && (
-                    <span className="ml-auto text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">Me</span>
+                    <span className={`${badgeStyles({ tone: "success" })} ml-auto `}>Me</span>
                   )}
                 </li>
               ))}
@@ -826,31 +827,31 @@ export default async function MatchPage({
 
         {/* Waitlist Section */}
         {waitlist.length > 0 && (
-          <div className="bg-white dark:bg-zinc-900 border border-blue-200 dark:border-blue-800 rounded-2xl p-5 shadow-sm">
+          <div className={surfaceStyles({ interactive: false, density: "default" })}>
             <div className="flex items-center space-x-2 mb-4">
-              <span className="px-2 py-1 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 rounded text-xs font-bold">
+              <span className={`${badgeStyles({ tone: "brand" })} `}>
                 {locale === "ko" ? "대기자" : "Waitlist"}
               </span>
-              <span className="text-zinc-500 text-sm">({waitlist.length})</span>
+              <span className="text-pp-muted text-sm">({waitlist.length})</span>
             </div>
 
             <ul className="space-y-3">
               {waitlist.map((p, i) => (
-                <li key={p.id} className="flex items-center space-x-3 text-sm p-3 bg-blue-50 dark:bg-blue-950/50 rounded-lg">
-                  <div className="w-6 h-6 bg-blue-200 dark:bg-blue-700 rounded-full flex items-center justify-center text-xs font-bold text-blue-700 dark:text-blue-200">
+                <li key={p.id} className="flex items-center space-x-3 text-sm p-3 bg-pp-accent-soft rounded-lg">
+                  <div className="w-6 h-6 bg-pp-accent-soft rounded-full flex items-center justify-center text-xs font-bold text-pp-accent-text ">
                     {i + 1}
                   </div>
                   <span className="font-medium">
                     {p.user?.full_name || p.user?.email?.split('@')[0]}
                   </span>
-                  <span className="text-xs bg-zinc-200 text-zinc-600 dark:bg-zinc-700 dark:text-zinc-400 px-2 py-0.5 rounded">
+                  <span className={`${badgeStyles({ tone: "neutral" })} `}>
                     {t(`match.position.${p.position}`)}
                   </span>
                   {p.user?.id && p.user.id !== user?.id && (
                     <div className="ml-auto">
                       <StartChatButton
                         targetUserId={p.user.id}
-                        className="p-1.5 text-zinc-400 hover:text-blue-600 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full"
+                        className="p-1.5 text-pp-muted hover:text-pp-accent-text hover:bg-pp-surface-muted rounded-full"
                         iconOnly
                         label={t("match.contactParticipant")}
                         origin={matchOrigin}
@@ -858,7 +859,7 @@ export default async function MatchPage({
                     </div>
                   )}
                   {p.id === userParticipant?.id && (
-                    <span className="ml-auto text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded">Me</span>
+                    <span className={`${badgeStyles({ tone: "brand" })} ml-auto `}>Me</span>
                   )}
                 </li>
               ))}

@@ -1,5 +1,7 @@
 "use client";
 
+import { buttonStyles, surfaceStyles } from "@/components/ui/styles";
+
 import { useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -84,12 +86,12 @@ export function CalendarView({ matches, onDateSelect }: CalendarViewProps) {
   };
 
   return (
-    <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-4">
+    <div className={surfaceStyles({ interactive: false, density: "compact" })}>
       {/* Header: Month Navigation */}
       <div className="flex items-center justify-between mb-4">
-        <button
+        <button type="button"
           onClick={prevMonth}
-          className="p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+          className={buttonStyles({ variant: "secondary", size: "compact" })}
           aria-label="Previous month"
         >
           <ChevronLeft className="w-5 h-5" />
@@ -97,9 +99,9 @@ export function CalendarView({ matches, onDateSelect }: CalendarViewProps) {
         <h2 className="text-lg font-bold">
           {year}년 {monthNames[month]}
         </h2>
-        <button
+        <button type="button"
           onClick={nextMonth}
-          className="p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+          className={buttonStyles({ variant: "secondary", size: "compact" })}
           aria-label="Next month"
         >
           <ChevronRight className="w-5 h-5" />
@@ -112,7 +114,7 @@ export function CalendarView({ matches, onDateSelect }: CalendarViewProps) {
           <div
             key={day}
             className={`text-center text-xs font-medium py-2 ${
-              i === 0 ? "text-red-500" : "text-zinc-500 dark:text-zinc-400"
+              i === 0 ? "text-pp-danger-text" : "text-pp-muted "
             }`}
           >
             {day}
@@ -132,22 +134,22 @@ export function CalendarView({ matches, onDateSelect }: CalendarViewProps) {
           const isSunday = index % 7 === 0;
 
           return (
-            <button
+            <button data-ui-exception="calendar-day" type="button"
               key={day}
               onClick={() => onDateSelect(formatDateString(day))}
               className={`aspect-square flex flex-col items-center justify-center rounded-lg transition-all text-sm relative ${
                 today
-                  ? "bg-blue-600 text-white font-bold"
+                  ? "bg-pp-accent text-white font-bold"
                   : matchCount > 0
-                  ? "bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40"
-                  : "hover:bg-zinc-100 dark:hover:bg-zinc-800"
-              } ${isSunday && !today ? "text-red-500" : ""}`}
+                  ? "bg-pp-accent-soft hover:bg-pp-accent-soft "
+                  : "hover:bg-pp-surface-muted "
+              } ${isSunday && !today ? "text-pp-danger-text" : ""}`}
             >
               <span>{day}</span>
               {matchCount > 0 && (
                 <span
                   className={`text-xs mt-0.5 ${
-                    today ? "text-blue-200" : "text-blue-600 dark:text-blue-400"
+                    today ? "text-white/80" : "text-pp-accent-text"
                   }`}
                 >
                   🏒{matchCount > 1 ? matchCount : ""}
@@ -159,9 +161,9 @@ export function CalendarView({ matches, onDateSelect }: CalendarViewProps) {
       </div>
 
       {/* Legend */}
-      <div className="mt-4 flex items-center justify-center gap-4 text-xs text-zinc-500 dark:text-zinc-400">
+      <div className="mt-4 flex items-center justify-center gap-4 text-xs text-pp-muted ">
         <div className="flex items-center gap-1">
-          <span className="w-3 h-3 rounded bg-blue-600" />
+          <span className="w-3 h-3 rounded bg-pp-accent" />
           <span>{locale === "ko" ? "오늘" : "Today"}</span>
         </div>
         <div className="flex items-center gap-1">

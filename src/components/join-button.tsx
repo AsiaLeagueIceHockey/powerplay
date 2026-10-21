@@ -1,4 +1,5 @@
 "use client";
+import { buttonStyles, surfaceStyles } from "@/components/ui/styles";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -44,13 +45,13 @@ export function JoinButton({
   // If not logged in, show login prompt
   if (!userId) {
     return (
-      <div className="rounded-lg border border-zinc-200 bg-white p-6 text-center dark:border-zinc-800 dark:bg-zinc-900">
-        <p className="mb-4 text-zinc-600 dark:text-zinc-400">
+      <div className={`${surfaceStyles({ density: "default" })} text-center`}>
+        <p className="mb-4 text-pp-muted ">
           {t("join")}을 위해 로그인이 필요합니다
         </p>
         <Link
           href="/login"
-          className="inline-block rounded-lg bg-zinc-900 px-6 py-2 font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100"
+          className={buttonStyles({ variant: "primary", size: "compact" })}
         >
           {tAuth("login")}
         </Link>
@@ -61,20 +62,19 @@ export function JoinButton({
   // If onboarding not completed, redirect to onboarding
   if (!onboardingCompleted) {
     return (
-      <div className="rounded-lg border border-amber-200 bg-amber-50 p-6 text-center dark:border-amber-800 dark:bg-amber-900/20">
-        <p className="mb-4 text-amber-700 dark:text-amber-300">
+      <div className="rounded-lg border border-pp-warning-border bg-pp-warning-soft p-6 text-center ">
+        <p className="mb-4 text-pp-warning-text ">
           경기 참가 전 프로필 설정이 필요합니다
         </p>
-        <button
+        <button type="button"
           onClick={() => router.push(`/${locale}/onboarding`)}
-          className="inline-block rounded-lg bg-amber-600 px-6 py-2 font-medium text-white transition-colors hover:bg-amber-700"
+          className={buttonStyles({ variant: "warning", size: "compact" })}
         >
           프로필 설정하기
         </button>
       </div>
     );
   }
-
 
   // If already joined, show cancel option
   if (userParticipant) {
@@ -91,22 +91,22 @@ export function JoinButton({
     };
 
     return (
-      <div className="rounded-lg border border-green-200 bg-green-50 p-6 dark:border-green-800 dark:bg-green-900/20">
+      <div className="rounded-lg border border-pp-success-border bg-pp-success-soft p-6 ">
         <div className="mb-4 flex items-center gap-2">
-          <span className="text-green-600 dark:text-green-400">✓</span>
-          <span className="font-medium text-green-700 dark:text-green-300">
+          <span className="text-pp-success-text ">✓</span>
+          <span className="font-medium text-pp-success-text ">
             {t("position." + userParticipant.position)}로 신청 완료
           </span>
         </div>
-        <button
+        <button type="button"
           onClick={handleCancel}
           disabled={isLoading}
-          className="rounded-lg border border-red-300 px-4 py-2 text-sm font-medium text-red-600 transition-colors hover:bg-red-50 disabled:opacity-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-900/20"
+          className={buttonStyles({ variant: "danger", size: "compact" })}
         >
           {isLoading ? "..." : t("cancel")}
         </button>
         {error && (
-          <p className="mt-2 text-sm text-red-600 dark:text-red-400">{error}</p>
+          <p className="mt-2 text-sm text-pp-danger-text ">{error}</p>
         )}
       </div>
     );
@@ -134,21 +134,21 @@ export function JoinButton({
     const isInsufficientPoints = error?.includes("Insufficient") || error?.includes("INSUFFICIENT");
 
     return (
-      <div className="rounded-lg border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
+      <div className={surfaceStyles({ density: "default" })}>
         <h3 className="mb-4 font-semibold">포지션 선택</h3>
         
         {/* Insufficient Points Warning */}
         {isInsufficientPoints && (
-          <div className="mb-4 p-4 rounded-lg bg-amber-50 border border-amber-200 dark:bg-amber-900/20 dark:border-amber-800">
-            <p className="text-amber-700 dark:text-amber-300 font-medium mb-2">
+          <div className="mb-4 p-4 rounded-lg bg-pp-warning-soft border border-pp-warning-border ">
+            <p className="text-pp-warning-text font-medium mb-2">
               💰 잔액이 부족합니다
             </p>
-            <p className="text-sm text-amber-600 dark:text-amber-400 mb-3">
+            <p className="text-sm text-pp-warning-text mb-3">
               이 경기에 참가하려면 충전이 필요합니다.
             </p>
-            <button
+            <button type="button"
               onClick={() => router.push(`/${locale}/mypage/points/charge`)}
-              className="inline-block px-4 py-2 bg-amber-500 text-white rounded-lg text-sm font-medium hover:bg-amber-600 transition"
+              className={buttonStyles({ variant: "warning", size: "compact" })}
             >
               충전하러 가기 →
             </button>
@@ -157,38 +157,38 @@ export function JoinButton({
         
         {/* Other errors */}
         {error && !isInsufficientPoints && (
-          <p className="mb-4 text-sm text-red-600 dark:text-red-400">{error}</p>
+          <p className="mb-4 text-sm text-pp-danger-text ">{error}</p>
         )}
         
         <div className="flex flex-wrap gap-3">
-          <button
+          <button type="button"
             onClick={() => handleJoin("FW")}
             disabled={availableSkaters <= 0 || isLoading}
-            className="flex-1 rounded-lg border border-blue-300 bg-blue-50 px-4 py-3 font-medium text-blue-700 transition-colors hover:bg-blue-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-blue-800 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/40"
+            className={`${buttonStyles({ variant: "primary", size: "default" })} flex-1`}
           >
             {t("position.FW")}
             <span className="ml-2 text-sm opacity-70">({availableSkaters}석)</span>
           </button>
-          <button
+          <button type="button"
             onClick={() => handleJoin("DF")}
             disabled={availableSkaters <= 0 || isLoading}
-            className="flex-1 rounded-lg border border-orange-300 bg-orange-50 px-4 py-3 font-medium text-orange-700 transition-colors hover:bg-orange-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-orange-800 dark:bg-orange-900/20 dark:text-orange-400 dark:hover:bg-orange-900/40"
+            className={`${buttonStyles({ variant: "outline", size: "default" })} flex-1`}
           >
             {t("position.DF")}
             <span className="ml-2 text-sm opacity-70">({availableSkaters}석)</span>
           </button>
-          <button
+          <button type="button"
             onClick={() => handleJoin("G")}
             disabled={availableG <= 0 || isLoading}
-            className="flex-1 rounded-lg border border-purple-300 bg-purple-50 px-4 py-3 font-medium text-purple-700 transition-colors hover:bg-purple-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-purple-800 dark:bg-purple-900/20 dark:text-purple-400 dark:hover:bg-purple-900/40"
+            className={`${buttonStyles({ variant: "outline", size: "default" })} flex-1`}
           >
             {t("position.G")}
             <span className="ml-2 text-sm opacity-70">({availableG}석)</span>
           </button>
         </div>
-        <button
+        <button type="button"
           onClick={() => setShowPositionSelect(false)}
-          className="mt-4 text-sm text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"
+          className={`${buttonStyles({ variant: "ghost", size: "compact" })} mt-4`}
         >
           취소
         </button>
@@ -197,9 +197,9 @@ export function JoinButton({
   }
 
   return (
-    <button
+    <button type="button"
       onClick={() => setShowPositionSelect(true)}
-      className="w-full rounded-lg bg-zinc-900 px-6 py-3 text-lg font-semibold text-white transition-colors hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100"
+      className={`${buttonStyles({ variant: "primary", size: "large" })} w-full`}
     >
       {t("join")}
     </button>

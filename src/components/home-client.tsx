@@ -1,5 +1,7 @@
 "use client";
 
+import { fieldStyles, filterChipStyles, surfaceStyles, segmentedItemStyles } from "@/components/ui/styles";
+
 import dynamic from "next/dynamic";
 import { useState, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -10,7 +12,7 @@ import { DateFilter } from "@/components/date-filter";
 import { MatchCard } from "@/components/match-card";
 const CalendarView = dynamic(
   () => import("@/components/calendar-view").then((module) => module.CalendarView),
-  { loading: () => <div className="min-h-80 animate-pulse rounded-xl bg-zinc-100 dark:bg-zinc-800" /> }
+  { loading: () => <div className="min-h-80 animate-pulse rounded-xl bg-pp-surface-muted " /> }
 );
 import { RinkExplorer } from "@/components/rink-explorer";
 import { useTranslations, useLocale } from "next-intl";
@@ -71,7 +73,7 @@ export function HomeClient({
   // Client-side filtering state
   const [selectedDate, setSelectedDate] = useState<string | null>(initialDate ?? searchParams.get("date"));
   const [activeFilters, setActiveFilters] = useState<Set<string>>(new Set());
-  
+
   // Rink Filter State
   const [selectedRinkIds, setSelectedRinkIds] = useState<string[]>([]);
   const [isRinkFilterOpen, setIsRinkFilterOpen] = useState(false);
@@ -156,7 +158,7 @@ export function HomeClient({
         filterMatch = false;
       }
     }
-    
+
     // 3. Rink Filter (Intersection / OR within Rinks)
     if (selectedRinkIds.length > 0) {
         const rinkId = match.rink?.id;
@@ -255,13 +257,10 @@ export function HomeClient({
   return (
     <div className="flex flex-col gap-6">
       {!forcedTab ? (
-        <div className="flex border-b border-zinc-200 dark:border-zinc-800">
-          <button
+        <div className="flex border-b border-pp-border ">
+          <button type="button"
             onClick={() => setActiveTab("club")}
-            className={`flex-1 pb-3 text-lg font-bold transition-all relative ${activeTab === "club"
-              ? "text-zinc-900 dark:text-white"
-              : "text-zinc-400 hover:text-zinc-600"
-              }`}
+            className={`${segmentedItemStyles({ selected: activeTab === "club", kind: "tab" })} flex-1 relative`}
           >
             <span className="flex items-center justify-center gap-2">
               {t("tabs.club")}
@@ -270,12 +269,9 @@ export function HomeClient({
               <span className="absolute bottom-0 left-0 w-full h-0.5 bg-zinc-900 dark:bg-white" />
             )}
           </button>
-          <button
+          <button type="button"
             onClick={() => setActiveTab("rink")}
-            className={`flex-1 pb-3 text-lg font-bold transition-all relative ${activeTab === "rink"
-              ? "text-zinc-900 dark:text-white"
-              : "text-zinc-400 hover:text-zinc-600"
-              }`}
+            className={`${segmentedItemStyles({ selected: activeTab === "rink", kind: "tab" })} flex-1 relative`}
           >
             <span className="flex items-center justify-center gap-2">
               {t("tabs.rink")}
@@ -284,12 +280,9 @@ export function HomeClient({
               <span className="absolute bottom-0 left-0 w-full h-0.5 bg-zinc-900 dark:bg-white" />
             )}
           </button>
-          <button
+          <button type="button"
             onClick={() => setActiveTab("match")}
-            className={`flex-1 pb-3 text-lg font-bold transition-all relative ${activeTab === "match"
-              ? "text-zinc-900 dark:text-white"
-              : "text-zinc-400 hover:text-zinc-600"
-              }`}
+            className={`${segmentedItemStyles({ selected: activeTab === "match", kind: "tab" })} flex-1 relative`}
           >
             <span className="flex items-center justify-center gap-2">
               {t("tabs.match")}
@@ -304,8 +297,8 @@ export function HomeClient({
       {/* Tab Content */}
       <div className="relative min-h-[500px]">
         {isPending && (
-            <div className="absolute inset-0 z-50 flex items-start justify-center pt-20 bg-white/50 dark:bg-zinc-950/50 backdrop-blur-sm transition-all duration-300">
-                <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+            <div className="absolute inset-0 z-50 flex items-start justify-center pt-20 bg-white/50 dark:bg-pp-surface/50 backdrop-blur-sm transition-all duration-300">
+                <Loader2 className="w-8 h-8 animate-spin text-pp-accent-text" />
             </div>
         )}
         <div className={`transition-all duration-300 ${isPending ? 'opacity-50' : 'opacity-100'}`}>
@@ -313,23 +306,17 @@ export function HomeClient({
           <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
             {/* View Mode Toggle */}
             <div className="flex items-center justify-end">
-              <div className="flex items-center bg-zinc-100 dark:bg-zinc-800 p-1 rounded-lg">
-                <button
+              <div className="flex items-center bg-pp-surface-muted p-1 rounded-lg">
+                <button type="button"
                   onClick={() => setViewMode("list")}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-bold transition-colors ${viewMode === "list"
-                    ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-700 dark:text-white"
-                    : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
-                    }`}
+                  className={`${segmentedItemStyles({ selected: viewMode === "list" })} flex items-center gap-2 `}
                 >
                   <List className="w-4 h-4" />
                   {t("viewList")}
                 </button>
-                <button
+                <button type="button"
                   onClick={() => setViewMode("calendar")}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-bold transition-colors ${viewMode === "calendar"
-                    ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-700 dark:text-white"
-                    : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
-                    }`}
+                  className={`${segmentedItemStyles({ selected: viewMode === "calendar" })} flex items-center gap-2 `}
                 >
                   <CalendarDays className="w-4 h-4" />
                   {t("viewCalendar")}
@@ -340,40 +327,32 @@ export function HomeClient({
             {viewMode === "list" ? (
               <>
                 {/* Date Filter (horizontal scrollable dates) */}
-                <div className="sticky top-0 z-10 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-sm pt-2 pb-0" style={{ marginBottom: "8px"}}>
+                <div className="sticky top-0 z-10 bg-white/80 dark:bg-pp-surface/80 backdrop-blur-sm pt-2 pb-0" style={{ marginBottom: "8px"}}>
                   <DateFilter selectedDate={selectedDate} onSelect={handleDateSelect} />
                 </div>
 
                 {/* Filter Chips */}
                 <div className="flex overflow-x-auto gap-2 px-1 pb-2 no-scrollbar">
-                  <button
+                  <button type="button"
                     onClick={() => setIsRinkFilterOpen(true)}
-                    className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium border transition-colors whitespace-nowrap ${
-                      selectedRinkIds.length > 0
-                        ? "bg-blue-600 text-white border-blue-600 shadow-sm"
-                        : "bg-white text-zinc-600 border-zinc-200 hover:bg-zinc-50 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700 dark:hover:bg-zinc-700"
-                    }`}
+                    className={`${filterChipStyles({ selected: selectedRinkIds.length > 0 })} flex items-center gap-1 whitespace-nowrap`}
                   >
-                    {locale === "ko" ? "링크장" : "Rink"} 
+                    {locale === "ko" ? "링크장" : "Rink"}
                     {selectedRinkIds.length > 0 && ` (${selectedRinkIds.length})`}
                     <ChevronDown className={`w-3 h-3 transition-transform ${isRinkFilterOpen ? "rotate-180" : ""}`} />
                   </button>
 
                   {/* Match Type Filter Button */}
-                  <button
+                  <button type="button"
                     onClick={() => setIsMatchTypeFilterOpen(!isMatchTypeFilterOpen)}
-                    className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium border transition-colors whitespace-nowrap ${
-                      selectedMatchTypes.length > 0
-                        ? "bg-blue-600 text-white border-blue-600 shadow-sm"
-                        : "bg-white text-zinc-600 border-zinc-200 hover:bg-zinc-50 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700 dark:hover:bg-zinc-700"
-                    }`}
+                    className={`${filterChipStyles({ selected: selectedMatchTypes.length > 0 })} flex items-center gap-1 whitespace-nowrap`}
                   >
                     {t("filter.matchType")}
                     {selectedMatchTypes.length > 0 && ` (${selectedMatchTypes.length})`}
                     <ChevronDown className={`w-3 h-3 transition-transform ${isMatchTypeFilterOpen ? "rotate-180" : ""}`} />
                   </button>
 
-                  <button
+                  <button type="button"
                     onClick={() => {
                       const newFilters = new Set(activeFilters);
                       if (newFilters.has("goalie_spots")) {
@@ -383,15 +362,11 @@ export function HomeClient({
                       }
                       setActiveFilters(newFilters);
                     }}
-                    className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors whitespace-nowrap ${
-                      activeFilters.has("goalie_spots")
-                        ? "bg-blue-600 text-white border-blue-600 shadow-sm"
-                        : "bg-white text-zinc-600 border-zinc-200 hover:bg-zinc-50 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700 dark:hover:bg-zinc-700"
-                    }`}
+                    className={`${filterChipStyles({ selected: activeFilters.has("goalie_spots") })} whitespace-nowrap`}
                   >
                     {t("filter.goalieSpots")}
                   </button>
-                  <button
+                  <button type="button"
                     onClick={() => {
                       const newFilters = new Set(activeFilters);
                       if (newFilters.has("rental_available")) {
@@ -401,15 +376,11 @@ export function HomeClient({
                       }
                       setActiveFilters(newFilters);
                     }}
-                    className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors whitespace-nowrap ${
-                      activeFilters.has("rental_available")
-                        ? "bg-blue-600 text-white border-blue-600 shadow-sm"
-                        : "bg-white text-zinc-600 border-zinc-200 hover:bg-zinc-50 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700 dark:hover:bg-zinc-700"
-                    }`}
+                    className={`${filterChipStyles({ selected: activeFilters.has("rental_available") })} whitespace-nowrap`}
                   >
                     {t("filter.rentalAvailable")}
                   </button>
-                  <button
+                  <button type="button"
                     onClick={() => {
                       const newFilters = new Set(activeFilters);
                       if (newFilters.has("skater_spots")) {
@@ -419,19 +390,15 @@ export function HomeClient({
                       }
                       setActiveFilters(newFilters);
                     }}
-                    className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors whitespace-nowrap ${
-                      activeFilters.has("skater_spots")
-                        ? "bg-blue-600 text-white border-blue-600 shadow-sm"
-                        : "bg-white text-zinc-600 border-zinc-200 hover:bg-zinc-50 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700 dark:hover:bg-zinc-700"
-                    }`}
+                    className={`${filterChipStyles({ selected: activeFilters.has("skater_spots") })} whitespace-nowrap`}
                   >
                     {t("filter.skaterSpots")}
                   </button>
                 </div>
 
                 {filteredMatches.length === 0 ? (
-                  <div className="text-center py-20 bg-zinc-50 dark:bg-zinc-900 rounded-xl border border-zinc-100 dark:border-zinc-800">
-                    <p className="text-zinc-500">{t("noMatches")}</p>
+                  <div className={`${surfaceStyles({ interactive: false, density: "none" })} text-center `}>
+                    <p className="text-pp-muted">{t("noMatches")}</p>
                   </div>
                 ) : (
                   <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -464,37 +431,29 @@ export function HomeClient({
 
               {/* Search Input */}
               <div className="relative mb-3">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-pp-muted" />
                 <input
                   type="text"
                   value={clubSearchQuery}
                   onChange={(e) => setClubSearchQuery(e.target.value)}
                   placeholder={t("filter.searchClub")}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white text-sm placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  className={`${fieldStyles({ leadingIcon: true })} w-full`}
                 />
               </div>
 
               {/* Filter Chips */}
               <div className="flex overflow-x-auto gap-2 px-1 pb-1 no-scrollbar">
-                <button
+                <button type="button"
                   onClick={() => setIsRegionFilterOpen(true)}
-                  className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium border transition-colors whitespace-nowrap ${
-                    selectedRegions.length > 0
-                      ? "bg-blue-600 text-white border-blue-600 shadow-sm"
-                      : "bg-white text-zinc-600 border-zinc-200 hover:bg-zinc-50 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700 dark:hover:bg-zinc-700"
-                  }`}
+                  className={`${filterChipStyles({ selected: selectedRegions.length > 0 })} flex items-center gap-1 whitespace-nowrap`}
                 >
                   {t("filter.region")}
                   {selectedRegions.length > 0 && ` (${selectedRegions.length})`}
                   <ChevronDown className={`w-3 h-3 transition-transform ${isRegionFilterOpen ? "rotate-180" : ""}`} />
                 </button>
-                <button
+                <button type="button"
                   onClick={() => setIsRinkFilterOpen(true)}
-                  className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium border transition-colors whitespace-nowrap ${
-                    selectedRinkIds.length > 0
-                      ? "bg-blue-600 text-white border-blue-600 shadow-sm"
-                      : "bg-white text-zinc-600 border-zinc-200 hover:bg-zinc-50 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700 dark:hover:bg-zinc-700"
-                  }`}
+                  className={`${filterChipStyles({ selected: selectedRinkIds.length > 0 })} flex items-center gap-1 whitespace-nowrap`}
                 >
                   {locale === "ko" ? "주 이용 링크장" : "Rinks"}
                   {selectedRinkIds.length > 0 && ` (${selectedRinkIds.length})`}
@@ -503,26 +462,26 @@ export function HomeClient({
               </div>
             </div>
 
-            <details className="group mb-6 rounded-xl bg-zinc-50 px-4 py-3 text-zinc-600 dark:bg-zinc-900 dark:text-zinc-300">
+            <details className={`${surfaceStyles({ density: "none" })} group mb-6 `}>
               <summary className="flex cursor-pointer list-none items-center justify-between gap-3 [&::-webkit-details-marker]:hidden">
                 <div className="min-w-0">
-                  <p className="text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
+                  <p className="text-[11px] font-medium text-pp-muted ">
                     {t("clubRanking.badge")}
                   </p>
-                  <h2 className="mt-0.5 text-sm font-semibold text-zinc-800 dark:text-zinc-100">
+                  <h2 className="mt-0.5 text-sm font-semibold text-pp-text ">
                     {t("clubRanking.bannerTitle")}
                   </h2>
                 </div>
                 <ChevronDown className="h-4 w-4 shrink-0 transition-transform group-open:rotate-180" aria-hidden="true" />
               </summary>
-              <div className="mt-3 border-t border-zinc-200 pt-3 text-xs leading-relaxed dark:border-zinc-800">
+              <div className="mt-3 border-t border-pp-border pt-3 text-xs leading-relaxed ">
                 <p>{t("clubRanking.voteHint")}</p>
-                <p className="mt-1 text-zinc-500 dark:text-zinc-400">{t("clubRanking.bannerSubdescription")}</p>
+                <p className="mt-1 text-pp-muted ">{t("clubRanking.bannerSubdescription")}</p>
                 <a
                   href={POWERPLAY_INSTAGRAM_URL}
                   target="_blank"
                   rel="noreferrer"
-                  className="mt-2 inline-flex min-h-8 items-center font-medium underline underline-offset-4 hover:text-blue-600 dark:hover:text-blue-400"
+                  className="mt-2 inline-flex min-h-8 items-center font-medium underline underline-offset-4 hover:text-pp-accent-text "
                 >
                   {t("clubRanking.instagramAction")}
                 </a>
@@ -530,8 +489,8 @@ export function HomeClient({
             </details>
 
             {filteredClubs.length === 0 ? (
-              <div className="text-center py-20 bg-zinc-50 dark:bg-zinc-900 rounded-xl border border-zinc-100 dark:border-zinc-800">
-                <p className="text-zinc-500">{t("noClubs")}</p>
+              <div className={`${surfaceStyles({ interactive: false, density: "none" })} text-center `}>
+                <p className="text-pp-muted">{t("noClubs")}</p>
               </div>
             ) : (
               <div className="grid gap-x-4 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
@@ -549,7 +508,7 @@ export function HomeClient({
         )}
         </div>
       </div>
-      
+
       {/* Rink Filter Drawer */}
       <RinkFilterDrawer
         isOpen={isRinkFilterOpen}

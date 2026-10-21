@@ -1,5 +1,7 @@
 "use client";
 
+import { buttonStyles, filterChipStyles, overlayStyles } from "@/components/ui/styles";
+
 import { useEffect, useState } from "react";
 import { X, Check, RefreshCw } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
@@ -24,17 +26,21 @@ export function MatchTypeFilterDrawer({
   const [isVisible, setIsVisible] = useState(false);
   const [tempSelected, setTempSelected] = useState<string[]>(selectedTypes);
 
+  const [previousInput, setPreviousInput] = useState({ isOpen, selected: selectedTypes });
+  if (previousInput.isOpen !== isOpen || previousInput.selected !== selectedTypes) {
+    setPreviousInput({ isOpen, selected: selectedTypes });
+    if (isOpen) { setIsVisible(true); setTempSelected(selectedTypes); }
+  }
+
   useEffect(() => {
     if (isOpen) {
-      setIsVisible(true);
-      setTempSelected(selectedTypes);
+      const previousOverflow = document.body.style.overflow;
       document.body.style.overflow = "hidden";
-    } else {
-      const timer = setTimeout(() => setIsVisible(false), 300);
-      document.body.style.overflow = "";
-      return () => clearTimeout(timer);
+      return () => { document.body.style.overflow = previousOverflow; };
     }
-  }, [isOpen, selectedTypes]);
+    const timer = setTimeout(() => setIsVisible(false), 300);
+    return () => clearTimeout(timer);
+  }, [isOpen]);
 
   const toggleType = (type: string) => {
     setTempSelected((prev) =>
@@ -53,28 +59,6 @@ export function MatchTypeFilterDrawer({
 
   if (!isVisible && !isOpen) return null;
 
-  // Color configs per type
-  const typeColors: Record<string, { bg: string; border: string; text: string; check: string }> = {
-    training: {
-      bg: "bg-blue-50 dark:bg-blue-900/20",
-      border: "border-blue-500",
-      text: "text-blue-700 dark:text-blue-300",
-      check: "bg-blue-600",
-    },
-    game: {
-      bg: "bg-purple-50 dark:bg-purple-900/20",
-      border: "border-purple-500",
-      text: "text-purple-700 dark:text-purple-300",
-      check: "bg-purple-600",
-    },
-    team_match: {
-      bg: "bg-teal-50 dark:bg-teal-900/20",
-      border: "border-teal-500",
-      text: "text-teal-700 dark:text-teal-300",
-      check: "bg-teal-600",
-    },
-  };
-
   return (
     <div className={`fixed inset-0 z-50 flex items-end justify-center transition-all duration-300 ${isOpen ? "visible" : "invisible"}`}>
       {/* Overlay */}
@@ -85,23 +69,25 @@ export function MatchTypeFilterDrawer({
 
       {/* Drawer */}
       <div
-        className={`relative w-full max-w-md bg-white dark:bg-zinc-900 rounded-t-3xl shadow-xl transform transition-transform duration-300 flex flex-col max-h-[85vh] ${
+        role="dialog" aria-modal="true" aria-labelledby="match-type-filter-title"
+        className={`${overlayStyles({ kind: "sheet" })} relative w-full max-w-md transform transition-transform duration-300 flex flex-col max-h-[85vh] ${
           isOpen ? "translate-y-0" : "translate-y-full"
         }`}
       >
         {/* Handle Bar */}
         <div className="flex justify-center pt-3 pb-2" onClick={onClose}>
-          <div className="w-12 h-1.5 bg-zinc-300 dark:bg-zinc-700 rounded-full" />
+          <div className="w-12 h-1.5 bg-pp-surface-muted rounded-full" />
         </div>
 
         {/* Header */}
-        <div className="px-6 pb-4 flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800">
-          <h2 className="text-xl font-bold text-zinc-900 dark:text-white">
+        <div className="px-6 pb-4 flex items-center justify-between border-b border-pp-border ">
+          <h2 id="match-type-filter-title" className="text-xl font-bold text-pp-text dark:text-white">
             {locale === "ko" ? "대관 구분" : "Match Type"}
           </h2>
-          <button
+          <button type="button"
             onClick={onClose}
-            className="p-2 -mr-2 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white rounded-full transition-colors"
+            aria-label={locale === "ko" ? "닫기" : "Close"}
+            className={`${buttonStyles({ variant: "ghost", size: "compact", shape: "circle" })} -mr-2`}
           >
             <X className="w-6 h-6" />
           </button>
@@ -111,22 +97,18 @@ export function MatchTypeFilterDrawer({
         <div className="flex-1 overflow-y-auto p-4 space-y-2">
           {MATCH_TYPES.map((type) => {
             const isSelected = tempSelected.includes(type);
-            const colors = typeColors[type];
             return (
-              <button
+              <button type="button"
+                aria-pressed={isSelected}
                 key={type}
                 onClick={() => toggleType(type)}
-                className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all ${
-                  isSelected
-                    ? `${colors.bg} ${colors.border} ${colors.text}`
-                    : "bg-white border-zinc-200 text-zinc-700 hover:bg-zinc-50 dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-800"
-                }`}
+                className={`${filterChipStyles({ selected: isSelected, shape: "row" })} w-full flex items-center justify-between`}
               >
                 <span className="font-semibold text-left whitespace-nowrap">
                   {tMatch(`types.${type}`)}
                 </span>
                 {isSelected && (
-                  <div className={`w-6 h-6 ${colors.check} rounded-full flex items-center justify-center text-white`}>
+                  <div className={`w-6 h-6 bg-[var(--pp-accent)] rounded-full flex items-center justify-center text-white`}>
                     <Check className="w-4 h-4" />
                   </div>
                 )}
@@ -136,17 +118,17 @@ export function MatchTypeFilterDrawer({
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-zinc-100 dark:border-zinc-800 flex gap-3 safe-area-bottom">
-          <button
+        <div className="p-4 border-t border-pp-border flex gap-3 safe-area-bottom">
+          <button type="button"
             onClick={handleReset}
-            className="flex items-center justify-center gap-2 px-5 py-4 rounded-xl font-bold bg-zinc-100 text-zinc-600 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700 transition"
+            className={`${buttonStyles({ variant: "secondary", size: "large" })} flex items-center justify-center gap-2`}
           >
             <RefreshCw className="w-5 h-5" />
-            <span className="sr-only">Reset</span>
+            <span className="sr-only">{locale === "ko" ? "초기화" : "Reset"}</span>
           </button>
-          <button
+          <button type="button"
             onClick={handleApply}
-            className="flex-1 py-4 rounded-xl font-bold bg-blue-600 text-white hover:bg-blue-700 transition shadow-lg shadow-blue-600/20"
+            className={`${buttonStyles({ variant: "primary", size: "large" })} flex-1`}
           >
             {locale === "ko" ? `${tempSelected.length}개 적용하기` : `Apply (${tempSelected.length})`}
           </button>

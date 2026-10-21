@@ -1,5 +1,7 @@
 "use client";
 
+import { badgeStyles, surfaceStyles } from "@/components/ui/styles";
+
 import { useTranslations } from "next-intl";
 
 interface Participant {
@@ -38,10 +40,10 @@ export function ParticipantList({
     return (
       <div
         key={participant.id}
-        className="flex items-center justify-between rounded-lg border border-zinc-100 bg-zinc-50 px-4 py-3 dark:border-zinc-800 dark:bg-zinc-900/50"
+        className={`${surfaceStyles({ interactive: false, density: "none" })} flex items-center justify-between `}
       >
         <div className="flex items-center gap-3">
-          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-zinc-200 text-xs font-medium dark:bg-zinc-700">
+          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-pp-surface-muted text-xs font-medium ">
             {index + 1}
           </span>
           <span className="font-medium">
@@ -52,7 +54,7 @@ export function ParticipantList({
         </div>
         <div className="flex items-center gap-2">
           {participant.payment_status && (
-            <span className="rounded bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400">
+            <span className={`${badgeStyles({ tone: "success" })} `}>
               {tParticipant("payment.paid")}
             </span>
           )}
@@ -69,18 +71,18 @@ export function ParticipantList({
   return (
     <div className="space-y-6">
       {/* Forwards */}
-      <div className="rounded-lg border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
+      <div className={surfaceStyles({ interactive: false, density: "roomy" })}>
         <h3 className="mb-4 flex items-center gap-2 text-lg font-semibold">
-          <span className="rounded bg-blue-100 px-2 py-1 text-sm text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+          <span className={`${badgeStyles({ tone: "brand" })} `}>
             {t("position.FW")}
           </span>
-          <span className="text-zinc-500 dark:text-zinc-400">
+          <span className="text-pp-muted ">
             ({fwParticipants.length})
           </span>
         </h3>
         <div className="space-y-2">
           {fwParticipants.length === 0 ? (
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            <p className="text-sm text-pp-muted ">
               No participants yet
             </p>
           ) : (
@@ -90,18 +92,18 @@ export function ParticipantList({
       </div>
 
       {/* Defense */}
-      <div className="rounded-lg border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
+      <div className={surfaceStyles({ interactive: false, density: "roomy" })}>
         <h3 className="mb-4 flex items-center gap-2 text-lg font-semibold">
-          <span className="rounded bg-orange-100 px-2 py-1 text-sm text-orange-700 dark:bg-orange-900/30 dark:text-orange-400">
+          <span className={`${badgeStyles({ tone: "warning" })} `}>
             {t("position.DF")}
           </span>
-          <span className="text-zinc-500 dark:text-zinc-400">
+          <span className="text-pp-muted ">
             ({dfParticipants.length})
           </span>
         </h3>
         <div className="space-y-2">
           {dfParticipants.length === 0 ? (
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            <p className="text-sm text-pp-muted ">
               No participants yet
             </p>
           ) : (
@@ -111,18 +113,18 @@ export function ParticipantList({
       </div>
 
       {/* Goalies */}
-      <div className="rounded-lg border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
+      <div className={surfaceStyles({ interactive: false, density: "roomy" })}>
         <h3 className="mb-4 flex items-center gap-2 text-lg font-semibold">
-          <span className="rounded bg-purple-100 px-2 py-1 text-sm text-purple-700 dark:bg-purple-900/30 dark:text-purple-400">
+          <span className={`${badgeStyles({ tone: "neutral" })} `}>
             {t("position.G")}
           </span>
-          <span className="text-zinc-500 dark:text-zinc-400">
+          <span className="text-pp-muted ">
             ({gParticipants.length})
           </span>
         </h3>
         <div className="space-y-2">
           {gParticipants.length === 0 ? (
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            <p className="text-sm text-pp-muted ">
               No participants yet
             </p>
           ) : (

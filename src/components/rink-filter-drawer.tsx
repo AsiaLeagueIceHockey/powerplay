@@ -1,5 +1,7 @@
 "use client";
 
+import { buttonStyles, filterChipStyles, overlayStyles } from "@/components/ui/styles";
+
 import { useEffect, useState } from "react";
 import { Rink } from "@/app/actions/types";
 import { X, Check, RefreshCw } from "lucide-react";
@@ -25,18 +27,21 @@ export function RinkFilterDrawer({
   const [tempSelectedIds, setTempSelectedIds] = useState<string[]>(selectedRinkIds);
 
   // Handle opening animation and sync state
+  const [previousInput, setPreviousInput] = useState({ isOpen, selected: selectedRinkIds });
+  if (previousInput.isOpen !== isOpen || previousInput.selected !== selectedRinkIds) {
+    setPreviousInput({ isOpen, selected: selectedRinkIds });
+    if (isOpen) { setIsVisible(true); setTempSelectedIds(selectedRinkIds); }
+  }
+
   useEffect(() => {
     if (isOpen) {
-      setIsVisible(true);
-      setTempSelectedIds(selectedRinkIds);
-      // Prevent body scroll
+      const previousOverflow = document.body.style.overflow;
       document.body.style.overflow = "hidden";
-    } else {
-      const timer = setTimeout(() => setIsVisible(false), 300);
-      document.body.style.overflow = "";
-      return () => clearTimeout(timer);
+      return () => { document.body.style.overflow = previousOverflow; };
     }
-  }, [isOpen, selectedRinkIds]);
+    const timer = setTimeout(() => setIsVisible(false), 300);
+    return () => clearTimeout(timer);
+  }, [isOpen]);
 
   const toggleRink = (id: string) => {
     setTempSelectedIds((prev) =>
@@ -65,23 +70,25 @@ export function RinkFilterDrawer({
 
       {/* Drawer */}
       <div
-        className={`relative w-full max-w-md bg-white dark:bg-zinc-900 rounded-t-3xl shadow-xl transform transition-transform duration-300 flex flex-col max-h-[85vh] ${
+        role="dialog" aria-modal="true" aria-labelledby="rink-filter-title"
+        className={`${overlayStyles({ kind: "sheet" })} relative w-full max-w-md transform transition-transform duration-300 flex flex-col max-h-[85vh] ${
           isOpen ? "translate-y-0" : "translate-y-full"
         }`}
       >
         {/* Handle Bar */}
         <div className="flex justify-center pt-3 pb-2" onClick={onClose}>
-          <div className="w-12 h-1.5 bg-zinc-300 dark:bg-zinc-700 rounded-full" />
+          <div className="w-12 h-1.5 bg-pp-surface-muted rounded-full" />
         </div>
 
         {/* Header */}
-        <div className="px-6 pb-4 flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800">
-          <h2 className="text-xl font-bold text-zinc-900 dark:text-white">
+        <div className="px-6 pb-4 flex items-center justify-between border-b border-pp-border ">
+          <h2 id="rink-filter-title" className="text-xl font-bold text-pp-text dark:text-white">
              {locale === "ko" ? "링크장 선택" : "Select Rink"}
           </h2>
-          <button
+          <button type="button"
             onClick={onClose}
-            className="p-2 -mr-2 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white rounded-full transition-colors"
+            aria-label={locale === "ko" ? "닫기" : "Close"}
+            className={`${buttonStyles({ variant: "ghost", size: "compact", shape: "circle" })} -mr-2`}
           >
             <X className="w-6 h-6" />
           </button>
@@ -90,35 +97,32 @@ export function RinkFilterDrawer({
         {/* List */}
         <div className="flex-1 overflow-y-auto p-4 space-y-2">
             {rinks.length === 0 && (
-                <p className="text-center text-zinc-500 py-8">
+                <p className="text-center text-pp-muted py-8">
                     {locale === "ko" ? "선택 가능한 링크장 없습니다." : "No rinks available."}
                 </p>
             )}
-            
+
             {rinks.map((rink) => {
             const isSelected = tempSelectedIds.includes(rink.id);
             return (
-              <button
+              <button type="button"
+                aria-pressed={isSelected}
                 key={rink.id}
                 onClick={() => toggleRink(rink.id)}
-                className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all ${
-                  isSelected
-                    ? "bg-blue-50 border-blue-500 text-blue-700 dark:bg-blue-900/20 dark:border-blue-500 dark:text-blue-300"
-                    : "bg-white border-zinc-200 text-zinc-700 hover:bg-zinc-50 dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-800"
-                }`}
+                className={`${filterChipStyles({ selected: isSelected, shape: "row" })} w-full flex items-center justify-between`}
               >
                 <div className="flex flex-col">
                   <span className="font-semibold text-left">
                     {locale === "ko" ? rink.name_ko : rink.name_en}
                   </span>
                   {rink.address && (
-                    <span className="text-xs text-zinc-500 dark:text-zinc-400 font-normal text-left">
+                    <span className="text-xs text-pp-muted font-normal text-left">
                       {rink.address.split(" ").slice(0, 2).join(" ")}
                     </span>
                   )}
                 </div>
                 {isSelected && (
-                  <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-white">
+                  <div className="w-6 h-6 bg-pp-accent rounded-full flex items-center justify-center text-white">
                     <Check className="w-4 h-4" />
                   </div>
                 )}
@@ -126,19 +130,19 @@ export function RinkFilterDrawer({
             );
           })}
         </div>
-        
+
         {/* Footer */}
-        <div className="p-4 border-t border-zinc-100 dark:border-zinc-800 flex gap-3 safe-area-bottom">
-            <button 
+        <div className="p-4 border-t border-pp-border flex gap-3 safe-area-bottom">
+            <button type="button"
                 onClick={handleReset}
-                className="flex items-center justify-center gap-2 px-5 py-4 rounded-xl font-bold bg-zinc-100 text-zinc-600 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700 transition"
+                className={`${buttonStyles({ variant: "secondary", size: "large" })} flex items-center justify-center gap-2`}
             >
                 <RefreshCw className="w-5 h-5" />
-                <span className="sr-only">Reset</span>
+                <span className="sr-only">{locale === "ko" ? "초기화" : "Reset"}</span>
             </button>
-            <button 
+            <button type="button"
                 onClick={handleApply}
-                className="flex-1 py-4 rounded-xl font-bold bg-blue-600 text-white hover:bg-blue-700 transition shadow-lg shadow-blue-600/20"
+                className={`${buttonStyles({ variant: "primary", size: "large" })} flex-1`}
             >
                 {locale === "ko" ? `${tempSelectedIds.length}개 적용하기` : `Apply (${tempSelectedIds.length})`}
             </button>

@@ -1,10 +1,13 @@
 "use client";
 
+import { buttonStyles } from "@/components/ui/styles";
+
+import type { Match } from "@/app/actions/match";
 import { useState } from "react";
 import { useLocale } from "next-intl";
 
 interface MatchShareButtonProps {
-  match: any; // Using any for simplicity with complex match objects
+  match: Pick<Match, "rink" | "start_time">;
 }
 
 export function MatchShareButton({ match }: MatchShareButtonProps) {
@@ -26,10 +29,10 @@ export function MatchShareButton({ match }: MatchShareButtonProps) {
       minute: "2-digit",
       timeZone: "Asia/Seoul",
     });
-    
+
     // Rink Name
     const rinkName = locale === "ko" ? match.rink?.name_ko : match.rink?.name_en || match.rink?.name_ko;
-    
+
     const title = locale === "ko" ? "[PowerPlay] 경기 모집" : "[PowerPlay] Match Invitation";
     let text = "";
     let toastMsg = "";
@@ -78,9 +81,9 @@ export function MatchShareButton({ match }: MatchShareButtonProps) {
 
   return (
     <div className="relative">
-      <button
+      <button type="button"
         onClick={handleShare}
-        className="p-2 text-zinc-500 hover:text-blue-600 hover:bg-blue-50 dark:text-zinc-400 dark:hover:text-blue-400 dark:hover:bg-blue-900/20 rounded-full transition"
+        className={`${buttonStyles({ variant: "primary", size: "compact" })} !rounded-full aspect-square`}
         title={locale === "ko" ? "공유하기" : "Share"}
       >
         <svg
