@@ -1,75 +1,42 @@
 ---
 name: ui-component-pattern
-description: Guide for creating consistent UI components in PowerPlay, including styling rules and reusable patterns.
+description: Author or refactor ordinary PowerPlay, Lounge and Youth UI using the shared native design system while preserving existing behavior and brand semantics.
 ---
 
-# UI Component Pattern Skill
+# Shared UI authoring
 
-This skill defines the visual language and component patterns for PowerPlay. Use this when creating new UI components or refactoring existing ones to ensure consistency.
+Read `docs/design-system.md`, the canonical guide, before changing ordinary user UI. Check `docs/design-system-routes.json` for source/runtime coverage and `scripts/ui-policy.json` for existing narrow exceptions. Preserve project-specific instructions in `AGENTS.md`.
 
-## 1. 🎨 Core Design Principles (P7 Polish)
+## Choose the existing layer
 
-Follow these rules strictly to maintain the "Premium & Consistent" look defined in `AGENTS.md`:
+- Use `@/components/ui` native primitives for new buttons, locale-aware link buttons, icon buttons, fields, surfaces, badges, chips, view switches and modal/sheet presentations.
+- Use pure recipes from `@/components/ui/styles` when an existing domain control must retain its element, event isolation or tracking behavior.
+- Keep authorization, votes, applications, payments, filter drafts, chat and provider behavior in domain components. No new UI dependencies or blanket element styling.
+- Do not import nonexistent `@/lib/utils` / `cn` or assume a `Dialog` engine exists. The real conditional helper is `uiClassNames`; modal/sheet primitives are presentation-only.
 
-- **Border Radius**: Always use `rounded-xl` for cards, inputs, and major containers. Avoid `rounded-lg` or mixed radii.
-- **Interactivity**: Add hover effects to clickable elements.
-    - Standard: `hover:border-blue-500 hover:shadow-md transition-all duration-200`
-- **Shadows**: Use `shadow-sm` for subtle depth, `shadow-md` for meaningful elevation (hover or modals).
-- **Colors**:
-    - Primary: Blue (`text-blue-600`, `bg-blue-600`) for actions.
-    - Neutral: Zinc (`text-zinc-500` for secondary text, `bg-zinc-100` for backgrounds).
-    - Danger: Red (`text-red-600`) for destructive actions.
+## Author the UI
 
-## 2. 📱 Responsive & Dark Mode
-
-PowerPlay is **Mobile-First**.
-
-- **Mobile First**: Write classes for mobile first (e.g., `flex-col`), then override for larger screens (e.g., `md:flex-row`).
-- **Dark Mode**: Every component MUST support dark mode.
-    - Backgrounds: `bg-white dark:bg-zinc-900`
-    - Text: `text-zinc-900 dark:text-zinc-100`
-    - Borders: `border-zinc-200 dark:border-zinc-800`
-
-## 3. 🧩 Component Structure
-
-Isolate UI logic into small, reusable components in `src/components/`.
+- Select documented variants/sizes/tones rather than redefining shared appearance in `className`; layout width, placement and visibility classes are allowed.
+- Keep existing PowerPlay blue/navy, Lounge gold plus category accents, Youth violet, provider branding and status/points/cheer meaning.
+- Use default 44px, compact 36px and large 56px controls. Existing club actions retain 46px height, 18px icons and one-line labels; reuse `club-detail-action-styles`.
+- Write `type="submit"` explicitly for submissions; `Button` defaults to `type="button"`. Preserve ref, native props, form wiring, ARIA and events. Icon-only actions require `IconButton`'s `label`.
+- Use `Field` with a stable `id`, label and optional help/error around one native/shared control. Preserve existing descriptions and validation logic.
+- Preserve correct links/buttons and keyboard semantics. Use `surfaceStyles` on actionable links rather than making a generic container interactive.
+- Keep i18n, OS light/dark and responsive behavior. Ordinary user copy describes user benefit.
 
 ```tsx
-"use client"; // Only if interactive
-import { useTranslations } from "next-intl";
-import { cn } from "@/lib/utils"; // Use cn for conditional classes
+import { Button, Field, Input } from "@/components/ui";
 
-interface Props {
-  className?: string;
-  title: string;
-}
-
-export function MyComponent({ className, title }: Props) {
-  const t = useTranslations("MyComponent");
-  
-  return (
-    <div className={cn(
-      "p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900",
-      "hover:shadow-md transition-shadow", // P7 Polish
-      className
-    )}>
-      <h3 className="font-bold text-lg">{title}</h3>
-    </div>
-  );
-}
+<Field id="nickname" label={t("nickname")} error={error || undefined}>
+  <Input name="nickname" autoComplete="nickname" required />
+</Field>
+<Button type="submit" loading={saving}>{t("save")}</Button>
 ```
 
-## 4. 🗺️ Common Patterns
+## Verify and maintain
 
-- **Cards**: Used for Matches, Rinks, Clubs. `rounded-xl`, `border`, `bg-white`.
-- **Lists**: Use `flex flex-col gap-4`.
-- **Forms**: Use `Label` + `Input` pattern. Inputs are `rounded-xl`.
-- **Modals**: Use existing `Dialog` or `Modal` primitives if available, or stick to `rounded-xl` panel centered on screen with backdrop blur.
+Update implementation, deterministic gallery example, meaningful regression test and canonical docs together when adding a variant. Add exact, justified semantic exceptions to policy; never except a whole page because runtime access is unavailable.
 
-## 5. ⚠️ Fonts & Icons
+Run `npm run ui:check`, `npm run ui:test`, `npm run ui:visual`, typecheck, relevant tests and build. Existing DOM tests require Node >=22.12; use the existing bundled runtime if needed. Inspect actual routes with `powerplay-ui-final-check`, including translations, mobile wrapping, console errors and unaffected admin/export output. Never perform a real vote, application, payment or chat read while testing.
 
-- **Font**: Pretendard (via `var(--font-pretendard)`).
-- **Icons**: Lucide React. Import from `lucide-react`.
-    - E.g., `import { Calendar, MapPin } from "lucide-react";`
-
-Remember: **Consistency > Creativity** for basic UI elements.
+Record source migration and runtime evidence separately. Compare existing failures by their identities in `docs/design-system-baseline.json`, not by counts. Include before/after screenshots and honest authenticated coverage gaps in the PR.

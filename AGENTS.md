@@ -886,3 +886,13 @@ UPDATE profiles SET role = 'superuser' WHERE email = 'your-email@example.com';
   - Updated public Lounge cards/detail components to show region text and embed compact maps in detail views
   - Updated `.agent/implementation/premium-showcase-hub.md` with the new SQL dependency and location scope
 - **Next Steps**: Apply `sql/v35_lounge_location_maps.sql`, then tune public location UX density and consider nearby/location-based filtering.
+
+<!-- POWERPLAY-DESIGN-SYSTEM:START -->
+## Shared user UI
+
+- Follow `docs/design-system.md` for ordinary user UI; use `src/components/ui` primitives or recipes before adding local appearance rules.
+- Preserve domain behavior, locale-aware navigation, provider/category/status colors and the approved club-action sizing. Use `className` for layout, not shared-control appearance overrides.
+- Scope themes explicitly, including outside-public routes and global overlays; keep admin, SEO and exported artwork isolated. Ordinary controls around artwork remain in scope.
+- Update component, fixture gallery, regression test and documentation together for new variants. Record narrow exceptions with a reason in `scripts/ui-policy.json`.
+- Run `ui:check`, `ui:test`, `ui:visual` and the existing PowerPlay UI final check. Keep source migration and runtime verification distinct in `docs/design-system-routes.json`; unresolved work is never a design exception.
+<!-- POWERPLAY-DESIGN-SYSTEM:END -->
