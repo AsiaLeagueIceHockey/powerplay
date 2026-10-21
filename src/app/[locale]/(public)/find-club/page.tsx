@@ -57,11 +57,11 @@ export default async function FindClubPage({
     <div className="container mx-auto px-4 py-8 max-w-2xl">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="inline-flex items-center gap-2 text-xl font-bold tracking-tight text-zinc-900 dark:text-white">
+        <h1 className="inline-flex items-center gap-2 text-xl font-bold tracking-tight text-pp-text dark:text-white">
           {locale === "ko" ? "나에게 맞는 하키클럽 찾기" : "Find Your Hockey Club"}
           <span className="text-xl">🏒</span>
         </h1>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1.5">
+        <p className="text-sm text-pp-muted mt-1.5">
           {locale === "ko"
             ? "3가지 질문으로 딱 맞는 클럽을 추천해드려요"
             : "Get personalized recommendations with 3 simple questions"}

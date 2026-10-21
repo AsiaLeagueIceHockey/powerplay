@@ -1,13 +1,14 @@
 "use client";
 
+import { buttonStyles } from "@/components/ui/styles";
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { UserPlus, Check, UserMinus } from "lucide-react";
+import { UserPlus, UserMinus } from "lucide-react";
 
 import { subscribeToClubNews, unsubscribeFromClubNews } from "@/app/actions/clubs";
 import {
-  clubDetailActionButtonClass,
   clubDetailActionIconClass,
   clubDetailActionLabelClass,
 } from "@/components/club-detail-action-styles";
@@ -91,11 +92,7 @@ export function ClubSubscribeButton({
       type="button"
       onClick={handleToggle}
       disabled={isSubmitting}
-      className={`${clubDetailActionButtonClass} border transition-all ${
-        subscribed
-          ? "border-red-200 bg-red-50 text-red-600 hover:border-red-300 hover:bg-red-100 dark:border-red-900/50 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/40"
-          : "border-zinc-200 bg-white text-zinc-900 hover:border-zinc-300 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white dark:hover:border-zinc-600 dark:hover:bg-zinc-800"
-      } ${className}`}
+      className={`${buttonStyles({ variant: subscribed ? "danger" : "outline", size: "club" })} ${className}`}
     >
       {isSubmitting ? (
         <span className="w-5 h-5 block opacity-50" />
@@ -104,7 +101,7 @@ export function ClubSubscribeButton({
       ) : (
         <UserPlus
           strokeWidth={2.25}
-          className={`${clubDetailActionIconClass} text-zinc-900 dark:text-white`}
+          className={`${clubDetailActionIconClass} text-pp-text dark:text-white`}
         />
       )}
       <span className={clubDetailActionLabelClass}>

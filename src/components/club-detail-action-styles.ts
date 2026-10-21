@@ -1,9 +1,6 @@
-// Shared mobile-safe action button styles for club detail pages.
-// Icon + label must always stay on one line. If width gets tight, truncate instead of wrapping.
+import { buttonStyles, clubActionIconClass, actionLabelClass } from "@/components/ui/styles";
 
-export const clubDetailActionButtonClass =
-  "flex min-w-0 w-full h-[46px] items-center justify-center gap-1.5 whitespace-nowrap rounded-xl px-3 text-[13px] font-bold leading-none tracking-[-0.01em] sm:px-4";
-
-export const clubDetailActionIconClass = "h-[18px] w-[18px] shrink-0";
-
-export const clubDetailActionLabelClass = "min-w-0 truncate whitespace-nowrap";
+// One-line 46px domain actions; variants are chosen by the owning control.
+export const clubDetailActionButtonClass = buttonStyles({ size: "club", fullWidth: true });
+export const clubDetailActionIconClass = clubActionIconClass;
+export const clubDetailActionLabelClass = actionLabelClass;

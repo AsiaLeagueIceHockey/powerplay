@@ -1,5 +1,7 @@
 "use client";
 
+import { buttonStyles } from "@/components/ui/styles";
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale } from "next-intl";
@@ -7,7 +9,6 @@ import { Heart } from "lucide-react";
 
 import { castClubVote } from "@/app/actions/clubs";
 import {
-  clubDetailActionButtonClass,
   clubDetailActionIconClass,
   clubDetailActionLabelClass,
 } from "@/components/club-detail-action-styles";
@@ -71,15 +72,11 @@ export function ClubVoteButton({
       type="button"
       onClick={handleVote}
       disabled={didVoteToday || isSubmitting}
-      className={`${clubDetailActionButtonClass} transition-all ${
-        didVoteToday || isSubmitting
-          ? "bg-zinc-100 text-zinc-400 dark:bg-zinc-800 dark:text-zinc-500"
-          : "bg-rose-100 text-zinc-900 hover:bg-rose-200"
-      } ${className}`}
+      className={`${buttonStyles({ variant: didVoteToday || isSubmitting ? "secondary" : "cheer", size: "club" })} ${className}`}
     >
       <Heart
         className={`${clubDetailActionIconClass} ${
-          didVoteToday || isSubmitting ? "" : "fill-rose-500 text-rose-500"
+          didVoteToday || isSubmitting ? "" : "fill-current"
         }`}
       />
       <span className={clubDetailActionLabelClass}>

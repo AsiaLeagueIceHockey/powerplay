@@ -1,3 +1,5 @@
+
+import { badgeStyles, buttonStyles, surfaceStyles } from "@/components/ui/styles";
 import { getPublicClubById, getPublicClubIds, getPublicClubNotices } from "@/lib/public-clubs";
 import { getMyClubVoteSummary, isClubMember } from "@/app/actions/clubs";
 import { getTranslations, setRequestLocale } from "next-intl/server";
@@ -9,7 +11,6 @@ import { ClubShareButton } from "@/components/club-share-button";
 import { LinkifiedText } from "@/components/linkified-text";
 import { StartChatButton } from "@/components/start-chat-button";
 import {
-  clubDetailActionButtonClass,
   clubDetailActionIconClass,
   clubDetailActionLabelClass,
 } from "@/components/club-detail-action-styles";
@@ -100,41 +101,41 @@ export default async function ClubDetailPage({
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
         <div className="flex items-start gap-4 min-w-0">
           {/* Club Logo */}
-          <div className="w-16 h-16 rounded-2xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center overflow-hidden shrink-0 border border-zinc-200 dark:border-zinc-700 shadow-sm">
+          <div className="w-16 h-16 rounded-2xl bg-pp-surface-muted flex items-center justify-center overflow-hidden shrink-0 border border-pp-border shadow-sm">
             {club.logo_url ? (
-              <Image 
-                src={club.logo_url} 
-                alt={club.name} 
+              <Image
+                src={club.logo_url}
+                alt={club.name}
                 width={64}
                 height={64}
                 className="w-full h-full object-cover"
               />
             ) : (
-              <Building2 className="w-8 h-8 text-zinc-400" />
+              <Building2 className="w-8 h-8 text-pp-muted" />
             )}
           </div>
-          
+
           {/* Club Name & Badges */}
           <div className="flex flex-col gap-1.5 min-w-0">
-            <h1 className="text-2xl font-black tracking-tight text-zinc-900 break-words dark:text-white">
+            <h1 className="text-2xl font-black tracking-tight text-pp-text break-words dark:text-white">
               {club.name}
             </h1>
             <div className="flex flex-wrap items-center gap-2 mt-0.5">
               {club.member_count !== undefined && (
-                <span className="inline-flex items-center text-xs font-medium text-zinc-500 bg-zinc-100 dark:bg-zinc-800 px-2.5 py-1 rounded-full shrink-0">
+                <span className={`${badgeStyles({ tone: "neutral" })} inline-flex items-center shrink-0`}>
                   <Users className="w-3.5 h-3.5 mr-1" />
                   {club.member_count} {locale === "ko" ? "명" : "Members"}
                 </span>
               )}
               {club.monthly_rank && (club.monthly_vote_count ?? 0) > 0 ? (
-                <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700 ring-1 ring-amber-200 dark:bg-amber-950/30 dark:text-amber-300 dark:ring-amber-900 shrink-0">
+                <span className={`${badgeStyles({ tone: "warning" })} inline-flex items-center gap-1 shrink-0`}>
                   <Medal className="h-3.5 w-3.5" />
                   {locale === "ko"
                     ? `${club.monthly_rank_tied ? "공동 " : ""}${club.monthly_rank}위`
                     : `${club.monthly_rank_tied ? "T-" : "#"}${club.monthly_rank}`}
                 </span>
               ) : null}
-              <span className="inline-flex items-center gap-1 rounded-full bg-rose-50 px-2.5 py-1 text-xs font-semibold text-rose-600 ring-1 ring-rose-200 dark:bg-rose-950/30 dark:text-rose-300 dark:ring-rose-900 shrink-0">
+              <span className={`${badgeStyles({ tone: "cheer" })} inline-flex items-center gap-1 shrink-0`}>
                 <Heart className="h-3.5 w-3.5 fill-current" />
                 {locale === "ko"
                   ? `이번 달 응원 ${(club.monthly_vote_count ?? 0).toLocaleString()}표`
@@ -148,7 +149,7 @@ export default async function ClubDetailPage({
         <div className="flex shrink-0 self-end items-center gap-1 sm:self-auto">
           <Link
             href={`/${locale}/clubs/${club.id}/card`}
-            className="p-2.5 text-zinc-500 hover:text-blue-600 hover:bg-blue-50 dark:text-zinc-400 dark:hover:text-blue-400 dark:hover:bg-blue-900/20 rounded-full transition-colors flex items-center justify-center"
+            className={`${buttonStyles({ variant: "primary", size: "compact" })} flex items-center justify-center`}
             title={t("card.view", { fallback: "카드 보기" })}
           >
             <CreditCard className="w-5 h-5" />
@@ -157,18 +158,18 @@ export default async function ClubDetailPage({
         </div>
       </div>
 
-      <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 mb-8 shadow-sm">
+      <div className={`${surfaceStyles({ interactive: false, density: "default" })} mb-8`}>
         <div className="flex flex-col gap-6">
 
           {/* Middle Row: Description */}
-          <p className="text-zinc-600 dark:text-zinc-400 whitespace-pre-wrap leading-relaxed">
+          <p className="text-pp-muted whitespace-pre-wrap leading-relaxed">
             {club.description || (locale === "ko" ? "소개글이 없습니다." : "No description.")}
           </p>
 
           {/* Main Rinks */}
           {club.rinks && club.rinks.length > 0 && (
              <div className="flex flex-col gap-2 mt-2">
-                 <h4 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                 <h4 className="text-sm font-semibold text-pp-text ">
                     {locale === "ko" ? "주 이용 링크장" : "Main Rinks"}
                  </h4>
                  <div className="flex flex-wrap gap-2">
@@ -181,11 +182,11 @@ export default async function ClubDetailPage({
                                 href={naverMapUrl}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="flex flex-col gap-1 text-sm px-3 py-2 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors group"
+                                className={`${buttonStyles({ variant: "outline", size: "compact" })} flex flex-col gap-1 group`}
                             >
-                                <span className="font-medium group-hover:text-blue-600 dark:group-hover:text-blue-400">{locale === "ko" ? rink.name_ko : rink.name_en}</span>
+                                <span className="font-medium group-hover:text-pp-accent-text ">{locale === "ko" ? rink.name_ko : rink.name_en}</span>
                                 {region && (
-                                    <span className="flex items-center gap-1 text-xs text-zinc-400 dark:text-zinc-500">
+                                    <span className="flex items-center gap-1 text-xs text-pp-muted ">
                                         <MapPin className="w-3 h-3 shrink-0" />
                                         {region}
                                     </span>
@@ -213,7 +214,7 @@ export default async function ClubDetailPage({
                    href={club.kakao_open_chat_url}
                    target="_blank"
                    rel="noreferrer"
-                   className={`${clubDetailActionButtonClass} bg-[#FAE100] text-[#371D1E] transition-colors hover:bg-[#FCE620]`}
+                   className={`${buttonStyles({ variant: "kakao", size: "club", fullWidth: true })}`}
                  >
                    <MessageCircle className={`${clubDetailActionIconClass} fill-current`} />
                    <span className={clubDetailActionLabelClass}>
@@ -236,7 +237,7 @@ export default async function ClubDetailPage({
                  <StartChatButton
                    targetUserId={club.created_by}
                    label={locale === "ko" ? "동호회 문의하기" : "Contact Club"}
-                   className={`${clubDetailActionButtonClass} bg-[#1e3a6e] text-white hover:bg-[#162d58] dark:bg-[#1e3a6e] dark:hover:bg-[#162d58]`}
+                   variant="navy" size="club" className="w-full"
                    origin={{
                      type: "club",
                      id: club.id,
@@ -255,34 +256,34 @@ export default async function ClubDetailPage({
       <div className="space-y-6">
         <h2 className="text-2xl font-bold flex items-center gap-2">
           {locale === "ko" ? "공지사항" : "Notices"}
-          <span className="text-sm font-normal text-zinc-500 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-full">
+          <span className={`${badgeStyles({ tone: "neutral" })} `}>
             {notices.length}
           </span>
         </h2>
 
         {notices.length === 0 ? (
-          <div className="text-center py-12 bg-zinc-50 dark:bg-zinc-900 rounded-xl border border-zinc-100 dark:border-zinc-800">
-            <p className="text-zinc-500">{locale === "ko" ? "등록된 공지사항이 없습니다." : "No notices yet."}</p>
+          <div className={`${surfaceStyles({ interactive: false, density: "none" })} text-center `}>
+            <p className="text-pp-muted">{locale === "ko" ? "등록된 공지사항이 없습니다." : "No notices yet."}</p>
           </div>
         ) : (
           <div className="grid gap-4">
             {notices.map((notice) => (
-              <div 
-                key={notice.id} 
-                className="bg-white dark:bg-zinc-900 p-5 rounded-xl border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 transition-colors"
+              <div
+                key={notice.id}
+                className={surfaceStyles({ interactive: true, density: "default" })}
               >
                 <div className="flex justify-between items-start mb-2">
-                  <h3 className="text-lg font-bold text-zinc-900 dark:text-white">
+                  <h3 className="text-lg font-bold text-pp-text dark:text-white">
                     {notice.title}
                   </h3>
-                  <span className="text-xs text-zinc-500 flex items-center gap-1 shrink-0">
+                  <span className="text-xs text-pp-muted flex items-center gap-1 shrink-0">
                     <Calendar className="w-3 h-3" />
                     {new Date(notice.created_at).toLocaleDateString(locale === "ko" ? "ko-KR" : "en-US", {
                        year: 'numeric', month: 'long', day: 'numeric'
                     })}
                   </span>
                 </div>
-                <p className="text-zinc-600 dark:text-zinc-400 whitespace-pre-wrap text-sm leading-relaxed">
+                <p className="text-pp-muted whitespace-pre-wrap text-sm leading-relaxed">
                   <LinkifiedText text={notice.content} />
                 </p>
               </div>

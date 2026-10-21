@@ -1,5 +1,7 @@
 "use client";
 
+import { buttonStyles } from "@/components/ui/styles";
+
 import { useState } from "react";
 import { useLocale } from "next-intl";
 
@@ -83,13 +85,9 @@ ${matchUrl}`;
 
   return (
     <div className="flex flex-wrap gap-2">
-      <button
+      <button type="button"
         onClick={() => copyToClipboard("kakao")}
-        className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-          copied === "kakao"
-            ? "bg-green-100 text-green-800"
-            : "bg-yellow-400 text-yellow-900 hover:bg-yellow-500"
-        }`}
+        className={`${buttonStyles({ variant: copied === "kakao" ? "success" : "kakao", size: "default" })} flex items-center gap-2 `}
       >
         {copied === "kakao" ? (
           <>✓ {locale === "ko" ? "복사됨!" : "Copied!"}</>
@@ -98,13 +96,9 @@ ${matchUrl}`;
         )}
       </button>
 
-      <button
+      <button type="button"
         onClick={() => copyToClipboard("global")}
-        className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-          copied === "global"
-            ? "bg-green-100 text-green-800"
-            : "bg-blue-600 text-white hover:bg-blue-700"
-        }`}
+        className={`${buttonStyles({ variant: copied === "global" ? "success" : "primary", size: "default" })} flex items-center gap-2 `}
       >
         {copied === "global" ? (
           <>✓ {locale === "ko" ? "복사됨!" : "Copied!"}</>

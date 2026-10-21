@@ -1,4 +1,5 @@
 "use client";
+import { buttonStyles, filterChipStyles } from "@/components/ui/styles";
 
 import React, { useRef, useState } from "react";
 import { toPng } from "html-to-image";
@@ -366,26 +367,26 @@ export function CardNewsStudio() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 p-6 md:p-10">
+    <div data-ui-mode="dark" className="pp-ui min-h-screen bg-pp-background text-pp-text p-6 md:p-10">
       {/* Header */}
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 pb-6 border-b border-zinc-800">
+      <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 pb-6 border-b border-pp-border">
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-semibold mb-2">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-pp-accent/10 border border-pp-accent/20 text-pp-accent-text text-xs font-semibold mb-2">
             <Sparkles className="w-3.5 h-3.5" />
             인스타 마케팅 스튜디오 v17 (100% Authentic PowerPlay UI Replicas & Rules Compliance)
           </div>
           <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-white">
             파워플레이 SNS 카드뉴스 공식 스튜디오
           </h1>
-          <p className="text-sm text-zinc-400 mt-1">
+          <p className="text-sm text-pp-muted mt-1">
             실제 파워플레이 UI(소속팀 등록, 응원 투표, 게스트 참가 신청) 100% 반영 및 1:1 WYSIWYG 보증.
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <button
+          <button type="button"
             onClick={handleDownloadAll}
             disabled={downloadAllProgress}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold shadow-lg shadow-blue-500/20 transition disabled:opacity-50 cursor-pointer whitespace-nowrap"
+            className={buttonStyles({ variant: "primary", size: "large" })}
           >
             <Download className="w-4 h-4 animate-bounce" />
             {downloadAllProgress ? "전체 다운로드 중..." : "전체 슬라이드 PNG로 저장 (5장)"}
@@ -395,69 +396,51 @@ export function CardNewsStudio() {
 
       {/* Series Selection Tabs (6 Distinct Theme Colors) */}
       <div className="max-w-7xl mx-auto mb-8">
-        <div className="flex flex-wrap items-center gap-3 p-1.5 rounded-2xl bg-zinc-900 border border-zinc-800 w-fit">
-          <button
+        <div className="flex flex-wrap items-center gap-3 p-1.5 rounded-2xl bg-zinc-900 border border-pp-border w-fit">
+          <button type="button"
             onClick={() => setActiveTab("series-1")}
-            className={`flex items-center gap-2 px-4.5 py-3 rounded-xl font-bold text-xs md:text-sm transition cursor-pointer ${
-              activeTab === "series-1"
-                ? "bg-[#E8FF00] text-black shadow-md"
-                : "text-zinc-400 hover:text-white hover:bg-zinc-800/50"
-            }`}
+            aria-pressed={activeTab === "series-1"}
+            className={filterChipStyles({ selected: activeTab === "series-1" })}
           >
             <Zap className="w-4 h-4" />
             <span>Series 1: 운영진 구원 (일정 복사·운영진 승격)</span>
           </button>
-          <button
+          <button type="button"
             onClick={() => setActiveTab("series-2")}
-            className={`flex items-center gap-2 px-4.5 py-3 rounded-xl font-bold text-xs md:text-sm transition cursor-pointer ${
-              activeTab === "series-2"
-                ? "bg-[#00FFCC] text-black shadow-md"
-                : "text-zinc-400 hover:text-white hover:bg-zinc-800/50"
-            }`}
+            aria-pressed={activeTab === "series-2"}
+            className={filterChipStyles({ selected: activeTab === "series-2" })}
           >
             <Users className="w-4 h-4" />
             <span>Series 2: 플레이어 필수 (소속팀 등록·게스트 신청)</span>
           </button>
-          <button
+          <button type="button"
             onClick={() => setActiveTab("series-3")}
-            className={`flex items-center gap-2 px-4.5 py-3 rounded-xl font-bold text-xs md:text-sm transition cursor-pointer ${
-              activeTab === "series-3"
-                ? "bg-[#FF007F] text-white shadow-md"
-                : "text-zinc-400 hover:text-white hover:bg-zinc-800/50"
-            }`}
+            aria-pressed={activeTab === "series-3"}
+            className={filterChipStyles({ selected: activeTab === "series-3" })}
           >
             <Smile className="w-4 h-4" />
             <span>Series 3: 하키 재미요소 (AI 캐릭터·하키 운세)</span>
           </button>
-          <button
+          <button type="button"
             onClick={() => setActiveTab("series-4")}
-            className={`flex items-center gap-2 px-4.5 py-3 rounded-xl font-bold text-xs md:text-sm transition cursor-pointer ${
-              activeTab === "series-4"
-                ? "bg-[#0066FF] text-white shadow-md"
-                : "text-zinc-400 hover:text-white hover:bg-zinc-800/50"
-            }`}
+            aria-pressed={activeTab === "series-4"}
+            className={filterChipStyles({ selected: activeTab === "series-4" })}
           >
             <MapPin className="w-4 h-4" />
             <span>Series 4: 전국 아이스링크 (지도·대관 TO)</span>
           </button>
-          <button
+          <button type="button"
             onClick={() => setActiveTab("series-5")}
-            className={`flex items-center gap-2 px-4.5 py-3 rounded-xl font-bold text-xs md:text-sm transition cursor-pointer ${
-              activeTab === "series-5"
-                ? "bg-[#FEE500] text-black shadow-md"
-                : "text-zinc-400 hover:text-white hover:bg-zinc-800/50"
-            }`}
+            aria-pressed={activeTab === "series-5"}
+            className={filterChipStyles({ selected: activeTab === "series-5" })}
           >
             <Share2 className="w-4 h-4" />
             <span>Series 5: 카톡 공유 (원링크 상황판)</span>
           </button>
-          <button
+          <button type="button"
             onClick={() => setActiveTab("series-6")}
-            className={`flex items-center gap-2 px-4.5 py-3 rounded-xl font-bold text-xs md:text-sm transition cursor-pointer ${
-              activeTab === "series-6"
-                ? "bg-[#F59E0B] text-white shadow-md"
-                : "text-zinc-400 hover:text-white hover:bg-zinc-800/50"
-            }`}
+            aria-pressed={activeTab === "series-6"}
+            className={filterChipStyles({ selected: activeTab === "series-6" })}
           >
             <Trophy className="w-4 h-4" />
             <span>Series 6: 유소년 하키 (하키맘·대디 커뮤니티)</span>
@@ -467,15 +450,15 @@ export function CardNewsStudio() {
 
       {/* Success Notification */}
       {successMsg && (
-        <div className="max-w-7xl mx-auto mb-6 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center gap-2 font-medium animate-fade-in shadow-lg">
-          <Check className="w-5 h-5 text-emerald-400 flex-shrink-0" />
+        <div className="max-w-7xl mx-auto mb-6 p-4 rounded-xl bg-pp-success/10 border border-pp-success-border/30 text-pp-success-text flex items-center gap-2 font-medium animate-fade-in shadow-lg">
+          <Check className="w-5 h-5 text-pp-success-text flex-shrink-0" />
           <span>{successMsg}</span>
         </div>
       )}
 
       {/* Automated Instagram Post Copy Section */}
-      <div className="max-w-7xl mx-auto mb-10 p-6 rounded-2xl bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-950 border border-zinc-700/80 shadow-xl">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 pb-4 border-b border-zinc-800">
+      <div className="max-w-7xl mx-auto mb-10 p-6 rounded-2xl bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-950 border border-pp-border/80 shadow-xl">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 pb-4 border-b border-pp-border">
           <div>
             <div className="flex items-center gap-3 mb-1">
               <span className={`text-xs font-black uppercase tracking-wider px-2 py-0.5 rounded ${
@@ -493,13 +476,13 @@ export function CardNewsStudio() {
               }`}>
                 {currentCaption.theme}
               </span>
-              <span className="text-xs text-zinc-400 font-semibold">{currentCaption.target}</span>
+              <span className="text-xs text-pp-muted font-semibold">{currentCaption.target}</span>
             </div>
             <h3 className="text-lg md:text-xl font-black text-white mt-1">{currentCaption.title}</h3>
           </div>
-          <button
+          <button type="button"
             onClick={handleCopyCaption}
-            className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs md:text-sm border border-white/15 transition cursor-pointer whitespace-nowrap shadow-md"
+            className={buttonStyles({ variant: "outline", size: "compact" })}
           >
             <Copy className={`w-4 h-4 ${
               activeTab === "series-1"
@@ -518,10 +501,10 @@ export function CardNewsStudio() {
           </button>
         </div>
         <div className="relative">
-          <pre className="p-4 rounded-xl bg-black/60 border border-zinc-800 text-zinc-300 font-sans text-xs md:text-sm leading-relaxed whitespace-pre-wrap max-h-48 overflow-y-auto selection:bg-[#E8FF00] selection:text-black">
+          <pre className="p-4 rounded-xl bg-black/60 border border-pp-border text-pp-muted font-sans text-xs md:text-sm leading-relaxed whitespace-pre-wrap max-h-48 overflow-y-auto selection:bg-[#E8FF00] selection:text-black">
             {currentCaption.text}
           </pre>
-          <div className="absolute right-3 bottom-3 text-[11px] text-zinc-500 bg-black/80 px-2 py-1 rounded border border-zinc-800">
+          <div className="absolute right-3 bottom-3 text-[11px] text-pp-muted bg-black/80 px-2 py-1 rounded border border-pp-border">
             ✅ 해시태그 5개 제한 준수 완료
           </div>
         </div>
@@ -531,12 +514,12 @@ export function CardNewsStudio() {
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {currentSlides.map((slide, idx) => (
           <div key={slide.id} className="flex flex-col gap-3">
-            <div className="flex items-center justify-between text-sm text-zinc-400 font-medium px-1">
-              <span className="font-bold text-zinc-300">Slide #{idx + 1}</span>
-              <button
+            <div className="flex items-center justify-between text-sm text-pp-muted font-medium px-1">
+              <span className="font-bold text-pp-muted">Slide #{idx + 1}</span>
+              <button type="button"
                 onClick={() => handleDownloadSingle(idx)}
                 disabled={downloadingIndex === idx}
-                className="flex items-center gap-1.5 text-xs text-blue-400 hover:text-blue-300 font-semibold transition cursor-pointer disabled:opacity-50"
+                className={buttonStyles({ variant: "primary", size: "large" })}
               >
                 <Download className="w-3.5 h-3.5" />
                 {downloadingIndex === idx ? "저장 중..." : "이 슬라이드만 저장"}
@@ -544,7 +527,7 @@ export function CardNewsStudio() {
             </div>
 
             {/* 1080x1080 Aspect Square Container */}
-            <div
+            <div data-ui-artwork="export-canvas"
               ref={(el) => { slideRefs.current[idx] = el; }}
               className={`w-full aspect-square relative overflow-hidden rounded-2xl ${slide.bgColor} ${
                 activeTab === "series-4" || activeTab === "series-6"
@@ -929,7 +912,7 @@ export function CardNewsStudio() {
                             <ChevronRight className="h-4 w-4" />
                           </div>
                         </div>
-                        
+
                         <div className="flex items-center gap-3 pt-0.5">
                           <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-xl border border-sky-900/60 bg-zinc-900/90 shadow-inner overflow-hidden">
                             <TamagotchiAvatar
@@ -1034,7 +1017,7 @@ export function CardNewsStudio() {
                       {/* 100% Authentic Player Card Replica (Left-Right Side-by-Side Layout) */}
                       <div className="p-3 rounded-[18px] bg-gradient-to-br from-[#18181b] to-[#09090b] border border-zinc-700 shadow-2xl flex flex-col gap-1.5 w-full shrink-0 relative overflow-hidden my-0.5">
                         <div className="absolute top-0 right-0 w-28 h-28 bg-blue-500/10 rounded-full blur-xl pointer-events-none -mr-6 -mt-6" />
-                        
+
                         <div className="flex justify-between items-center z-10 w-full border-b border-white/10 pb-1.5">
                           <div className="flex items-center gap-1.5 bg-white/5 backdrop-blur-sm rounded-md pr-2 pl-1.5 py-0.5 border border-white/10">
                             <img src="/favicon.png" alt="PowerPlay" className="w-3.5 h-3.5 object-contain rounded-sm bg-white/10" />
@@ -1054,8 +1037,8 @@ export function CardNewsStudio() {
                             </h3>
                           </div>
                           <div className="relative flex-shrink-0 drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]">
-                            <img 
-                              src="/player.svg" 
+                            <img
+                              src="/player.svg"
                               alt="Player Graphic"
                               className="w-16 h-16 md:w-20 md:h-20 object-contain brightness-0 invert opacity-90"
                             />

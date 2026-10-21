@@ -1,5 +1,7 @@
 "use client";
 
+import { buttonStyles } from "@/components/ui/styles";
+
 import { Club } from "@/app/actions/types";
 import { joinClub } from "@/app/actions/clubs";
 import { useState } from "react";
@@ -42,14 +44,10 @@ export function JoinClubButton({ club, initialIsMember, className }: JoinClubBut
   };
 
   return (
-    <button
+    <button type="button"
       onClick={handleJoin}
       disabled={isMember || loading}
-      className={`px-6 py-2 rounded-lg font-medium transition-colors ${
-        isMember 
-          ? "bg-zinc-100 text-zinc-400 cursor-default" 
-          : "bg-blue-600 text-white hover:bg-blue-700 shadow-sm"
-      } ${className || ""}`}
+      className={`${buttonStyles({ variant: isMember ? "secondary" : "primary", size: "default" })} ${className || ""}`}
     >
       {loading
         ? "..."

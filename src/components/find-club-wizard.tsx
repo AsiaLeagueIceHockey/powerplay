@@ -1,5 +1,7 @@
 "use client";
 
+import { badgeStyles, buttonStyles, filterChipStyles, surfaceStyles } from "@/components/ui/styles";
+
 import { useState, useTransition } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "next/navigation";
@@ -34,6 +36,58 @@ interface FindClubWizardProps {
 }
 
 type Step = 1 | 2 | 3 | "result";
+
+function OptionCard({
+    selected,
+    onClick,
+    icon,
+    label,
+    desc,
+  }: {
+    selected: boolean;
+    onClick: () => void;
+    icon: React.ReactNode;
+    label: string;
+    desc: string;
+  }) {
+    return (
+      <button type="button"
+        onClick={onClick}
+        className={`${filterChipStyles({ selected, shape: "row" })} w-full flex items-center gap-4 text-left`}
+      >
+        <div
+          className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${
+            selected
+              ? "bg-pp-accent text-white"
+              : "bg-pp-surface-muted text-pp-muted"
+          }`}
+        >
+          {icon}
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className={`font-bold text-base ${selected ? "text-pp-accent-text " : "text-pp-text dark:text-white"}`}>
+            {label}
+          </p>
+          <p className="text-sm text-pp-muted mt-0.5">
+            {desc}
+          </p>
+        </div>
+        <div
+          className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${
+            selected
+              ? "border-pp-accent bg-pp-accent"
+              : "border-pp-border "
+          }`}
+        >
+          {selected && (
+            <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+            </svg>
+          )}
+        </div>
+      </button>
+    );
+  }
 
 export function FindClubWizard({ regions }: FindClubWizardProps) {
   const t = useTranslations("findClub");
@@ -119,66 +173,10 @@ export function FindClubWizard({ regions }: FindClubWizardProps) {
   // ============================================
   // Option card component
   // ============================================
-  function OptionCard({
-    selected,
-    onClick,
-    icon,
-    label,
-    desc,
-  }: {
-    selected: boolean;
-    onClick: () => void;
-    icon: React.ReactNode;
-    label: string;
-    desc: string;
-  }) {
-    return (
-      <button
-        onClick={onClick}
-        className={`w-full flex items-center gap-4 p-5 rounded-2xl border-2 transition-all duration-200 text-left ${
-          selected
-            ? "border-blue-500 bg-blue-50 dark:bg-blue-950/30 shadow-md scale-[1.02]"
-            : "border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:border-blue-300 hover:shadow-sm"
-        }`}
-      >
-        <div
-          className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${
-            selected
-              ? "bg-blue-600 text-white"
-              : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500"
-          }`}
-        >
-          {icon}
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className={`font-bold text-base ${selected ? "text-blue-700 dark:text-blue-300" : "text-zinc-900 dark:text-white"}`}>
-            {label}
-          </p>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
-            {desc}
-          </p>
-        </div>
-        <div
-          className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${
-            selected
-              ? "border-blue-500 bg-blue-500"
-              : "border-zinc-300 dark:border-zinc-600"
-          }`}
-        >
-          {selected && (
-            <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-            </svg>
-          )}
-        </div>
-      </button>
-    );
-  }
-
   // ============================================
   // Region grid
   // ============================================
-  function RegionGrid() {
+  function renderRegionGrid() {
     const toggleRegion = (r: string) => {
       setSelectedRegions((prev) =>
         prev.includes(r) ? prev.filter((x) => x !== r) : [...prev, r]
@@ -187,20 +185,16 @@ export function FindClubWizard({ regions }: FindClubWizardProps) {
 
     return (
       <>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-3 flex items-center gap-1.5">
+        <p className="text-sm text-pp-muted mb-3 flex items-center gap-1.5">
           <MapPin className="w-4 h-4 shrink-0" />
           {t("q2.hint")}
         </p>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
           {regions.map((r) => (
-            <button
+            <button type="button"
               key={r}
               onClick={() => toggleRegion(r)}
-              className={`p-3 rounded-xl border-2 text-center font-medium text-xs sm:text-sm transition-all truncate ${
-                selectedRegions.includes(r)
-                  ? "border-blue-500 bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300"
-                  : "border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 hover:border-blue-300"
-              }`}
+              className={`${filterChipStyles({ selected: selectedRegions.includes(r), shape: "row" })} text-center truncate`}
             >
               {r}
             </button>
@@ -213,7 +207,7 @@ export function FindClubWizard({ regions }: FindClubWizardProps) {
   // ============================================
   // Result card
   // ============================================
-  function ResultCard({ club }: { club: RecommendedClub }) {
+  function renderResultCard({ club }: { club: RecommendedClub }) {
     const detailHref = club.type === "business"
       ? `/lounge/${club.slug}`
       : `/clubs/${club.id}`;
@@ -221,11 +215,11 @@ export function FindClubWizard({ regions }: FindClubWizardProps) {
     return (
       <Link
         href={detailHref}
-        className="block bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-4 shadow-sm hover:shadow-md hover:border-zinc-300 dark:hover:border-zinc-600 transition-all duration-200"
+        className={`${surfaceStyles({ interactive: true, density: "compact" })} block`}
       >
         <div className="flex items-center gap-3">
           {/* Logo */}
-          <div className="w-12 h-12 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center overflow-hidden shrink-0 border border-zinc-200 dark:border-zinc-700">
+          <div className="w-12 h-12 rounded-xl bg-pp-surface-muted flex items-center justify-center overflow-hidden shrink-0 border border-pp-border ">
             {club.logoUrl ? (
               <Image
                 src={club.logoUrl}
@@ -235,17 +229,17 @@ export function FindClubWizard({ regions }: FindClubWizardProps) {
                 className="w-full h-full object-cover"
               />
             ) : (
-              <Building2 className="w-5 h-5 text-zinc-400" />
+              <Building2 className="w-5 h-5 text-pp-muted" />
             )}
           </div>
 
           {/* Info */}
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-sm text-zinc-900 dark:text-white truncate">
+            <h3 className="font-semibold text-sm text-pp-text dark:text-white truncate">
               {club.name}
             </h3>
             {club.regionLabel && (
-              <p className="text-xs text-zinc-400 flex items-center gap-1 mt-0.5">
+              <p className="text-xs text-pp-muted flex items-center gap-1 mt-0.5">
                 <MapPin className="w-3 h-3 shrink-0" />
                 {club.regionLabel}
               </p>
@@ -253,26 +247,26 @@ export function FindClubWizard({ regions }: FindClubWizardProps) {
           </div>
 
           {/* Arrow */}
-          <ChevronRight className="w-4 h-4 text-zinc-300 dark:text-zinc-600 shrink-0" />
+          <ChevronRight className="w-4 h-4 text-pp-muted shrink-0" />
         </div>
 
         {/* Badges */}
         {(club.recentMatchCount > 0 || club.hasRentalMatches || club.hasKakaoChat) && (
           <div className="flex flex-wrap gap-1.5 mt-3">
             {club.recentMatchCount > 0 && (
-              <span className="inline-flex items-center gap-1 text-xs text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-full">
+              <span className={`${badgeStyles({ tone: "neutral" })} inline-flex items-center gap-1 `}>
                 <Calendar className="w-3 h-3" />
                 {t("result.matches", { count: club.recentMatchCount })}
               </span>
             )}
             {club.hasRentalMatches && (
-              <span className="inline-flex items-center gap-1 text-xs font-medium text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-950/30 px-2 py-0.5 rounded-full ring-1 ring-green-200 dark:ring-green-900">
+              <span className={`${badgeStyles({ tone: "success" })} inline-flex items-center gap-1 `}>
                 <ShieldCheck className="w-3 h-3" />
                 {t("result.rentalBadge")}
               </span>
             )}
             {club.hasKakaoChat && (
-              <span className="inline-flex items-center gap-1 text-xs font-medium text-yellow-700 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-950/30 px-2 py-0.5 rounded-full ring-1 ring-yellow-200 dark:ring-yellow-900">
+              <span className={`${badgeStyles({ tone: "warning" })} inline-flex items-center gap-1 `}>
                 <MessageCircle className="w-3 h-3" />
                 {t("result.kakaoChat")}
               </span>
@@ -282,14 +276,14 @@ export function FindClubWizard({ regions }: FindClubWizardProps) {
 
         {/* Rink names */}
         {club.rinkNames.length > 0 && (
-          <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-2 truncate">
+          <p className="text-xs text-pp-muted mt-2 truncate">
             🏟️ {club.rinkNames.slice(0, 3).join(", ")}
           </p>
         )}
 
         {/* Description */}
         {club.description && (
-          <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-2 line-clamp-2 leading-relaxed">
+          <p className="text-xs text-pp-muted mt-2 line-clamp-2 leading-relaxed">
             {club.description}
           </p>
         )}
@@ -306,11 +300,11 @@ export function FindClubWizard({ regions }: FindClubWizardProps) {
       {step !== "result" && (
         <div className="mb-8">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
+            <span className="text-sm font-medium text-pp-muted ">
               {t("step", { current: step, total: totalSteps })}
             </span>
           </div>
-          <div className="h-2 bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
+          <div className="h-2 bg-pp-surface-muted rounded-full overflow-hidden">
             <div
               className="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transition-all duration-500 ease-out"
               style={{ width: `${((step as number) / totalSteps) * 100}%` }}
@@ -324,7 +318,7 @@ export function FindClubWizard({ regions }: FindClubWizardProps) {
         {/* Step 1: Adult / Youth */}
         {step === 1 && (
           <div className="animate-in fade-in slide-in-from-right-4 duration-300">
-            <h2 className="text-2xl font-black text-zinc-900 dark:text-white mb-6">
+            <h2 className="text-2xl font-black text-pp-text dark:text-white mb-6">
               {t("q1.title")}
             </h2>
             <div className="space-y-3">
@@ -349,17 +343,17 @@ export function FindClubWizard({ regions }: FindClubWizardProps) {
         {/* Step 2: Region */}
         {step === 2 && (
           <div className="animate-in fade-in slide-in-from-right-4 duration-300">
-            <h2 className="text-2xl font-black text-zinc-900 dark:text-white mb-6">
+            <h2 className="text-2xl font-black text-pp-text dark:text-white mb-6">
               {t("q2.title")}
             </h2>
-            <RegionGrid />
+            {renderRegionGrid()}
           </div>
         )}
 
         {/* Step 3: Equipment */}
         {step === 3 && (
           <div className="animate-in fade-in slide-in-from-right-4 duration-300">
-            <h2 className="text-2xl font-black text-zinc-900 dark:text-white mb-6">
+            <h2 className="text-2xl font-black text-pp-text dark:text-white mb-6">
               {t("q4.title")}
             </h2>
             <div className="space-y-3">
@@ -384,8 +378,8 @@ export function FindClubWizard({ regions }: FindClubWizardProps) {
         {/* Loading */}
         {isPending && (
           <div className="flex flex-col items-center justify-center py-20 gap-4">
-            <Loader2 className="w-10 h-10 text-blue-600 animate-spin" />
-            <p className="text-zinc-500 dark:text-zinc-400 font-medium">
+            <Loader2 className="w-10 h-10 text-pp-accent-text animate-spin" />
+            <p className="text-pp-muted font-medium">
               {locale === "ko"
                 ? "최적의 클럽을 찾고 있어요..."
                 : "Finding the best clubs for you..."}
@@ -398,10 +392,10 @@ export function FindClubWizard({ regions }: FindClubWizardProps) {
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
             {result.recommendations.length === 0 && (
               <div className="text-center mb-6">
-                <h2 className="text-lg font-bold text-zinc-900 dark:text-white">
+                <h2 className="text-lg font-bold text-pp-text dark:text-white">
                   {t("result.noResult")}
                 </h2>
-                <p className="text-zinc-500 mt-2 text-sm">
+                <p className="text-pp-muted mt-2 text-sm">
                   {t("result.noResultDesc")}
                 </p>
               </div>
@@ -410,12 +404,12 @@ export function FindClubWizard({ regions }: FindClubWizardProps) {
             {/* Recommendation cards */}
             <div className="space-y-3 mb-6">
               {result.recommendations.map((club) => (
-                <ResultCard key={club.id} club={club} />
+                <div key={club.id}>{renderResultCard({ club })}</div>
               ))}
             </div>
 
             {/* Stats */}
-            <p className="text-center text-xs text-zinc-400 dark:text-zinc-500 mb-4">
+            <p className="text-center text-xs text-pp-muted mb-4">
               {t("result.totalInfo", {
                 clubs: result.totalClubCount,
               })}
@@ -423,17 +417,17 @@ export function FindClubWizard({ regions }: FindClubWizardProps) {
 
             {/* Action buttons */}
             <div className="flex gap-3">
-              <button
+              <button type="button"
                 onClick={handleRestart}
-                className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 font-bold text-sm hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+                className={`${buttonStyles({ variant: "outline", size: "compact" })} flex-1 flex items-center justify-center gap-2 `}
               >
                 <RotateCcw className="w-4 h-4" />
                 {t("restart")}
               </button>
               {result.recommendations.length > 0 && (
-                <button
+                <button type="button"
                   onClick={handleShare}
-                  className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-blue-600 text-white font-bold text-sm hover:bg-blue-700 transition-colors"
+                  className={`${buttonStyles({ variant: "primary", size: "compact" })} flex-1 flex items-center justify-center gap-2 `}
                 >
                   <Share2 className="w-4 h-4" />
                   {t("result.share")}
@@ -444,7 +438,7 @@ export function FindClubWizard({ regions }: FindClubWizardProps) {
             {/* Browse all */}
             <Link
               href="/clubs"
-              className="mt-4 block text-center py-3 rounded-xl text-blue-600 dark:text-blue-400 font-bold text-sm hover:bg-blue-50 dark:hover:bg-blue-950/20 transition-colors"
+              className={`${buttonStyles({ variant: "primary", size: "default" })} mt-4 block text-center `}
             >
               {t("result.viewAll")} →
             </Link>
@@ -456,22 +450,18 @@ export function FindClubWizard({ regions }: FindClubWizardProps) {
       {step !== "result" && !isPending && (
         <div className="flex gap-3 mt-8">
           {(step as number) > 1 && (
-            <button
+            <button type="button"
               onClick={handlePrev}
-              className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl border-2 border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 font-bold text-sm hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+              className={`${buttonStyles({ variant: "outline", size: "compact" })} flex items-center justify-center gap-2 `}
             >
               <ArrowLeft className="w-4 h-4" />
               {t("prev")}
             </button>
           )}
-          <button
+          <button type="button"
             onClick={handleNext}
             disabled={!canProceed()}
-            className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm transition-all ${
-              canProceed()
-                ? "bg-blue-600 text-white hover:bg-blue-700 shadow-sm"
-                : "bg-zinc-200 dark:bg-zinc-800 text-zinc-400 cursor-not-allowed"
-            }`}
+            className={`${buttonStyles({ variant: canProceed() ? "primary" : "ghost", size: "default" })} flex-1 flex items-center justify-center gap-2 `}
           >
             {step === 3 ? (
               <>

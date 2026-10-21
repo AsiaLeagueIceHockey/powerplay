@@ -1,5 +1,7 @@
 "use client";
 
+import { buttonStyles, surfaceStyles } from "@/components/ui/styles";
+
 import { useState, useRef, useEffect } from "react";
 import { NaverMap, Marker, useNavermaps, Container as MapContainer, NavermapsProvider } from "react-naver-maps";
 import { Rink, Club } from "../app/actions/types";
@@ -27,18 +29,18 @@ function RinkDetailCard({ rink, matches, clubs = [], onClose }: { rink: Rink; ma
   return (
     <div className="absolute bottom-4 left-4 right-4 z-20 md:bottom-auto md:left-4 md:top-4 md:right-auto md:w-80 animate-in slide-in-from-bottom-10 md:slide-in-from-left-2 fade-in duration-300">
       {/* Floating Close Button */}
-      <button 
+      <button type="button"
         onClick={onClose}
-        className="absolute -top-12 right-0 p-2 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white rounded-full shadow-lg border border-zinc-200 dark:border-zinc-700 hover:scale-105 transition-transform"
+        className={`${buttonStyles({ variant: "outline", size: "compact", shape: "circle" })} absolute -top-12 right-0 `}
         aria-label="닫기"
       >
         <X className="w-5 h-5" />
       </button>
 
       {/* Card Content */}
-      <div className="p-4 bg-white dark:bg-zinc-900 rounded-xl shadow-lg border border-zinc-200 dark:border-zinc-800 max-h-[60vh] overflow-y-auto">
-        <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-1">{rink.name_ko}</h3>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400 flex items-start gap-1.5 mb-4">
+      <div className={`${surfaceStyles({ interactive: false, density: "compact" })} max-h-[60vh] overflow-y-auto`}>
+        <h3 className="text-xl font-bold text-pp-text dark:text-white mb-1">{rink.name_ko}</h3>
+        <p className="text-sm text-pp-muted flex items-start gap-1.5 mb-4">
           <MapPin className="w-4 h-4 mt-0.5 shrink-0" />
           {rink.address || "주소 정보 없음"}
         </p>
@@ -49,14 +51,14 @@ function RinkDetailCard({ rink, matches, clubs = [], onClose }: { rink: Rink; ma
            if (rinkClubs.length === 0) return null;
            return (
               <div className="mb-4">
-                  <h4 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2 flex items-center gap-1">
+                  <h4 className="text-xs font-semibold text-pp-muted uppercase tracking-wider mb-2 flex items-center gap-1">
                      <Users className="w-3 h-3" />
                      주 이용 동호회
                   </h4>
                   <div className="flex flex-wrap gap-2">
                      {rinkClubs.map(club => (
-                         <Link key={club.id} href={`/clubs/${club.id}`} className="flex items-center gap-2 px-3 py-2 bg-zinc-50 dark:bg-zinc-800/50 rounded-lg border border-zinc-100 dark:border-zinc-800 hover:border-blue-300 dark:hover:border-blue-700 transition-colors">
-                             <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">{club.name}</span>
+                         <Link key={club.id} href={`/clubs/${club.id}`} className={`${surfaceStyles({ interactive: true, density: "none" })} flex items-center gap-2 `}>
+                             <span className="text-sm font-medium text-pp-muted ">{club.name}</span>
                          </Link>
                      ))}
                   </div>
@@ -66,16 +68,16 @@ function RinkDetailCard({ rink, matches, clubs = [], onClose }: { rink: Rink; ma
 
         {rinkMatches.length > 0 && (
           <div className="mb-4">
-            <h4 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2 flex items-center gap-1">
+            <h4 className="text-xs font-semibold text-pp-muted uppercase tracking-wider mb-2 flex items-center gap-1">
               <Calendar className="w-3 h-3" />
               예정된 경기
             </h4>
             <ul className="space-y-2">
               {rinkMatches.map((match) => (
                 <li key={match.id}>
-                  <Link href={`/match/${match.id}`} className="block text-sm bg-zinc-50 dark:bg-zinc-800/50 p-2 rounded border border-zinc-100 dark:border-zinc-800/50 hover:bg-blue-50 dark:hover:bg-blue-900/10 hover:border-blue-200 dark:hover:border-blue-800 transition-colors">
+                  <Link href={`/match/${match.id}`} className={`${surfaceStyles({ interactive: true, density: "default" })} block `}>
                      <div className="flex justify-between items-start mb-1">
-                        <span className="font-medium text-zinc-800 dark:text-zinc-200">
+                        <span className="font-medium text-pp-text ">
                           {new Intl.DateTimeFormat("ko-KR", {
                             month: "long",
                             day: "numeric",
@@ -85,11 +87,11 @@ function RinkDetailCard({ rink, matches, clubs = [], onClose }: { rink: Rink; ma
                             hour12: false,
                           }).format(new Date(match.start_time))}
                         </span>
-                        <span className={`text-xs whitespace-nowrap ml-2 px-1.5 py-0.5 rounded ${match.status === "open" ? "text-blue-600 bg-blue-50 dark:bg-blue-900/20 font-medium" : "text-zinc-400 bg-zinc-100 dark:bg-zinc-800"}`}>
+                        <span className={`text-xs whitespace-nowrap ml-2 px-1.5 py-0.5 rounded ${match.status === "open" ? "text-pp-accent-text bg-pp-accent-soft font-medium" : "text-pp-muted bg-pp-surface-muted "}`}>
                           {match.status === "open" ? "신청 가능" : "마감"}
                         </span>
                      </div>
-                     <div className="text-xs text-zinc-500 line-clamp-1">
+                     <div className="text-xs text-pp-muted line-clamp-1">
                        {match.description || "친선 경기"}
                      </div>
                   </Link>
@@ -102,15 +104,15 @@ function RinkDetailCard({ rink, matches, clubs = [], onClose }: { rink: Rink; ma
         <div className="grid grid-cols-2 gap-2">
             <Link
                 href={`/rinks/${rink.id}`}
-                className="flex items-center justify-center gap-2 bg-zinc-900 hover:bg-blue-600 text-white text-sm font-bold py-2.5 rounded-lg transition-colors dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-blue-400"
+                className={`${buttonStyles({ variant: "primary", size: "compact" })} flex items-center justify-center gap-2 `}
             >
                 {locale === "ko" ? "링크장 상세" : "Rink details"}
             </Link>
-            <a 
-                href={rink.map_url || `https://map.naver.com/v5/search/${rink.name_ko}`} 
-                target="_blank" 
+            <a
+                href={rink.map_url || `https://map.naver.com/v5/search/${rink.name_ko}`}
+                target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 bg-[#03C75A] hover:bg-[#02b351] text-white text-sm font-bold py-2.5 rounded-lg transition-colors"
+                className={`${buttonStyles({ variant: "naver", size: "compact" })} flex items-center justify-center gap-2 `}
             >
                 <span className="font-black">N</span> 네이버 지도
             </a>
@@ -134,7 +136,7 @@ function RinkMapContent({ rinks, matches = [], clubs = [], isCompact = false }: 
         // Delay slightly to ensure render/animation allows for correct scrolling
         setTimeout(() => {
             containerRef.current?.scrollIntoView({ block: "end", behavior: "smooth" });
-        }, 300); 
+        }, 300);
     }
   }, [selectedRink]);
 
@@ -147,7 +149,7 @@ function RinkMapContent({ rinks, matches = [], clubs = [], isCompact = false }: 
 
   const handleMyLocation = () => {
     if (!map) return;
-    
+
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -169,7 +171,7 @@ function RinkMapContent({ rinks, matches = [], clubs = [], isCompact = false }: 
   };
 
   return (
-    <div ref={containerRef} className={`relative w-full rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-900 ${isCompact ? "h-full" : "h-[calc(100vh-200px)] min-h-[500px]"}`}>
+    <div ref={containerRef} className={`relative w-full rounded-lg overflow-hidden border border-pp-border bg-pp-surface-muted ${isCompact ? "h-full" : "h-[calc(100vh-200px)] min-h-[500px]"}`}>
       <MapContainer className="w-full h-full">
         <NaverMap
             defaultCenter={initialCenter}
@@ -182,14 +184,14 @@ function RinkMapContent({ rinks, matches = [], clubs = [], isCompact = false }: 
             scaleControl={true}
             mapDataControl={false}
             logoControl={false} // Custom positioning if needed, or let it be
-        > 
+        >
             {/* Rink Markers */}
             {rinks.map((rink) => {
               if (!rink.lat || !rink.lng) return null;
-              
-              const hasOpenMatches = matches.some(m => 
-                m.rink?.id === rink.id && 
-                m.status === 'open' && 
+
+              const hasOpenMatches = matches.some(m =>
+                m.rink?.id === rink.id &&
+                m.status === 'open' &&
                 new Date(m.start_time) >= new Date()
               );
               const hasClubs = clubs.some(c => c.rinks?.some(r => r.id === rink.id));
@@ -206,10 +208,10 @@ function RinkMapContent({ rinks, matches = [], clubs = [], isCompact = false }: 
                   icon={{
                     content: `
                       <div class="px-2 py-1.5 rounded-lg shadow-md text-xs font-bold whitespace-nowrap transition-transform cursor-pointer flex items-center gap-1
-                         ${isSelected 
-                             ? 'bg-blue-600 text-white border-blue-700 scale-110 z-50' 
-                             : isActive 
-                                ? 'bg-white text-blue-700 border-2 border-blue-500 z-40' 
+                         ${isSelected
+                             ? 'bg-blue-600 text-white border-blue-700 scale-110 z-50'
+                             : isActive
+                                ? 'bg-white text-blue-700 border-2 border-blue-500 z-40'
                                 : 'bg-white text-zinc-500 border border-zinc-300 z-30'
                          }
                       ">
@@ -239,19 +241,19 @@ function RinkMapContent({ rinks, matches = [], clubs = [], isCompact = false }: 
 
       {/* Rink Detail Card Overlay */}
       {!isCompact && selectedRink && (
-        <RinkDetailCard 
-            rink={selectedRink} 
-            matches={matches} 
+        <RinkDetailCard
+            rink={selectedRink}
+            matches={matches}
             clubs={clubs}
-            onClose={() => setSelectedRink(null)} 
+            onClose={() => setSelectedRink(null)}
         />
       )}
 
       {/* Floating My Location Button */}
       {!isCompact && (
-        <button
+        <button type="button"
           onClick={handleMyLocation}
-          className="absolute bottom-6 right-6 bg-white dark:bg-zinc-800 p-3 rounded-full shadow-lg border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-700 z-10 transition-transform active:scale-95 text-zinc-700 dark:text-zinc-200"
+          className={`${buttonStyles({ variant: "outline", size: "default" })} absolute bottom-6 right-6 z-10 !rounded-full aspect-square`}
           title="내 위치"
         >
           <Navigation className="w-5 h-5" />
@@ -265,7 +267,7 @@ export function RinkMap({ rinks, matches, clubs, isCompact = false }: RinkMapPro
   const clientId = process.env.NEXT_PUBLIC_NAVER_MAP_CLIENT_ID;
 
   if (!clientId) {
-    return <div className="p-4 bg-red-50 text-red-500 rounded">Naver Map Client ID not found.</div>;
+    return <div className="p-4 bg-pp-danger-soft text-pp-danger-text rounded">Naver Map Client ID not found.</div>;
   }
 
   return (

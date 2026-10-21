@@ -1,11 +1,13 @@
 "use client";
 
+import { buttonStyles } from "@/components/ui/styles";
+
 import { useState } from "react";
 import { useLocale } from "next-intl";
 import { Share2 } from "lucide-react";
 
 interface ClubShareButtonProps {
-  club: any;
+  club: { name: string };
 }
 
 export function ClubShareButton({ club }: ClubShareButtonProps) {
@@ -57,9 +59,9 @@ export function ClubShareButton({ club }: ClubShareButtonProps) {
 
   return (
     <div className="relative">
-      <button
+      <button type="button"
         onClick={handleShare}
-        className="p-2.5 text-zinc-500 hover:text-blue-600 hover:bg-blue-50 dark:text-zinc-400 dark:hover:text-blue-400 dark:hover:bg-blue-900/20 rounded-full transition-colors flex items-center justify-center shrink-0"
+        className={`${buttonStyles({ variant: "primary", size: "compact" })} flex items-center justify-center shrink-0 !rounded-full aspect-square`}
         title={locale === "ko" ? "링크 공유하기" : "Share Link"}
         aria-label="Share"
       >

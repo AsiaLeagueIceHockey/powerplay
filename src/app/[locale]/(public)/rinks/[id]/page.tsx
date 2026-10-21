@@ -1,3 +1,5 @@
+
+import { buttonStyles, surfaceStyles } from "@/components/ui/styles";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { setRequestLocale } from "next-intl/server";
@@ -83,42 +85,42 @@ export default async function RinkDetailPage({
     <div className="mx-auto max-w-5xl space-y-8">
       <RinkPlaceJsonLd rink={rink} locale={locale} />
 
-      <section className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-        <div className="flex flex-wrap items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400">
-          <Link href="/rinks" className="hover:text-blue-600 dark:hover:text-blue-400">
+      <section className={surfaceStyles({ interactive: false, density: "roomy" })}>
+        <div className="flex flex-wrap items-center gap-2 text-sm text-pp-muted ">
+          <Link href="/rinks" className="hover:text-pp-accent-text ">
             {isKo ? "링크장 디렉토리" : "Rink directory"}
           </Link>
           <span>/</span>
           <span>{region || name}</span>
         </div>
 
-        <h1 className="mt-3 text-3xl font-black tracking-tight text-zinc-900 dark:text-zinc-100">{name}</h1>
-        <p className="mt-3 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+        <h1 className="mt-3 text-3xl font-black tracking-tight text-pp-text ">{name}</h1>
+        <p className="mt-3 text-sm leading-6 text-pp-muted ">
           {isKo
             ? `${name} 링크장에서 뛸 경기와 활동 중인 동호회를 한눈에 확인해보세요. 위치와 일정, 팀 정보를 한 페이지에 모아 두었습니다.`
             : `This rink page collects address, active clubs, and upcoming match information in one place.`}
         </p>
 
         <div className="mt-5 grid gap-3 sm:grid-cols-3">
-          <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-950">
-            <div className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
+          <div className={surfaceStyles({ interactive: false, density: "compact" })}>
+            <div className="text-xs font-semibold uppercase tracking-wide text-pp-muted">
               {isKo ? "지역" : "Region"}
             </div>
-            <div className="mt-2 text-base font-bold text-zinc-900 dark:text-zinc-100">
+            <div className="mt-2 text-base font-bold text-pp-text ">
               {region || (isKo ? "정보 준비 중" : "TBD")}
             </div>
           </div>
-          <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-950">
-            <div className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
+          <div className={surfaceStyles({ interactive: false, density: "compact" })}>
+            <div className="text-xs font-semibold uppercase tracking-wide text-pp-muted">
               {isKo ? "예정 경기" : "Upcoming matches"}
             </div>
-            <div className="mt-2 text-2xl font-black text-zinc-900 dark:text-zinc-100">{rink.upcoming_match_count}</div>
+            <div className="mt-2 text-2xl font-black text-pp-text ">{rink.upcoming_match_count}</div>
           </div>
-          <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-950">
-            <div className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
+          <div className={surfaceStyles({ interactive: false, density: "compact" })}>
+            <div className="text-xs font-semibold uppercase tracking-wide text-pp-muted">
               {isKo ? "활동 동호회" : "Active clubs"}
             </div>
-            <div className="mt-2 text-2xl font-black text-zinc-900 dark:text-zinc-100">{rink.club_count}</div>
+            <div className="mt-2 text-2xl font-black text-pp-text ">{rink.club_count}</div>
           </div>
         </div>
 
@@ -128,14 +130,14 @@ export default async function RinkDetailPage({
               href={rink.map_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center rounded-lg bg-[#03C75A] px-3 py-2 font-semibold text-white transition-colors hover:bg-[#02b351]"
+              className={`${buttonStyles({ variant: "naver", size: "compact" })} inline-flex items-center`}
             >
               {isKo ? "네이버 지도 열기" : "Open in Naver Map"}
             </a>
           ) : null}
           <Link
             href="/rinks"
-            className="inline-flex items-center rounded-lg border border-zinc-200 px-3 py-2 font-semibold text-zinc-700 transition-colors hover:border-blue-500 hover:text-blue-600 dark:border-zinc-700 dark:text-zinc-200 dark:hover:border-blue-400 dark:hover:text-blue-400"
+            className="inline-flex items-center rounded-lg border border-pp-border px-3 py-2 font-semibold text-pp-muted transition-colors hover:border-pp-accent hover:text-pp-accent-text "
           >
             {isKo ? "다른 링크장 보기" : "Browse more rinks"}
           </Link>
@@ -143,12 +145,12 @@ export default async function RinkDetailPage({
       </section>
 
       {(rink.lat && rink.lng) ? (
-        <section className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-          <div className="border-b border-zinc-200 px-6 py-4 dark:border-zinc-800">
-            <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
+        <section className={`${surfaceStyles({ interactive: false, density: "none" })} overflow-hidden`}>
+          <div className="border-b border-pp-border px-6 py-4 ">
+            <h2 className="text-xl font-bold text-pp-text ">
               {isKo ? "링크장 위치" : "Rink location"}
             </h2>
-            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+            <p className="mt-1 text-sm text-pp-muted ">
               {rink.address || (isKo ? "지도 좌표 기준 위치 정보" : "Location based on map coordinates")}
             </p>
           </div>
@@ -159,18 +161,18 @@ export default async function RinkDetailPage({
       ) : null}
 
       <section className="grid gap-6 lg:grid-cols-[1.3fr_0.9fr]">
-        <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-          <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
+        <div className={surfaceStyles({ interactive: false, density: "roomy" })}>
+          <h2 className="text-2xl font-bold text-pp-text ">
             {isKo ? "예정 경기" : "Upcoming matches"}
           </h2>
-          <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+          <p className="mt-2 text-sm leading-6 text-pp-muted ">
             {isKo
               ? `${name} 링크장에서 현재 참가 가능한 경기 일정입니다.`
               : `Current open matches available for this rink.`}
           </p>
 
           {upcomingMatches.length === 0 ? (
-            <div className="mt-5 rounded-xl border border-dashed border-zinc-200 bg-zinc-50 p-5 text-sm text-zinc-500 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-400">
+            <div className={`${surfaceStyles({ interactive: false, density: "default" , tone: "muted" })} mt-5  `}>
               {isKo
                 ? "현재 등록된 예정 경기가 없습니다. 추후 일정이 등록되면 이 페이지에 자동으로 반영됩니다."
                 : "No upcoming matches are listed yet."}
@@ -192,26 +194,26 @@ export default async function RinkDetailPage({
                 return (
                   <article
                     key={match.id}
-                    className="rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-950"
+                    className={surfaceStyles({ interactive: false, density: "compact" })}
                   >
                     <div className="flex flex-wrap items-start justify-between gap-3">
                       <div>
-                        <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-100">
-                          <Link href={`/match/${match.id}`} className="hover:text-blue-600 dark:hover:text-blue-400">
+                        <h3 className="text-base font-bold text-pp-text ">
+                          <Link href={`/match/${match.id}`} className="hover:text-pp-accent-text ">
                             {match.description || (isKo ? "아이스하키 경기" : "Ice hockey match")}
                           </Link>
                         </h3>
-                        <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">{formattedDate}</p>
+                        <p className="mt-1 text-sm text-pp-muted ">{formattedDate}</p>
                       </div>
                       <div className="text-right">
-                        <div className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">
+                        <div className="text-sm font-semibold text-pp-muted ">
                           {(match.entry_points || match.fee).toLocaleString()}
                           {isKo ? "원" : " KRW"}
                         </div>
                         {match.club ? (
                           <Link
                             href={`/clubs/${match.club.id}`}
-                            className="mt-1 inline-flex text-xs font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+                            className="mt-1 inline-flex text-xs font-medium text-pp-accent-text hover:text-pp-accent-text "
                           >
                             {match.club.name}
                           </Link>
@@ -226,18 +228,18 @@ export default async function RinkDetailPage({
         </div>
 
         <div className="space-y-6">
-          <section className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-            <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
+          <section className={surfaceStyles({ interactive: false, density: "roomy" })}>
+            <h2 className="text-2xl font-bold text-pp-text ">
               {isKo ? "활동 동호회" : "Active clubs"}
             </h2>
-            <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+            <p className="mt-2 text-sm leading-6 text-pp-muted ">
               {isKo
                 ? `${name} 링크장을 주 이용 링크장으로 등록한 동호회 목록입니다.`
                 : `Clubs that use this rink as one of their main rinks.`}
             </p>
 
             {activeClubs.length === 0 ? (
-              <div className="mt-5 rounded-xl border border-dashed border-zinc-200 bg-zinc-50 p-5 text-sm text-zinc-500 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-400">
+              <div className={`${surfaceStyles({ interactive: false, density: "default" , tone: "muted" })} mt-5  `}>
                 {isKo ? "현재 연결된 동호회가 없습니다." : "No clubs linked yet."}
               </div>
             ) : (
@@ -245,11 +247,11 @@ export default async function RinkDetailPage({
                 {activeClubs.map((club) => (
                   <article
                     key={club.id}
-                    className="rounded-xl border border-zinc-200 bg-zinc-50 p-4 transition-colors hover:border-blue-400 dark:border-zinc-800 dark:bg-zinc-950 dark:hover:border-blue-500/60"
+                    className={surfaceStyles({ interactive: true, density: "compact" })}
                   >
                     <Link href={`/clubs/${club.id}`} className="block">
                       <div className="flex items-start gap-3">
-                        <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-zinc-100 dark:bg-zinc-800">
+                        <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-pp-surface-muted ">
                           {club.logo_url ? (
                             <Image
                               src={club.logo_url}
@@ -259,22 +261,22 @@ export default async function RinkDetailPage({
                               className="h-full w-full object-cover"
                             />
                           ) : (
-                            <Building2 className="h-5 w-5 text-zinc-400" />
+                            <Building2 className="h-5 w-5 text-pp-muted" />
                           )}
                         </div>
 
                         <div className="min-w-0 flex-1">
                           <div className="flex items-start justify-between gap-3">
-                            <h3 className="text-base font-bold text-zinc-900 transition-colors hover:text-blue-600 dark:text-zinc-100 dark:hover:text-blue-400">
+                            <h3 className="text-base font-bold text-pp-text transition-colors hover:text-pp-accent-text ">
                               {club.name}
                             </h3>
-                            <span className="inline-flex items-center gap-1 text-xs font-semibold text-blue-600 dark:text-blue-400">
+                            <span className="inline-flex items-center gap-1 text-xs font-semibold text-pp-accent-text ">
                               {isKo ? "동호회 보기" : "View club"}
                               <ArrowRight className="h-3.5 w-3.5" />
                             </span>
                           </div>
                           {club.description ? (
-                            <p className="mt-2 line-clamp-3 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+                            <p className="mt-2 line-clamp-3 text-sm leading-6 text-pp-muted ">
                               {club.description}
                             </p>
                           ) : null}
