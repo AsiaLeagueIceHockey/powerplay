@@ -1,6 +1,6 @@
 ---
 name: nextjs-patterns
-description: Power Play의 Next.js 16 App Router 코드 작성 시 사용. Server Actions 규약, route groups((public)/(admin)), 미들웨어 역할 보호, TypeScript strict 패턴, `next-intl` 클라이언트 통합, KST 날짜 처리, Tailwind v4 기반 카드/버튼 UI 가드레일. `src/app/`, `src/components/`, `src/lib/` 파일을 추가·수정·리팩토링하거나 새 페이지·액션·컴포넌트·훅을 만들 때 반드시 트리거.
+description: Power Play의 Next.js 16 App Router 코드 작성 시 사용. Server Actions 규약, route groups((public)/(admin)), 미들웨어 역할 보호, TypeScript strict 패턴, `next-intl` 클라이언트 통합, KST 날짜 처리, UI 규칙은 docs/design-system.md 참조. `src/app/`, `src/components/`, `src/lib/` 파일을 추가·수정·리팩토링하거나 새 페이지·액션·컴포넌트·훅을 만들 때 반드시 트리거.
 ---
 
 # Next.js Patterns — Power Play 구현 규약
@@ -97,16 +97,17 @@ export async function createMatch(input: CreateMatchInput) {
 "use client";
 
 import { useTranslations, useFormatter } from "next-intl";
+import { Surface } from "@/components/ui";
 import type { Match } from "@/lib/supabase/types";
 
 export function MatchCard({ match }: { match: Match }) {
   const t = useTranslations("matchCard");
   const format = useFormatter();
 
+  // Appearance comes from the shared Surface; className is layout only.
   return (
-    <article className="rounded-xl border bg-white p-4 transition
-                        hover:border-blue-500 hover:shadow-md">
-      <h3 className="whitespace-nowrap truncate">{t("title")}</h3>
+    <Surface className="flex flex-col gap-2">
+      <h3 className="truncate text-pp-text">{t("title")}</h3>
       <time dateTime={match.startTime}>
         {format.dateTime(new Date(match.startTime), {
           timeZone: "Asia/Seoul",
@@ -114,7 +115,7 @@ export function MatchCard({ match }: { match: Match }) {
           hour: "2-digit", minute: "2-digit",
         })}
       </time>
-    </article>
+    </Surface>
   );
 }
 ```
@@ -122,8 +123,7 @@ export function MatchCard({ match }: { match: Match }) {
 ### 4.1 필수 체크
 - `"use client";` 최상단.
 - i18n: `useTranslations(namespace)`.
-- 카드: `rounded-xl` + hover `border-blue-500 + shadow-md`.
-- 버튼 텍스트: `whitespace-nowrap truncate`. 같은 행의 버튼은 폰트·아이콘 크기 통일.
+- UI: `docs/design-system.md`의 "Rules at a glance"를 따른다. 프리미티브·레시피·`pp-*` 토큰을 쓰고, 클릭 가능한 카드는 실제 링크나 버튼에 `surfaceStyles({ interactive: true })`를 적용한다.
 
 ## 5. Supabase 클라이언트 사용
 
@@ -168,14 +168,12 @@ new Intl.DateTimeFormat("ko-KR", {
 
 ## 9. UI 패턴 통일
 
-| 요소 | 규칙 |
+시각 규칙(카드, 버튼, 색, radius, 간격)은 `docs/design-system.md`에만 있다. 여기에는 동작 규칙만 남긴다.
+
+| 요소 | 동작 규칙 |
 |------|------|
-| 카드 | `rounded-xl`, border, hover 효과 공통 |
-| 버튼 | 주요 버튼 `rounded-xl`, 아이콘+라벨 `whitespace-nowrap truncate` |
 | 필터 | 날짜 클릭 시 해당 날짜 필터, 전체 클릭 시 해제 |
 | 헤더 | 프로필 드롭다운: Person/Coin/Tool 구조. 언어 설정은 마이페이지 하단 |
-
-동호회 상세 액션 버튼 등 **공유 스타일이 있는 컴포넌트는 그 스타일/harness를 재사용한다.** 버튼 하나만 따로 스타일링하지 말 것.
 
 ## 10. 성능
 

@@ -113,7 +113,7 @@ rg "Type(Name)?[:<]" src/ --type=ts -n
 - [ ] **Path alias**: `@/*` 사용, 상대경로 탈출(../../..) 없음.
 - [ ] **any/@ts-ignore**: grep 결과 없음.
 - [ ] **i18n 누락**: public/user 영역 하드코딩 한국어 없음. ko/en 키 일치.
-- [ ] **UI 가드레일**: 새 카드 `rounded-xl`, 버튼 `whitespace-nowrap`.
+- [ ] **UI 규칙**: `docs/design-system.md` "Rules at a glance" 준수. `npm run ui:check` 통과, 새 예외는 `scripts/ui-policy.json`에 사유 기록.
 
 ## 7. 보고서 포맷
 

@@ -34,8 +34,7 @@ planner의 계획과 db-architect의 스키마 변경을 받아 실제 Next.js 1
 7. **소프트 삭제.** 프로필은 DELETE 금지, `deleted_at` 세팅.
 8. **병렬 fetch.** 독립 쿼리는 `Promise.all`.
 9. **UI 톤.** 사용자 문구는 SEO·개발자 관점이 아닌 **사용자 가치 중심**으로 작성. AI 에이전트 framing 금지.
-10. **UI 가드레일.** 아이콘+라벨 버튼은 `whitespace-nowrap` + `truncate` 기본. 모바일 줄바꿈 금지. 같은 그룹 버튼은 폰트·아이콘 크기 통일.
-11. **카드 스타일 통일.** 모든 카드는 `rounded-xl`, hover `border-blue-500 + shadow-md`.
+10. **UI 규칙.** 일반 사용자 UI는 `docs/design-system.md`의 "Rules at a glance"를 따른다. `@/components/ui` 프리미티브와 레시피, `pp-*` 토큰을 쓰고 `className`은 레이아웃에만 쓴다. 값(radius, 색, 간격)을 직접 정하지 않는다.
 
 ## 입력
 

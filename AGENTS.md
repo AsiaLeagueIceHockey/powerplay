@@ -182,10 +182,7 @@ src/
 
 ### 🟣 P7. UI/UX 디자인 통일 (UI Polish)
 - **필터 동작**: 특정 날짜 클릭 시 해당 날짜만 필터링. 전체 클릭 시 필터 해제. 직관성 개선.
-- **카드 스타일**: 모든 카드형 UI(`MatchCard`, `ClubCard` 등)를 **`rounded-xl`**로 통일.
-- **인터랙션**: Hover 시 **`border-blue-500` + `shadow-md`** 효과를 공통 적용하여 프리미엄 느낌 강화.
-- **버튼 스타일**: 주요 버튼의 곡률을 `rounded-xl`로 조정하여 카드와 조화롭게 변경.
-- **아이콘 버튼 가드레일**: 아이콘 + 라벨 버튼은 모바일에서 절대 줄바꿈되면 안 됨. `whitespace-nowrap` + `truncate`를 기본으로 두고, 같은 그룹의 버튼은 폰트 크기와 아이콘 크기를 통일할 것. 특히 동호회 상세 액션 버튼은 shared style/harness를 재사용하고, 새 작업 시 한 버튼만 따로 스타일링하지 말 것.
+- **카드·버튼·인터랙션·아이콘 버튼 규칙**: 2026-10-21부터 `docs/design-system.md`("Rules at a glance", "Visual direction")가 유일한 기준이다. 예전의 `rounded-xl`, `border-blue-500` + `shadow-md` 규칙은 폐기됐다.
 - **헤더(Header)**:
     - 상단 포인트 바 제거, 오직 로고와 프로필 메뉴만 유지하여 깔끔함 확보.
     - 프로필 드롭다운 재구성: **Person(마이페이지) | Coin(포인트) | Tool(관리자)** 구조.
@@ -890,9 +887,7 @@ UPDATE profiles SET role = 'superuser' WHERE email = 'your-email@example.com';
 <!-- POWERPLAY-DESIGN-SYSTEM:START -->
 ## Shared user UI
 
-- Follow `docs/design-system.md` for ordinary user UI; use `src/components/ui` primitives or recipes before adding local appearance rules.
-- Preserve domain behavior, locale-aware navigation, provider/category/status colors and the approved club-action sizing. Use `className` for layout, not shared-control appearance overrides.
-- Scope themes explicitly, including outside-public routes and global overlays; keep admin, SEO and exported artwork isolated. Ordinary controls around artwork remain in scope.
-- Update component, fixture gallery, regression test and documentation together for new variants. Record narrow exceptions with a reason in `scripts/ui-policy.json`.
-- Run `ui:check`, `ui:test`, `ui:visual` and the existing PowerPlay UI final check. Keep source migration and runtime verification distinct in `docs/design-system-routes.json`; unresolved work is never a design exception.
+- `docs/design-system.md` is the single source of UI rules and values; read its "Rules at a glance" and "Visual direction" before changing ordinary user UI. Do not restate values here. If a rule changes, edit only that file.
+- Direction and history: `decisions/design-system.md`. Stage plan: `docs/design-system-restyle-plan.md`.
+- Keep source migration and runtime verification distinct in `docs/design-system-routes.json`; unresolved work is never a design exception.
 <!-- POWERPLAY-DESIGN-SYSTEM:END -->

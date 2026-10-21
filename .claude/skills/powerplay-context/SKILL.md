@@ -1,6 +1,6 @@
 ---
 name: powerplay-context
-description: Power Play 프로젝트의 핵심 도메인 규약(KST timezone, soft delete, 역할 체계 user/admin/superuser, Supabase RLS/SECURITY DEFINER RPC, i18n scope, path alias, 파일명 컨벤션, 카드/버튼 UI 가드레일)을 통합 제공한다. Power Play 코드베이스의 `src/`, `sql/`, `messages/` 어느 곳이든 작업을 시작하기 전에 반드시 이 스킬을 먼저 읽어 규약을 확인하라. 신기능 추가, 리팩토링, 버그 수정, QA 등 모든 작업에 해당된다.
+description: Power Play 프로젝트의 핵심 도메인 규약(KST timezone, soft delete, 역할 체계 user/admin/superuser, Supabase RLS/SECURITY DEFINER RPC, i18n scope, path alias, 파일명 컨벤션, UI 규칙 위치 docs/design-system.md)을 통합 제공한다. Power Play 코드베이스의 `src/`, `sql/`, `messages/` 어느 곳이든 작업을 시작하기 전에 반드시 이 스킬을 먼저 읽어 규약을 확인하라. 신기능 추가, 리팩토링, 버그 수정, QA 등 모든 작업에 해당된다.
 ---
 
 # Power Play — 프로젝트 컨텍스트
@@ -88,9 +88,8 @@ sql/                     ← v1~vN 버전 마이그레이션
 - **export는 async 함수만**. sync 헬퍼는 미export 또는 `src/lib/`로 이동 (Next.js 빌드 제약).
 - 인증/인가 체크는 액션 내부에서
 
-### 3.9 UI 가드레일
-- 카드는 `rounded-xl`, hover `border-blue-500 + shadow-md`
-- 아이콘+라벨 버튼: `whitespace-nowrap` + `truncate`. 모바일 줄바꿈 금지. 같은 그룹은 폰트·아이콘 크기 통일.
+### 3.9 UI 규칙
+- 일반 사용자 UI 규칙과 값은 `docs/design-system.md` 한 곳에만 있다. 작업 전에 "Rules at a glance"와 "Visual direction"을 읽는다. 관리자, SEO 봇, 내보내기 캔버스는 범위 밖이다.
 - 사용자 문구는 **사용자 가치 중심**. AI·SEO·개발자 프레이밍 금지.
 
 ### 3.10 성능 패턴

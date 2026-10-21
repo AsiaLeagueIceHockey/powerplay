@@ -17,8 +17,7 @@ Read `docs/design-system.md`, the canonical guide, before changing ordinary user
 ## Author the UI
 
 - Select documented variants/sizes/tones rather than redefining shared appearance in `className`; layout width, placement and visibility classes are allowed.
-- Keep existing PowerPlay blue/navy, Lounge gold plus category accents, Youth violet, provider branding and status/points/cheer meaning.
-- Use default 44px, compact 36px and large 56px controls. Existing club actions retain 46px height, 18px icons and one-line labels; reuse `club-detail-action-styles`.
+- Take colors, accent usage, radius, spacing, typography and control sizes from `docs/design-system.md` ("Rules at a glance", "Visual direction"); this skill intentionally restates no values. Reuse `club-detail-action-styles` for club actions.
 - Write `type="submit"` explicitly for submissions; `Button` defaults to `type="button"`. Preserve ref, native props, form wiring, ARIA and events. Icon-only actions require `IconButton`'s `label`.
 - Use `Field` with a stable `id`, label and optional help/error around one native/shared control. Preserve existing descriptions and validation logic.
 - Preserve correct links/buttons and keyboard semantics. Use `surfaceStyles` on actionable links rather than making a generic container interactive.

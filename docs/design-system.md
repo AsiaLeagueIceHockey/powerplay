@@ -1,6 +1,21 @@
 # PowerPlay design system
 
-This is the canonical UI authoring and maintenance guide. Preserve the current product identity and domain behavior while using one shared vocabulary for ordinary user controls. The approved implementation and verification contracts live in `docs/archive/omx/plans/prd-design-system.md` and `docs/archive/omx/plans/test-spec-design-system.md`.
+This is the **single source of UI rules** for ordinary user UI. `CLAUDE.md`, `AGENTS.md` and agent skills point here instead of restating values; when they disagree, this file wins. The original implementation and verification contracts live in `docs/archive/omx/plans/prd-design-system.md` and `docs/archive/omx/plans/test-spec-design-system.md`; the 2026-10-21 visual direction below supersedes their "preserve the current look" goal (see `decisions/design-system.md`). The staged restyle plan is `docs/design-system-restyle-plan.md`.
+
+## Rules at a glance
+
+1. **Use the shared layer.** New ordinary controls use primitives from `@/components/ui`. Use a recipe from `@/components/ui/styles` only when a domain wrapper must keep its own element, event isolation or tracking.
+2. **`className` is for layout only**: placement, width, flex/grid, visibility. Never set colors, font size, padding, radius, height or shadow on a shared control. Pick a documented option instead, or add a variant (rule 9).
+3. **Colors come from `pp-*` tokens** (`bg-pp-surface`, `text-pp-muted`, `border-pp-border`, `bg-pp-accent` …). Raw Tailwind palette classes and hex values are allowed in ordinary UI only as a recorded exception in `scripts/ui-policy.json`.
+4. **Do not pair a token with a `dark:` override** (for example `text-pp-text dark:text-white`). Tokens already resolve for dark mode.
+5. **One brand accent.** Primary actions, links, focus rings and selected states use the brand accent in every section. Lounge and Youth section colors appear only in badges, icons and accent lines.
+6. **Status, category, points, cheer and provider colors keep their meaning.** Use them for small marks (badges, icons, lines), not large fills.
+7. **Icon + label actions never wrap on mobile.** Shared buttons are `nowrap`; wrap the label in `actionLabelClass` so it truncates. Buttons in one group share size. Club detail actions reuse `components/club-detail-action-styles.ts`.
+8. **Clickable cards** apply `surfaceStyles({ interactive: true })` to the real link or button; hover and focus come from the recipe, never ad-hoc `hover:border-*` or `hover:shadow-*`. Static panels are not interactive.
+9. **A new variant ships together with** its implementation, gallery fixture, behavior test and an update to this guide.
+10. **Before reporting UI work as done**, run `npm run ui:check`, `npm run ui:test`, `npm run ui:visual` and `npm run typecheck`, then the PowerPlay UI final check.
+
+Out of scope: administrator screens (`/admin`), the SEO bot renderer and exported image canvases (Instagram, card news, player/club cards, fortune/tamagotchi artwork). Ordinary controls *around* export canvases and artwork are in scope.
 
 ## Architecture and boundaries
 
@@ -14,24 +29,28 @@ A recipe is useful when a domain wrapper must retain its existing DOM element or
 
 The migration does not change server actions, authorization, data schemas, money calculations, refunds, chat read receipts or tracking. A visual test must not submit a real vote/application/payment or read a live chat room.
 
-## Preserve these design decisions
+## Visual direction (amended 2026-10-21)
 
-| Role | Standard | Intentional preservation |
+The UI should be calm and spacious, like the Linear, Vercel and Stripe dashboards: neutral gray surfaces, a single brand accent, restrained corner radius and minimal shadow. Domain meaning (status, points, cheer, categories, providers) stays intact.
+
+The **Now** column is what the tokens implement today. The **Target** column is what the restyle stages in `docs/design-system-restyle-plan.md` deliver. Once a stage lands, update **Now** in the same change.
+
+| Role | Target | Now |
 | --- | --- | --- |
-| PowerPlay accent | Existing blue/navy | Do not recolor domain status, points or cheering as generic brand blue |
-| Lounge accent | Existing ice gold (`#d4a017`, pale gold `#f3d27a`) | Preserve category-specific lesson blue, youth-club green, training teal, tournament rose, brand violet and service orange |
-| Youth accent | Existing violet | Keep verified-parent and post state semantics |
-| Surface/field radius | 12px | Existing circles, pills, avatars, hero/banner artwork have explicit purposes |
-| Modal/sheet radius | 24px | Presentation changes do not replace dialog lifecycle |
-| Spacing vocabulary | 4, 8, 12, 16, 20, 24, 32px | Keep useful density differences between a card, form and detail page |
-| Control sizes | compact 36px, default 44px, large CTA 56px | Approved club actions remain 46px with 18px icons and one-line labels |
-| Typography | Existing Pretendard and heading/body hierarchy | Do not uniformly enlarge or flatten all metadata |
-| Interactive cards | Shared hover border, shadow and keyboard focus | Noninteractive panels do not imply clickability |
-| Home discovery | Clubs → Rinks → Matches | Keep equally compact club-finder banners and monthly ranking disclosure |
-| Theme preference | Existing OS light/dark preference | No new user theme setting or forced dark mode |
-| Provider identity | Kakao yellow, Naver green, provider marks | Use provider variants; never redefine them as site accent |
+| Brand accent | `#2563eb` (hover `#1d4ed8`) for every section's primary actions, links, focus and selection | `#2563eb` in PowerPlay. Lounge and Youth scopes still swap `--pp-accent` to gold and violet |
+| Section themes | Lounge ice gold `#d4a017` / `#f3d27a` and Youth violet `#7c3aed` exposed as a separate section accent, used only in badges, icons and accent lines | Applied through `--pp-accent`, so buttons, chips and focus also turn gold or violet |
+| Neutrals | One gray family for background, surface, muted surface, border and text in light and dark | Light uses Tailwind gray (`#f9fafb`, `#e5e7eb`, `#6b7280`); dark uses zinc |
+| Radius | Controls and cards 8px, small elements (badges, chips, segmented items) 6px, modal and sheet 12px; pills, avatars and circles stay full | 12px for controls and cards, 24px for modal and sheet |
+| Shadow | Resting cards have a border only; hover changes the border color. Overlays and popovers get one small shadow | Cards have a resting shadow, hover adds a medium shadow, overlays have an xl shadow |
+| Spacing | 4px-based scale (4, 8, 12, 16, 20, 24, 32, 40, 48, 64). More generous defaults for page padding, section gap and card padding | Scale defined up to 32px, but unused; padding is chosen per file |
+| Control sizes | Compact 36px, default 44px, large CTA 56px (touch targets). Club actions 46px with 18px icons and one-line labels | Same |
+| Typography | Token scale caption 12, body 14, body-lg 16, heading 18, title 24, display 30, plus a micro step (11px) for dense metadata. Weights 400, 500, 600, 700 only | Four `pp-text-*` classes; ad-hoc sizes include `text-[10px]` and `text-[11px]`; weights 400–900 |
+| Theme preference | OS light/dark only | Same |
+| Category, status, points, cheer | Keep the hues, used for small marks only | Same hues, sometimes as large fills |
+| Provider identity | Kakao yellow, Naver green and provider marks through provider button variants | Same |
+| Home discovery | Clubs → Rinks → Matches, with equally compact club-finder banners and the monthly ranking disclosure | Same |
 
-Theme scopes must cover user routes outside `(public)`, including onboarding, chat rooms, fortune controls and the Lounge membership brochure. Global notification and install UI needs its own explicit scope because it is rendered in the locale layout. Administrator screens and export canvases must not inherit the new public appearance accidentally.
+Theme scopes must cover user routes outside `(public)`, including onboarding, chat rooms, fortune controls and the Lounge membership brochure. Global notification and install UI needs its own explicit scope because it is rendered in the locale layout. Administrator screens and export canvases must not pick up the public appearance by accident.
 
 ## Components and recipes
 
