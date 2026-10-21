@@ -1,34 +1,42 @@
 "use client";
+import { useTranslations } from "next-intl";
+import { buttonStyles } from "@/components/ui/styles";
 
 import { useEffect, useState } from "react";
-import { Download, X } from "lucide-react";
+import { X } from "lucide-react";
 import { useNotification } from "@/contexts/notification-context";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 
+interface InstallPromptEvent extends Event {
+  prompt(): Promise<void>;
+  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
+}
+
 export function InstallPrompt() {
+  const copy = useTranslations("installUi");
   const pathname = usePathname();
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [deferredPrompt, setDeferredPrompt] = useState<InstallPromptEvent | null>(null);
   const [isVisible, setIsVisible] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
   const { openGuide, isOpen } = useNotification();
 
   useEffect(() => {
     // Check if mobile device
-    const userAgent = window.navigator.userAgent || window.navigator.vendor || (window as any).opera;
+    const userAgent = window.navigator.userAgent || window.navigator.vendor;
     const isMobile = /iPhone|iPad|iPod|Android/i.test(userAgent);
-    
+
     // Don't show on desktop
     if (!isMobile) {
       return;
     }
 
     // Android / Desktop PWA Prompt
-    const handler = (e: any) => {
+    const handler = (e: Event) => {
       // Prevent Chrome 67 and earlier from automatically showing the prompt
       e.preventDefault();
       // Stash the event so it can be triggered later.
-      setDeferredPrompt(e);
+      setDeferredPrompt(e as InstallPromptEvent);
       setIsVisible(true);
     };
 
@@ -37,28 +45,31 @@ export function InstallPrompt() {
     // iOS and In-App Browser Detection
     const ua = userAgent.toLowerCase();
     const isIosDevice = /iphone|ipad|ipod/.test(ua);
-    const isStandalone = (window.navigator as any).standalone === true || 
+    const isStandalone = (window.navigator as Navigator & { standalone?: boolean }).standalone === true ||
                         window.matchMedia("(display-mode: standalone)").matches;
-    
+
     // Detect In-App Browsers (KakaoTalk, Instagram, Facebook, Line, etc.)
     const isInApp = /kakaotalk|instagram|fban|fbav|line/i.test(ua);
 
     // Show prompt if:
     // 1. iOS and NOT standalone
     // 2. Any Mobile In-App Browser and NOT standalone (since beforeinstallprompt often fails there)
-    if (!isStandalone && (isIosDevice || isInApp)) {
+    const timer = window.setTimeout(() => { if (!isStandalone && (isIosDevice || isInApp)) {
         if (isIosDevice) setIsIOS(true);
         setIsVisible(true);
-    }
+    } }, 0);
 
-    window.addEventListener("appinstalled", () => {
+    const handleInstalled = () => {
       // Log app installed to analytics if needed
       setDeferredPrompt(null);
       setIsVisible(false);
-    });
+    };
+    window.addEventListener("appinstalled", handleInstalled);
 
     return () => {
       window.removeEventListener("beforeinstallprompt", handler);
+      window.removeEventListener("appinstalled", handleInstalled);
+      window.clearTimeout(timer);
     };
   }, []);
 
@@ -77,7 +88,7 @@ export function InstallPrompt() {
 
     // Wait for the user to respond to the prompt
     const { outcome } = await deferredPrompt.userChoice;
-    
+
     // Optionally log outcome
     // console.log(`User response to the install prompt: ${outcome}`);
 
@@ -94,40 +105,40 @@ export function InstallPrompt() {
   };
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 z-50 animate-in slide-in-from-bottom-5 duration-300">
-      <div className="relative bg-zinc-900 dark:bg-zinc-800 text-white p-5 rounded-2xl shadow-2xl flex items-center justify-between gap-4 border border-zinc-800 dark:border-zinc-700">
-        
+    <div className="pp-ui fixed bottom-4 left-4 right-4 z-50 animate-in slide-in-from-bottom-5 duration-300">
+      <div className="relative bg-zinc-900 dark:bg-pp-surface text-white p-5 rounded-2xl shadow-2xl flex items-center justify-between gap-4 border border-pp-border ">
+
         {/* Close Button - Top Right */}
-        <button
+        <button type="button"
+            aria-label="닫기 / Close"
             onClick={handleDismiss}
-            className="absolute -top-2 -right-2 p-1.5 bg-zinc-800 text-zinc-400 hover:text-white rounded-full border border-zinc-700 shadow-md transition"
+            className={buttonStyles({ variant: "outline", size: "compact" }) + " absolute -top-2 -right-2"}
         >
             <X className="w-4 h-4" />
         </button>
 
         <div className="flex items-center gap-4">
-          <div className="relative w-12 h-12 rounded-xl overflow-hidden shadow-sm border border-zinc-200 dark:border-zinc-700 flex-shrink-0">
-             <Image 
-               src="/favicon.png" 
-               alt="PowerPlay" 
+          <div className="relative w-12 h-12 rounded-xl overflow-hidden shadow-sm border border-pp-border flex-shrink-0">
+             <Image
+               src="/favicon.png"
+               alt="PowerPlay"
                fill
                className="object-cover"
              />
           </div>
           <div>
-            <p className="font-bold text-base">PowerPlay 앱 설치</p>
-            <p className="text-xs text-zinc-400">
-                {isIOS ? "홈 화면에 추가하여 앱처럼 사용하세요" : "더 빠르고 편리하게 이용하세요"}
+            <p className="font-bold text-base">{copy("title")}</p>
+            <p className="text-xs text-pp-muted">
+                {isIOS ? copy("iosHelp") : copy("help")}
             </p>
           </div>
         </div>
-        
-        <button
+
+        <button type="button"
             onClick={handleInstallClick}
-            className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 active:scale-95 rounded-xl text-sm font-bold transition whitespace-nowrap shadow-lg shadow-blue-900/20"
+            className={buttonStyles({ variant: "primary", size: "compact" }) + " active:scale-95"}
           >
-            설치하기
-        </button>
+            {copy("install")}</button>
       </div>
     </div>
   );

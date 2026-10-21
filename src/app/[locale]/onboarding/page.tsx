@@ -25,9 +25,9 @@ export default async function OnboardingPage({
 
   return (
     <div className="mx-auto max-w-2xl py-8">
-      <OnboardingForm 
-        profile={profile} 
-        locale={locale} 
+      <OnboardingForm
+        profile={profile}
+        locale={locale}
       />
     </div>
   );

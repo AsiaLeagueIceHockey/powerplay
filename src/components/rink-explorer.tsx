@@ -1,4 +1,7 @@
 "use client";
+import { useTranslations } from "next-intl";
+
+import { badgeStyles, buttonStyles, fieldStyles, surfaceStyles, segmentedItemStyles } from "@/components/ui/styles";
 
 import { useState } from "react";
 import { Rink, Club } from "@/app/actions/types";
@@ -15,6 +18,7 @@ interface RinkExplorerProps {
 }
 
 export function RinkExplorer({ rinks, matches, clubs }: RinkExplorerProps) {
+  const copy = useTranslations("rinkExplorer");
   const locale = useLocale();
   const [viewMode, setViewMode] = useState<"map" | "list">("map");
   const [searchQuery, setSearchQuery] = useState("");
@@ -29,60 +33,49 @@ export function RinkExplorer({ rinks, matches, clubs }: RinkExplorerProps) {
     <div className="flex flex-col gap-4">
       {/* Search & Toggle Bar */}
       {/* Search & Toggle Bar */}
-      <div className="flex flex-col gap-3 sticky top-0 z-10 bg-white dark:bg-zinc-950 pb-2">
+      <div className="flex flex-col gap-3 sticky top-0 z-10 bg-pp-surface pb-2">
         {/* View Toggle */}
         <div className="flex justify-end">
-            <div className="flex bg-zinc-100 p-1 rounded-lg dark:bg-zinc-800">
-            <button
+            <div className="flex bg-pp-surface-muted p-1 rounded-lg ">
+            <button type="button"
                 onClick={() => setViewMode("map")}
-                className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-bold transition-all ${
-                viewMode === "map"
-                    ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-700 dark:text-white"
-                    : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400"
-                }`}
+                className={`${segmentedItemStyles({ selected: viewMode === "map" })} flex items-center gap-2 `}
             >
                 <MapIcon className="w-4 h-4" />
-                지도
-            </button>
-            <button
+                {copy("map")}</button>
+            <button type="button"
                 onClick={() => setViewMode("list")}
-                className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-bold transition-all ${
-                viewMode === "list"
-                    ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-700 dark:text-white"
-                    : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400"
-                }`}
+                className={`${segmentedItemStyles({ selected: viewMode === "list" })} flex items-center gap-2 `}
             >
                 <List className="w-4 h-4" />
-                목록
-            </button>
+                {copy("list")}</button>
             </div>
         </div>
 
         {/* Search Input (Only relevant for list view) */}
         {viewMode === "list" && (
             <div className="relative animate-in fade-in slide-in-from-top-1 duration-300">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-            <input 
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-pp-muted" />
+            <input
                 type="text"
-                placeholder="링크장 검색..."
+                placeholder={copy("search")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-4 py-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm font-medium transition-shadow"
+                className={`${fieldStyles({ leadingIcon: true })} w-full`}
             />
             </div>
         )}
       </div>
 
       {/* Content Area */}
-      <div className={`flex-1 relative rounded-xl overflow-hidden ${viewMode === 'map' ? 'h-[calc(100vh-200px)] min-h-[600px] border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900' : ''}`}>
+      <div className={`flex-1 relative rounded-xl overflow-hidden ${viewMode === 'map' ? 'h-[calc(100vh-200px)] min-h-[600px] border border-pp-border bg-pp-surface-muted ' : ''}`}>
         {viewMode === "map" ? (
           <DynamicRinkMap rinks={rinks} matches={matches} clubs={clubs} />
         ) : (
           <div className="pb-4">
             {filteredRinks.length === 0 ? (
-                <div className="h-full flex items-center justify-center text-zinc-500">
-                    검색 결과가 없습니다.
-                </div>
+                <div className="h-full flex items-center justify-center text-pp-muted">
+                    {copy("empty")}</div>
             ) : (
                 <div className="flex flex-col gap-4">
                 {filteredRinks.map((rink) => {
@@ -91,25 +84,25 @@ export function RinkExplorer({ rinks, matches, clubs }: RinkExplorerProps) {
                         .filter((m) => new Date(m.start_time) >= new Date())
                         .sort((a,b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime())
                         .slice(0, 2);
-                    
+
                     const rinkClubs = clubs.filter(c => c.rinks?.some(r => r.id === rink.id));
                     const hasContent = rinkMatches.length > 0 || rinkClubs.length > 0;
 
                     return (
-                        <div key={rink.id} className="bg-white dark:bg-zinc-900 p-5 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
+                        <div key={rink.id} className={surfaceStyles({ interactive: false, density: "default" })}>
                              {/* Header */}
                             <div className="flex justify-between items-start mb-4">
                                 <div>
-                                    <h3 className="font-bold text-lg text-zinc-900 dark:text-white mb-1">{rink.name_ko}</h3>
-                                    <p className="text-sm text-zinc-500 flex items-center gap-1">
+                                    <h3 className="font-bold text-lg text-pp-text dark:text-white mb-1">{rink.name_ko}</h3>
+                                    <p className="text-sm text-pp-muted flex items-center gap-1">
                                         <MapPin className="w-3.5 h-3.5 shrink-0" />
-                                        {rink.address || "주소 미등록"}
+                                        {rink.address || copy("noAddress")}
                                     </p>
                                 </div>
                                 <div className="flex flex-col items-end gap-2">
                                      {rink.rink_type && (
-                                        <span className="text-xs text-zinc-500 bg-zinc-100 dark:bg-zinc-800 px-2 py-1 rounded whitespace-nowrap">
-                                            {rink.rink_type === 'FULL' ? '정규 규격' : '미니 링크'}
+                                        <span className={`${badgeStyles({ tone: "neutral" })} whitespace-nowrap`}>
+                                            {rink.rink_type === 'FULL' ? copy("fullRink") : copy("miniRink")}
                                         </span>
                                     )}
                                 </div>
@@ -120,18 +113,18 @@ export function RinkExplorer({ rinks, matches, clubs }: RinkExplorerProps) {
                                 {/* Matches */}
                                 {rinkMatches.length > 0 && (
                                     <div>
-                                        <h4 className="text-xs font-semibold text-zinc-900 dark:text-zinc-100 mb-2">예정된 경기</h4>
+                                        <h4 className="text-xs font-semibold text-pp-text mb-2">{copy("upcoming")}</h4>
                                         <div className="space-y-2">
                                             {rinkMatches.map(match => (
                                                 <Link key={match.id} href={`/match/${match.id}`} className="block">
-                                                    <div className="flex items-center justify-between p-3 bg-zinc-50 dark:bg-zinc-800/50 rounded-lg border border-zinc-100 dark:border-zinc-800 hover:border-blue-300 dark:hover:border-blue-700 transition-colors">
+                                                    <div className={`${surfaceStyles({ interactive: true, density: "default" })} flex items-center justify-between`}>
                                                         <div className="flex flex-col">
-                                                            <span className="text-sm font-bold text-zinc-800 dark:text-zinc-200">
+                                                            <span className="text-sm font-bold text-pp-text ">
                                                                 {new Intl.DateTimeFormat("ko-KR", { month: "short", day: "numeric", weekday: "short", hour: "2-digit", minute:"2-digit", hour12: false, timeZone: "Asia/Seoul" }).format(new Date(match.start_time))}
                                                             </span>
-                                                            <span className="text-xs text-zinc-500 line-clamp-1">{match.description || "친선 경기"}</span>
+                                                            <span className="text-xs text-pp-muted line-clamp-1">{match.description || copy("friendly")}</span>
                                                         </div>
-                                                        <span className="ml-2 text-xs font-medium text-blue-600 bg-blue-50 dark:bg-blue-900/20 px-2 py-1 rounded whitespace-nowrap">신청 가능</span>
+                                                        <span className={`${badgeStyles({ tone: "brand" })} ml-2 whitespace-nowrap`}>{copy("available")}</span>
                                                     </div>
                                                 </Link>
                                             ))}
@@ -142,41 +135,39 @@ export function RinkExplorer({ rinks, matches, clubs }: RinkExplorerProps) {
                                 {/* Clubs */}
                                 {rinkClubs.length > 0 && (
                                     <div>
-                                        <h4 className="text-xs font-semibold text-zinc-900 dark:text-zinc-100 mb-2">주 이용 동호회</h4>
+                                        <h4 className="text-xs font-semibold text-pp-text mb-2">{copy("clubs")}</h4>
                                         <div className="flex flex-wrap gap-2">
                                             {rinkClubs.map(club => (
-                                                <Link key={club.id} href={`/clubs/${club.id}`} className="flex items-center gap-2 px-3 py-2 bg-zinc-50 dark:bg-zinc-800/50 rounded-lg border border-zinc-100 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-600 transition-colors">
-                                                    <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">{club.name}</span>
+                                                <Link key={club.id} href={`/clubs/${club.id}`} className={`${surfaceStyles({ interactive: true, density: "none" })} flex items-center gap-2 `}>
+                                                    <span className="text-sm font-medium text-pp-muted ">{club.name}</span>
                                                 </Link>
                                             ))}
                                         </div>
                                     </div>
                                 )}
-                                
+
                                 {!hasContent && (
-                                    <div className="text-xs text-zinc-400 py-2 border-t border-dashed border-zinc-200 dark:border-zinc-800 mt-2">
-                                        현재 등록된 경기나 동호회가 없습니다.
-                                    </div>
+                                    <div className="text-xs text-pp-muted py-2 border-t border-dashed border-pp-border mt-2">
+                                        {copy("noActivity")}</div>
                                 )}
                             </div>
-                            
+
                             {/* Actions */}
-                             <div className="mt-5 pt-3 border-t border-zinc-100 dark:border-zinc-800">
+                             <div className="mt-5 pt-3 border-t border-pp-border ">
                                 <div className="grid grid-cols-2 gap-2">
                                     <Link
                                         href={`/rinks/${rink.id}`}
-                                        className="block w-full text-center text-sm font-bold bg-zinc-900 text-white py-3 rounded-xl hover:bg-blue-600 transition-colors dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-blue-400"
+                                        className={`${buttonStyles({ variant: "primary", size: "default" })} block w-full text-center `}
                                     >
                                         {locale === "ko" ? "링크장 상세" : "Rink details"}
                                     </Link>
-                                    <a 
+                                    <a
                                         href={rink.map_url || `https://map.naver.com/v5/search/${rink.name_ko}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="block w-full text-center text-sm font-bold bg-[#03C75A] text-white py-3 rounded-xl hover:bg-[#02b351] transition-colors"
+                                        className={`${buttonStyles({ variant: "naver", size: "default" })} block w-full text-center `}
                                     >
-                                        네이버 지도
-                                    </a>
+                                        {copy("naver")}</a>
                                 </div>
                              </div>
                         </div>

@@ -1,4 +1,5 @@
 "use client";
+import { buttonStyles, fieldStyles, filterChipStyles, overlayStyles, surfaceStyles } from "@/components/ui/styles";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -36,12 +37,13 @@ const DETAILED_POSITIONS: Record<string, string[]> = {
 };
 
 export function OnboardingForm({ profile, locale }: OnboardingFormProps) {
+  const copy = useTranslations("onboardingUi");
   const router = useRouter();
   const t = useTranslations("profile");
   const tMatch = useTranslations("match");
-  
+
   const [loading, setLoading] = useState(false);
-  
+
   // Form data
   const [formData, setFormData] = useState<{
     fullName: string;
@@ -91,7 +93,7 @@ export function OnboardingForm({ profile, locale }: OnboardingFormProps) {
       return;
     }
     setLoading(true);
-    
+
     const fd = new FormData();
     fd.set("fullName", formData.fullName);
     fd.set("position", formData.position || "");
@@ -100,7 +102,7 @@ export function OnboardingForm({ profile, locale }: OnboardingFormProps) {
     fd.set("birthDate", formData.birthDate);
     fd.set("termsAgreed", formData.termsAgreed.toString());
     fd.set("onboarding_completed", "true"); // Complete onboarding immediately
-    
+
     if (formData.hockeyStartDate) {
       fd.set("hockeyStartDate", formData.hockeyStartDate);
     }
@@ -111,57 +113,57 @@ export function OnboardingForm({ profile, locale }: OnboardingFormProps) {
       // Must append as a string for FormData, server action should parse it
       fd.set("detailedPositions", JSON.stringify(formData.detailedPositions));
     }
-    
+
     await updateProfile(fd);
-    
+
     router.push(`/${locale}`);
     router.refresh();
   };
 
   // Form Validation Logic
-  const isFormValid = 
-    formData.fullName && 
-    formData.phone && 
-    formData.birthDate && 
-    formData.termsAgreed && 
-    formData.hockeyStartDate && 
+  const isFormValid =
+    formData.fullName &&
+    formData.phone &&
+    formData.birthDate &&
+    formData.termsAgreed &&
+    formData.hockeyStartDate &&
     formData.stickDirection;
 
   return (
     <>
       <div className="space-y-8">
-        <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-6 space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+        <div className={`${surfaceStyles({ density: "default" })} space-y-6 animate-in fade-in slide-in-from-right-4`}>
           <div className="text-center">
-            <h1 className="text-2xl font-bold">👋 환영합니다!</h1>
-            <p className="text-zinc-500 mt-2">기본 정보를 입력해주세요</p>
+            <h1 className="text-2xl font-bold">{copy("welcome")}</h1>
+            <p className="text-pp-muted mt-2">{copy("intro")}</p>
           </div>
 
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-2">{t("fullName")} <span className="text-red-500">*</span></label>
-              <input
+              <label htmlFor={"onboarding-form-1"} className="block text-sm font-medium mb-2">{t("fullName")} <span className="text-pp-danger-text">*</span></label>
+              <input id={"onboarding-form-1"}
                 type="text"
                 value={formData.fullName}
                 onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                placeholder="홍길동"
-                className="w-full px-4 py-3 rounded-lg border border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800 focus:ring-2 focus:ring-blue-500"
+                placeholder={copy("nameExample")}
+                className={`${fieldStyles()} w-full`}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">{t("phone")} <span className="text-red-500">*</span></label>
-              <input
+              <label htmlFor={"onboarding-form-2"} className="block text-sm font-medium mb-2">{t("phone")} <span className="text-pp-danger-text">*</span></label>
+              <input id={"onboarding-form-2"}
                 type="tel"
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                 placeholder={t("placeholder.phone")}
-                className="w-full px-4 py-3 rounded-lg border border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800 focus:ring-2 focus:ring-blue-500"
+                className={`${fieldStyles()} w-full`}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">{t("birthDate")} <span className="text-red-500">*</span></label>
-              <BirthDatePicker 
+              <label htmlFor={"onboarding-form-3"} className="block text-sm font-medium mb-2">{t("birthDate")} <span className="text-pp-danger-text">*</span></label>
+              <BirthDatePicker id={"onboarding-form-3"}
                 value={formData.birthDate}
                 onChange={(date) => setFormData({ ...formData, birthDate: date })}
                 placeholder={t("placeholder.birthDate")}
@@ -169,17 +171,17 @@ export function OnboardingForm({ profile, locale }: OnboardingFormProps) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">{t("position")}</label>
-              <select
+              <label htmlFor={"onboarding-form-4"} className="block text-sm font-medium mb-2">{t("position")}</label>
+              <select id={"onboarding-form-4"}
                 value={formData.position || ""}
                 onChange={(e) => {
-                  setFormData({ 
-                    ...formData, 
+                  setFormData({
+                    ...formData,
                     position: (e.target.value as "FW" | "DF" | "G" | "") || null,
                     detailedPositions: [] // Reset detailed positions when base position changes
                   })
                 }}
-                className="w-full px-4 py-3 rounded-lg border border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800"
+                className={`${fieldStyles()} w-full`}
               >
                 <option value="">{tMatch("position.NONE")}</option>
                 <option value="FW">{tMatch("position.FW")}</option>
@@ -189,11 +191,11 @@ export function OnboardingForm({ profile, locale }: OnboardingFormProps) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">{t("preferredLang")}</label>
-              <select
+              <label htmlFor={"onboarding-form-5"} className="block text-sm font-medium mb-2">{t("preferredLang")}</label>
+              <select id={"onboarding-form-5"}
                 value={formData.preferredLang}
                 onChange={(e) => setFormData({ ...formData, preferredLang: e.target.value as "ko" | "en" })}
-                className="w-full px-4 py-3 rounded-lg border border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800"
+                className={`${fieldStyles()} w-full`}
               >
                 <option value="ko">한국어</option>
                 <option value="en">English</option>
@@ -203,9 +205,9 @@ export function OnboardingForm({ profile, locale }: OnboardingFormProps) {
             {/* Hockey Start Date (Experience) */}
             <div>
               <label className="block text-sm font-medium mb-1">
-                아이스하키 시작 <span className="text-red-500">*</span>
+                {copy("hockeyStart")}<span className="text-pp-danger-text">*</span>
               </label>
-              <p className="text-xs text-zinc-500 mb-2">구력 계산을 위해 처음 하키를 시작한 시기를 선택해주세요.</p>
+              <p className="text-xs text-pp-muted mb-2">{copy("hockeyHelp")}</p>
               <div className="flex gap-2">
                 <select
                   value={formData.hockeyStartDate ? formData.hockeyStartDate.split("-")[0] : ""}
@@ -214,11 +216,11 @@ export function OnboardingForm({ profile, locale }: OnboardingFormProps) {
                     const month = formData.hockeyStartDate ? formData.hockeyStartDate.split("-")[1] : "01";
                     setFormData({ ...formData, hockeyStartDate: year ? `${year}-${month}-01` : "" });
                   }}
-                  className="w-full px-4 py-3 rounded-lg border border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800 focus:ring-2 focus:ring-blue-500"
+                  className={`${fieldStyles()} w-full`}
                 >
-                  <option value="">년도 선택</option>
+                  <option value="">{copy("year")}</option>
                   {years.map((y) => (
-                    <option key={y} value={y}>{y}년</option>
+                    <option key={y} value={y}>{y}{copy("yearSuffix")}</option>
                   ))}
                 </select>
                 <select
@@ -228,11 +230,11 @@ export function OnboardingForm({ profile, locale }: OnboardingFormProps) {
                     const year = formData.hockeyStartDate ? formData.hockeyStartDate.split("-")[0] : currentYear.toString();
                     setFormData({ ...formData, hockeyStartDate: month ? `${year}-${month}-01` : "" });
                   }}
-                  className="w-full px-4 py-3 rounded-lg border border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800 focus:ring-2 focus:ring-blue-500"
+                  className={`${fieldStyles()} w-full`}
                 >
-                  <option value="">월 선택</option>
+                  <option value="">{copy("month")}</option>
                   {months.map((m) => (
-                    <option key={m} value={m}>{m}월</option>
+                    <option key={m} value={m}>{m}{copy("monthSuffix")}</option>
                   ))}
                 </select>
               </div>
@@ -241,7 +243,7 @@ export function OnboardingForm({ profile, locale }: OnboardingFormProps) {
             {/* Stick Direction */}
             <div>
               <label className="block text-sm font-medium mb-2">
-                스틱 방향 <span className="text-red-500">*</span>
+                {copy("stick")}<span className="text-pp-danger-text">*</span>
               </label>
               <div className="flex gap-4">
                 <label className="flex items-center gap-2 cursor-pointer">
@@ -251,9 +253,9 @@ export function OnboardingForm({ profile, locale }: OnboardingFormProps) {
                     value="LEFT"
                     checked={formData.stickDirection === "LEFT"}
                     onChange={() => setFormData({ ...formData, stickDirection: "LEFT" })}
-                    className="w-4 h-4 text-blue-600 focus:ring-blue-500"
+                    className="w-4 h-4 text-pp-accent-text focus:ring-pp-accent"
                   />
-                  <span>레프트 (Left)</span>
+                  <span>{copy("left")}</span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
@@ -262,9 +264,9 @@ export function OnboardingForm({ profile, locale }: OnboardingFormProps) {
                     value="RIGHT"
                     checked={formData.stickDirection === "RIGHT"}
                     onChange={() => setFormData({ ...formData, stickDirection: "RIGHT" })}
-                    className="w-4 h-4 text-blue-600 focus:ring-blue-500"
+                    className="w-4 h-4 text-pp-accent-text focus:ring-pp-accent"
                   />
-                  <span>라이트 (Right)</span>
+                  <span>{copy("right")}</span>
                 </label>
               </div>
             </div>
@@ -272,7 +274,7 @@ export function OnboardingForm({ profile, locale }: OnboardingFormProps) {
             {/* Detailed Positions (Conditionally rendered) */}
             {formData.position && DETAILED_POSITIONS[formData.position] && (
               <div className="animate-in fade-in slide-in-from-top-2 duration-200">
-                <label className="block text-sm font-medium mb-2">상세 포지션</label>
+                <label className="block text-sm font-medium mb-2">{copy("positions")}</label>
                 <div className="flex flex-wrap gap-2">
                   {DETAILED_POSITIONS[formData.position].map((pos) => {
                     const isSelected = formData.detailedPositions.includes(pos);
@@ -281,11 +283,8 @@ export function OnboardingForm({ profile, locale }: OnboardingFormProps) {
                         key={pos}
                         type="button"
                         onClick={() => handleDetailedPositionToggle(pos)}
-                        className={`px-4 py-2 rounded-lg border text-sm font-medium transition-colors ${
-                          isSelected
-                            ? "bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-900/30 dark:border-blue-800 dark:text-blue-300"
-                            : "bg-white border-zinc-200 text-zinc-700 hover:bg-zinc-50 dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-800"
-                        }`}
+                        aria-pressed={isSelected}
+                        className={filterChipStyles({ selected: isSelected })}
                       >
                         {pos}
                         {isSelected && <Check className="w-3 h-3 inline-block ml-1" />}
@@ -298,34 +297,34 @@ export function OnboardingForm({ profile, locale }: OnboardingFormProps) {
 
             {/* Terms Agreement */}
             <div className="pt-2">
-              <label className="flex items-start space-x-3 p-3 border border-zinc-200 dark:border-zinc-800 rounded-lg cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition relative">
+              <label className="flex items-start space-x-3 p-3 border border-pp-border rounded-lg cursor-pointer hover:bg-pp-surface-muted transition relative">
                 <input
                   type="checkbox"
                   checked={formData.termsAgreed}
                   onChange={(e) => setFormData({ ...formData, termsAgreed: e.target.checked })}
-                  className="mt-1 w-5 h-5 text-blue-600 rounded focus:ring-blue-500 shrink-0"
+                  className="mt-1 w-5 h-5 text-pp-accent-text rounded focus:ring-pp-accent shrink-0"
                 />
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-sm block">{t("terms.title")} <span className="text-red-500 text-xs font-normal">{t("terms.required")}</span></span>
-                    <button 
+                    <span className="font-bold text-sm block">{t("terms.title")} <span className="text-pp-danger-text text-xs font-normal">{t("terms.required")}</span></span>
+                    <button
                       type="button"
                       onClick={(e) => {
                         e.preventDefault();
                         setShowTermsModal(true);
                       }}
-                      className="text-xs text-zinc-500 underline hover:text-blue-500 z-10"
+                      className={`${buttonStyles({ variant: "ghost", size: "compact" })} underline z-10`}
                     >
                       {t("terms.viewDetails")}
                     </button>
                   </div>
-                  <p className="text-zinc-500 text-xs mt-1 leading-snug">{t("terms.agree")}</p>
-                  <div className="mt-2 flex items-center gap-3 text-[11px] text-zinc-400 dark:text-zinc-500">
-                    <Link href="/privacy" className="underline underline-offset-2 hover:text-zinc-600 dark:hover:text-zinc-300">
+                  <p className="text-pp-muted text-xs mt-1 leading-snug">{t("terms.agree")}</p>
+                  <div className="mt-2 flex items-center gap-3 text-[11px] text-pp-muted ">
+                    <Link href="/privacy" className="underline underline-offset-2 hover:text-pp-muted ">
                       {locale === "ko" ? "개인정보처리방침" : "Privacy Policy"}
                     </Link>
-                    <Link href="/terms" className="underline underline-offset-2 hover:text-zinc-600 dark:hover:text-zinc-300">
-                      {locale === "ko" ? "이용약관" : "Terms of Service"}
+                    <Link href="/terms" className="underline underline-offset-2 hover:text-pp-muted ">
+                      {locale === "ko" ? copy("terms") : "Terms of Service"}
                     </Link>
                   </div>
                 </div>
@@ -333,12 +332,12 @@ export function OnboardingForm({ profile, locale }: OnboardingFormProps) {
             </div>
           </div>
 
-          <button
+          <button type="button"
             onClick={handleSubmit}
             disabled={loading || !isFormValid}
-            className="w-full py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 flex items-center justify-center gap-2"
+            className={`${buttonStyles({ variant: "primary", size: "large" })} w-full`}
           >
-            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "완료"}
+            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : copy("done")}
           </button>
         </div>
       </div>
@@ -346,40 +345,41 @@ export function OnboardingForm({ profile, locale }: OnboardingFormProps) {
       {/* Full Screen Modal for Terms */}
       {showTermsModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-zinc-900 rounded-2xl w-full max-w-lg max-h-[85vh] flex flex-col shadow-2xl animate-in zoom-in-95 duration-200">
-            <div className="p-4 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between sticky top-0 bg-white dark:bg-zinc-900 rounded-t-2xl z-10">
-              <h3 className="font-bold text-lg">{t("terms.title")}</h3>
-              <button 
+          <div role="dialog" aria-modal="true" aria-labelledby="onboarding-terms-title" className={overlayStyles() + " w-full max-w-lg max-h-[85vh] flex flex-col animate-in zoom-in-95 duration-200"}>
+            <div className={`${surfaceStyles({ density: "compact" })} flex items-center justify-between sticky top-0 z-10`}>
+              <h3 id="onboarding-terms-title" className="font-bold text-lg">{t("terms.title")}</h3>
+              <button type="button"
                 onClick={() => setShowTermsModal(false)}
-                className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full"
+                aria-label={locale === "ko" ? "닫기" : "Close"}
+                className={buttonStyles({ variant: "secondary", size: "compact", shape: "circle" })}
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
-            
+
             <div className="p-6 overflow-y-auto space-y-8">
               <div>
-                <h4 className="font-bold text-zinc-900 dark:text-zinc-100 mb-2">개인정보 처리방침</h4>
-                <p className="text-sm text-zinc-600 dark:text-zinc-400 whitespace-pre-wrap leading-relaxed bg-zinc-50 dark:bg-zinc-800/50 p-4 rounded-lg">
+                <h4 className="font-bold text-pp-text mb-2">{copy("privacy")}</h4>
+                <p className="text-sm text-pp-muted whitespace-pre-wrap leading-relaxed bg-pp-surface-muted p-4 rounded-lg">
                   {t("terms.privacyPolicySummary")}
                 </p>
               </div>
 
               <div>
-                <h4 className="font-bold text-zinc-900 dark:text-zinc-100 mb-2">이용약관</h4>
-                <p className="text-sm text-zinc-600 dark:text-zinc-400 whitespace-pre-wrap leading-relaxed bg-zinc-50 dark:bg-zinc-800/50 p-4 rounded-lg">
+                <h4 className="font-bold text-pp-text mb-2">{copy("terms")}</h4>
+                <p className="text-sm text-pp-muted whitespace-pre-wrap leading-relaxed bg-pp-surface-muted p-4 rounded-lg">
                   {t("terms.termsFullText")}
                 </p>
               </div>
             </div>
 
-            <div className="p-4 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50 rounded-b-2xl sticky bottom-0 z-10">
-              <button
+            <div className="p-4 border-t border-pp-border bg-pp-surface-muted rounded-b-2xl sticky bottom-0 z-10">
+              <button type="button"
                 onClick={() => setShowTermsModal(false)}
-                className="w-full py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition active:scale-[0.98]"
+                aria-label={locale === "ko" ? "닫기" : "Close"}
+                className={`${buttonStyles({ variant: "primary", size: "default" })} w-full`}
               >
-                확인
-              </button>
+                {copy("confirm")}</button>
             </div>
           </div>
         </div>
