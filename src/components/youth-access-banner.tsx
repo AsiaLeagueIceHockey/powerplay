@@ -1,4 +1,5 @@
 "use client";
+import { buttonStyles } from "@/components/ui/styles";
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
@@ -66,17 +67,17 @@ export function YouthAccessBanner() {
   const needsPush = !hasDbSubscription;
 
   return (
-    <div className="border border-amber-200 bg-amber-50/50 px-4 py-3 dark:border-amber-900/40 dark:bg-amber-950/20 rounded-xl mb-4">
+    <div className="border border-pp-warning-border bg-pp-warning-soft/50 px-4 py-3 rounded-xl mb-4">
       <div className="flex w-full items-start gap-3">
-        <div className="mt-0.5 rounded-full bg-amber-100 p-2 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300 flex-shrink-0">
+        <div className="mt-0.5 rounded-full bg-pp-warning-soft p-2 text-pp-warning-text flex-shrink-0">
           {needsInstall ? <Download className="h-4 w-4" /> : <BellOff className="h-4 w-4" />}
         </div>
 
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold text-amber-900 dark:text-amber-100">
+          <p className="text-sm font-semibold text-pp-warning-text ">
             {t("accessBannerTitle")}
           </p>
-          <p className="mt-1 text-xs sm:text-sm text-amber-800 dark:text-amber-200 leading-normal">
+          <p className="mt-1 text-xs sm:text-sm text-pp-warning-text leading-normal">
             {needsInstall && needsPush
               ? t("accessBannerDescAll")
               : needsInstall
@@ -86,7 +87,7 @@ export function YouthAccessBanner() {
 
           <div className="mt-3 flex flex-wrap gap-2">
             {needsInstall && os === "android" ? (
-              <button
+              <button type="button"
                 onClick={async () => {
                   if (deferredPrompt) {
                     await promptInstall();
@@ -94,7 +95,7 @@ export function YouthAccessBanner() {
                   }
                   openGuide("install");
                 }}
-                className="inline-flex items-center gap-1 rounded-xl bg-amber-600 px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-amber-700 cursor-pointer select-none border-none focus:outline-none"
+                className={buttonStyles({ variant: "warning", size: "compact" }) + " inline-flex items-center gap-1"}
               >
                 <span>{t("installPwa")}</span>
                 <ArrowRight className="h-3.5 w-3.5" />
@@ -102,9 +103,9 @@ export function YouthAccessBanner() {
             ) : null}
 
             {needsInstall && os !== "android" ? (
-              <button
+              <button type="button"
                 onClick={() => openGuide("install")}
-                className="inline-flex items-center gap-1 rounded-xl bg-amber-600 px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-amber-700 cursor-pointer select-none border-none focus:outline-none"
+                className={buttonStyles({ variant: "warning", size: "compact" }) + " inline-flex items-center gap-1"}
               >
                 <span>{t("installPwa")}</span>
                 <ArrowRight className="h-3.5 w-3.5" />
@@ -112,9 +113,9 @@ export function YouthAccessBanner() {
             ) : null}
 
             {!needsInstall && needsPush ? (
-              <button
+              <button type="button"
                 onClick={() => openGuide("notification")}
-                className="inline-flex items-center gap-1 rounded-xl bg-amber-600 px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-amber-700 cursor-pointer select-none border-none focus:outline-none"
+                className={buttonStyles({ variant: "warning", size: "compact" }) + " inline-flex items-center gap-1"}
               >
                 <span>{t("enablePush")}</span>
                 <ArrowRight className="h-3.5 w-3.5" />

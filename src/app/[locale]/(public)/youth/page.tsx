@@ -48,7 +48,7 @@ export default async function YouthPage({
 
   const myApplication = await getMyParentApplication();
 
-  let isApproved = profile?.parent_verification_status === "approved";
+  const isApproved = profile?.parent_verification_status === "approved";
   const isSuperUser = profile?.role === "superuser";
 
   if ((isApproved || isSuperUser) && profile && !profile.parent_nickname) {
