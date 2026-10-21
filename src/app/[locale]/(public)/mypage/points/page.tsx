@@ -1,3 +1,5 @@
+
+import { buttonStyles, surfaceStyles } from "@/components/ui/styles";
 import { setRequestLocale, getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
@@ -71,21 +73,21 @@ export default async function PointsPage({
     <div className="max-w-2xl mx-auto space-y-6">
       {/* 포인트 잔액 카드 */}
       <div className="bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl p-6 text-white shadow-lg">
-        <p className="text-amber-100 text-sm mb-1">{t("balance")}</p>
+        <p className="text-pp-warning-text text-sm mb-1">{t("balance")}</p>
         <p className="text-4xl font-bold">{points.toLocaleString()}{currencyUnit}</p>
         <Link
           href={`/${locale}/mypage/points/charge`}
-          className="inline-block mt-4 px-6 py-2 bg-white text-amber-600 rounded-lg font-medium hover:bg-amber-50 transition"
+          className={`${buttonStyles({ variant: "points", size: "compact" })} mt-4`}
         >
           {t("charge")} →
         </Link>
       </div>
 
       {/* 포인트 안내 */}
-      <div className="flex gap-3 bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-100 dark:border-blue-800">
-        <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
-        <div className="text-sm text-zinc-700 dark:text-zinc-300 space-y-1">
-          <p className="font-semibold text-blue-800 dark:text-blue-300">
+      <div className="flex gap-3 bg-pp-accent-soft p-4 rounded-xl border border-pp-accent ">
+        <Info className="w-5 h-5 text-pp-accent-text flex-shrink-0 mt-0.5" />
+        <div className="text-sm text-pp-muted space-y-1">
+          <p className="font-semibold text-pp-accent-text ">
             {t("infoTitle")}
           </p>
           <p>
@@ -96,16 +98,16 @@ export default async function PointsPage({
 
       {/* 환불 정책 */}
       {refundPolicy && refundPolicy.rules.length > 0 && (
-        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-sm">
+        <div className={surfaceStyles({ density: "compact" })}>
           <h2 className="text-lg font-bold mb-3">{t("refundPolicy.title")}</h2>
-          <p className="text-sm text-zinc-500 mb-3">{t("refundPolicy.description")}</p>
+          <p className="text-sm text-pp-muted mb-3">{t("refundPolicy.description")}</p>
           <div className="space-y-2">
             {refundPolicy.rules
               .sort((a, b) => b.hoursBeforeMatch - a.hoursBeforeMatch)
               .map((rule, i) => (
                 <div
                   key={i}
-                  className="flex justify-between text-sm py-2 px-3 bg-zinc-50 dark:bg-zinc-800 rounded-lg"
+                  className="flex justify-between text-sm py-2 px-3 bg-pp-surface-muted rounded-lg"
                 >
                   <span>
                     {rule.hoursBeforeMatch === 0
@@ -114,7 +116,7 @@ export default async function PointsPage({
                           ? `경기 ${rule.hoursBeforeMatch}시간 전`
                           : `${rule.hoursBeforeMatch}h before match`)}
                   </span>
-                  <span className={rule.refundPercent === 0 ? "text-red-500" : "text-green-600 font-medium"}>
+                  <span className={rule.refundPercent === 0 ? "text-pp-danger-text" : "text-pp-success-text font-medium"}>
                     {rule.refundPercent === 0
                       ? (locale === "ko" ? "환불 불가" : "No refund")
                       : `${rule.refundPercent}% ${locale === "ko" ? "환불" : "refund"}`}
@@ -127,17 +129,17 @@ export default async function PointsPage({
 
       {/* 충전 요청 내역 */}
       {chargeRequests.length > 0 && (
-        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-sm">
+        <div className={surfaceStyles({ density: "compact" })}>
           <h2 className="text-lg font-bold mb-4">{t("chargeRequest.myRequests")}</h2>
           <div className="space-y-3">
             {chargeRequests.map((req) => (
               <div
                 key={req.id}
-                className="flex items-center justify-between py-3 border-b border-zinc-100 dark:border-zinc-800 last:border-0"
+                className="flex items-center justify-between py-3 border-b border-pp-border last:border-0"
               >
                 <div>
                   <p className="font-medium">{req.amount.toLocaleString()}{currencyUnit}</p>
-                  <p className="text-xs text-zinc-500">
+                  <p className="text-xs text-pp-muted">
                     {new Date(req.created_at).toLocaleDateString(locale === "ko" ? "ko-KR" : "en-US", {
                       timeZone: "Asia/Seoul"
                     })}
@@ -155,7 +157,7 @@ export default async function PointsPage({
                     }}>
                       <button
                         type="submit"
-                        className="px-2 py-1 text-xs text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"
+                        className={buttonStyles({ variant: "danger", size: "compact" })}
                       >
                         {t("chargeRequest.cancel")}
                       </button>
@@ -169,20 +171,20 @@ export default async function PointsPage({
       )}
 
       {/* 포인트 내역 */}
-      <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-sm">
+      <div className={surfaceStyles({ density: "compact" })}>
         <h2 className="text-lg font-bold mb-4">{t("history")}</h2>
         {transactions.length === 0 ? (
-          <p className="text-zinc-500 text-center py-8">{t("noHistory")}</p>
+          <p className="text-pp-muted text-center py-8">{t("noHistory")}</p>
         ) : (
           <div className="space-y-3">
             {transactions.map((tx) => (
               <div
                 key={tx.id}
-                className="flex items-center justify-between py-3 border-b border-zinc-100 dark:border-zinc-800 last:border-0"
+                className="flex items-center justify-between py-3 border-b border-pp-border last:border-0"
               >
                 <div>
                   <p className="font-medium">{tx.description || t(`transaction.${tx.type}`)}</p>
-                  <p className="text-xs text-zinc-500">
+                  <p className="text-xs text-pp-muted">
                     {new Date(tx.created_at).toLocaleString(locale === "ko" ? "ko-KR" : "en-US", {
                       timeZone: "Asia/Seoul",
                       month: "short",
@@ -197,7 +199,7 @@ export default async function PointsPage({
                   <p className={`font-bold ${getTypeColor(tx.type)}`}>
                     {tx.amount > 0 ? "+" : ""}{tx.amount.toLocaleString()}{currencyUnit}
                   </p>
-                  <p className="text-xs text-zinc-400">
+                  <p className="text-xs text-pp-muted">
                     {tx.balance_after.toLocaleString()}{currencyUnit}
                   </p>
                 </div>

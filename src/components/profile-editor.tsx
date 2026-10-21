@@ -1,4 +1,5 @@
 "use client";
+import { buttonStyles, fieldStyles, filterChipStyles, surfaceStyles } from "@/components/ui/styles";
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
@@ -28,12 +29,12 @@ interface ProfileEditorProps {
   updatedAt?: string | null;
 }
 
-export function ProfileEditor({ 
+export function ProfileEditor({
   initialAvatarUrl,
-  initialBio, 
-  hockeyStartDate, 
-  primaryClubId, 
-  detailedPositions, 
+  initialBio,
+  hockeyStartDate,
+  primaryClubId,
+  detailedPositions,
   stickDirection,
   phone,
   birthDate,
@@ -46,10 +47,10 @@ export function ProfileEditor({
   const t = useTranslations();
   const router = useRouter();
   const avatarInputRef = useRef<HTMLInputElement>(null);
-  
+
   const initialYear = hockeyStartDate ? hockeyStartDate.split("-")[0] : "";
   const initialMonth = hockeyStartDate ? hockeyStartDate.split("-")[1] : "";
-  
+
   const [bio, setBio] = useState(initialBio || "");
   const [startYear, setStartYear] = useState(initialYear);
   const [startMonth, setStartMonth] = useState(initialMonth ? parseInt(initialMonth, 10).toString() : "");
@@ -81,17 +82,17 @@ export function ProfileEditor({
     const isYearChanged = startYear !== initialYear;
     const isMonthChanged = startMonth !== (initialMonth ? parseInt(initialMonth, 10).toString() : "");
     const isClubChanged = primaryClubIdState !== (primaryClubId || "");
-    
+
     // Array comparison
     const initialPos = detailedPositions || [];
     const isPosChanged = positions.length !== initialPos.length || !positions.every(p => initialPos.includes(p));
-    
+
     const isStickChanged = stick !== (stickDirection || "");
     const isPhoneChanged = phoneState !== (phone || "");
     const isBirthDateChanged = birthDateState !== (birthDate || "");
     const isNameChanged = nameState !== (fullName || "");
     const isAvatarChanged = Boolean(avatarFile) || avatarUrl !== (initialAvatarUrl || "");
-    
+
     return isBioChanged || isYearChanged || isMonthChanged || isClubChanged || isPosChanged || isStickChanged || isPhoneChanged || isBirthDateChanged || isNameChanged || isAvatarChanged;
   }, [bio, initialBio, startYear, initialYear, startMonth, initialMonth, primaryClubIdState, primaryClubId, positions, detailedPositions, stick, stickDirection, phoneState, phone, birthDateState, birthDate, nameState, fullName, avatarFile, avatarUrl, initialAvatarUrl]);
 
@@ -142,13 +143,13 @@ export function ProfileEditor({
     setSaveError(null);
     const fd = new FormData();
     fd.set("bio", bio);
-    
+
     if (startYear && startMonth) {
       fd.set("hockeyStartDate", `${startYear}-${startMonth.padStart(2, '0')}-01`);
     } else {
       fd.set("hockeyStartDate", "");
     }
-    
+
     fd.set("primaryClubId", primaryClubIdState);
     fd.set("detailedPositions", JSON.stringify(positions));
     fd.set("stickDirection", stick);
@@ -157,7 +158,7 @@ export function ProfileEditor({
     fd.set("fullName", nameState);
     fd.set("avatarUrl", avatarUrl);
     if (avatarFile) fd.set("avatarFile", avatarFile);
-    
+
     const result = await updateProfile(fd);
 
     if (result.error) {
@@ -170,14 +171,14 @@ export function ProfileEditor({
     setAvatarUrl(savedAvatarUrl || "");
     setAvatarPreviewUrl(savedAvatarUrl || "");
     setAvatarFile(null);
-    
+
     setLoading(false);
     setSaved(true);
     router.refresh();
     setTimeout(() => setSaved(false), 2000);
   };
 
-  const isProfileComplete = 
+  const isProfileComplete =
     nameState.trim() !== "" &&
     phoneState.trim() !== "" &&
     startYear !== "" &&
@@ -188,7 +189,7 @@ export function ProfileEditor({
 
   const handleIssueCard = async () => {
     if (!isProfileComplete) return;
-    
+
     setCardLoading(true);
     const result = await issuePlayerCard();
     if (result.success) {
@@ -226,12 +227,12 @@ export function ProfileEditor({
     const start = new Date(parseInt(startYear), parseInt(startMonth) - 1, 1);
     const now = new Date();
     const diffMonths = (now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth());
-    
+
     if (diffMonths <= 0) return t("profile.experience.lessThanMonth");
-    
+
     const y = Math.floor(diffMonths / 12);
     const m = diffMonths % 12;
-    
+
     if (y === 0) return `${m}${t("profile.experience.monthDuration")}`;
     if (m === 0) return `${y}${t("profile.experience.year")}`;
     return t("profile.experience.calculated", { years: y, months: m });
@@ -243,15 +244,15 @@ export function ProfileEditor({
         <div className="flex items-center justify-end px-1">
           <div className="flex items-center gap-3">
             {!isChanged && saved && (
-              <span className="text-sm text-green-600 dark:text-green-400 font-medium">
+              <span className="text-sm text-pp-success-text font-medium">
                 {t("profile.saved")}
               </span>
             )}
             {isChanged && (
-              <button
+              <button type="button"
                 onClick={handleSave}
                 disabled={loading}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                className={buttonStyles({ variant: "primary", size: "compact" })}
               >
                 {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                 {t("common.save")}
@@ -261,9 +262,9 @@ export function ProfileEditor({
         </div>
       )}
 
-      <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-6 space-y-8">
-        <section className="flex items-center gap-4 border-b border-zinc-200 pb-6 dark:border-zinc-800">
-          <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-full border-4 border-white bg-zinc-100 shadow-md ring-1 ring-zinc-200 dark:border-zinc-900 dark:bg-zinc-800 dark:ring-zinc-700">
+      <div className={`${surfaceStyles({ density: "default" })} space-y-8`}>
+        <section className="flex items-center gap-4 border-b border-pp-border pb-6 ">
+          <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-full border-4 border-white bg-pp-surface-muted shadow-md ring-1 ring-pp-border dark:border-pp-border ">
             {avatarPreviewUrl ? (
               <Image
                 src={avatarPreviewUrl}
@@ -273,14 +274,14 @@ export function ProfileEditor({
                 className="object-cover"
               />
             ) : (
-              <div className="flex h-full w-full items-center justify-center text-zinc-400 dark:text-zinc-500">
+              <div className="flex h-full w-full items-center justify-center text-pp-muted ">
                 <UserRound className="h-12 w-12" strokeWidth={1.6} aria-hidden="true" />
               </div>
             )}
           </div>
 
           <div className="min-w-0 flex-1">
-            <h2 className="text-base font-bold text-zinc-900 dark:text-zinc-100">
+            <h2 className="text-base font-bold text-pp-text ">
               {t("profile.photo.title")}
             </h2>
             <input
@@ -298,7 +299,7 @@ export function ProfileEditor({
                 type="button"
                 onClick={() => avatarInputRef.current?.click()}
                 disabled={loading}
-                className="inline-flex min-h-10 items-center gap-2 whitespace-nowrap rounded-xl border border-zinc-300 bg-white px-3.5 py-2 text-sm font-semibold text-zinc-700 transition hover:border-blue-500 hover:text-blue-600 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:border-blue-500 dark:hover:text-blue-400"
+                className={`${buttonStyles({ variant: "primary", size: "default" })}`}
               >
                 <Camera className="h-4 w-4" />
                 {t("profile.photo.choose")}
@@ -310,7 +311,7 @@ export function ProfileEditor({
                   disabled={loading}
                   aria-label={t("profile.photo.remove")}
                   title={t("profile.photo.remove")}
-                  className="inline-flex min-h-10 min-w-10 items-center justify-center rounded-xl text-red-600 transition hover:bg-red-50 disabled:opacity-50 dark:text-red-400 dark:hover:bg-red-950/30"
+                  className={`${buttonStyles({ variant: "danger", size: "default", shape: "circle" })}`}
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
@@ -322,7 +323,7 @@ export function ProfileEditor({
         {saveError ? (
           <p
             role="alert"
-            className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-300"
+            className="rounded-xl border border-pp-danger-border bg-pp-danger-soft px-4 py-3 text-sm text-pp-danger-text "
           >
             {saveError}
           </p>
@@ -331,37 +332,37 @@ export function ProfileEditor({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Full Name */}
         <div className="space-y-3">
-          <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+          <label htmlFor={"profile-editor-1"} className="block text-sm font-medium text-pp-muted ">
             {t("profile.fullName")}
           </label>
-          <input
+          <input id={"profile-editor-1"}
             type="text"
             value={nameState}
             onChange={(e) => setNameState(e.target.value)}
-            className="w-full px-3 py-2 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-transparent text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+            className={`${fieldStyles()} w-full`}
           />
         </div>
 
         {/* Phone Number */}
         <div className="space-y-3">
-          <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+          <label htmlFor={"profile-editor-2"} className="block text-sm font-medium text-pp-muted ">
             {t("profile.phone")}
           </label>
-          <input
+          <input id={"profile-editor-2"}
             type="tel"
             value={phoneState}
             onChange={(e) => setPhoneState(e.target.value)}
             placeholder={t("profile.placeholder.phone")}
-            className="w-full px-3 py-2 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-transparent text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+            className={`${fieldStyles()} w-full`}
           />
         </div>
 
         {/* Birth Date */}
         <div className="space-y-3">
-          <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+          <label htmlFor={"profile-editor-3"} className="block text-sm font-medium text-pp-muted ">
             {t("profile.birthDate")}
           </label>
-          <BirthDatePicker
+          <BirthDatePicker id={"profile-editor-3"}
             value={birthDateState}
             onChange={setBirthDateState}
             placeholder={t("profile.placeholder.birthDate")}
@@ -370,14 +371,14 @@ export function ProfileEditor({
 
         {/* Experience Section */}
         <div className="space-y-3">
-          <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+          <label className="block text-sm font-medium text-pp-muted ">
             {t("profile.experience.title")}
           </label>
           <div className="flex gap-2">
             <select
               value={startYear}
               onChange={(e) => setStartYear(e.target.value)}
-              className="flex-1 px-3 py-2 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-transparent text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+              className={`${fieldStyles()} flex-1`}
             >
               <option value="">{t("profile.experience.placeholderYear")}</option>
               {years.map(y => <option key={`y-${y}`} value={y}>{y}{t("profile.experience.year")}</option>)}
@@ -385,14 +386,14 @@ export function ProfileEditor({
             <select
               value={startMonth}
               onChange={(e) => setStartMonth(e.target.value)}
-              className="w-24 px-3 py-2 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-transparent text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+              className={`${fieldStyles()} w-24`}
             >
               <option value="">{t("profile.experience.placeholderMonth")}</option>
               {months.map(m => <option key={`m-${m}`} value={m}>{m}{t("profile.experience.month")}</option>)}
             </select>
           </div>
           {experienceText && (
-            <p className="text-sm font-medium text-blue-600 dark:text-blue-400 mt-1">
+            <p className="text-sm font-medium text-pp-accent-text mt-1">
               🗓️ {experienceText}
             </p>
           )}
@@ -400,13 +401,13 @@ export function ProfileEditor({
 
         {/* Primary Club */}
         <div className="space-y-3">
-          <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+          <label htmlFor={"profile-editor-4"} className="block text-sm font-medium text-pp-muted ">
             {t("profile.team.title")}
           </label>
-          <select
+          <select id={"profile-editor-4"}
             value={primaryClubIdState}
             onChange={(e) => setPrimaryClubIdState(e.target.value)}
-            className="w-full px-3 py-2 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-transparent text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+            className={`${fieldStyles()} w-full`}
           >
             <option value="">{t("profile.team.none")}</option>
             {clubs.map(c => (
@@ -417,7 +418,7 @@ export function ProfileEditor({
 
         {/* Stick Direction */}
         <div className="space-y-3 md:col-span-2">
-          <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+          <label className="block text-sm font-medium text-pp-muted ">
             {t("profile.stick.title")}
           </label>
           <div className="flex gap-3">
@@ -425,13 +426,9 @@ export function ProfileEditor({
               { val: "LEFT", label: t("profile.stick.left") },
               { val: "RIGHT", label: t("profile.stick.right") }
             ].map(opt => (
-              <label 
-                key={opt.val} 
-                className={`flex items-center justify-center px-4 py-2 border rounded-lg cursor-pointer transition-colors flex-1 md:flex-none md:w-32 ${
-                  stick === opt.val 
-                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400' 
-                    : 'border-zinc-300 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800'
-                }`}
+              <label
+                key={opt.val}
+                className={`${filterChipStyles({ selected: stick === opt.val })} flex-1 md:flex-none md:w-32 focus-within:outline-2 focus-within:outline-offset-2`}
               >
                 <input
                   type="radio"
@@ -449,7 +446,7 @@ export function ProfileEditor({
 
         {/* Detailed Positions */}
         <div className="space-y-3 md:col-span-2">
-          <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+          <label className="block text-sm font-medium text-pp-muted ">
             {t("profile.positions.title")}
           </label>
           <div className="flex flex-wrap gap-2">
@@ -460,11 +457,8 @@ export function ProfileEditor({
                   key={opt.value}
                   type="button"
                   onClick={() => togglePosition(opt.value)}
-                  className={`px-3 py-1.5 rounded-full border text-sm font-medium transition-colors ${
-                    checked
-                      ? 'border-blue-500 bg-blue-500 text-white'
-                      : 'border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800'
-                  }`}
+                  aria-pressed={checked}
+                  className={filterChipStyles({ selected: checked })}
                 >
                   {opt.label}
                 </button>
@@ -474,41 +468,41 @@ export function ProfileEditor({
         </div>
 
         {/* Player Card Section */}
-        <div className="space-y-4 md:col-span-2 pt-4 border-t border-zinc-200 dark:border-zinc-800">
-          <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+        <div className="space-y-4 md:col-span-2 pt-4 border-t border-pp-border ">
+          <label className="block text-sm font-medium text-pp-muted ">
             {t("profile.card.title", { fallback: "선수 디지털 카드" })}
           </label>
-          <div className="flex flex-col sm:flex-row items-center justify-between p-4 bg-zinc-50 dark:bg-zinc-800/50 rounded-lg border border-zinc-200 dark:border-zinc-700">
-            <div className="text-sm text-zinc-600 dark:text-zinc-400 mb-4 sm:mb-0">
-              {cardIssuedAt 
+          <div className={`${surfaceStyles({ density: "compact" })} flex flex-col sm:flex-row items-center justify-between`}>
+            <div className="text-sm text-pp-muted mb-4 sm:mb-0">
+              {cardIssuedAt
                 ? t("profile.card.issuedDesc", { fallback: "나의 선수 디지털 카드를 확인해보세요." })
                 : t("profile.card.unissuedDesc", { fallback: "프로필을 입력하고, 선수 디지털 카드를 발급 받아 보세요!" })
               }
             </div>
-            
+
             <div className="flex flex-col gap-2 w-full sm:w-auto">
               {cardIssuedAt && (
                 <button
                   type="button"
                   onClick={handleViewCard}
-                  className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-2.5 border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-lg text-sm font-medium hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors"
+                  className={`${buttonStyles({ variant: "secondary", size: "compact" })} w-full sm:w-auto`}
                 >
                   <CreditCard className="w-5 h-5" />
                   {t("profile.card.view", { fallback: "선수 카드 보기" })}
                 </button>
               )}
-              
+
               {(!cardIssuedAt || (updatedAt && cardIssuedAt && new Date(updatedAt) > new Date(cardIssuedAt))) && (
                 <button
                   type="button"
                   onClick={handleIssueCard}
                   disabled={!isProfileComplete || cardLoading || isChanged}
-                  className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-2.5 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-lg text-sm font-medium hover:bg-zinc-800 dark:hover:bg-zinc-200 disabled:opacity-50 transition-colors"
+                  className={`${buttonStyles({ variant: "primary", size: "compact" })} w-full sm:w-auto`}
                   title={isChanged ? t("profile.card.needSave", { fallback: "변경사항을 먼저 저장해주세요." }) : undefined}
                 >
                   {cardLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <CreditCard className="w-5 h-5" />}
-                  {cardIssuedAt 
-                    ? t("profile.card.reissue", { fallback: "새로 발급받기" }) 
+                  {cardIssuedAt
+                    ? t("profile.card.reissue", { fallback: "새로 발급받기" })
                     : t("profile.card.create", { fallback: "선수 카드 만들기" })
                   }
                 </button>
@@ -518,8 +512,8 @@ export function ProfileEditor({
         </div>
 
         {/* Bio */}
-        <div className="space-y-3 md:col-span-2 pt-4 border-t border-zinc-200 dark:border-zinc-800">
-          <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+        <div className="space-y-3 md:col-span-2 pt-4 border-t border-pp-border ">
+          <label className="block text-sm font-medium text-pp-muted ">
             {t("profile.bio.title")}
           </label>
           <div className="relative">
@@ -527,10 +521,10 @@ export function ProfileEditor({
               value={bio}
               onChange={(e) => setBio(e.target.value)}
               placeholder={t("profile.bio.placeholder")}
-              className="w-full h-32 px-4 py-3 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-transparent text-zinc-900 dark:text-white resize-none focus:ring-2 focus:ring-blue-500 transition-all font-normal placeholder:font-normal placeholder:text-zinc-400 dark:placeholder:text-zinc-500"
+              className={`${fieldStyles({ multiline: true })} pp-textarea w-full resize-none`}
             />
-            <div className="absolute bottom-3 right-4 text-xs font-medium text-zinc-400 dark:text-zinc-500 font-mono">
-              {bio.length} <span className="text-zinc-300 dark:text-zinc-600">/</span> 500
+            <div className="absolute bottom-3 right-4 text-xs font-medium text-pp-muted font-mono">
+              {bio.length} <span className="text-pp-muted ">/</span> 500
             </div>
           </div>
         </div>

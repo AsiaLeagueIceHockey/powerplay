@@ -1,4 +1,5 @@
 "use client";
+import { buttonStyles } from "@/components/ui/styles";
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
@@ -28,10 +29,10 @@ function StatBar({ label, value, accent }: StatBarProps) {
   return (
     <div className="space-y-1.5">
       <div className="flex items-center justify-between gap-2">
-        <p className="truncate text-xs font-semibold text-zinc-600 dark:text-zinc-300">{label}</p>
-        <p className="text-xs font-black tabular-nums text-zinc-900 dark:text-white">{clamped}</p>
+        <p className="truncate text-xs font-semibold text-pp-muted ">{label}</p>
+        <p className="text-xs font-black tabular-nums text-pp-text dark:text-white">{clamped}</p>
       </div>
-      <div className="h-2 overflow-hidden rounded-full bg-zinc-200/80 dark:bg-zinc-800">
+      <div className="h-2 overflow-hidden rounded-full bg-pp-surface-muted/80 ">
         <div
           className={`h-full rounded-full transition-[width] duration-500 ${accent}`}
           style={{ width: `${clamped}%` }}
@@ -89,22 +90,22 @@ export function TamagotchiHero({ locale, initialState }: TamagotchiHeroProps) {
   const statusMessage = state.actions.bothCompleted ? t("bothDone") : t("statusActive");
 
   return (
-    <section className="mb-6 rounded-2xl border border-sky-200 bg-gradient-to-br from-sky-50 via-white to-violet-50 p-5 shadow-sm transition-colors dark:border-sky-900/60 dark:from-sky-950/40 dark:via-zinc-900 dark:to-violet-950/40">
+    <section className="mb-6 rounded-2xl border border-pp-info-border bg-gradient-to-br from-sky-50 via-white to-violet-50 p-5 shadow-sm transition-colors dark:from-sky-950/40 dark:via-zinc-900 dark:to-violet-950/40">
       <div className="flex items-center justify-between gap-3">
-        <h2 className="truncate text-lg font-black text-zinc-900 dark:text-white">
+        <h2 className="truncate text-lg font-black text-pp-text dark:text-white">
           {t("greeting")}
         </h2>
         <Link
           href={`/${locale}/mypage/tamagotchi`}
           aria-label={t("detailLink")}
-          className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-zinc-700 transition-colors hover:bg-white/70 dark:text-zinc-200 dark:hover:bg-zinc-800/70"
+          className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-pp-muted transition-colors hover:bg-white/70 dark:hover:bg-pp-surface/70"
         >
           <ChevronRight className="h-5 w-5" />
         </Link>
       </div>
 
       <div className="mt-4 flex items-stretch gap-4">
-        <div className="flex h-24 w-24 flex-shrink-0 items-center justify-center rounded-2xl border border-sky-200/80 bg-white/80 dark:border-sky-900/60 dark:bg-zinc-900/70">
+        <div className="flex h-24 w-24 flex-shrink-0 items-center justify-center rounded-2xl border border-pp-info-border/80 bg-white/80 dark:bg-pp-surface/70">
           <TamagotchiAvatar
             size={80}
             colors={state.pet.colors}
@@ -125,7 +126,7 @@ export function TamagotchiHero({ locale, initialState }: TamagotchiHeroProps) {
           type="button"
           onClick={() => runAction("feed")}
           disabled={!state.actions.canFeed || isPending}
-          className="inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-xl bg-emerald-600 px-3 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-zinc-300 dark:disabled:bg-zinc-700"
+          className={buttonStyles({ variant: "success" }) + " min-w-0"}
         >
           <Drumstick className="h-4 w-4 flex-shrink-0" />
           <span className="truncate">
@@ -136,7 +137,7 @@ export function TamagotchiHero({ locale, initialState }: TamagotchiHeroProps) {
           type="button"
           onClick={() => runAction("train")}
           disabled={!state.actions.canTrain || isPending}
-          className="inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-xl bg-sky-600 px-3 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-sky-700 disabled:cursor-not-allowed disabled:bg-zinc-300 dark:disabled:bg-zinc-700"
+          className={buttonStyles() + " min-w-0"}
         >
           <Dumbbell className="h-4 w-4 flex-shrink-0" />
           <span className="truncate">
@@ -145,11 +146,11 @@ export function TamagotchiHero({ locale, initialState }: TamagotchiHeroProps) {
         </button>
       </div>
 
-      <p className="mt-3 text-xs leading-5 text-zinc-600 dark:text-zinc-400">
+      <p className="mt-3 text-xs leading-5 text-pp-muted ">
         {statusMessage}
       </p>
       {error ? (
-        <p className="mt-2 text-xs font-semibold text-rose-500">{error}</p>
+        <p className="mt-2 text-xs font-semibold text-pp-cheer-text">{error}</p>
       ) : null}
     </section>
   );

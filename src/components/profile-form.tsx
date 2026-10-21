@@ -1,4 +1,5 @@
 "use client";
+import { buttonStyles, fieldStyles } from "@/components/ui/styles";
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
@@ -44,8 +45,8 @@ export function ProfileForm({ profile }: { profile: Profile | null }) {
         <div
           className={`rounded-lg p-4 text-sm ${
             message.type === "success"
-              ? "bg-green-50 text-green-600 dark:bg-green-900/20 dark:text-green-400"
-              : "bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400"
+              ? "bg-pp-success-soft text-pp-success-text "
+              : "bg-pp-danger-soft text-pp-danger-text "
           }`}
         >
           {message.text}
@@ -53,21 +54,22 @@ export function ProfileForm({ profile }: { profile: Profile | null }) {
       )}
 
       <div>
-        <label className="mb-2 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+        <label htmlFor="profile-email" className="pp-field-label mb-2">
           {t("email")}
         </label>
         <input
           type="email"
+          id="profile-email"
           value={profile?.email || ""}
           disabled
-          className="w-full rounded-lg border border-zinc-300 bg-zinc-50 px-4 py-2 text-zinc-500 dark:border-zinc-700 dark:bg-zinc-800"
+          className={`${fieldStyles()} w-full`}
         />
       </div>
 
       <div>
         <label
           htmlFor="fullName"
-          className="mb-2 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
+          className="mb-2 block text-sm font-medium text-pp-muted "
         >
           {t("fullName")}
         </label>
@@ -76,14 +78,14 @@ export function ProfileForm({ profile }: { profile: Profile | null }) {
           id="fullName"
           name="fullName"
           defaultValue={profile?.full_name || ""}
-          className="w-full rounded-lg border border-zinc-300 px-4 py-2 focus:border-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-500/20 dark:border-zinc-700 dark:bg-zinc-800"
+          className={`${fieldStyles()} w-full`}
         />
       </div>
 
       <div>
         <label
           htmlFor="position"
-          className="mb-2 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
+          className="mb-2 block text-sm font-medium text-pp-muted "
         >
           {t("position")}
         </label>
@@ -91,7 +93,7 @@ export function ProfileForm({ profile }: { profile: Profile | null }) {
           id="position"
           name="position"
           defaultValue={profile?.position || ""}
-          className="w-full rounded-lg border border-zinc-300 px-4 py-2 focus:border-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-500/20 dark:border-zinc-700 dark:bg-zinc-800"
+          className={`${fieldStyles()} w-full`}
         >
           <option value="">{tMatch("position.NONE")}</option>
           <option value="FW">{tMatch("position.FW")}</option>
@@ -103,7 +105,7 @@ export function ProfileForm({ profile }: { profile: Profile | null }) {
       <div>
         <label
           htmlFor="preferredLang"
-          className="mb-2 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
+          className="mb-2 block text-sm font-medium text-pp-muted "
         >
           {t("preferredLang")}
         </label>
@@ -111,7 +113,7 @@ export function ProfileForm({ profile }: { profile: Profile | null }) {
           id="preferredLang"
           name="preferredLang"
           defaultValue={profile?.preferred_lang || "ko"}
-          className="w-full rounded-lg border border-zinc-300 px-4 py-2 focus:border-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-500/20 dark:border-zinc-700 dark:bg-zinc-800"
+          className={`${fieldStyles()} w-full`}
         >
           <option value="ko">한국어</option>
           <option value="en">English</option>
@@ -121,7 +123,7 @@ export function ProfileForm({ profile }: { profile: Profile | null }) {
       <button
         type="submit"
         disabled={isLoading}
-        className="w-full rounded-lg bg-zinc-900 px-4 py-2 font-medium text-white transition-colors hover:bg-zinc-800 disabled:opacity-50 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100"
+        className={`${buttonStyles({ variant: "primary", size: "default" })} w-full`}
       >
         {isLoading ? t("saving") : t("save")}
       </button>

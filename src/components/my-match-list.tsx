@@ -1,4 +1,5 @@
 "use client";
+import { buttonStyles, surfaceStyles , segmentedItemStyles} from "@/components/ui/styles";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -73,37 +74,29 @@ export function MyMatchList({ matches }: MyMatchListProps) {
   return (
     <div>
       {/* Tabs */}
-      <div className="flex border-b border-zinc-200 dark:border-zinc-800 mb-6">
-        <button
+      <div className="flex border-b border-pp-border mb-6">
+        <button type="button"
           onClick={() => setActiveTab("upcoming")}
-          className={`flex-1 pb-3 text-sm font-medium transition-colors relative ${
-            activeTab === "upcoming"
-              ? "text-blue-600 dark:text-blue-400"
-              : "text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-300"
-          }`}
+          className={segmentedItemStyles({ selected: activeTab === "upcoming", kind: "tab" }) + " relative flex-1"}
         >
           {locale === "ko" ? "신청 내역 / 예정" : "Upcoming"}
-          <span className="ml-2 px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-xs text-zinc-600 dark:text-zinc-400">
+          <span className="ml-2 px-2 py-0.5 rounded-full bg-pp-surface-muted text-xs text-pp-muted ">
             {upcomingMatches.length}
           </span>
           {activeTab === "upcoming" && (
-            <div className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 dark:bg-blue-400" />
+            <div className="absolute bottom-0 left-0 w-full h-0.5 bg-pp-accent " />
           )}
         </button>
-        <button
+        <button type="button"
           onClick={() => setActiveTab("past")}
-          className={`flex-1 pb-3 text-sm font-medium transition-colors relative ${
-            activeTab === "past"
-              ? "text-blue-600 dark:text-blue-400"
-              : "text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-300"
-          }`}
+          className={segmentedItemStyles({ selected: activeTab === "past", kind: "tab" }) + " relative flex-1"}
         >
           {locale === "ko" ? "지난 경기" : "Past Matches"}
-          <span className="ml-2 px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-xs text-zinc-600 dark:text-zinc-400">
+          <span className="ml-2 px-2 py-0.5 rounded-full bg-pp-surface-muted text-xs text-pp-muted ">
             {pastMatches.length}
           </span>
           {activeTab === "past" && (
-            <div className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 dark:bg-blue-400" />
+            <div className="absolute bottom-0 left-0 w-full h-0.5 bg-pp-accent " />
           )}
         </button>
       </div>
@@ -111,8 +104,8 @@ export function MyMatchList({ matches }: MyMatchListProps) {
       {/* Match List */}
       <div className="space-y-4">
         {activeMatches.length === 0 ? (
-          <div className="text-center py-12 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 border-dashed">
-            <p className="text-zinc-500 dark:text-zinc-400 mb-4">
+          <div className={`${surfaceStyles({ density: "none" })} text-center`}>
+            <p className="text-pp-muted mb-4">
               {activeTab === "upcoming"
                 ? (locale === "ko" ? "예정된 경기가 없습니다." : "No upcoming matches.")
                 : (locale === "ko" ? "지난 경기 내역이 없습니다." : "No past matches found.")}
@@ -120,7 +113,7 @@ export function MyMatchList({ matches }: MyMatchListProps) {
             {activeTab === "upcoming" && (
               <Link
                 href={`/${locale}?tab=match`}
-                className="inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition font-medium text-sm"
+                className={buttonStyles({ variant: "primary", size: "compact" })}
               >
                 {locale === "ko" ? "경기 둘러보기" : "Browse Matches"}
               </Link>
@@ -131,23 +124,23 @@ export function MyMatchList({ matches }: MyMatchListProps) {
             <Link
               key={match.participation.id}
               href={`/match/${match.id}`}
-              className="block bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 hover:border-blue-500 hover:shadow-md transition-all duration-300"
+              className={`${surfaceStyles({ interactive: true, density: "none" })} block`}
             >
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div className="flex-1">
-                  <div className="font-bold text-lg text-zinc-900 dark:text-white mb-1">
+                  <div className="font-bold text-lg text-pp-text dark:text-white mb-1">
                     {locale === "ko"
                       ? match.rink?.name_ko || "미정"
                       : match.rink?.name_en || match.rink?.name_ko || "TBD"}
                   </div>
-                  <div className="text-zinc-500 dark:text-zinc-400 text-sm flex items-center gap-2">
+                  <div className="text-pp-muted text-sm flex items-center gap-2">
                     <span>📅 {formatDate(match.start_time)}</span>
                   </div>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2">
                   {/* Position Badge */}
-                  <span className="px-2.5 py-1 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 rounded-lg text-xs font-semibold uppercase">
+                  <span className="px-2.5 py-1 bg-pp-surface-muted text-pp-muted rounded-lg text-xs font-semibold uppercase">
                     {t(`match.position.${match.participation.position}`)}
                   </span>
 
@@ -170,8 +163,8 @@ export function MyMatchList({ matches }: MyMatchListProps) {
                       match.status === "canceled" ? "canceled" : match.participation.status
                     )}`}
                   >
-                    {match.status === "canceled" 
-                      ? t("match.status.canceled") 
+                    {match.status === "canceled"
+                      ? t("match.status.canceled")
                       : t(`participant.status.${match.participation.status}`)}
                   </span>
                 </div>

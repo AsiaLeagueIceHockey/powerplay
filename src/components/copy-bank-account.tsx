@@ -1,12 +1,13 @@
 "use client";
+import { buttonStyles } from "@/components/ui/styles";
 
 import { useState } from "react";
 
-export function CopyBankAccount({ 
-  bankAccount, 
-  locale 
-}: { 
-  bankAccount: string; 
+export function CopyBankAccount({
+  bankAccount,
+  locale
+}: {
+  bankAccount: string;
   locale: string;
 }) {
   const [copied, setCopied] = useState(false);
@@ -22,13 +23,13 @@ export function CopyBankAccount({
   };
 
   return (
-    <button
+    <button type="button"
       onClick={handleCopy}
-      className="font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 flex items-center gap-1 transition"
+      className={buttonStyles({ variant: "ghost", size: "compact" })}
     >
       <span className="text-xs max-w-[150px] truncate">{bankAccount}</span>
       {copied ? (
-        <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-4 h-4 text-pp-success-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
         </svg>
       ) : (

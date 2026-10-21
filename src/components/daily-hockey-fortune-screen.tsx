@@ -1,4 +1,5 @@
 "use client";
+import { buttonStyles } from "@/components/ui/styles";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -82,7 +83,7 @@ export function DailyHockeyFortuneScreen({
             <button
               type="button"
               onClick={() => router.push(`/${locale}/mypage`)}
-              className="inline-flex items-center gap-1 rounded-full px-2 py-2 text-zinc-900 transition-colors hover:bg-zinc-100 dark:text-white dark:hover:bg-white/10"
+              className={buttonStyles({ variant: "secondary", size: "compact" }) + " inline-flex items-center gap-1"}
             >
               <ChevronLeft className="h-6 w-6" />
             </button>
@@ -121,7 +122,7 @@ export function DailyHockeyFortuneScreen({
             <button
               type="button"
               onClick={() => router.push(`/${locale}/mypage`)}
-              className="inline-flex items-center gap-1 rounded-full px-2 py-2 text-zinc-900 transition-colors hover:bg-zinc-100 dark:text-white dark:hover:bg-white/10"
+              className={buttonStyles({ variant: "secondary", size: "compact" }) + " inline-flex items-center gap-1"}
             >
               <ChevronLeft className="h-6 w-6" />
             </button>

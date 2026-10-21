@@ -13,7 +13,7 @@ export default async function PlayerCardPage() {
   }
 
   const profile = await getProfile();
-  
+
   if (!profile) {
     redirect(`/${locale}/mypage`);
   }

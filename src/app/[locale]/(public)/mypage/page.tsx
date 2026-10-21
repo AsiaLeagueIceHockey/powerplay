@@ -1,3 +1,4 @@
+import { surfaceStyles } from "@/components/ui/styles";
 import { redirect } from "next/navigation";
 import { getTranslations, getLocale } from "next-intl/server";
 import { getUser, getProfile } from "@/app/actions/auth";
@@ -25,8 +26,8 @@ export default async function MyPage() {
     <div className="container mx-auto px-4 max-w-4xl">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold mb-2 text-zinc-900 dark:text-white">
-          <span className="text-blue-600 dark:text-blue-400">
+        <h1 className="text-2xl font-bold mb-2 text-pp-text dark:text-white">
+          <span className="text-pp-accent-text ">
             {profile?.full_name || user.email?.split("@")[0]}
           </span>
           {locale === "ko" ? "님, 안녕하세요! 👋" : ", Welcome back! 👋"}
@@ -40,7 +41,7 @@ export default async function MyPage() {
       ) : null}
 
       {/* Menu list */}
-      <nav className="mt-6 overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+      <nav className={surfaceStyles({ density: "none" }) + " mt-6 overflow-hidden"}>
         <ul className="divide-y divide-zinc-100 dark:divide-zinc-800">
           <li>
             <MypageMenuRow

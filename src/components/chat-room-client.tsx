@@ -1,4 +1,5 @@
 "use client";
+import { buttonStyles, fieldStyles } from "@/components/ui/styles";
 
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useTranslations } from "next-intl";
@@ -129,7 +130,7 @@ export function ChatRoomClient({
         (payload) => {
           const newMessage = payload.new as Message;
           // console.log("Received new message via Realtime:", newMessage);
-          
+
           // Manual filter check
           if (newMessage.room_id !== roomId) return;
 
@@ -145,8 +146,8 @@ export function ChatRoomClient({
               // crypto.randomUUID() generates a UUID, so we can check for that
               // or just look for any message from me that isn't the real ID yet
               const optimisticIdx = prev.findLastIndex(
-                (msg) => 
-                  msg.sender_id === currentUserId && 
+                (msg) =>
+                  msg.sender_id === currentUserId &&
                   msg.content === newMessage.content &&
                   msg.id.length > 30 // Rough check for UUID length
               );
@@ -160,7 +161,7 @@ export function ChatRoomClient({
 
             return [...prev, newMessage];
           });
-          
+
           // If we received a message from the other person while the room is open, mark it as read
           if (newMessage.sender_id !== currentUserId) {
             markMessagesAsRead(roomId);
@@ -174,7 +175,7 @@ export function ChatRoomClient({
           const updatedMessage = payload.new as Message;
           if (updatedMessage.room_id !== roomId) return;
 
-          setMessages((prev) => 
+          setMessages((prev) =>
             prev.map((msg) => msg.id === updatedMessage.id ? updatedMessage : msg)
           );
         }
@@ -210,7 +211,7 @@ export function ChatRoomClient({
 
     // Actual API call
     const result = await sendMessage(roomId, content, otherParticipant.id);
-    
+
     if (result.error) {
       // Remove optimistic message on error and show alert
       setMessages((prev) => prev.filter(msg => msg.id !== tempId));
@@ -256,26 +257,26 @@ export function ChatRoomClient({
 
   return (
     <div ref={rootRef} className="flex flex-col flex-1 min-h-0 overflow-hidden">
-      <header className="px-4 py-3 flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md shrink-0 z-10 pt-safe">
+      <header className="px-4 py-3 flex items-center justify-between border-b border-pp-border bg-white/80 dark:bg-pp-surface/80 backdrop-blur-md shrink-0 z-10 pt-safe">
         <div className="flex items-center gap-3">
-          <button 
+          <button type="button"
             onClick={() => router.push(`/${locale}/chat`)}
-            className="p-1 -ml-1 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors"
+            className={`${buttonStyles({ variant: "ghost", size: "compact" })} -ml-1`}
           >
             <ArrowLeft size={24} />
           </button>
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center text-zinc-500 dark:text-zinc-400 font-bold shrink-0 text-sm">
+            <div className="w-8 h-8 rounded-full bg-pp-surface-muted flex items-center justify-center text-pp-muted font-bold shrink-0 text-sm">
               {otherParticipant.full_name?.charAt(0) || "U"}
             </div>
-            <h2 className="text-lg font-bold dark:text-zinc-100">{otherParticipant.full_name}</h2>
+            <h2 className="text-lg font-bold dark:text-pp-text">{otherParticipant.full_name}</h2>
           </div>
         </div>
       </header>
 
       <ChatAccessBanner />
 
-      <main ref={mainRef} className="flex-1 overflow-y-auto p-4 bg-white dark:bg-zinc-900 mb-safe flex flex-col">
+      <main ref={mainRef} className="flex-1 overflow-y-auto p-4 bg-pp-surface mb-safe flex flex-col">
         {/* Spacer pushes the message list to the bottom when content is shorter than the viewport.
             Once messages overflow, this auto margin collapses and natural scrolling takes over. */}
         <div className="mt-auto flex flex-col gap-1">
@@ -309,7 +310,7 @@ export function ChatRoomClient({
               }
               return (
                 <div key={message.id} className="my-2 flex justify-center">
-                  <span className="rounded-full bg-zinc-100 dark:bg-zinc-800 px-3 py-1 text-xs text-zinc-500 dark:text-zinc-400 max-w-[85%] text-center">
+                  <span className="rounded-full bg-pp-surface-muted px-3 py-1 text-xs text-pp-muted max-w-[85%] text-center">
                     {text}
                   </span>
                 </div>
@@ -328,16 +329,16 @@ export function ChatRoomClient({
                   <div
                     className={`px-4 py-2.5 rounded-2xl break-words whitespace-pre-wrap ${
                       isMine
-                        ? 'bg-blue-600 text-white rounded-br-sm'
-                        : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-700/50 rounded-bl-sm'
+                        ? 'bg-pp-accent text-white rounded-br-sm'
+                        : 'bg-pp-surface-muted text-pp-text border border-pp-border rounded-bl-sm'
                     }`}
                   >
                     {message.content}
                   </div>
 
-                  <div className={`flex flex-col gap-0.5 text-[10px] text-zinc-400 ${isMine ? 'items-end' : 'items-start'}`}>
+                  <div className={`flex flex-col gap-0.5 text-[10px] text-pp-muted ${isMine ? 'items-end' : 'items-start'}`}>
                     {isMine && !message.is_read && (
-                      <span className="text-blue-500 font-semibold px-0.5">1</span>
+                      <span className="text-pp-accent-text font-semibold px-0.5">1</span>
                     )}
                     {isLastInGroup && (
                       <span className="whitespace-nowrap pb-0.5">{formatMessageTime(message.created_at)}</span>
@@ -350,7 +351,7 @@ export function ChatRoomClient({
         </div>
       </main>
 
-      <footer className="p-3 bg-white dark:bg-zinc-950 border-t border-zinc-200 dark:border-zinc-800 pb-safe">
+      <footer className="p-3 bg-pp-surface border-t border-pp-border pb-safe">
         <form onSubmit={handleSend} className="max-w-3xl mx-auto flex items-end gap-2 relative">
           <textarea
             ref={textareaRef}
@@ -358,7 +359,7 @@ export function ChatRoomClient({
             onChange={adjustTextareaHeight}
             onKeyDown={handleKeyDown}
             placeholder={t("inputPlaceholder")}
-            className="flex-1 max-h-32 min-h-[44px] block w-full resize-none rounded-2xl border-0 py-2.5 pl-4 pr-12 text-zinc-900 dark:text-zinc-100 bg-zinc-100 dark:bg-zinc-900 ring-1 ring-inset ring-zinc-200 dark:ring-zinc-800 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
+            className={`${fieldStyles({ multiline: true })} pp-textarea flex-1 max-h-32 block w-full resize-none `}
             rows={1}
           />
           <button
@@ -368,7 +369,7 @@ export function ChatRoomClient({
             // to the button on tap, so iOS Safari does NOT dismiss the keyboard.
             // The click event still fires and submits the form normally.
             onMouseDown={(e) => e.preventDefault()}
-            className="absolute right-2 bottom-1.5 p-2 rounded-full text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:bg-zinc-300 dark:disabled:bg-zinc-700 disabled:text-zinc-500 transition-colors"
+            className={`${buttonStyles({ variant: "primary", size: "compact", shape: "circle" })} absolute right-2 bottom-1.5`}
           >
             <Send size={18} />
           </button>

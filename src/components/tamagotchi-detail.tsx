@@ -1,4 +1,5 @@
 "use client";
+import { buttonStyles } from "@/components/ui/styles";
 
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
@@ -28,10 +29,10 @@ function StatBar({ label, value, accent }: StatBarProps) {
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between gap-2">
-        <p className="truncate text-sm font-semibold text-zinc-700 dark:text-zinc-200">{label}</p>
-        <p className="text-base font-black tabular-nums text-zinc-900 dark:text-white">{clamped}</p>
+        <p className="truncate text-sm font-semibold text-pp-muted ">{label}</p>
+        <p className="text-base font-black tabular-nums text-pp-text dark:text-white">{clamped}</p>
       </div>
-      <div className="h-2.5 overflow-hidden rounded-full bg-zinc-200/80 dark:bg-zinc-800">
+      <div className="h-2.5 overflow-hidden rounded-full bg-pp-surface-muted/80 ">
         <div
           className={`h-full rounded-full transition-[width] duration-500 ${accent}`}
           style={{ width: `${clamped}%` }}
@@ -103,9 +104,9 @@ export function TamagotchiDetail({ locale, initialState }: TamagotchiDetailProps
   return (
     <div className="space-y-5">
       {/* Character + Stats card */}
-      <section className="rounded-2xl border border-sky-200 bg-gradient-to-br from-sky-50 via-white to-violet-50 p-5 shadow-sm transition-colors dark:border-sky-900/60 dark:from-sky-950/40 dark:via-zinc-900 dark:to-violet-950/40">
+      <section className="rounded-2xl border border-pp-info-border bg-gradient-to-br from-sky-50 via-white to-violet-50 p-5 shadow-sm transition-colors dark:from-sky-950/40 dark:via-zinc-900 dark:to-violet-950/40">
         <div className="flex flex-col items-center">
-          <div className="flex aspect-square w-full max-w-[256px] items-center justify-center rounded-2xl border border-sky-200/80 bg-white/80 dark:border-sky-900/60 dark:bg-zinc-900/70 sm:max-w-[320px]">
+          <div className="flex aspect-square w-full max-w-[256px] items-center justify-center rounded-2xl border border-pp-info-border/80 bg-white/80 dark:bg-pp-surface/70 sm:max-w-[320px]">
             <TamagotchiAvatar
               size={216}
               colors={state.pet.colors}
@@ -118,7 +119,7 @@ export function TamagotchiDetail({ locale, initialState }: TamagotchiDetailProps
         </div>
 
         <div className="mt-5">
-          <h3 className="mb-3 text-sm font-bold text-zinc-700 dark:text-zinc-200">
+          <h3 className="mb-3 text-sm font-bold text-pp-muted ">
             {tDetail("statsHeading")}
           </h3>
           <div className="flex flex-col gap-3">
@@ -128,7 +129,7 @@ export function TamagotchiDetail({ locale, initialState }: TamagotchiDetailProps
         </div>
 
         <div className="mt-5">
-          <h3 className="mb-3 text-sm font-bold text-zinc-700 dark:text-zinc-200">
+          <h3 className="mb-3 text-sm font-bold text-pp-muted ">
             {tDetail("actionsHeading")}
           </h3>
           <div className="grid grid-cols-2 gap-3">
@@ -136,7 +137,7 @@ export function TamagotchiDetail({ locale, initialState }: TamagotchiDetailProps
               type="button"
               onClick={() => runAction("feed")}
               disabled={!state.actions.canFeed || isPending}
-              className="inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-xl bg-emerald-600 px-3 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-zinc-300 dark:disabled:bg-zinc-700"
+              className={buttonStyles({ variant: "success", size: "compact" }) + " inline-flex items-center justify-center gap-1.5"}
             >
               <Drumstick className="h-4 w-4 flex-shrink-0" />
               <span className="truncate">
@@ -147,7 +148,7 @@ export function TamagotchiDetail({ locale, initialState }: TamagotchiDetailProps
               type="button"
               onClick={() => runAction("train")}
               disabled={!state.actions.canTrain || isPending}
-              className="inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-xl bg-sky-600 px-3 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-sky-700 disabled:cursor-not-allowed disabled:bg-zinc-300 dark:disabled:bg-zinc-700"
+              className={buttonStyles({ variant: "primary", size: "compact" }) + " inline-flex items-center justify-center gap-1.5"}
             >
               <Dumbbell className="h-4 w-4 flex-shrink-0" />
               <span className="truncate">
@@ -157,11 +158,11 @@ export function TamagotchiDetail({ locale, initialState }: TamagotchiDetailProps
           </div>
         </div>
 
-        <p className="mt-4 text-xs leading-5 text-zinc-600 dark:text-zinc-400">
+        <p className="mt-4 text-xs leading-5 text-pp-muted ">
           {statusMessage}
         </p>
         {error ? (
-          <p className="mt-2 text-xs font-semibold text-rose-500">{error}</p>
+          <p className="mt-2 text-xs font-semibold text-pp-cheer-text">{error}</p>
         ) : null}
       </section>
 
@@ -169,17 +170,17 @@ export function TamagotchiDetail({ locale, initialState }: TamagotchiDetailProps
       <button
         type="button"
         onClick={() => setIsClosetOpen(true)}
-        className="group block w-full rounded-xl border border-zinc-200 bg-white p-5 text-left shadow-sm transition-colors hover:border-blue-500 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900"
+        className={buttonStyles({ variant: "outline", size: "compact" }) + " group block w-full text-left"}
       >
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-sky-100 dark:bg-sky-950/60">
-            <Shirt className="h-5 w-5 text-sky-600 dark:text-sky-300" />
+          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-pp-info-soft ">
+            <Shirt className="h-5 w-5 text-pp-info-text " />
           </div>
           <div className="min-w-0 flex-1">
-            <h3 className="truncate text-base font-bold text-zinc-900 dark:text-zinc-100">
+            <h3 className="truncate text-base font-bold text-pp-text ">
               {tDetail("closetHeading")}
             </h3>
-            <p className="mt-0.5 truncate text-sm text-zinc-600 dark:text-zinc-400">
+            <p className="mt-0.5 truncate text-sm text-pp-muted ">
               {tDetail("closetDescription")}
             </p>
           </div>
@@ -188,11 +189,11 @@ export function TamagotchiDetail({ locale, initialState }: TamagotchiDetailProps
               <span
                 key={part}
                 aria-hidden="true"
-                className="h-4 w-4 rounded-full border border-zinc-300 dark:border-zinc-700"
+                className="h-4 w-4 rounded-full border border-pp-border "
                 style={{ backgroundColor: state.pet.colors[part] }}
               />
             ))}
-            <ChevronRight className="ml-1 h-5 w-5 flex-shrink-0 text-zinc-400 transition-colors group-hover:text-blue-500 dark:text-zinc-500" />
+            <ChevronRight className="ml-1 h-5 w-5 flex-shrink-0 text-pp-muted transition-colors group-hover:text-pp-accent-text " />
           </div>
         </div>
       </button>

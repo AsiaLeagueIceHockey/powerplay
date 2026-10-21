@@ -1,4 +1,5 @@
 "use client";
+import { buttonStyles } from "@/components/ui/styles";
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
@@ -66,17 +67,17 @@ export function ChatAccessBanner() {
   const needsPush = !hasDbSubscription;
 
   return (
-    <div className="border-b border-amber-200 bg-amber-50 px-4 py-3 dark:border-amber-900/40 dark:bg-amber-950/40">
+    <div className="border-b border-pp-warning-border bg-pp-warning-soft px-4 py-3 ">
       <div className="mx-auto flex w-full max-w-2xl items-start gap-3">
-        <div className="mt-0.5 rounded-full bg-amber-100 p-2 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
+        <div className="mt-0.5 rounded-full bg-pp-warning-soft p-2 text-pp-warning-text ">
           {needsInstall ? <Download className="h-4 w-4" /> : <BellOff className="h-4 w-4" />}
         </div>
 
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold text-amber-900 dark:text-amber-100">
+          <p className="text-sm font-semibold text-pp-warning-text ">
             {t("accessBannerTitle")}
           </p>
-          <p className="mt-1 text-sm text-amber-800 dark:text-amber-200">
+          <p className="mt-1 text-sm text-pp-warning-text ">
             {needsInstall && needsPush
               ? t("accessBannerDescAll")
               : needsInstall
@@ -86,7 +87,7 @@ export function ChatAccessBanner() {
 
           <div className="mt-3 flex flex-wrap gap-2">
             {needsInstall && os === "android" ? (
-              <button
+              <button type="button"
                 onClick={async () => {
                   if (deferredPrompt) {
                     await promptInstall();
@@ -95,7 +96,7 @@ export function ChatAccessBanner() {
 
                   openGuide("install");
                 }}
-                className="inline-flex items-center gap-1 rounded-full bg-amber-600 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-amber-700"
+                className={buttonStyles({ variant: "warning", size: "compact", shape: "pill" })}
               >
                 <span>{t("installPwa")}</span>
                 <ArrowRight className="h-4 w-4" />
@@ -103,9 +104,9 @@ export function ChatAccessBanner() {
             ) : null}
 
             {needsInstall && os !== "android" ? (
-              <button
+              <button type="button"
                 onClick={() => openGuide("install")}
-                className="inline-flex items-center gap-1 rounded-full bg-amber-600 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-amber-700"
+                className={buttonStyles({ variant: "warning", size: "compact", shape: "pill" })}
               >
                 <span>{t("installPwa")}</span>
                 <ArrowRight className="h-4 w-4" />
@@ -113,9 +114,9 @@ export function ChatAccessBanner() {
             ) : null}
 
             {!needsInstall && needsPush ? (
-              <button
+              <button type="button"
                 onClick={() => openGuide("notification")}
-                className="inline-flex items-center gap-1 rounded-full bg-amber-600 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-amber-700"
+                className={buttonStyles({ variant: "warning", size: "compact", shape: "pill" })}
               >
                 <span>{t("enablePush")}</span>
                 <ArrowRight className="h-4 w-4" />

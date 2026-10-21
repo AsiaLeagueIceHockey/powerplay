@@ -11,7 +11,7 @@ export default async function ChatRoomPage({
   params: Promise<{ locale: string; roomId: string }>;
 }) {
   const { locale, roomId } = await params;
-  
+
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -52,8 +52,8 @@ export default async function ChatRoomPage({
   const { messages } = await getChatMessages(roomId);
 
   return (
-    <div className="flex flex-col h-[100dvh] bg-white dark:bg-zinc-950 supports-[min-height:100dvh]:min-h-[100dvh] touch-none">
-      <ChatRoomClient 
+    <div className="flex flex-col h-[100dvh] bg-pp-surface supports-[min-height:100dvh]:min-h-[100dvh] touch-none">
+      <ChatRoomClient
         roomId={roomId}
         initialMessages={messages}
         currentUserId={user.id}

@@ -1,4 +1,5 @@
 "use client";
+import { buttonStyles, fieldStyles, surfaceStyles } from "@/components/ui/styles";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -16,10 +17,10 @@ export function ChargeForm({ bankAccount, initialAmount = 30000 }: ChargeFormPro
   const t = useTranslations("points.chargeRequest");
   const locale = useLocale();
   const router = useRouter();
-  
+
   // Use exact initialAmount (no rounding)
   const defaultAmount = initialAmount > 0 ? initialAmount : 30000;
-  
+
   const [amount, setAmount] = useState<number>(defaultAmount);
   const [customAmount, setCustomAmount] = useState(
     QUICK_AMOUNTS.includes(defaultAmount) ? "" : defaultAmount.toLocaleString()
@@ -79,12 +80,12 @@ export function ChargeForm({ bankAccount, initialAmount = 30000 }: ChargeFormPro
 
   if (success) {
     return (
-      <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-2xl p-8 text-center">
+      <div className="bg-pp-success-soft border border-pp-success-border rounded-2xl p-8 text-center">
         <div className="text-5xl mb-4">✅</div>
-        <h2 className="text-xl font-bold text-green-700 dark:text-green-400 mb-2">
+        <h2 className="text-xl font-bold text-pp-success-text mb-2">
           {locale === "ko" ? "충전 신청 완료!" : "Charge Request Submitted!"}
         </h2>
-        <p className="text-green-600 dark:text-green-300">
+        <p className="text-pp-success-text ">
           {locale === "ko"
             ? "입금 확인 후 금액이 충전됩니다."
             : "Credits will be added after payment confirmation."}
@@ -96,14 +97,14 @@ export function ChargeForm({ bankAccount, initialAmount = 30000 }: ChargeFormPro
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {error && (
-        <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 rounded-lg">
+        <div id="charge-error" role="alert" className="p-4 bg-pp-danger-soft border border-pp-danger-border text-pp-danger-text rounded-lg">
           {error}
         </div>
       )}
 
       {/* 빠른 선택 */}
       <div>
-        <label className="block text-sm font-medium mb-3 text-zinc-700 dark:text-zinc-300">
+        <label className="block text-sm font-medium mb-3 text-pp-muted ">
           {t("quickAmounts")}
         </label>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -112,11 +113,8 @@ export function ChargeForm({ bankAccount, initialAmount = 30000 }: ChargeFormPro
               key={value}
               type="button"
               onClick={() => handleQuickAmount(value)}
-              className={`py-3 px-4 rounded-lg border text-sm font-medium transition ${
-                amount === value && !customAmount
-                  ? "bg-amber-500 border-amber-500 text-white"
-                  : "bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:border-amber-300"
-              }`}
+              aria-pressed={amount === value && !customAmount}
+              className={buttonStyles({ variant: amount === value && !customAmount ? "points" : "outline" })}
             >
               {value.toLocaleString()}{currencyUnit}
             </button>
@@ -126,25 +124,27 @@ export function ChargeForm({ bankAccount, initialAmount = 30000 }: ChargeFormPro
 
       {/* 직접 입력 */}
       <div>
-        <label className="block text-sm font-medium mb-2 text-zinc-700 dark:text-zinc-300">
+        <label htmlFor="charge-custom-amount" className="pp-field-label mb-2">
           {t("customAmount")}
         </label>
         <div className="relative">
           <input
             type="text"
+            id="charge-custom-amount"
+            inputMode="numeric"
             value={customAmount}
             onChange={(e) => handleCustomAmount(e.target.value)}
             placeholder="0"
-            className="w-full px-4 py-3 pr-10 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+            className={`${fieldStyles()} w-full `}
           />
-          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500">{currencyUnit}</span>
+          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-pp-muted">{currencyUnit}</span>
         </div>
       </div>
 
       {/* 선택된 금액 표시 */}
-      <div className="bg-amber-50 dark:bg-amber-900/20 p-4 rounded-lg">
-        <p className="text-sm text-amber-700 dark:text-amber-300">{t("amount")}</p>
-        <p className="text-3xl font-bold text-amber-600 dark:text-amber-400">
+      <div className="bg-pp-warning-soft p-4 rounded-lg">
+        <p className="text-sm text-pp-warning-text ">{t("amount")}</p>
+        <p className="text-3xl font-bold text-pp-warning-text ">
           {amount.toLocaleString()}{currencyUnit}
         </p>
       </div>
@@ -152,16 +152,16 @@ export function ChargeForm({ bankAccount, initialAmount = 30000 }: ChargeFormPro
       {/* 입금 계좌 */}
       {bankAccount && bankAccount.bank && (
         <div>
-          <label className="block text-sm font-medium mb-2 text-zinc-700 dark:text-zinc-300">
+          <label className="block text-sm font-medium mb-2 text-pp-muted ">
             {t("bankAccount")}
           </label>
-          <div className="p-4 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800">
+          <div className={surfaceStyles({ density: "compact" })}>
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium text-m">
                   {bankAccount.bank} {bankAccount.account}
                 </p>
-                <p className="text-sm text-zinc-500">{bankAccount.holder}</p>
+                <p className="text-sm text-pp-muted">{bankAccount.holder}</p>
               </div>
               <button
                 type="button"
@@ -171,7 +171,7 @@ export function ChargeForm({ bankAccount, initialAmount = 30000 }: ChargeFormPro
                     alert(locale === "ko" ? "계좌번호가 복사되었습니다!" : "Account copied!");
                   });
                 }}
-                className="px-3 py-2 bg-zinc-200 dark:bg-zinc-700 rounded-lg text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-300 dark:hover:bg-zinc-600 transition flex items-center gap-1 whitespace-nowrap flex-shrink-0"
+                className={`${buttonStyles({ variant: "secondary", size: "compact" })} flex-shrink-0`}
               >
                 📋 {locale === "ko" ? "복사" : "Copy"}
               </button>
@@ -182,21 +182,23 @@ export function ChargeForm({ bankAccount, initialAmount = 30000 }: ChargeFormPro
 
       {/* 입금자명 */}
       <div>
-        <label className="block text-sm font-medium mb-2 text-zinc-700 dark:text-zinc-300">
+        <label htmlFor="charge-depositor-name" className="pp-field-label mb-2">
           {t("depositorName")} *
         </label>
         <input
           type="text"
+          id="charge-depositor-name"
+          aria-describedby={error ? "charge-error" : undefined}
           value={depositorName}
           onChange={(e) => setDepositorName(e.target.value)}
           placeholder={t("depositorNamePlaceholder")}
           required
-          className="w-full px-4 py-3 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+          className={`${fieldStyles()} w-full`}
         />
       </div>
 
       {/* 안내 메시지 */}
-      <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg text-sm text-blue-700 dark:text-blue-300">
+      <div className="p-4 bg-pp-accent-soft border border-pp-accent rounded-lg text-sm text-pp-accent-text ">
         💡 {t("note")}
       </div>
 
@@ -204,7 +206,7 @@ export function ChargeForm({ bankAccount, initialAmount = 30000 }: ChargeFormPro
       <button
         type="submit"
         disabled={isSubmitting || amount < 1000}
-        className="w-full py-4 bg-amber-500 text-white rounded-lg font-bold text-lg hover:bg-amber-600 disabled:opacity-50 disabled:cursor-not-allowed transition"
+        className={`${buttonStyles({ variant: "points", size: "large" })} w-full`}
       >
         {isSubmitting ? t("submitting") : t("submit")}
       </button>

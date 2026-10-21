@@ -1,5 +1,6 @@
 "use client";
 
+import { buttonStyles, type ButtonSize, type ButtonVariant } from "@/components/ui/styles";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { MessageCircle, Loader2 } from "lucide-react";
@@ -10,6 +11,8 @@ interface StartChatButtonProps {
   targetUserId: string;
   className?: string;
   iconOnly?: boolean;
+  variant?: ButtonVariant;
+  size?: ButtonSize;
   label?: string;
   /**
    * Optional context describing where this chat was started from. When
@@ -25,6 +28,8 @@ export function StartChatButton({
   className = "",
   iconOnly = false,
   label,
+  variant = "primary",
+  size = "default",
   origin,
 }: StartChatButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
@@ -57,9 +62,11 @@ export function StartChatButton({
 
   return (
     <button
+      type="button"
+      aria-label={label || t("chat.newChatTooltip")}
       onClick={handleStartChat}
       disabled={isLoading}
-      className={`inline-flex items-center justify-center gap-2 disabled:opacity-50 transition-colors ${className}`}
+      className={`${buttonStyles({ variant, size, shape: iconOnly ? "circle" : "default" })} ${className}`}
       title={label || t("chat.newChatTooltip")}
     >
       {isLoading ? (

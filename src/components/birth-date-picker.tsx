@@ -1,20 +1,22 @@
 "use client";
+import { buttonStyles, fieldStyles, filterChipStyles, surfaceStyles } from "@/components/ui/styles";
 
 import { useState, useRef, useEffect } from "react";
 import { ChevronLeft, Calendar as CalendarIcon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 
 interface BirthDatePickerProps {
+  id?: string;
   value: string;
   onChange: (date: string) => void;
   placeholder?: string;
   className?: string; // Add className prop for flexibility
 }
 
-export function BirthDatePicker({ value, onChange, placeholder, className = "" }: BirthDatePickerProps) {
+export function BirthDatePicker({ id, value, onChange, placeholder, className = "" }: BirthDatePickerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [view, setView] = useState<"day" | "month" | "year">("year"); // Default to year selection for older users
-  
+
   // Parse initial date or default to a reasonable default for adults (e.g., 1990)
   const initialDate = value ? new Date(value) : new Date("1990-01-01");
   const [currentDate, setCurrentDate] = useState(initialDate);
@@ -54,7 +56,7 @@ export function BirthDatePicker({ value, onChange, placeholder, className = "" }
     const newDate = new Date(currentDate);
     newDate.setDate(day);
     setCurrentDate(newDate);
-    
+
     // Format YYYY-MM-DD
     const year = newDate.getFullYear();
     const month = String(newDate.getMonth() + 1).padStart(2, "0");
@@ -85,29 +87,32 @@ export function BirthDatePicker({ value, onChange, placeholder, className = "" }
 
   return (
     <div className={`relative ${className}`} ref={containerRef}>
-      <button
+      <button id={id}
         type="button"
         aria-label={placeholder || "YYYY-MM-DD"}
         onClick={() => {
           setIsOpen(!isOpen);
           setView("year"); // Reset to year view when opening
         }}
-        className="w-full px-4 py-3 text-left rounded-lg border border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800 focus:ring-2 focus:ring-blue-500 flex items-center justify-between"
+        aria-expanded={isOpen}
+        aria-haspopup="dialog"
+        className={`${fieldStyles()} w-full text-left flex items-center justify-between`}
       >
-        <span className={!value ? "text-zinc-400" : ""}>
+        <span className={!value ? "text-pp-muted" : ""}>
           {value || placeholder || "YYYY-MM-DD"}
         </span>
-        <CalendarIcon className="w-5 h-5 text-zinc-400" />
+        <CalendarIcon className="w-5 h-5 text-pp-muted" />
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 mt-2 w-full max-w-[320px] bg-white dark:bg-zinc-900 rounded-xl shadow-xl border border-zinc-200 dark:border-zinc-800 p-4 z-50 animate-in fade-in zoom-in-95 duration-100">
-          
+        <div role="dialog" aria-label={placeholder || "YYYY-MM-DD"}
+          className={`${surfaceStyles({ density: "compact" })} absolute top-full left-0 mt-2 w-full max-w-[320px] z-50 animate-in fade-in zoom-in-95 duration-100`}>
+
           {/* Header Back Button logic */}
           {(view === "month" || view === "day") && (
-            <button 
+            <button type="button"
               onClick={() => setView(view === "day" ? "month" : "year")}
-              className="mb-2 text-sm text-blue-600 font-medium flex items-center"
+              className={`${buttonStyles({ variant: "ghost", size: "compact" })} mb-2`}
             >
               <ChevronLeft className="w-4 h-4 mr-1" />
               {view === "day" ? formatYear(currentDate) : t("birthDatePicker.selectYear")}
@@ -118,14 +123,10 @@ export function BirthDatePicker({ value, onChange, placeholder, className = "" }
           {view === "year" && (
             <div className="grid grid-cols-4 gap-2 max-h-60 overflow-y-auto custom-scrollbar">
               {years.map(year => (
-                <button
+                <button type="button"
                   key={year}
                   onClick={() => handleYearSelect(year)}
-                  className={`p-2 rounded-lg text-sm ${
-                    currentDate.getFullYear() === year
-                      ? "bg-blue-600 text-white"
-                      : "hover:bg-zinc-100 dark:hover:bg-zinc-800"
-                  }`}
+                  className={filterChipStyles({ selected: currentDate.getFullYear() === year, shape: "date" })}
                 >
                   {year}
                 </button>
@@ -139,14 +140,10 @@ export function BirthDatePicker({ value, onChange, placeholder, className = "" }
               <div className="font-bold mb-4">{formatYear(currentDate)}</div>
               <div className="grid grid-cols-3 gap-2">
                 {months.map(month => (
-                  <button
+                  <button type="button"
                     key={month}
                     onClick={() => handleMonthSelect(month - 1)}
-                    className={`p-3 rounded-lg ${
-                      currentDate.getMonth() + 1 === month
-                        ? "bg-blue-600 text-white"
-                        : "hover:bg-zinc-100 dark:hover:bg-zinc-800"
-                    }`}
+                    className={filterChipStyles({ selected: currentDate.getMonth() + 1 === month, shape: "date" })}
                   >
                     {formatMonth(month - 1)}
                   </button>
@@ -161,7 +158,7 @@ export function BirthDatePicker({ value, onChange, placeholder, className = "" }
               <div className="text-center font-bold mb-4">
                 {formatYearMonth(currentDate)}
               </div>
-              <div className="grid grid-cols-7 gap-1 text-center text-sm mb-2 text-zinc-500">
+              <div className="grid grid-cols-7 gap-1 text-center text-sm mb-2 text-pp-muted">
                 {weekdays.map((weekday, index) => <div key={`${weekday}-${index}`}>{weekday}</div>)}
               </div>
               <div className="grid grid-cols-7 gap-1">
@@ -169,15 +166,10 @@ export function BirthDatePicker({ value, onChange, placeholder, className = "" }
                   <div key={`empty-${i}`} />
                 ))}
                 {Array.from({ length: getDaysInMonth(currentDate) }, (_, i) => i + 1).map(day => (
-                  <button
+                  <button type="button"
                     key={day}
                     onClick={() => handleDaySelect(day)}
-                    className={`p-2 rounded-full text-sm ${
-                      value === 
-                      `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`
-                        ? "bg-blue-600 text-white"
-                        : "hover:bg-zinc-100 dark:hover:bg-zinc-800"
-                    }`}
+                    className={filterChipStyles({ selected: value === `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`, shape: "date" })}
                   >
                     {day}
                   </button>

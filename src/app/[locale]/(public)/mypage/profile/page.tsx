@@ -13,7 +13,7 @@ export default async function MypageProfilePage() {
   }
 
   const [t, clubsData, myClubs] = await Promise.all([
-    getTranslations(), 
+    getTranslations(),
     getClubs(),
     import('@/app/actions/clubs').then(m => m.getMyClubs())
   ]);

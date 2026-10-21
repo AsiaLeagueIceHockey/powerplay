@@ -1,3 +1,5 @@
+
+import { surfaceStyles } from "@/components/ui/styles";
 import { redirect } from "next/navigation";
 import { getTranslations, getLocale } from "next-intl/server";
 import { getUser } from "@/app/actions/auth";
@@ -21,10 +23,10 @@ export default async function MypageClubsPage() {
         title={t("mypage.subpageTitle.clubs")}
         backLabel={t("mypage.back")}
       />
-      
+
       {myClubs.length === 0 ? (
-        <div className="text-center py-12 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 border-dashed">
-          <p className="text-zinc-500 dark:text-zinc-400">
+        <div className={`${surfaceStyles({ density: "none" })} text-center`}>
+          <p className="text-pp-muted ">
             {locale === "ko" ? "등록된 소속팀이 없습니다." : "No teams registered yet."}
           </p>
         </div>

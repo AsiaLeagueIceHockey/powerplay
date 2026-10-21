@@ -1,4 +1,5 @@
 "use client";
+import { buttonStyles, segmentedItemStyles } from "@/components/ui/styles";
 
 import { useEffect, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
@@ -32,14 +33,11 @@ export function TamagotchiCloset({
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  // 모달이 새로 열릴 때마다 draft 초기화 (이전 세션 잔상 차단)
-  useEffect(() => {
-    if (isOpen) {
-      setDraft(initialColors);
-      setSelectedPart("helmet");
-      setError(null);
-    }
-  }, [isOpen, initialColors]);
+  const [previousInput, setPreviousInput] = useState({ isOpen, initialColors });
+  if (previousInput.isOpen !== isOpen || previousInput.initialColors !== initialColors) {
+    setPreviousInput({ isOpen, initialColors });
+    if (isOpen) { setDraft(initialColors); setSelectedPart("helmet"); setError(null); }
+  }
 
   // ESC 닫기
   useEffect(() => {
@@ -94,11 +92,11 @@ export function TamagotchiCloset({
       role="dialog"
       aria-modal="true"
       aria-label={t("modalTitle")}
-      className="fixed inset-0 z-50 flex flex-col bg-white dark:bg-zinc-950"
+      className="fixed inset-0 z-50 flex flex-col bg-pp-surface "
     >
       {/* Header */}
-      <header className="flex items-center justify-between gap-3 border-b border-zinc-200 px-4 py-3 dark:border-zinc-800">
-        <h2 className="truncate text-base font-black text-zinc-900 dark:text-white">
+      <header className="flex items-center justify-between gap-3 border-b border-pp-border px-4 py-3 ">
+        <h2 className="truncate text-base font-black text-pp-text dark:text-white">
           {t("modalTitle")}
         </h2>
         <button
@@ -106,7 +104,7 @@ export function TamagotchiCloset({
           onClick={onClose}
           disabled={isPending}
           aria-label={t("cancel")}
-          className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-zinc-700 transition-colors hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-50 dark:text-zinc-200 dark:hover:bg-zinc-800"
+          className={buttonStyles({ variant: "secondary", size: "compact", shape: "circle" }) + " flex flex-shrink-0 items-center justify-center pp-icon-button"}
         >
           <X className="h-5 w-5" />
         </button>
@@ -116,7 +114,7 @@ export function TamagotchiCloset({
       <div className="flex-1 overflow-y-auto px-4 py-5">
         {/* Preview */}
         <section aria-label={t("preview")} className="flex flex-col items-center">
-          <div className="flex aspect-square w-full max-w-[240px] items-center justify-center rounded-2xl border border-sky-200/80 bg-gradient-to-br from-sky-50 via-white to-violet-50 dark:border-sky-900/60 dark:from-sky-950/40 dark:via-zinc-900 dark:to-violet-950/40">
+          <div className="flex aspect-square w-full max-w-[240px] items-center justify-center rounded-2xl border border-pp-info-border/80 bg-gradient-to-br from-sky-50 via-white to-violet-50 dark:from-sky-950/40 dark:via-zinc-900 dark:to-violet-950/40">
             <TamagotchiAvatar
               size={200}
               colors={draft}
@@ -132,7 +130,7 @@ export function TamagotchiCloset({
           <div
             role="tablist"
             aria-orientation="horizontal"
-            className="grid grid-cols-3 gap-2 rounded-xl bg-zinc-100 p-1 dark:bg-zinc-900"
+            className="grid grid-cols-3 gap-2 rounded-xl bg-pp-surface-muted p-1 "
           >
             {TAMAGOTCHI_PARTS.map((part) => {
               const isActive = selectedPart === part;
@@ -143,11 +141,7 @@ export function TamagotchiCloset({
                   role="tab"
                   aria-selected={isActive}
                   onClick={() => setSelectedPart(part)}
-                  className={`whitespace-nowrap rounded-lg px-3 py-2 text-sm font-bold transition-colors ${
-                    isActive
-                      ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-800 dark:text-white"
-                      : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-                  }`}
+                  className={segmentedItemStyles({ selected: isActive })}
                 >
                   <span className="truncate">{partLabel(part)}</span>
                 </button>
@@ -163,7 +157,7 @@ export function TamagotchiCloset({
               const isSelected = draft[selectedPart].toUpperCase() === entry.hex.toUpperCase();
               const colorLabel = t(`colors.${entry.key}`);
               return (
-                <button
+                <button data-ui-exception="pet-color-swatch"
                   key={entry.hex}
                   type="button"
                   onClick={() => handleSelectColor(selectedPart, entry.hex)}
@@ -174,8 +168,8 @@ export function TamagotchiCloset({
                   aria-pressed={isSelected}
                   className={`flex aspect-square items-center justify-center rounded-full border-2 transition-all ${
                     isSelected
-                      ? "border-sky-500 ring-2 ring-sky-500 ring-offset-2 ring-offset-white dark:ring-offset-zinc-950"
-                      : "border-zinc-200 hover:border-zinc-400 dark:border-zinc-700 dark:hover:border-zinc-500"
+                      ? "border-pp-info-border ring-2 ring-pp-info-border ring-offset-2 ring-offset-white dark:ring-offset-zinc-950"
+                      : "border-pp-border hover:border-pp-border "
                   }`}
                   style={{ backgroundColor: entry.hex }}
                 />
@@ -185,19 +179,19 @@ export function TamagotchiCloset({
         </section>
 
         {error ? (
-          <p className="mt-4 text-sm font-semibold text-rose-500" role="alert">
+          <p className="mt-4 text-sm font-semibold text-pp-cheer-text" role="alert">
             {error}
           </p>
         ) : null}
       </div>
 
       {/* Footer */}
-      <footer className="flex items-center gap-3 border-t border-zinc-200 px-4 py-3 dark:border-zinc-800">
+      <footer className="flex items-center gap-3 border-t border-pp-border px-4 py-3 ">
         <button
           type="button"
           onClick={onClose}
           disabled={isPending}
-          className="inline-flex flex-1 items-center justify-center whitespace-nowrap rounded-xl border border-zinc-300 bg-white px-4 py-2.5 text-sm font-bold text-zinc-700 transition hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
+          className={buttonStyles({ variant: "outline", size: "compact" }) + " inline-flex flex-1 items-center justify-center"}
         >
           <span className="truncate">{t("cancel")}</span>
         </button>
@@ -205,7 +199,7 @@ export function TamagotchiCloset({
           type="button"
           onClick={handleSave}
           disabled={isPending}
-          className="inline-flex flex-1 items-center justify-center whitespace-nowrap rounded-xl bg-sky-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-sky-700 disabled:cursor-not-allowed disabled:bg-zinc-300 dark:disabled:bg-zinc-700"
+          className={buttonStyles({ variant: "primary", size: "compact" }) + " inline-flex flex-1 items-center justify-center"}
         >
           <span className="truncate">{isPending ? t("saving") : t("save")}</span>
         </button>

@@ -1,4 +1,5 @@
 "use client";
+import { buttonStyles } from "@/components/ui/styles";
 
 import { useEffect, useState } from "react";
 import { saveSubscription } from "@/app/actions/push";
@@ -148,14 +149,14 @@ export function PushPermissionButton({
 
   if (isSubscribed) {
     return (
-      <button className={`${className} opacity-50 cursor-default`} disabled>
+      <button type="button" className={buttonStyles({ variant: "outline", size: "compact" }) + " " + className} disabled>
         {children || "알림 설정됨"}
       </button>
     );
   }
 
   return (
-    <button onClick={handleSubscribe} disabled={loading} className={className}>
+    <button type="button" onClick={handleSubscribe} disabled={loading} className={buttonStyles({ variant: "outline", size: "compact" }) + " " + className}>
       {loading ? "..." : children || "알림 받기"}
     </button>
   );
