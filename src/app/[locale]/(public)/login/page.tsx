@@ -1,4 +1,5 @@
 "use client";
+import { buttonStyles, fieldStyles, surfaceStyles } from "@/components/ui/styles";
 
 import { Suspense, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
@@ -40,21 +41,21 @@ function LoginContent() {
 
   return (
     <div className="mx-auto max-w-md">
-      <div className="rounded-lg border border-zinc-200 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+      <div className={surfaceStyles({ density: "roomy" })}>
         <h1 className="mb-6 text-center text-2xl font-bold">{t("login")}</h1>
 
         {(error || oauthError) && (
-          <div className="mb-4 rounded-lg bg-red-50 p-4 text-sm text-red-600 dark:bg-red-900/20 dark:text-red-400">
+          <div className="mb-4 rounded-lg bg-pp-danger-soft p-4 text-sm text-pp-danger-text ">
             {error || oauthError}
           </div>
         )}
 
         <div className="space-y-3">
           {/* Google Login Button */}
-          <button
+          <button type="button"
             onClick={handleGoogleSignIn}
             disabled={isLoading !== null}
-            className="flex w-full items-center justify-center gap-3 rounded-lg border border-zinc-300 bg-white px-4 py-3 font-medium text-zinc-700 transition-colors hover:bg-zinc-50 disabled:opacity-50 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
+            className={`${buttonStyles({ variant: "secondary", size: "default" })} w-full`}
           >
             {/* Google Logo SVG */}
             <svg
@@ -83,10 +84,10 @@ function LoginContent() {
           </button>
 
           {/* Kakao Login Button */}
-          <button
+          <button type="button"
             onClick={handleKakaoSignIn}
             disabled={isLoading !== null}
-            className="flex w-full items-center justify-center gap-3 rounded-lg bg-[#FEE500] px-4 py-3 font-medium text-[#000000D9] transition-colors hover:bg-[#FDD800] disabled:opacity-50"
+            className={`${buttonStyles({ variant: "kakao", size: "large" })} w-full`}
           >
             {/* Kakao Logo SVG */}
             <svg
@@ -105,8 +106,8 @@ function LoginContent() {
 
           {/* Email/Password Login (Dev Only) */}
           {process.env.NODE_ENV === "development" && (
-            <div className="mt-8 border-t border-zinc-200 pt-6 dark:border-zinc-700">
-              <div className="mb-4 text-center text-xs font-semibold uppercase text-zinc-500">
+            <div className="mt-8 border-t border-pp-border pt-6 ">
+              <div className="mb-4 text-center text-xs font-semibold uppercase text-pp-muted">
                 Development Only
               </div>
               <form action={async (formData) => {
@@ -116,20 +117,22 @@ function LoginContent() {
                 <input
                   type="email"
                   name="email"
+                  aria-label="Email"
                   placeholder="Email"
                   required
-                  className="w-full rounded-lg border border-zinc-300 px-4 py-2 text-sm focus:border-zinc-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800"
+                  className={`${fieldStyles()} w-full`}
                 />
                 <input
                   type="password"
                   name="password"
+                  aria-label="Password"
                   placeholder="Password"
                   required
-                  className="w-full rounded-lg border border-zinc-300 px-4 py-2 text-sm focus:border-zinc-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800"
+                  className={`${fieldStyles()} w-full`}
                 />
                 <button
                   type="submit"
-                  className="w-full rounded-lg bg-zinc-200 px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-300 dark:bg-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-600"
+                  className={`${buttonStyles({ variant: "secondary", size: "compact" })} w-full`}
                 >
                   Sign in with Email
                 </button>

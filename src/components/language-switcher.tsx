@@ -1,4 +1,5 @@
 "use client";
+import { segmentedItemStyles, surfaceStyles } from "@/components/ui/styles";
 
 import { usePathname, useRouter } from "next/navigation";
 import { setStoredLocalePreference } from "@/lib/locale-preference";
@@ -19,25 +20,19 @@ export function LanguageSwitcher({ locale }: { locale: string }) {
   };
 
   return (
-    <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 shadow-sm">
+    <div className={surfaceStyles({ density: "compact" })}>
       <div className="flex gap-3">
-          <button
+          <button type="button"
             onClick={() => switchLocale("ko")}
-            className={`flex-1 py-3 px-4 rounded-xl font-medium transition border ${
-              locale === "ko"
-                ? "bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-900/30 dark:border-blue-800 dark:text-blue-300"
-                : "border-zinc-200 text-zinc-600 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-800"
-            }`}
+            aria-pressed={locale === "ko"}
+            className={`${segmentedItemStyles({ selected: locale === "ko" })} flex-1`}
           >
             🇰🇷 한국어
           </button>
-          <button
+          <button type="button"
             onClick={() => switchLocale("en")}
-            className={`flex-1 py-3 px-4 rounded-xl font-medium transition border ${
-              locale === "en"
-                ? "bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-900/30 dark:border-blue-800 dark:text-blue-300"
-                : "border-zinc-200 text-zinc-600 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-800"
-            }`}
+            aria-pressed={locale === "en"}
+            className={`${segmentedItemStyles({ selected: locale === "en" })} flex-1`}
           >
             🇺🇸 English
           </button>

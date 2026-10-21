@@ -48,7 +48,7 @@ export default async function AboutPage({
   return (
     <>
       <HashScrollHandler />
-      <AboutPageContent locale={locale} />
+      <AboutPageContent locale={locale} designSystem />
     </>
   );
 }

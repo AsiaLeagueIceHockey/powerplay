@@ -12,7 +12,7 @@ export function LinkifiedText({ text }: { text: string }) {
             href={segment.href}
             target="_blank"
             rel="noopener noreferrer"
-            className="break-all font-semibold text-blue-600 underline decoration-blue-400/60 underline-offset-2 transition-colors hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+            className="break-all font-semibold text-pp-accent-text underline decoration-blue-400/60 underline-offset-2 transition-colors hover:text-pp-accent-text "
           >
             {segment.value}
           </a>

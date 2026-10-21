@@ -1,4 +1,5 @@
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
+import { segmentedItemStyles } from "@/components/ui/styles";
 
 type PublicSectionTab = "match" | "rink" | "club";
 
@@ -16,19 +17,16 @@ export function PublicSectionTabs({
   ];
 
   return (
-    <nav className="flex border-b border-zinc-200 dark:border-zinc-800" aria-label="Public sections">
+    <nav className="flex border-b border-pp-border " aria-label="Public sections">
       {tabs.map((tab) => {
         const isActive = tab.key === activeTab;
         return (
           <Link
             key={tab.key}
-            href={tab.href}
+            locale={locale as "ko" | "en"}
+            href={tab.key === "match" ? "/?tab=match" : tab.href.replace(`/${locale}`, "") || "/"}
             prefetch={false}
-            className={`relative flex-1 pb-3 text-center text-lg font-bold transition-colors ${
-              isActive
-                ? "text-zinc-900 dark:text-white"
-                : "text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
-            }`}
+            className={`${segmentedItemStyles({ selected: isActive, kind: "tab" })} relative flex-1 text-center`}
             aria-current={isActive ? "page" : undefined}
           >
             <span className="inline-flex items-center justify-center gap-2">{tab.label}</span>

@@ -1,4 +1,5 @@
 "use client";
+import { buttonStyles } from "@/components/ui/styles";
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -127,7 +128,7 @@ export function FeedbackBannerClient({
                   <p className="truncate text-sm font-bold leading-tight text-white">
                     {banner.title}
                   </p>
-                  <p className="truncate pr-8 text-xs text-zinc-200">
+                  <p className="truncate pr-8 text-xs text-white/80">
                     {banner.description}
                   </p>
                 </div>
@@ -144,7 +145,7 @@ export function FeedbackBannerClient({
 
             if (banner.internal) {
               return (
-                <button
+                <button data-ui-exception="compact-brand-banner"
                   key={banner.id}
                   type="button"
                   onClick={() => {
@@ -173,7 +174,7 @@ export function FeedbackBannerClient({
           })}
         </div>
 
-        <div className="pointer-events-none absolute bottom-2.5 right-3 z-10 rounded-full bg-black/20 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-white/90 backdrop-blur-[2px]">
+        <div className={buttonStyles({ variant: "ghost", size: "compact", shape: "circle" })}>
           {currentIndex + 1} / {banners.length}
         </div>
       </div>

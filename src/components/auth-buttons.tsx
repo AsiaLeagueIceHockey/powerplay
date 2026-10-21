@@ -1,4 +1,5 @@
 "use client";
+import { buttonStyles } from "@/components/ui/styles";
 
 import { useTranslations } from "next-intl";
 import { Link, useRouter } from "@/i18n/navigation";
@@ -39,7 +40,7 @@ export function AuthButtons() {
 
   if (isLoading) {
     return (
-      <div className="h-9 w-20 animate-pulse rounded-lg bg-zinc-200 dark:bg-zinc-800" />
+      <div className="h-9 w-20 animate-pulse rounded-lg bg-pp-surface-muted " />
     );
   }
 
@@ -48,13 +49,13 @@ export function AuthButtons() {
       <div className="flex items-center gap-3">
         <Link
           href="/mypage"
-          className="text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
+          className="text-sm font-medium text-pp-muted hover:text-pp-text dark:hover:text-white"
         >
           {user.email?.split("@")[0]}
         </Link>
-        <button
+        <button type="button"
           onClick={handleSignOut}
-          className="rounded-xl border border-zinc-300 px-3 py-1.5 text-sm font-medium transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
+          className={buttonStyles({ variant: "secondary", size: "compact" })}
         >
           {t("logout")}
         </button>
@@ -65,7 +66,7 @@ export function AuthButtons() {
   return (
     <Link
       href="/login"
-      className="rounded-xl bg-zinc-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100"
+      className={buttonStyles({ variant: "primary", size: "compact" })}
     >
       {t("login")}
     </Link>

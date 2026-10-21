@@ -67,8 +67,8 @@ export function BottomNav({ locale }: { locale: string }) {
       const visualViewport = window.visualViewport;
       const handleResize = () => {
         // Checking against window.screen.height (which is constant) resolves iOS Safari resizing innerHeight
-        const isKeyboard = 
-          visualViewport.height < window.innerHeight * 0.85 || 
+        const isKeyboard =
+          visualViewport.height < window.innerHeight * 0.85 ||
           (window.screen && visualViewport.height < window.screen.height * 0.70);
 
         if (isKeyboard) {
@@ -157,7 +157,7 @@ export function BottomNav({ locale }: { locale: string }) {
   ];
 
   return (
-    <nav className={`fixed bottom-0 left-0 right-0 z-40 w-full border-t border-zinc-200 bg-white/80 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-950/80 pb-safe transition-all duration-300 bottom-navigation-bar ${isKeyboardOpen ? "translate-y-full opacity-0 pointer-events-none" : "translate-y-0 opacity-100"}`}>
+    <nav className={`fixed bottom-0 left-0 right-0 z-40 w-full border-t border-pp-border bg-white/80 backdrop-blur-sm dark:bg-pp-surface/80 pb-safe transition-all duration-300 bottom-navigation-bar ${isKeyboardOpen ? "translate-y-full opacity-0 pointer-events-none" : "translate-y-0 opacity-100"}`}>
       <div className="flex justify-around items-center h-14 px-2">
         {tabs.map((tab) => {
           const active = isActive(tab.href);
@@ -170,8 +170,8 @@ export function BottomNav({ locale }: { locale: string }) {
               prefetch={false}
               className={`flex flex-col items-center justify-center w-full h-full gap-0.5 transition-colors ${
                 active
-                  ? "text-blue-600 dark:text-blue-400"
-                  : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+                  ? "text-pp-accent-text "
+                  : "text-pp-muted hover:text-pp-text "
               }`}
               title={tab.name}
               aria-label={tab.name}
@@ -199,7 +199,7 @@ export function BottomNav({ locale }: { locale: string }) {
                   </span>
                 ) : null}
                 {tab.badgeCount && tab.badgeCount > 0 ? (
-                  <span className="absolute -right-3 -top-2 inline-flex min-w-[1.1rem] items-center justify-center rounded-full bg-red-500 px-1 py-0.5 text-[10px] font-bold leading-none text-white shadow-sm">
+                  <span className="absolute -right-3 -top-2 inline-flex min-w-[1.1rem] items-center justify-center rounded-full bg-pp-danger px-1 py-0.5 text-[10px] font-bold leading-none text-white shadow-sm">
                     {tab.badgeCount > 99 ? "99+" : tab.badgeCount}
                   </span>
                 ) : null}

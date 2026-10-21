@@ -1,4 +1,5 @@
 "use client";
+import { buttonStyles, fieldStyles, surfaceStyles } from "@/components/ui/styles";
 
 import { useState } from "react";
 import { Link } from "@/i18n/navigation";
@@ -39,11 +40,11 @@ export default function SignupPage() {
   if (success) {
     return (
       <div className="mx-auto max-w-md">
-        <div className="rounded-lg border border-zinc-200 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <div className={surfaceStyles({ density: "roomy" })}>
           <div className="text-center">
             <div className="mb-4 text-4xl">✉️</div>
             <h1 className="mb-2 text-2xl font-bold">{t("checkEmail")}</h1>
-            <p className="text-zinc-600 dark:text-zinc-400">
+            <p className="text-pp-muted ">
               {t("confirmationSent")}
             </p>
           </div>
@@ -54,11 +55,11 @@ export default function SignupPage() {
 
   return (
     <div className="mx-auto max-w-md">
-      <div className="rounded-lg border border-zinc-200 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+      <div className={surfaceStyles({ density: "roomy" })}>
         <h1 className="mb-6 text-2xl font-bold">{t("signup")}</h1>
 
         {error && (
-          <div className="mb-4 rounded-lg bg-red-50 p-4 text-sm text-red-600 dark:bg-red-900/20 dark:text-red-400">
+          <div className="mb-4 rounded-lg bg-pp-danger-soft p-4 text-sm text-pp-danger-text ">
             {error}
           </div>
         )}
@@ -67,7 +68,7 @@ export default function SignupPage() {
           <div>
             <label
               htmlFor="fullName"
-              className="mb-2 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
+              className="mb-2 block text-sm font-medium text-pp-muted "
             >
               {t("fullName")}
             </label>
@@ -76,14 +77,14 @@ export default function SignupPage() {
               id="fullName"
               name="fullName"
               required
-              className="w-full rounded-lg border border-zinc-300 px-4 py-2 focus:border-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-500/20 dark:border-zinc-700 dark:bg-zinc-800"
+              className={`${fieldStyles()} w-full`}
             />
           </div>
 
           <div>
             <label
               htmlFor="email"
-              className="mb-2 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
+              className="mb-2 block text-sm font-medium text-pp-muted "
             >
               {t("email")}
             </label>
@@ -92,14 +93,14 @@ export default function SignupPage() {
               id="email"
               name="email"
               required
-              className="w-full rounded-lg border border-zinc-300 px-4 py-2 focus:border-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-500/20 dark:border-zinc-700 dark:bg-zinc-800"
+              className={`${fieldStyles()} w-full`}
             />
           </div>
 
           <div>
             <label
               htmlFor="password"
-              className="mb-2 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
+              className="mb-2 block text-sm font-medium text-pp-muted "
             >
               {t("password")}
             </label>
@@ -109,14 +110,14 @@ export default function SignupPage() {
               name="password"
               required
               minLength={6}
-              className="w-full rounded-lg border border-zinc-300 px-4 py-2 focus:border-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-500/20 dark:border-zinc-700 dark:bg-zinc-800"
+              className={`${fieldStyles()} w-full`}
             />
           </div>
 
           <div>
             <label
               htmlFor="confirmPassword"
-              className="mb-2 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
+              className="mb-2 block text-sm font-medium text-pp-muted "
             >
               {t("confirmPassword")}
             </label>
@@ -126,36 +127,36 @@ export default function SignupPage() {
               name="confirmPassword"
               required
               minLength={6}
-              className="w-full rounded-lg border border-zinc-300 px-4 py-2 focus:border-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-500/20 dark:border-zinc-700 dark:bg-zinc-800"
+              className={`${fieldStyles()} w-full`}
             />
           </div>
 
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full rounded-lg bg-zinc-900 px-4 py-2 font-medium text-white transition-colors hover:bg-zinc-800 disabled:opacity-50 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100"
+            className={`${buttonStyles({ variant: "primary", size: "large" })} w-full`}
           >
             {isLoading ? t("loading") : t("signup")}
           </button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-zinc-600 dark:text-zinc-400">
+        <p className="mt-6 text-center text-sm text-pp-muted ">
           {t("hasAccount")}{" "}
           <Link
             href="/login"
-            className="font-medium text-zinc-900 hover:underline dark:text-white"
+            className="font-medium text-pp-text hover:underline dark:text-white"
           >
             {t("login")}
           </Link>
         </p>
 
-        <div className="mt-4 text-center text-[11px] text-zinc-400 dark:text-zinc-500">
+        <div className="mt-4 text-center text-[11px] text-pp-muted ">
           <div className="flex items-center justify-center gap-3">
-            <Link href="/privacy" className="underline underline-offset-2 hover:text-zinc-600 dark:hover:text-zinc-300">
+            <Link href="/privacy" className="underline underline-offset-2 hover:text-pp-muted ">
               Privacy Policy
             </Link>
             <span aria-hidden="true">|</span>
-            <Link href="/terms" className="underline underline-offset-2 hover:text-zinc-600 dark:hover:text-zinc-300">
+            <Link href="/terms" className="underline underline-offset-2 hover:text-pp-muted ">
               Terms of Service
             </Link>
           </div>
