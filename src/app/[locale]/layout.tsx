@@ -1,4 +1,5 @@
 import { NextIntlClientProvider } from "next-intl";
+import { UserThemeScope } from "@/components/ui/user-theme-scope";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing, type Locale } from "@/i18n/routing";
@@ -121,7 +122,7 @@ export default async function LocaleLayout({
   return (
     <html lang={locale}>
       <body
-        className="antialiased bg-white text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100"
+        className="antialiased bg-pp-surface text-pp-text "
       >
         <NextIntlClientProvider messages={messages}>
           <NextTopLoader color="#2563EB" showSpinner={false} />
@@ -131,7 +132,7 @@ export default async function LocaleLayout({
               <ScrollToTop />
               <PushServiceWorkerRegister />
               <OnboardingGuard />
-              {children}
+              <UserThemeScope>{children}</UserThemeScope>
               <NotificationGuideModal />
               <InstallPrompt />
             </ChatUnreadProvider>

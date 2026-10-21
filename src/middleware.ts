@@ -52,6 +52,12 @@ function applyBotResponseHeaders(response: NextResponse): NextResponse {
 }
 
 export async function middleware(request: NextRequest) {
+  // Only this exact fixture route bypasses locale/auth providers; never expose it in production.
+  if (request.nextUrl.pathname.replace(/\/$/, "") === "/dev/design-system") {
+    return process.env.NODE_ENV === "development"
+      ? NextResponse.next()
+      : new NextResponse(null, { status: 404 });
+  }
   if (request.method === "OPTIONS") {
     return new NextResponse(null, { status: 204 });
   }
