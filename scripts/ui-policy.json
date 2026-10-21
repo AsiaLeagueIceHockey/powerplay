@@ -1,0 +1,374 @@
+{
+  "version": 1,
+  "files": {
+    "src/app/[locale]/(brochure)/lounge-membership/page.tsx": {
+      "colors": {
+        "text-[#8b6814]": "Approved Lounge gold brochure and Instagram brand gradient.",
+        "bg-[#f7f5ef]": "Approved Lounge gold brochure and Instagram brand gradient.",
+        "border-[#d4a017]/25": "Approved Lounge gold brochure and Instagram brand gradient.",
+        "text-[#f3d27a]": "Approved Lounge gold brochure and Instagram brand gradient.",
+        "bg-zinc-900": "Approved Lounge gold brochure and Instagram brand gradient.",
+        "bg-zinc-950": "Approved Lounge gold brochure and Instagram brand gradient.",
+        "from-[#833ab4]": "Approved Lounge gold brochure and Instagram brand gradient.",
+        "via-[#fd1d1d]": "Approved Lounge gold brochure and Instagram brand gradient.",
+        "to-[#fcb045]": "Approved Lounge gold brochure and Instagram brand gradient."
+      }
+    },
+    "src/app/[locale]/(public)/about/page.tsx": {},
+    "src/app/[locale]/(public)/card-news/page.tsx": {},
+    "src/app/[locale]/(public)/chat/page.tsx": {},
+    "src/app/[locale]/(public)/clubs/[id]/card/page.tsx": {},
+    "src/app/[locale]/(public)/clubs/[id]/page.tsx": {},
+    "src/app/[locale]/(public)/clubs/page.tsx": {},
+    "src/app/[locale]/(public)/find-club/page.tsx": {},
+    "src/app/[locale]/(public)/layout.tsx": {},
+    "src/app/[locale]/(public)/login/page.tsx": {},
+    "src/app/[locale]/(public)/lounge/[businessId]/notices/[noticeId]/page.tsx": {},
+    "src/app/[locale]/(public)/lounge/[businessId]/page.tsx": {},
+    "src/app/[locale]/(public)/lounge/page.tsx": {},
+    "src/app/[locale]/(public)/match/[id]/page.tsx": {},
+    "src/app/[locale]/(public)/mypage/card/page.tsx": {},
+    "src/app/[locale]/(public)/mypage/clubs/page.tsx": {},
+    "src/app/[locale]/(public)/mypage/language/page.tsx": {},
+    "src/app/[locale]/(public)/mypage/matches/page.tsx": {},
+    "src/app/[locale]/(public)/mypage/notifications/page.tsx": {},
+    "src/app/[locale]/(public)/mypage/page.tsx": {},
+    "src/app/[locale]/(public)/mypage/points/charge/page.tsx": {},
+    "src/app/[locale]/(public)/mypage/points/page.tsx": {
+      "colors": {
+        "from-amber-500": "Points balance hero uses the existing amber gradient.",
+        "to-amber-600": "Points balance hero uses the existing amber gradient."
+      }
+    },
+    "src/app/[locale]/(public)/mypage/profile/page.tsx": {},
+    "src/app/[locale]/(public)/mypage/tamagotchi/page.tsx": {},
+    "src/app/[locale]/(public)/page.tsx": {},
+    "src/app/[locale]/(public)/privacy/page.tsx": {},
+    "src/app/[locale]/(public)/profile/page.tsx": {},
+    "src/app/[locale]/(public)/rinks/[id]/page.tsx": {},
+    "src/app/[locale]/(public)/rinks/page.tsx": {},
+    "src/app/[locale]/(public)/signup/page.tsx": {},
+    "src/app/[locale]/(public)/terms/page.tsx": {},
+    "src/app/[locale]/(public)/youth/community/[id]/page.tsx": {},
+    "src/app/[locale]/(public)/youth/page.tsx": {},
+    "src/app/[locale]/(public)/youth/write/page.tsx": {},
+    "src/app/[locale]/chat/[roomId]/page.tsx": {},
+    "src/app/[locale]/instagram/club-ranking/page.tsx": {
+      "colors": {
+        "border-zinc-100": "Exported Instagram canvas colors are intentionally fixed independent of OS theme.",
+        "text-[#172554]": "Exported Instagram canvas colors are intentionally fixed independent of OS theme.",
+        "bg-zinc-100": "Exported Instagram canvas colors are intentionally fixed independent of OS theme.",
+        "text-zinc-300": "Exported Instagram canvas colors are intentionally fixed independent of OS theme.",
+        "text-zinc-500": "Exported Instagram canvas colors are intentionally fixed independent of OS theme.",
+        "bg-[#ffffff]": "Exported Instagram canvas colors are intentionally fixed independent of OS theme.",
+        "bg-[#172554]": "Exported Instagram canvas colors are intentionally fixed independent of OS theme.",
+        "bg-zinc-50": "Exported Instagram canvas colors are intentionally fixed independent of OS theme.",
+        "text-zinc-400": "Exported Instagram canvas colors are intentionally fixed independent of OS theme.",
+        "bg-blue-400": "Exported Instagram canvas colors are intentionally fixed independent of OS theme."
+      }
+    },
+    "src/app/[locale]/instagram/matches/page.tsx": {
+      "colors": {
+        "bg-[#ffffff]": "Exported Instagram canvas colors are intentionally fixed independent of OS theme.",
+        "text-[#172554]": "Exported Instagram canvas colors are intentionally fixed independent of OS theme.",
+        "bg-[#172554]": "Exported Instagram canvas colors are intentionally fixed independent of OS theme.",
+        "text-zinc-300": "Exported Instagram canvas colors are intentionally fixed independent of OS theme.",
+        "bg-zinc-50": "Exported Instagram canvas colors are intentionally fixed independent of OS theme.",
+        "text-zinc-400": "Exported Instagram canvas colors are intentionally fixed independent of OS theme.",
+        "border-zinc-100": "Exported Instagram canvas colors are intentionally fixed independent of OS theme.",
+        "text-zinc-200": "Exported Instagram canvas colors are intentionally fixed independent of OS theme.",
+        "bg-blue-400": "Exported Instagram canvas colors are intentionally fixed independent of OS theme."
+      }
+    },
+    "src/app/[locale]/instagram/weekly-matches/page.tsx": {
+      "colors": {
+        "bg-[#ffffff]": "Exported Instagram canvas colors are intentionally fixed independent of OS theme.",
+        "text-[#172554]": "Exported Instagram canvas colors are intentionally fixed independent of OS theme.",
+        "bg-[#172554]": "Exported Instagram canvas colors are intentionally fixed independent of OS theme.",
+        "text-zinc-500": "Exported Instagram canvas colors are intentionally fixed independent of OS theme.",
+        "border-zinc-100": "Exported Instagram canvas colors are intentionally fixed independent of OS theme.",
+        "bg-zinc-50": "Exported Instagram canvas colors are intentionally fixed independent of OS theme.",
+        "text-zinc-400": "Exported Instagram canvas colors are intentionally fixed independent of OS theme.",
+        "text-zinc-200": "Exported Instagram canvas colors are intentionally fixed independent of OS theme.",
+        "text-zinc-300": "Exported Instagram canvas colors are intentionally fixed independent of OS theme.",
+        "border-zinc-200": "Exported Instagram canvas colors are intentionally fixed independent of OS theme.",
+        "bg-blue-400": "Exported Instagram canvas colors are intentionally fixed independent of OS theme."
+      }
+    },
+    "src/app/[locale]/layout.tsx": {},
+    "src/app/[locale]/mypage/fortune/page.tsx": {},
+    "src/app/[locale]/onboarding/page.tsx": {},
+    "src/components/about-page-content.tsx": {
+      "colors": {
+        "from-blue-50": "Existing brand hero gradient and dark sponsor footer.",
+        "to-zinc-50": "Existing brand hero gradient and dark sponsor footer.",
+        "dark:from-blue-950/30": "Existing brand hero gradient and dark sponsor footer.",
+        "dark:via-zinc-950": "Existing brand hero gradient and dark sponsor footer.",
+        "dark:to-zinc-900": "Existing brand hero gradient and dark sponsor footer.",
+        "bg-zinc-950": "Existing brand hero gradient and dark sponsor footer."
+      },
+      "legacyBranch": {
+        "condition": "designSystem",
+        "reason": "Shared SEO renderer keeps the original classes by default; the ordinary public About route explicitly opts in."
+      }
+    },
+    "src/components/birth-date-picker.tsx": {},
+    "src/components/bottom-nav.tsx": {
+      "colors": {
+        "text-[#f0b63a]": "Preserve the existing Lounge gold navigation accent.",
+        "dark:text-[#f6d895]": "Preserve the existing Lounge gold navigation accent."
+      }
+    },
+    "src/components/brand-logo.tsx": {},
+    "src/components/calendar-view.tsx": {
+      "controls": {
+        "calendar-day": "Calendar grid cells retain square geometry and per-day counts; ordinary navigation uses shared buttons."
+      }
+    },
+    "src/components/charge-form.tsx": {},
+    "src/components/chat-access-banner.tsx": {},
+    "src/components/chat-list-client.tsx": {},
+    "src/components/chat-room-client.tsx": {},
+    "src/components/chat-user-selector.tsx": {},
+    "src/components/club-card.tsx": {},
+    "src/components/club-share-button.tsx": {
+      "colors": {
+        "bg-zinc-800": "Inverse surface for a toast, featured state or dark brand emphasis."
+      }
+    },
+    "src/components/club-subscribe-button.tsx": {},
+    "src/components/club-vote-button.tsx": {},
+    "src/components/daily-hockey-fortune-banner.tsx": {},
+    "src/components/daily-hockey-fortune-screen.tsx": {
+      "colors": {
+        "dark:bg-zinc-950": "Fortune artwork palette is excluded; surrounding ordinary controls use recipes.",
+        "bg-sky-100": "Fortune artwork palette is excluded; surrounding ordinary controls use recipes.",
+        "text-sky-600": "Fortune artwork palette is excluded; surrounding ordinary controls use recipes.",
+        "dark:bg-sky-900/30": "Fortune artwork palette is excluded; surrounding ordinary controls use recipes.",
+        "dark:text-sky-300": "Fortune artwork palette is excluded; surrounding ordinary controls use recipes.",
+        "text-zinc-900": "Fortune artwork palette is excluded; surrounding ordinary controls use recipes.",
+        "text-zinc-500": "Fortune artwork palette is excluded; surrounding ordinary controls use recipes.",
+        "dark:text-zinc-400": "Fortune artwork palette is excluded; surrounding ordinary controls use recipes.",
+        "bg-zinc-200": "Fortune artwork palette is excluded; surrounding ordinary controls use recipes.",
+        "dark:bg-zinc-800": "Fortune artwork palette is excluded; surrounding ordinary controls use recipes.",
+        "bg-sky-500": "Fortune artwork palette is excluded; surrounding ordinary controls use recipes.",
+        "border-zinc-100": "Fortune artwork palette is excluded; surrounding ordinary controls use recipes.",
+        "dark:border-zinc-900": "Fortune artwork palette is excluded; surrounding ordinary controls use recipes.",
+        "dark:bg-zinc-950/95": "Fortune artwork palette is excluded; surrounding ordinary controls use recipes.",
+        "border-zinc-200": "Fortune artwork palette is excluded; surrounding ordinary controls use recipes.",
+        "bg-zinc-50/80": "Fortune artwork palette is excluded; surrounding ordinary controls use recipes.",
+        "dark:border-zinc-800": "Fortune artwork palette is excluded; surrounding ordinary controls use recipes.",
+        "dark:bg-zinc-900": "Fortune artwork palette is excluded; surrounding ordinary controls use recipes.",
+        "text-zinc-950": "Fortune artwork palette is excluded; surrounding ordinary controls use recipes.",
+        "text-sky-700": "Fortune artwork palette is excluded; surrounding ordinary controls use recipes.",
+        "text-zinc-700": "Fortune artwork palette is excluded; surrounding ordinary controls use recipes.",
+        "dark:text-zinc-200": "Fortune artwork palette is excluded; surrounding ordinary controls use recipes.",
+        "text-zinc-800": "Fortune artwork palette is excluded; surrounding ordinary controls use recipes."
+      }
+    },
+    "src/components/date-filter.tsx": {},
+    "src/components/delete-account-modal.tsx": {},
+    "src/components/dynamic-rink-map.tsx": {},
+    "src/components/feedback-banner-client.tsx": {
+      "controls": {
+        "compact-brand-banner": "Preserve the approved compact promotional banner size, brand artwork and tracking behavior."
+      }
+    },
+    "src/components/feedback-banner.tsx": {},
+    "src/components/find-club-banner.tsx": {
+      "colors": {
+        "bg-[#1e3a6e]": "Preserve the approved compact navy finder banner."
+      }
+    },
+    "src/components/find-club-wizard.tsx": {
+      "colors": {
+        "from-blue-500": "Existing recommendation progress/accent gradient.",
+        "to-blue-600": "Existing recommendation progress/accent gradient."
+      }
+    },
+    "src/components/home-client.tsx": {
+      "colors": {
+        "bg-zinc-900": "Inverse surface for a toast, featured state or dark brand emphasis."
+      }
+    },
+    "src/components/install-prompt.tsx": {
+      "colors": {
+        "bg-zinc-900": "Inverse surface for a toast, featured state or dark brand emphasis."
+      }
+    },
+    "src/components/language-switcher.tsx": {},
+    "src/components/linkified-text.tsx": {},
+    "src/components/lounge-business-detail.tsx": {
+      "colors": {
+        "from-[#833ab4]": "Instagram provider brand gradient.",
+        "via-[#fd1d1d]": "Instagram provider brand gradient.",
+        "to-[#fcb045]": "Instagram provider brand gradient."
+      }
+    },
+    "src/components/lounge-calendar-view.tsx": {
+      "controls": {
+        "calendar-day": "Calendar grid cells retain square geometry and per-day counts; ordinary navigation uses shared buttons."
+      }
+    },
+    "src/components/lounge-card.tsx": {
+      "colors": {
+        "bg-zinc-900": "Inverse surface for a toast, featured state or dark brand emphasis."
+      }
+    },
+    "src/components/lounge-contact-menu.tsx": {},
+    "src/components/lounge-cta-button.tsx": {},
+    "src/components/lounge-detail-link.tsx": {},
+    "src/components/lounge-event-card.tsx": {},
+    "src/components/lounge-impression-tracker.tsx": {},
+    "src/components/lounge-location-map.tsx": {},
+    "src/components/lounge-notice-subscribe-button.tsx": {},
+    "src/components/lounge-page-client.tsx": {
+      "colors": {
+        "bg-zinc-900": "Inverse surface for a toast, featured state or dark brand emphasis."
+      }
+    },
+    "src/components/lounge-share-button.tsx": {
+      "colors": {
+        "bg-zinc-800": "Inverse surface for a toast, featured state or dark brand emphasis."
+      }
+    },
+    "src/components/match-application.tsx": {},
+    "src/components/match-card.tsx": {
+      "colors": {
+        "bg-[#172554]": "Match time uses PowerPlay navy as a separate brand emphasis.",
+        "text-[#172554]": "Match time uses PowerPlay navy as a separate brand emphasis."
+      }
+    },
+    "src/components/match-share-button.tsx": {
+      "colors": {
+        "bg-zinc-800": "Inverse surface for a toast, featured state or dark brand emphasis."
+      }
+    },
+    "src/components/match-type-filter-drawer.tsx": {},
+    "src/components/my-match-list.tsx": {},
+    "src/components/mypage-menu-row.tsx": {},
+    "src/components/mypage-subpage-header.tsx": {},
+    "src/components/notification-guide-modal.tsx": {},
+    "src/components/notification-status.tsx": {},
+    "src/components/onboarding-form.tsx": {},
+    "src/components/post-detail-client.tsx": {},
+    "src/components/profile-editor.tsx": {},
+    "src/components/profile-form.tsx": {},
+    "src/components/public-section-tabs.tsx": {
+      "colors": {
+        "bg-zinc-900": "Inverse surface for a toast, featured state or dark brand emphasis."
+      }
+    },
+    "src/components/push-manager.tsx": {},
+    "src/components/region-filter-drawer.tsx": {},
+    "src/components/rink-explorer.tsx": {},
+    "src/components/rink-filter-drawer.tsx": {},
+    "src/components/rink-map.tsx": {},
+    "src/components/skeletons.tsx": {},
+    "src/components/start-chat-button.tsx": {},
+    "src/components/tamagotchi-closet.tsx": {
+      "controls": {
+        "pet-color-swatch": "Color picker previews user-selectable pet artwork colors in circular swatches."
+      },
+      "colors": {
+        "from-sky-50": "Existing pet artwork stage gradient.",
+        "to-violet-50": "Existing pet artwork stage gradient.",
+        "dark:from-sky-950/40": "Existing pet artwork stage gradient.",
+        "dark:via-zinc-900": "Existing pet artwork stage gradient.",
+        "dark:to-violet-950/40": "Existing pet artwork stage gradient."
+      }
+    },
+    "src/components/tamagotchi-detail.tsx": {
+      "colors": {
+        "from-sky-50": "Existing pet artwork stage gradient.",
+        "to-violet-50": "Existing pet artwork stage gradient.",
+        "dark:from-sky-950/40": "Existing pet artwork stage gradient.",
+        "dark:via-zinc-900": "Existing pet artwork stage gradient.",
+        "dark:to-violet-950/40": "Existing pet artwork stage gradient."
+      }
+    },
+    "src/components/tamagotchi-hero.tsx": {
+      "colors": {
+        "from-sky-50": "Existing pet artwork stage gradient.",
+        "to-violet-50": "Existing pet artwork stage gradient.",
+        "dark:from-sky-950/40": "Existing pet artwork stage gradient.",
+        "dark:via-zinc-900": "Existing pet artwork stage gradient.",
+        "dark:to-violet-950/40": "Existing pet artwork stage gradient."
+      }
+    },
+    "src/components/ui/badge.tsx": {},
+    "src/components/ui/button.tsx": {},
+    "src/components/ui/design-system-gallery.tsx": {},
+    "src/components/ui/field.tsx": {},
+    "src/components/ui/filter-chip.tsx": {},
+    "src/components/ui/overlay.tsx": {},
+    "src/components/ui/segmented-control.tsx": {},
+    "src/components/ui/surface.tsx": {},
+    "src/components/ui/user-theme-scope.tsx": {},
+    "src/components/user-header-client.tsx": {},
+    "src/components/user-header-menu.tsx": {},
+    "src/components/youth-access-banner.tsx": {},
+    "src/components/youth-client.tsx": {},
+    "src/components/youth-write-client.tsx": {},
+    "src/app/[locale]/(public)/admin-apply/page.tsx": {},
+    "src/components/notification-help-button.tsx": {},
+    "src/components/auth-buttons.tsx": {},
+    "src/components/copy-bank-account.tsx": {},
+    "src/app/[locale]/(public)/clubs/[id]/card/page.client.tsx": {
+      "artwork": {
+        "export-canvas": "Exported card artwork keeps exact geometry, fixed colors and in-canvas editing handles; surrounding native controls use shared recipes."
+      },
+      "colors": {
+        "bg-zinc-900": "Inverse dark workbench surface around exported card art.",
+        "bg-zinc-950": "Existing dark workbench background around exported card art.",
+        "from-zinc-900": "Preserved dark workbench preview frame.",
+        "via-zinc-900": "Preserved dark workbench preview frame.",
+        "to-zinc-950": "Preserved dark workbench preview frame."
+      }
+    },
+    "src/app/[locale]/(public)/mypage/card/page.client.tsx": {
+      "artwork": {
+        "export-canvas": "Exported card artwork keeps exact geometry, fixed colors and in-canvas editing handles; surrounding native controls use shared recipes."
+      },
+      "colors": {
+        "bg-zinc-900": "Inverse dark workbench surface around exported card art.",
+        "bg-zinc-950": "Existing dark workbench background around exported card art.",
+        "from-zinc-900": "Preserved dark workbench preview frame.",
+        "via-zinc-900": "Preserved dark workbench preview frame.",
+        "to-zinc-950": "Preserved dark workbench preview frame."
+      }
+    },
+    "src/components/card-news-studio.tsx": {
+      "artwork": {
+        "export-canvas": "Exported card artwork keeps exact geometry, fixed colors and in-canvas editing handles; surrounding native controls use shared recipes."
+      },
+      "colors": {
+        "bg-zinc-900": "Inverse dark workbench surface around exported card art.",
+        "bg-zinc-950": "Existing dark workbench background around exported card art.",
+        "from-zinc-900": "Preserved dark workbench preview frame.",
+        "via-zinc-900": "Preserved dark workbench preview frame.",
+        "to-zinc-950": "Preserved dark workbench preview frame.",
+        "bg-[#E8FF00]/20": "Palette preview/selection uses the exact ink color of the exported card artwork.",
+        "text-[#E8FF00]": "Palette preview/selection uses the exact ink color of the exported card artwork.",
+        "bg-[#00FFCC]/20": "Palette preview/selection uses the exact ink color of the exported card artwork.",
+        "text-[#00FFCC]": "Palette preview/selection uses the exact ink color of the exported card artwork.",
+        "bg-[#FF007F]/20": "Palette preview/selection uses the exact ink color of the exported card artwork.",
+        "text-[#FF007F]": "Palette preview/selection uses the exact ink color of the exported card artwork.",
+        "bg-[#0066FF]/20": "Palette preview/selection uses the exact ink color of the exported card artwork.",
+        "text-[#0066FF]": "Palette preview/selection uses the exact ink color of the exported card artwork.",
+        "bg-[#FEE500]/20": "Palette preview/selection uses the exact ink color of the exported card artwork.",
+        "text-[#FEE500]": "Palette preview/selection uses the exact ink color of the exported card artwork.",
+        "bg-[#F59E0B]/20": "Palette preview/selection uses the exact ink color of the exported card artwork.",
+        "text-[#F59E0B]": "Palette preview/selection uses the exact ink color of the exported card artwork.",
+        "selection:bg-[#E8FF00]": "Palette preview/selection uses the exact ink color of the exported card artwork."
+      }
+    },
+    "src/components/join-button.tsx": {},
+    "src/components/join-club-button.tsx": {},
+    "src/components/participant-list.tsx": {},
+    "src/components/schedule-view.tsx": {},
+    "src/components/smart-share.tsx": {},
+    "src/app/dev/design-system/layout.tsx": {},
+    "src/app/dev/design-system/page.tsx": {}
+  }
+}

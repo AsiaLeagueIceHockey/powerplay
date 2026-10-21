@@ -1,0 +1,1749 @@
+{
+  "version": 1,
+  "baselineCommit": "7b0e5c9",
+  "updatedAt": "2026-10-17",
+  "statusContract": {
+    "migration": "pending until implementation inspection; complete requires source evidence; intentional-exception requires a specific visual reason. Mixed routes cannot be excepted wholesale.",
+    "verification": "Separate runtime status. Migration complete does not imply authenticated runtime coverage. Excluded routes remain pending until isolation is checked.",
+    "evidence": "Use repository-relative test/report/screenshot references with tested state/locale/viewport. Do not include credentials, user identifiers or private records."
+  },
+  "routes": [
+    {
+      "path": "/[locale]/admin/admins/[id]",
+      "source": "src/app/[locale]/(admin)/admin/admins/[id]/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation"
+      ],
+      "components": [],
+      "scope": "excluded",
+      "migration": "intentional-exception",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states",
+      "exceptionReason": "Administrator-only route; no design-system visual migration. Public /admin-apply remains in scope."
+    },
+    {
+      "path": "/[locale]/admin/admins",
+      "source": "src/app/[locale]/(admin)/admin/admins/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation"
+      ],
+      "components": [
+        "user-management-tab",
+        "copy-button",
+        "superuser-chat-tab"
+      ],
+      "scope": "excluded",
+      "migration": "intentional-exception",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states",
+      "exceptionReason": "Administrator-only route; no design-system visual migration. Public /admin-apply remains in scope."
+    },
+    {
+      "path": "/[locale]/admin/all-matches",
+      "source": "src/app/[locale]/(admin)/admin/all-matches/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation"
+      ],
+      "components": [
+        "admin-month-selector",
+        "superuser-match-browser"
+      ],
+      "scope": "excluded",
+      "migration": "intentional-exception",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states",
+      "exceptionReason": "Administrator-only route; no design-system visual migration. Public /admin-apply remains in scope."
+    },
+    {
+      "path": "/[locale]/admin/audit-logs",
+      "source": "src/app/[locale]/(admin)/admin/audit-logs/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation"
+      ],
+      "components": [],
+      "scope": "excluded",
+      "migration": "intentional-exception",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states",
+      "exceptionReason": "Administrator-only route; no design-system visual migration. Public /admin-apply remains in scope."
+    },
+    {
+      "path": "/[locale]/admin/clubs/[id]/edit",
+      "source": "src/app/[locale]/(admin)/admin/clubs/[id]/edit/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation",
+        "button",
+        "badge"
+      ],
+      "components": [
+        "club-form",
+        "admin-club-notices",
+        "admin-club-members"
+      ],
+      "scope": "excluded",
+      "migration": "intentional-exception",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states",
+      "exceptionReason": "Administrator-only route; no design-system visual migration. Public /admin-apply remains in scope."
+    },
+    {
+      "path": "/[locale]/admin/clubs/new",
+      "source": "src/app/[locale]/(admin)/admin/clubs/new/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation",
+        "button",
+        "badge"
+      ],
+      "components": [
+        "club-form"
+      ],
+      "scope": "excluded",
+      "migration": "intentional-exception",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states",
+      "exceptionReason": "Administrator-only route; no design-system visual migration. Public /admin-apply remains in scope."
+    },
+    {
+      "path": "/[locale]/admin/clubs",
+      "source": "src/app/[locale]/(admin)/admin/clubs/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation",
+        "button",
+        "badge",
+        "filter",
+        "segmented-control",
+        "compact-finder-banner"
+      ],
+      "components": [
+        "admin-club-list"
+      ],
+      "scope": "excluded",
+      "migration": "intentional-exception",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states",
+      "exceptionReason": "Administrator-only route; no design-system visual migration. Public /admin-apply remains in scope."
+    },
+    {
+      "path": "/[locale]/admin/email-test",
+      "source": "src/app/[locale]/(admin)/admin/email-test/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation"
+      ],
+      "components": [
+        "email-test-form"
+      ],
+      "scope": "excluded",
+      "migration": "intentional-exception",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states",
+      "exceptionReason": "Administrator-only route; no design-system visual migration. Public /admin-apply remains in scope."
+    },
+    {
+      "path": "/[locale]/admin/lounge/guide",
+      "source": "src/app/[locale]/(admin)/admin/lounge/guide/page.tsx",
+      "theme": "lounge",
+      "families": [
+        "surface",
+        "typography",
+        "navigation",
+        "button",
+        "badge"
+      ],
+      "components": [],
+      "scope": "excluded",
+      "migration": "intentional-exception",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states",
+      "exceptionReason": "Administrator-only route; no design-system visual migration. Public /admin-apply remains in scope."
+    },
+    {
+      "path": "/[locale]/admin/lounge",
+      "source": "src/app/[locale]/(admin)/admin/lounge/page.tsx",
+      "theme": "lounge",
+      "families": [
+        "surface",
+        "typography",
+        "navigation",
+        "button",
+        "badge",
+        "filter",
+        "segmented-control",
+        "compact-finder-banner"
+      ],
+      "components": [
+        "lounge-admin-dashboard"
+      ],
+      "scope": "excluded",
+      "migration": "intentional-exception",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states",
+      "exceptionReason": "Administrator-only route; no design-system visual migration. Public /admin-apply remains in scope."
+    },
+    {
+      "path": "/[locale]/admin/lounge-management",
+      "source": "src/app/[locale]/(admin)/admin/lounge-management/page.tsx",
+      "theme": "lounge",
+      "families": [
+        "surface",
+        "typography",
+        "navigation",
+        "button",
+        "badge"
+      ],
+      "components": [
+        "lounge-superuser-management-dashboard"
+      ],
+      "scope": "excluded",
+      "migration": "intentional-exception",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states",
+      "exceptionReason": "Administrator-only route; no design-system visual migration. Public /admin-apply remains in scope."
+    },
+    {
+      "path": "/[locale]/admin/marketing",
+      "source": "src/app/[locale]/(admin)/admin/marketing/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation"
+      ],
+      "components": [
+        "card-news-studio"
+      ],
+      "scope": "excluded",
+      "migration": "intentional-exception",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states",
+      "exceptionReason": "Administrator-only route; no design-system visual migration. Public /admin-apply remains in scope."
+    },
+    {
+      "path": "/[locale]/admin/matches/[id]/edit",
+      "source": "src/app/[locale]/(admin)/admin/matches/[id]/edit/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation",
+        "button",
+        "badge"
+      ],
+      "components": [
+        "match-edit-form"
+      ],
+      "scope": "excluded",
+      "migration": "intentional-exception",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states",
+      "exceptionReason": "Administrator-only route; no design-system visual migration. Public /admin-apply remains in scope."
+    },
+    {
+      "path": "/[locale]/admin/matches/bulk",
+      "source": "src/app/[locale]/(admin)/admin/matches/bulk/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation",
+        "button",
+        "badge"
+      ],
+      "components": [
+        "bulk-match-form"
+      ],
+      "scope": "excluded",
+      "migration": "intentional-exception",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states",
+      "exceptionReason": "Administrator-only route; no design-system visual migration. Public /admin-apply remains in scope."
+    },
+    {
+      "path": "/[locale]/admin/matches/new",
+      "source": "src/app/[locale]/(admin)/admin/matches/new/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation",
+        "button",
+        "badge"
+      ],
+      "components": [
+        "match-form"
+      ],
+      "scope": "excluded",
+      "migration": "intentional-exception",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states",
+      "exceptionReason": "Administrator-only route; no design-system visual migration. Public /admin-apply remains in scope."
+    },
+    {
+      "path": "/[locale]/admin/matches",
+      "source": "src/app/[locale]/(admin)/admin/matches/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation",
+        "button",
+        "badge"
+      ],
+      "components": [
+        "admin-match-card",
+        "admin-month-selector"
+      ],
+      "scope": "excluded",
+      "migration": "intentional-exception",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states",
+      "exceptionReason": "Administrator-only route; no design-system visual migration. Public /admin-apply remains in scope."
+    },
+    {
+      "path": "/[locale]/admin/notifications",
+      "source": "src/app/[locale]/(admin)/admin/notifications/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation",
+        "overlay"
+      ],
+      "components": [
+        "notification-test-panel"
+      ],
+      "scope": "excluded",
+      "migration": "intentional-exception",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states",
+      "exceptionReason": "Administrator-only route; no design-system visual migration. Public /admin-apply remains in scope."
+    },
+    {
+      "path": "/[locale]/admin",
+      "source": "src/app/[locale]/(admin)/admin/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation"
+      ],
+      "components": [],
+      "scope": "excluded",
+      "migration": "intentional-exception",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states",
+      "exceptionReason": "Administrator-only route; no design-system visual migration. Public /admin-apply remains in scope."
+    },
+    {
+      "path": "/[locale]/admin/parent-applications",
+      "source": "src/app/[locale]/(admin)/admin/parent-applications/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation"
+      ],
+      "components": [
+        "parent-applications-list"
+      ],
+      "scope": "excluded",
+      "migration": "intentional-exception",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states",
+      "exceptionReason": "Administrator-only route; no design-system visual migration. Public /admin-apply remains in scope."
+    },
+    {
+      "path": "/[locale]/admin/points",
+      "source": "src/app/[locale]/(admin)/admin/points/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation"
+      ],
+      "components": [
+        "charge-requests-list",
+        "point-status-tab",
+        "settings-form"
+      ],
+      "scope": "excluded",
+      "migration": "intentional-exception",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states",
+      "exceptionReason": "Administrator-only route; no design-system visual migration. Public /admin-apply remains in scope."
+    },
+    {
+      "path": "/[locale]/admin/push-test",
+      "source": "src/app/[locale]/(admin)/admin/push-test/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation"
+      ],
+      "components": [
+        "push-test-form"
+      ],
+      "scope": "excluded",
+      "migration": "intentional-exception",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states",
+      "exceptionReason": "Administrator-only route; no design-system visual migration. Public /admin-apply remains in scope."
+    },
+    {
+      "path": "/[locale]/admin/rinks/[id]/edit",
+      "source": "src/app/[locale]/(admin)/admin/rinks/[id]/edit/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation",
+        "button",
+        "badge"
+      ],
+      "components": [
+        "rink-form"
+      ],
+      "scope": "excluded",
+      "migration": "intentional-exception",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states",
+      "exceptionReason": "Administrator-only route; no design-system visual migration. Public /admin-apply remains in scope."
+    },
+    {
+      "path": "/[locale]/admin/rinks/new",
+      "source": "src/app/[locale]/(admin)/admin/rinks/new/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation",
+        "button",
+        "badge"
+      ],
+      "components": [
+        "rink-form"
+      ],
+      "scope": "excluded",
+      "migration": "intentional-exception",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states",
+      "exceptionReason": "Administrator-only route; no design-system visual migration. Public /admin-apply remains in scope."
+    },
+    {
+      "path": "/[locale]/admin/rinks",
+      "source": "src/app/[locale]/(admin)/admin/rinks/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation",
+        "button",
+        "badge",
+        "filter",
+        "segmented-control",
+        "compact-finder-banner"
+      ],
+      "components": [
+        "admin-rink-card"
+      ],
+      "scope": "excluded",
+      "migration": "intentional-exception",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states",
+      "exceptionReason": "Administrator-only route; no design-system visual migration. Public /admin-apply remains in scope."
+    },
+    {
+      "path": "/[locale]/admin/settings",
+      "source": "src/app/[locale]/(admin)/admin/settings/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation"
+      ],
+      "components": [
+        "settings-form"
+      ],
+      "scope": "excluded",
+      "migration": "intentional-exception",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states",
+      "exceptionReason": "Administrator-only route; no design-system visual migration. Public /admin-apply remains in scope."
+    },
+    {
+      "path": "/[locale]/lounge-membership",
+      "source": "src/app/[locale]/(brochure)/lounge-membership/page.tsx",
+      "theme": "lounge",
+      "families": [
+        "surface",
+        "typography",
+        "navigation",
+        "button",
+        "badge"
+      ],
+      "components": [],
+      "scope": "ordinary",
+      "migration": "pending",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states"
+    },
+    {
+      "path": "/[locale]/about",
+      "source": "src/app/[locale]/(public)/about/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation"
+      ],
+      "components": [
+        "about-page-content",
+        "hash-scroll-handler"
+      ],
+      "scope": "ordinary",
+      "migration": "pending",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states"
+    },
+    {
+      "path": "/[locale]/admin-apply",
+      "source": "src/app/[locale]/(public)/admin-apply/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation",
+        "field",
+        "form",
+        "button"
+      ],
+      "components": [],
+      "scope": "ordinary",
+      "migration": "pending",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states"
+    },
+    {
+      "path": "/[locale]/card-news",
+      "source": "src/app/[locale]/(public)/card-news/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation"
+      ],
+      "components": [
+        "card-news-studio"
+      ],
+      "scope": "mixed",
+      "migration": "pending",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states",
+      "exceptionReason": "Only fixed-size exported player/club/card-news canvas artwork is excluded. Surrounding ordinary controls remain in scope."
+    },
+    {
+      "path": "/[locale]/chat",
+      "source": "src/app/[locale]/(public)/chat/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation",
+        "button",
+        "badge",
+        "overlay"
+      ],
+      "components": [
+        "chat-list-client"
+      ],
+      "scope": "ordinary",
+      "migration": "pending",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "required"
+    },
+    {
+      "path": "/[locale]/clubs/[id]/card",
+      "source": "src/app/[locale]/(public)/clubs/[id]/card/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation",
+        "button",
+        "badge"
+      ],
+      "components": [
+        "page.client"
+      ],
+      "scope": "mixed",
+      "migration": "pending",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states",
+      "exceptionReason": "Only fixed-size exported player/club/card-news canvas artwork is excluded. Surrounding ordinary controls remain in scope."
+    },
+    {
+      "path": "/[locale]/clubs/[id]",
+      "source": "src/app/[locale]/(public)/clubs/[id]/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation",
+        "button",
+        "badge"
+      ],
+      "components": [
+        "ui/styles",
+        "club-vote-button",
+        "club-subscribe-button",
+        "club-share-button",
+        "linkified-text",
+        "start-chat-button",
+        "club-detail-action-styles",
+        "json-ld"
+      ],
+      "scope": "ordinary",
+      "migration": "pending",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states"
+    },
+    {
+      "path": "/[locale]/clubs",
+      "source": "src/app/[locale]/(public)/clubs/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation",
+        "button",
+        "badge",
+        "filter",
+        "segmented-control",
+        "compact-finder-banner"
+      ],
+      "components": [
+        "feedback-banner",
+        "home-client",
+        "public-section-tabs"
+      ],
+      "scope": "ordinary",
+      "migration": "pending",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states"
+    },
+    {
+      "path": "/[locale]/find-club",
+      "source": "src/app/[locale]/(public)/find-club/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation",
+        "button",
+        "badge",
+        "overlay"
+      ],
+      "components": [
+        "find-club-wizard"
+      ],
+      "scope": "ordinary",
+      "migration": "pending",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states"
+    },
+    {
+      "path": "/[locale]/login",
+      "source": "src/app/[locale]/(public)/login/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation",
+        "field",
+        "form",
+        "button"
+      ],
+      "components": [],
+      "scope": "ordinary",
+      "migration": "pending",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states"
+    },
+    {
+      "path": "/[locale]/lounge/[businessId]/notices/[noticeId]",
+      "source": "src/app/[locale]/(public)/lounge/[businessId]/notices/[noticeId]/page.tsx",
+      "theme": "lounge",
+      "families": [
+        "surface",
+        "typography",
+        "navigation",
+        "button",
+        "badge"
+      ],
+      "components": [
+        "linkified-text",
+        "lounge-share-button"
+      ],
+      "scope": "ordinary",
+      "migration": "pending",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states"
+    },
+    {
+      "path": "/[locale]/lounge/[businessId]",
+      "source": "src/app/[locale]/(public)/lounge/[businessId]/page.tsx",
+      "theme": "lounge",
+      "families": [
+        "surface",
+        "typography",
+        "navigation",
+        "button",
+        "badge"
+      ],
+      "components": [
+        "lounge-business-detail"
+      ],
+      "scope": "ordinary",
+      "migration": "pending",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states"
+    },
+    {
+      "path": "/[locale]/lounge",
+      "source": "src/app/[locale]/(public)/lounge/page.tsx",
+      "theme": "lounge",
+      "families": [
+        "surface",
+        "typography",
+        "navigation",
+        "button",
+        "badge",
+        "filter",
+        "segmented-control",
+        "compact-finder-banner"
+      ],
+      "components": [
+        "lounge-page-client"
+      ],
+      "scope": "ordinary",
+      "migration": "pending",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states"
+    },
+    {
+      "path": "/[locale]/match/[id]",
+      "source": "src/app/[locale]/(public)/match/[id]/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation",
+        "button",
+        "badge"
+      ],
+      "components": [
+        "ui/styles",
+        "match-application",
+        "admin-controls",
+        "match-share-button",
+        "dynamic-rink-map",
+        "start-chat-button",
+        "json-ld"
+      ],
+      "scope": "ordinary",
+      "migration": "pending",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states"
+    },
+    {
+      "path": "/[locale]/mypage/card",
+      "source": "src/app/[locale]/(public)/mypage/card/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation"
+      ],
+      "components": [
+        "page.client"
+      ],
+      "scope": "mixed",
+      "migration": "pending",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "required",
+      "exceptionReason": "Only fixed-size exported player/club/card-news canvas artwork is excluded. Surrounding ordinary controls remain in scope."
+    },
+    {
+      "path": "/[locale]/mypage/clubs",
+      "source": "src/app/[locale]/(public)/mypage/clubs/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation",
+        "button",
+        "badge",
+        "filter",
+        "segmented-control",
+        "compact-finder-banner"
+      ],
+      "components": [
+        "mypage-subpage-header",
+        "club-card"
+      ],
+      "scope": "ordinary",
+      "migration": "pending",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "required"
+    },
+    {
+      "path": "/[locale]/mypage/language",
+      "source": "src/app/[locale]/(public)/mypage/language/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation"
+      ],
+      "components": [
+        "language-switcher",
+        "mypage-subpage-header"
+      ],
+      "scope": "ordinary",
+      "migration": "pending",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "required"
+    },
+    {
+      "path": "/[locale]/mypage/matches",
+      "source": "src/app/[locale]/(public)/mypage/matches/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation",
+        "button",
+        "badge"
+      ],
+      "components": [
+        "my-match-list",
+        "mypage-subpage-header"
+      ],
+      "scope": "ordinary",
+      "migration": "pending",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "required"
+    },
+    {
+      "path": "/[locale]/mypage/notifications",
+      "source": "src/app/[locale]/(public)/mypage/notifications/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation",
+        "overlay"
+      ],
+      "components": [
+        "notification-status",
+        "mypage-subpage-header"
+      ],
+      "scope": "ordinary",
+      "migration": "pending",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "required"
+    },
+    {
+      "path": "/[locale]/mypage",
+      "source": "src/app/[locale]/(public)/mypage/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation"
+      ],
+      "components": [
+        "daily-hockey-fortune-banner",
+        "tamagotchi-hero",
+        "mypage-menu-row"
+      ],
+      "scope": "ordinary",
+      "migration": "pending",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "required"
+    },
+    {
+      "path": "/[locale]/mypage/points/charge",
+      "source": "src/app/[locale]/(public)/mypage/points/charge/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation",
+        "field",
+        "form",
+        "button"
+      ],
+      "components": [
+        "charge-form"
+      ],
+      "scope": "ordinary",
+      "migration": "pending",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "required"
+    },
+    {
+      "path": "/[locale]/mypage/points",
+      "source": "src/app/[locale]/(public)/mypage/points/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation"
+      ],
+      "components": [],
+      "scope": "ordinary",
+      "migration": "pending",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "required"
+    },
+    {
+      "path": "/[locale]/mypage/profile",
+      "source": "src/app/[locale]/(public)/mypage/profile/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation",
+        "field",
+        "form",
+        "button"
+      ],
+      "components": [
+        "profile-editor",
+        "mypage-subpage-header"
+      ],
+      "scope": "ordinary",
+      "migration": "pending",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "required"
+    },
+    {
+      "path": "/[locale]/mypage/tamagotchi",
+      "source": "src/app/[locale]/(public)/mypage/tamagotchi/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation"
+      ],
+      "components": [
+        "mypage-subpage-header",
+        "tamagotchi-detail"
+      ],
+      "scope": "mixed",
+      "migration": "pending",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "required",
+      "exceptionReason": "Only fortune/game artwork is excluded. Navigation, forms, panels and ordinary action controls remain in scope."
+    },
+    {
+      "path": "/[locale]",
+      "source": "src/app/[locale]/(public)/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation",
+        "filter",
+        "segmented-control",
+        "compact-finder-banner"
+      ],
+      "components": [
+        "feedback-banner",
+        "home-client",
+        "public-section-tabs",
+        "skeletons",
+        "find-club-banner"
+      ],
+      "scope": "ordinary",
+      "migration": "pending",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states"
+    },
+    {
+      "path": "/[locale]/privacy",
+      "source": "src/app/[locale]/(public)/privacy/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation"
+      ],
+      "components": [],
+      "scope": "ordinary",
+      "migration": "pending",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states"
+    },
+    {
+      "path": "/[locale]/profile",
+      "source": "src/app/[locale]/(public)/profile/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation",
+        "field",
+        "form",
+        "button"
+      ],
+      "components": [
+        "profile-form"
+      ],
+      "scope": "ordinary",
+      "migration": "pending",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "required"
+    },
+    {
+      "path": "/[locale]/rinks/[id]",
+      "source": "src/app/[locale]/(public)/rinks/[id]/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation",
+        "button",
+        "badge"
+      ],
+      "components": [
+        "ui/styles",
+        "dynamic-rink-map",
+        "json-ld"
+      ],
+      "scope": "ordinary",
+      "migration": "pending",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states"
+    },
+    {
+      "path": "/[locale]/rinks",
+      "source": "src/app/[locale]/(public)/rinks/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation",
+        "button",
+        "badge",
+        "filter",
+        "segmented-control",
+        "compact-finder-banner"
+      ],
+      "components": [
+        "feedback-banner",
+        "find-club-banner",
+        "public-section-tabs",
+        "rink-explorer"
+      ],
+      "scope": "ordinary",
+      "migration": "pending",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states"
+    },
+    {
+      "path": "/[locale]/signup",
+      "source": "src/app/[locale]/(public)/signup/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation",
+        "field",
+        "form",
+        "button"
+      ],
+      "components": [],
+      "scope": "ordinary",
+      "migration": "pending",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states"
+    },
+    {
+      "path": "/[locale]/terms",
+      "source": "src/app/[locale]/(public)/terms/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation"
+      ],
+      "components": [],
+      "scope": "ordinary",
+      "migration": "pending",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states"
+    },
+    {
+      "path": "/[locale]/youth/community/[id]",
+      "source": "src/app/[locale]/(public)/youth/community/[id]/page.tsx",
+      "theme": "youth",
+      "families": [
+        "surface",
+        "typography",
+        "navigation",
+        "button",
+        "badge",
+        "overlay"
+      ],
+      "components": [
+        "post-detail-client"
+      ],
+      "scope": "ordinary",
+      "migration": "pending",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states"
+    },
+    {
+      "path": "/[locale]/youth",
+      "source": "src/app/[locale]/(public)/youth/page.tsx",
+      "theme": "youth",
+      "families": [
+        "surface",
+        "typography",
+        "navigation",
+        "button",
+        "badge",
+        "overlay"
+      ],
+      "components": [
+        "youth-client"
+      ],
+      "scope": "ordinary",
+      "migration": "pending",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states"
+    },
+    {
+      "path": "/[locale]/youth/write",
+      "source": "src/app/[locale]/(public)/youth/write/page.tsx",
+      "theme": "youth",
+      "families": [
+        "surface",
+        "typography",
+        "navigation",
+        "button",
+        "badge",
+        "field",
+        "form",
+        "button",
+        "overlay"
+      ],
+      "components": [
+        "youth-write-client"
+      ],
+      "scope": "ordinary",
+      "migration": "pending",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "required"
+    },
+    {
+      "path": "/[locale]/chat/[roomId]",
+      "source": "src/app/[locale]/chat/[roomId]/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation",
+        "button",
+        "badge",
+        "overlay"
+      ],
+      "components": [
+        "chat-room-client"
+      ],
+      "scope": "ordinary",
+      "migration": "pending",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "required"
+    },
+    {
+      "path": "/[locale]/instagram/club-ranking",
+      "source": "src/app/[locale]/instagram/club-ranking/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation"
+      ],
+      "components": [],
+      "scope": "mixed",
+      "migration": "pending",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states",
+      "exceptionReason": "Only exported Instagram canvas artwork is excluded. Surrounding ordinary controls remain in scope."
+    },
+    {
+      "path": "/[locale]/instagram/matches",
+      "source": "src/app/[locale]/instagram/matches/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation",
+        "button",
+        "badge"
+      ],
+      "components": [
+        "instagram-match-card"
+      ],
+      "scope": "mixed",
+      "migration": "pending",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states",
+      "exceptionReason": "Only exported Instagram canvas artwork is excluded. Surrounding ordinary controls remain in scope."
+    },
+    {
+      "path": "/[locale]/instagram/weekly-matches",
+      "source": "src/app/[locale]/instagram/weekly-matches/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation"
+      ],
+      "components": [
+        "instagram-weekly-match-card",
+        "instagram-weekly-day-header"
+      ],
+      "scope": "mixed",
+      "migration": "pending",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states",
+      "exceptionReason": "Only exported Instagram canvas artwork is excluded. Surrounding ordinary controls remain in scope."
+    },
+    {
+      "path": "/[locale]/mypage/fortune",
+      "source": "src/app/[locale]/mypage/fortune/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation"
+      ],
+      "components": [
+        "daily-hockey-fortune-screen"
+      ],
+      "scope": "mixed",
+      "migration": "pending",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "required",
+      "exceptionReason": "Only fortune/game artwork is excluded. Navigation, forms, panels and ordinary action controls remain in scope."
+    },
+    {
+      "path": "/[locale]/onboarding",
+      "source": "src/app/[locale]/onboarding/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation",
+        "field",
+        "form",
+        "button"
+      ],
+      "components": [
+        "onboarding-form"
+      ],
+      "scope": "ordinary",
+      "migration": "pending",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "required"
+    },
+    {
+      "path": "/seo-bot/[locale]/about",
+      "source": "src/app/seo-bot/[locale]/about/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation"
+      ],
+      "components": [
+        "about-page-content"
+      ],
+      "scope": "excluded",
+      "migration": "intentional-exception",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states",
+      "exceptionReason": "SEO crawler renderer; preserve output and omit public presentation migration."
+    },
+    {
+      "path": "/seo-bot/[locale]/clubs",
+      "source": "src/app/seo-bot/[locale]/clubs/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation",
+        "button",
+        "badge",
+        "filter",
+        "segmented-control",
+        "compact-finder-banner"
+      ],
+      "components": [],
+      "scope": "excluded",
+      "migration": "intentional-exception",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states",
+      "exceptionReason": "SEO crawler renderer; preserve output and omit public presentation migration."
+    },
+    {
+      "path": "/seo-bot/[locale]/find-club",
+      "source": "src/app/seo-bot/[locale]/find-club/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation",
+        "button",
+        "badge",
+        "overlay"
+      ],
+      "components": [],
+      "scope": "excluded",
+      "migration": "intentional-exception",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states",
+      "exceptionReason": "SEO crawler renderer; preserve output and omit public presentation migration."
+    },
+    {
+      "path": "/seo-bot/[locale]/lounge/[businessId]",
+      "source": "src/app/seo-bot/[locale]/lounge/[businessId]/page.tsx",
+      "theme": "lounge",
+      "families": [
+        "surface",
+        "typography",
+        "navigation",
+        "button",
+        "badge"
+      ],
+      "components": [],
+      "scope": "excluded",
+      "migration": "intentional-exception",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states",
+      "exceptionReason": "SEO crawler renderer; preserve output and omit public presentation migration."
+    },
+    {
+      "path": "/seo-bot/[locale]/lounge",
+      "source": "src/app/seo-bot/[locale]/lounge/page.tsx",
+      "theme": "lounge",
+      "families": [
+        "surface",
+        "typography",
+        "navigation",
+        "button",
+        "badge",
+        "filter",
+        "segmented-control",
+        "compact-finder-banner"
+      ],
+      "components": [],
+      "scope": "excluded",
+      "migration": "intentional-exception",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states",
+      "exceptionReason": "SEO crawler renderer; preserve output and omit public presentation migration."
+    },
+    {
+      "path": "/seo-bot/[locale]",
+      "source": "src/app/seo-bot/[locale]/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation"
+      ],
+      "components": [],
+      "scope": "excluded",
+      "migration": "intentional-exception",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states",
+      "exceptionReason": "SEO crawler renderer; preserve output and omit public presentation migration."
+    },
+    {
+      "path": "/seo-bot/[locale]/rinks",
+      "source": "src/app/seo-bot/[locale]/rinks/page.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "typography",
+        "navigation",
+        "button",
+        "badge",
+        "filter",
+        "segmented-control",
+        "compact-finder-banner"
+      ],
+      "components": [],
+      "scope": "excluded",
+      "migration": "intentional-exception",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      },
+      "authCoverage": "public-and-authenticated-states",
+      "exceptionReason": "SEO crawler renderer; preserve output and omit public presentation migration."
+    }
+  ],
+  "globals": [
+    {
+      "id": "public-shell",
+      "source": "src/app/[locale]/(public)/layout.tsx",
+      "theme": "powerplay",
+      "families": [
+        "surface",
+        "navigation",
+        "typography"
+      ],
+      "scope": "ordinary",
+      "migration": "pending",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      }
+    },
+    {
+      "id": "user-header",
+      "source": "src/components/user-header-client.tsx",
+      "theme": "powerplay",
+      "families": [
+        "button",
+        "overlay",
+        "navigation"
+      ],
+      "scope": "ordinary",
+      "migration": "pending",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      }
+    },
+    {
+      "id": "bottom-nav",
+      "source": "src/components/bottom-nav.tsx",
+      "theme": "powerplay",
+      "families": [
+        "navigation"
+      ],
+      "scope": "ordinary",
+      "migration": "pending",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      }
+    },
+    {
+      "id": "notification-guide",
+      "source": "src/components/notification-guide-modal.tsx",
+      "theme": "powerplay",
+      "families": [
+        "overlay",
+        "button",
+        "surface"
+      ],
+      "scope": "ordinary",
+      "migration": "pending",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      }
+    },
+    {
+      "id": "install-prompt",
+      "source": "src/components/install-prompt.tsx",
+      "theme": "powerplay",
+      "families": [
+        "overlay",
+        "button",
+        "surface"
+      ],
+      "scope": "ordinary",
+      "migration": "pending",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      }
+    },
+    {
+      "id": "notification-status",
+      "source": "src/components/notification-status.tsx",
+      "theme": "powerplay",
+      "families": [
+        "badge",
+        "button",
+        "surface"
+      ],
+      "scope": "ordinary",
+      "migration": "pending",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      }
+    },
+    {
+      "id": "locale-shell",
+      "source": "src/app/[locale]/layout.tsx",
+      "theme": "powerplay",
+      "families": [
+        "theme-scope"
+      ],
+      "scope": "ordinary",
+      "migration": "pending",
+      "verification": {
+        "status": "pending",
+        "evidence": []
+      }
+    }
+  ]
+}

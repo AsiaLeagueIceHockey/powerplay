@@ -1,0 +1,37 @@
+name: User interface checks
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ui:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: https://ui-fixtures.invalid
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ui-fixture-no-access
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run typecheck
+      - run: npm run ui:check
+      - run: npm run ui:test
+      - run: npm run ui:baseline
+      - run: npm run ui:visual
+      - name: Preserve screenshots and exact baseline comparison
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-verification
+          path: artifacts/ui/

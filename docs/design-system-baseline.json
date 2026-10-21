@@ -1,0 +1,1279 @@
+{
+  "version": 1,
+  "commit": "7b0e5c9",
+  "recordedAt": "2026-10-17",
+  "tests": {
+    "total": 189,
+    "passed": 182,
+    "failed": 7,
+    "failures": [
+      {
+        "file": "src/app/actions/__tests__/financial-flows.test.ts",
+        "name": "Financial Flows Cancel Match Flow Scenario 1: Cancel \"Waiting\" status -> No Refund (The Bug Fix Check)"
+      },
+      {
+        "file": "src/app/actions/__tests__/financial-flows.test.ts",
+        "name": "Financial Flows Cancel Match Flow Scenario 2: Cancel \"Pending Payment\" -> No Refund"
+      },
+      {
+        "file": "src/app/actions/__tests__/financial-flows.test.ts",
+        "name": "Financial Flows Cancel Match Flow Scenario 3: Cancel Confirmed (Paid) with 100% Refund Policy"
+      },
+      {
+        "file": "src/app/actions/__tests__/financial-flows.test.ts",
+        "name": "Financial Flows Join Match Flow Scenario 1: Join with sufficient points -> Confirmed & Deducted"
+      },
+      {
+        "file": "src/app/actions/__tests__/financial-flows.test.ts",
+        "name": "Financial Flows Join Match Flow Scenario 3: Goalie Free -> Confirmed (0 Points)"
+      },
+      {
+        "file": "src/app/actions/__tests__/financial-flows.test.ts",
+        "name": "Financial Flows Waitlist Promotion Flow Scenario: FW Cancel -> DF Waiter Promoted (Skater Pool)"
+      },
+      {
+        "file": "tests/unit/superuser-match-filters.test.ts",
+        "name": "superuser-match-filters filters by status and type"
+      }
+    ]
+  },
+  "lint": {
+    "errors": [
+      {
+        "file": "scripts/update-rinks.js",
+        "rule": "@typescript-eslint/no-require-imports",
+        "message": "A `require()` style import is forbidden.",
+        "line": 2,
+        "column": 12,
+        "source": "const fs = require('fs');"
+      },
+      {
+        "file": "scripts/update-rinks.js",
+        "rule": "@typescript-eslint/no-require-imports",
+        "message": "A `require()` style import is forbidden.",
+        "line": 3,
+        "column": 26,
+        "source": "const { createClient } = require('@supabase/supabase-js');"
+      },
+      {
+        "file": "src/app/[locale]/(public)/clubs/[id]/card/page.client.tsx",
+        "rule": "prefer-const",
+        "message": "'displayName' is never reassigned. Use 'const' instead.",
+        "line": 383,
+        "column": 25,
+        "source": "let displayName = rink.name_ko;"
+      },
+      {
+        "file": "src/app/[locale]/(public)/clubs/[id]/card/page.client.tsx",
+        "rule": "prefer-const",
+        "message": "'rText' is never reassigned. Use 'const' instead.",
+        "line": 384,
+        "column": 25,
+        "source": "let rText = `${displayName}${region ? ` (${region})` : \"\"}`;"
+      },
+      {
+        "file": "src/app/[locale]/(public)/youth/page.tsx",
+        "rule": "prefer-const",
+        "message": "'isApproved' is never reassigned. Use 'const' instead.",
+        "line": 51,
+        "column": 7,
+        "source": "let isApproved = profile?.parent_verification_status === \"approved\";"
+      },
+      {
+        "file": "src/app/actions/__tests__/financial-flows.test.ts",
+        "rule": "@typescript-eslint/no-explicit-any",
+        "message": "Unexpected any. Specify a different type.",
+        "line": 41,
+        "column": 21,
+        "source": "let profilesMock: any;"
+      },
+      {
+        "file": "src/app/actions/__tests__/financial-flows.test.ts",
+        "rule": "@typescript-eslint/no-explicit-any",
+        "message": "Unexpected any. Specify a different type.",
+        "line": 42,
+        "column": 20,
+        "source": "let matchesMock: any;"
+      },
+      {
+        "file": "src/app/actions/__tests__/financial-flows.test.ts",
+        "rule": "@typescript-eslint/no-explicit-any",
+        "message": "Unexpected any. Specify a different type.",
+        "line": 43,
+        "column": 25,
+        "source": "let participantsMock: any;"
+      },
+      {
+        "file": "src/app/actions/__tests__/financial-flows.test.ts",
+        "rule": "@typescript-eslint/no-explicit-any",
+        "message": "Unexpected any. Specify a different type.",
+        "line": 44,
+        "column": 25,
+        "source": "let transactionsMock: any;"
+      },
+      {
+        "file": "src/app/actions/__tests__/financial-flows.test.ts",
+        "rule": "@typescript-eslint/no-explicit-any",
+        "message": "Unexpected any. Specify a different type.",
+        "line": 45,
+        "column": 21,
+        "source": "let requestsMock: any;"
+      },
+      {
+        "file": "src/app/actions/__tests__/financial-flows.test.ts",
+        "rule": "@typescript-eslint/no-explicit-any",
+        "message": "Unexpected any. Specify a different type.",
+        "line": 201,
+        "column": 34,
+        "source": "(calculateRefundPercent as any).mockResolvedValue(100);"
+      },
+      {
+        "file": "src/app/actions/__tests__/financial-flows.test.ts",
+        "rule": "@typescript-eslint/no-explicit-any",
+        "message": "Unexpected any. Specify a different type.",
+        "line": 278,
+        "column": 34,
+        "source": "(calculateRefundPercent as any).mockResolvedValue(100);"
+      },
+      {
+        "file": "src/app/actions/admin.ts",
+        "rule": "@typescript-eslint/ban-ts-comment",
+        "message": "Use \"@ts-expect-error\" instead of \"@ts-ignore\", as \"@ts-ignore\" will do nothing if the following line is error-free.",
+        "line": 387,
+        "column": 9,
+        "source": "// @ts-ignore"
+      },
+      {
+        "file": "src/app/actions/admin.ts",
+        "rule": "@typescript-eslint/ban-ts-comment",
+        "message": "Use \"@ts-expect-error\" instead of \"@ts-ignore\", as \"@ts-ignore\" will do nothing if the following line is error-free.",
+        "line": 461,
+        "column": 7,
+        "source": "// @ts-ignore"
+      },
+      {
+        "file": "src/app/actions/admin.ts",
+        "rule": "@typescript-eslint/ban-ts-comment",
+        "message": "Use \"@ts-expect-error\" instead of \"@ts-ignore\", as \"@ts-ignore\" will do nothing if the following line is error-free.",
+        "line": 571,
+        "column": 5,
+        "source": "// @ts-ignore"
+      },
+      {
+        "file": "src/app/actions/admin.ts",
+        "rule": "@typescript-eslint/ban-ts-comment",
+        "message": "Use \"@ts-expect-error\" instead of \"@ts-ignore\", as \"@ts-ignore\" will do nothing if the following line is error-free.",
+        "line": 659,
+        "column": 5,
+        "source": "// @ts-ignore"
+      },
+      {
+        "file": "src/app/actions/admin.ts",
+        "rule": "@typescript-eslint/ban-ts-comment",
+        "message": "Use \"@ts-expect-error\" instead of \"@ts-ignore\", as \"@ts-ignore\" will do nothing if the following line is error-free.",
+        "line": 661,
+        "column": 5,
+        "source": "// @ts-ignore"
+      },
+      {
+        "file": "src/app/actions/admin.ts",
+        "rule": "@typescript-eslint/no-explicit-any",
+        "message": "Unexpected any. Specify a different type.",
+        "line": 1549,
+        "column": 12,
+        "source": "profile: any;"
+      },
+      {
+        "file": "src/app/actions/admin.ts",
+        "rule": "@typescript-eslint/ban-ts-comment",
+        "message": "Use \"@ts-expect-error\" instead of \"@ts-ignore\", as \"@ts-ignore\" will do nothing if the following line is error-free.",
+        "line": 1641,
+        "column": 7,
+        "source": "// @ts-ignore"
+      },
+      {
+        "file": "src/app/actions/chat.ts",
+        "rule": "@typescript-eslint/no-explicit-any",
+        "message": "Unexpected any. Specify a different type.",
+        "line": 165,
+        "column": 28,
+        "source": "rooms.map(async (room: any) => {"
+      },
+      {
+        "file": "src/app/actions/clubs.ts",
+        "rule": "@typescript-eslint/no-explicit-any",
+        "message": "Unexpected any. Specify a different type.",
+        "line": 243,
+        "column": 42,
+        "source": "function extractClubMembers(membersData: any[] | null | undefined) {"
+      },
+      {
+        "file": "src/app/actions/match.ts",
+        "rule": "@typescript-eslint/ban-ts-comment",
+        "message": "Use \"@ts-expect-error\" instead of \"@ts-ignore\", as \"@ts-ignore\" will do nothing if the following line is error-free.",
+        "line": 347,
+        "column": 3,
+        "source": "// @ts-ignore"
+      },
+      {
+        "file": "src/app/actions/match.ts",
+        "rule": "@typescript-eslint/ban-ts-comment",
+        "message": "Use \"@ts-expect-error\" instead of \"@ts-ignore\", as \"@ts-ignore\" will do nothing if the following line is error-free.",
+        "line": 349,
+        "column": 3,
+        "source": "// @ts-ignore"
+      },
+      {
+        "file": "src/app/actions/match.ts",
+        "rule": "@typescript-eslint/ban-ts-comment",
+        "message": "Use \"@ts-expect-error\" instead of \"@ts-ignore\", as \"@ts-ignore\" will do nothing if the following line is error-free.",
+        "line": 612,
+        "column": 5,
+        "source": "// @ts-ignore"
+      },
+      {
+        "file": "src/app/actions/match.ts",
+        "rule": "@typescript-eslint/ban-ts-comment",
+        "message": "Use \"@ts-expect-error\" instead of \"@ts-ignore\", as \"@ts-ignore\" will do nothing if the following line is error-free.",
+        "line": 696,
+        "column": 3,
+        "source": "// @ts-ignore"
+      },
+      {
+        "file": "src/app/actions/match.ts",
+        "rule": "@typescript-eslint/ban-ts-comment",
+        "message": "Use \"@ts-expect-error\" instead of \"@ts-ignore\", as \"@ts-ignore\" will do nothing if the following line is error-free.",
+        "line": 738,
+        "column": 5,
+        "source": "// @ts-ignore"
+      },
+      {
+        "file": "src/app/actions/match.ts",
+        "rule": "@typescript-eslint/ban-ts-comment",
+        "message": "Use \"@ts-expect-error\" instead of \"@ts-ignore\", as \"@ts-ignore\" will do nothing if the following line is error-free.",
+        "line": 760,
+        "column": 5,
+        "source": "// @ts-ignore"
+      },
+      {
+        "file": "src/app/actions/match.ts",
+        "rule": "@typescript-eslint/ban-ts-comment",
+        "message": "Use \"@ts-expect-error\" instead of \"@ts-ignore\", as \"@ts-ignore\" will do nothing if the following line is error-free.",
+        "line": 849,
+        "column": 5,
+        "source": "// @ts-ignore"
+      },
+      {
+        "file": "src/app/actions/match.ts",
+        "rule": "@typescript-eslint/ban-ts-comment",
+        "message": "Use \"@ts-expect-error\" instead of \"@ts-ignore\", as \"@ts-ignore\" will do nothing if the following line is error-free.",
+        "line": 872,
+        "column": 5,
+        "source": "// @ts-ignore"
+      },
+      {
+        "file": "src/app/actions/match.ts",
+        "rule": "@typescript-eslint/ban-ts-comment",
+        "message": "Use \"@ts-expect-error\" instead of \"@ts-ignore\", as \"@ts-ignore\" will do nothing if the following line is error-free.",
+        "line": 884,
+        "column": 7,
+        "source": "// @ts-ignore"
+      },
+      {
+        "file": "src/app/actions/parent.ts",
+        "rule": "@typescript-eslint/no-explicit-any",
+        "message": "Unexpected any. Specify a different type.",
+        "line": 180,
+        "column": 17,
+        "source": "} catch (err: any) {"
+      },
+      {
+        "file": "src/app/actions/parent.ts",
+        "rule": "@typescript-eslint/no-explicit-any",
+        "message": "Unexpected any. Specify a different type.",
+        "line": 292,
+        "column": 26,
+        "source": "const profileUpdate: any = { parent_verification_status: status };"
+      },
+      {
+        "file": "src/app/actions/parent.ts",
+        "rule": "@typescript-eslint/no-explicit-any",
+        "message": "Unexpected any. Specify a different type.",
+        "line": 320,
+        "column": 17,
+        "source": "} catch (err: any) {"
+      },
+      {
+        "file": "src/app/actions/parent.ts",
+        "rule": "@typescript-eslint/no-explicit-any",
+        "message": "Unexpected any. Specify a different type.",
+        "line": 377,
+        "column": 36,
+        "source": "return (data || []).map((post: any) => {"
+      },
+      {
+        "file": "src/app/actions/parent.ts",
+        "rule": "@typescript-eslint/no-explicit-any",
+        "message": "Unexpected any. Specify a different type.",
+        "line": 482,
+        "column": 56,
+        "source": "const formattedComments = (comments || []).map((c: any) => {"
+      },
+      {
+        "file": "src/app/actions/parent.ts",
+        "rule": "@typescript-eslint/no-explicit-any",
+        "message": "Unexpected any. Specify a different type.",
+        "line": 552,
+        "column": 17,
+        "source": "} catch (err: any) {"
+      },
+      {
+        "file": "src/app/actions/parent.ts",
+        "rule": "@typescript-eslint/no-explicit-any",
+        "message": "Unexpected any. Specify a different type.",
+        "line": 611,
+        "column": 17,
+        "source": "} catch (err: any) {"
+      },
+      {
+        "file": "src/app/actions/parent.ts",
+        "rule": "@typescript-eslint/no-explicit-any",
+        "message": "Unexpected any. Specify a different type.",
+        "line": 672,
+        "column": 17,
+        "source": "} catch (err: any) {"
+      },
+      {
+        "file": "src/app/actions/parent.ts",
+        "rule": "@typescript-eslint/no-explicit-any",
+        "message": "Unexpected any. Specify a different type.",
+        "line": 720,
+        "column": 17,
+        "source": "} catch (err: any) {"
+      },
+      {
+        "file": "src/app/actions/parent.ts",
+        "rule": "@typescript-eslint/no-explicit-any",
+        "message": "Unexpected any. Specify a different type.",
+        "line": 791,
+        "column": 17,
+        "source": "} catch (err: any) {"
+      },
+      {
+        "file": "src/app/actions/parent.ts",
+        "rule": "@typescript-eslint/no-explicit-any",
+        "message": "Unexpected any. Specify a different type.",
+        "line": 843,
+        "column": 17,
+        "source": "} catch (err: any) {"
+      },
+      {
+        "file": "src/app/actions/parent.ts",
+        "rule": "@typescript-eslint/no-explicit-any",
+        "message": "Unexpected any. Specify a different type.",
+        "line": 899,
+        "column": 17,
+        "source": "} catch (err: any) {"
+      },
+      {
+        "file": "src/app/actions/parent.ts",
+        "rule": "@typescript-eslint/no-explicit-any",
+        "message": "Unexpected any. Specify a different type.",
+        "line": 951,
+        "column": 17,
+        "source": "} catch (err: any) {"
+      },
+      {
+        "file": "src/app/actions/parent.ts",
+        "rule": "@typescript-eslint/no-explicit-any",
+        "message": "Unexpected any. Specify a different type.",
+        "line": 987,
+        "column": 17,
+        "source": "} catch (err: any) {"
+      },
+      {
+        "file": "src/app/actions/parent.ts",
+        "rule": "@typescript-eslint/no-explicit-any",
+        "message": "Unexpected any. Specify a different type.",
+        "line": 1101,
+        "column": 17,
+        "source": "} catch (err: any) {"
+      },
+      {
+        "file": "src/app/actions/push.ts",
+        "rule": "@typescript-eslint/no-explicit-any",
+        "message": "Unexpected any. Specify a different type.",
+        "line": 73,
+        "column": 18,
+        "source": "let lastError: any;"
+      },
+      {
+        "file": "src/app/actions/push.ts",
+        "rule": "@typescript-eslint/no-explicit-any",
+        "message": "Unexpected any. Specify a different type.",
+        "line": 82,
+        "column": 19,
+        "source": "} catch (err: any) {"
+      },
+      {
+        "file": "src/app/actions/push.ts",
+        "rule": "@typescript-eslint/no-explicit-any",
+        "message": "Unexpected any. Specify a different type.",
+        "line": 315,
+        "column": 35,
+        "source": "subscriptions.map(async (sub: any) => {"
+      },
+      {
+        "file": "src/app/actions/push.ts",
+        "rule": "@typescript-eslint/no-explicit-any",
+        "message": "Unexpected any. Specify a different type.",
+        "line": 329,
+        "column": 21,
+        "source": "} catch (err: any) {"
+      },
+      {
+        "file": "src/app/actions/push.ts",
+        "rule": "@typescript-eslint/no-explicit-any",
+        "message": "Unexpected any. Specify a different type.",
+        "line": 406,
+        "column": 9,
+        "source": "logs: any[];"
+      },
+      {
+        "file": "src/app/api/cron/match-reminder/route.ts",
+        "rule": "@typescript-eslint/ban-ts-comment",
+        "message": "Use \"@ts-expect-error\" instead of \"@ts-ignore\", as \"@ts-ignore\" will do nothing if the following line is error-free.",
+        "line": 66,
+        "column": 7,
+        "source": "// @ts-ignore"
+      },
+      {
+        "file": "src/components/admin-match-card.tsx",
+        "rule": "@typescript-eslint/no-explicit-any",
+        "message": "Unexpected any. Specify a different type.",
+        "line": 19,
+        "column": 17,
+        "source": "participants: any[]; // Using any for simplicity in props, keeping it flexible"
+      },
+      {
+        "file": "src/components/admin-new-badge.tsx",
+        "rule": "react-hooks/set-state-in-effect",
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\n/Users/joelonsw/Desktop/PP/powerplay/src/components/admin-new-badge.tsx:23:7\n  21 |     \n  22 |     if (currentCount > seenCount) {\n> 23 |       setHasNew(true);\n     |       ^^^^^^^^^ Avoid calling setState() directly within an effect\n  24 |     }\n  25 |   }, [matchId, currentCount]);\n  26 |",
+        "line": 23,
+        "column": 7,
+        "source": "setHasNew(true);"
+      },
+      {
+        "file": "src/components/chat-user-selector.tsx",
+        "rule": "react-hooks/immutability",
+        "message": "Error: Cannot access variable before it is declared\n\n`fetchUsers` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.\n\n/Users/joelonsw/Desktop/PP/powerplay/src/components/chat-user-selector.tsx:31:7\n  29 |   useEffect(() => {\n  30 |     if (isOpen) {\n> 31 |       fetchUsers();\n     |       ^^^^^^^^^^ `fetchUsers` accessed before it is declared\n  32 |     }\n  33 |   }, [isOpen]);\n  34 |\n\n/Users/joelonsw/Desktop/PP/powerplay/src/components/chat-user-selector.tsx:35:3\n  33 |   }, [isOpen]);\n  34 |\n> 35 |   const fetchUsers = async () => {\n     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n> 36 |     setIsLoading(true);\n     | ^^^^^^^^^^^^^^^^^^^^^^^\n> 37 |     const supabase = createClient();\n     …\n     | ^^^^^^^^^^^^^^^^^^^^^^^\n> 58 |     setIsLoading(false);\n     | ^^^^^^^^^^^^^^^^^^^^^^^\n> 59 |   };\n     | ^^^^^ `fetchUsers` is declared here\n  60 |\n  61 |   const handleUserClick = async (targetUser: UserProfile) => {\n  62 |     if (confirm(t(\"startChatConfirm\"))) {",
+        "line": 31,
+        "column": 7,
+        "source": "fetchUsers();"
+      },
+      {
+        "file": "src/components/club-share-button.tsx",
+        "rule": "@typescript-eslint/no-explicit-any",
+        "message": "Unexpected any. Specify a different type.",
+        "line": 8,
+        "column": 9,
+        "source": "club: any;"
+      },
+      {
+        "file": "src/components/find-club-wizard.tsx",
+        "rule": "react-hooks/static-components",
+        "message": "Error: Cannot create components during render\n\nComponents created during render will reset their state each time they are created. Declare components outside of render.\n\n/Users/joelonsw/Desktop/PP/powerplay/src/components/find-club-wizard.tsx:331:16\n  329 |             </h2>\n  330 |             <div className=\"space-y-3\">\n> 331 |               <OptionCard\n      |                ^^^^^^^^^^ This component is created during render\n  332 |                 selected={playerType === \"adult\"}\n  333 |                 onClick={() => setPlayerType(\"adult\")}\n  334 |                 icon={<Users className=\"w-6 h-6\" />}\n\n/Users/joelonsw/Desktop/PP/powerplay/src/components/find-club-wizard.tsx:122:3\n  120 |   // Option card component\n  121 |   // ============================================\n> 122 |   function OptionCard({\n      |   ^^^^^^^^^^^^^^^^^^^^^\n> 123 |     selected,\n      | ^^^^^^^^^^^^^\n> 124 |     onClick,\n      …\n      | ^^^^^^^^^^^^^\n> 175 |     );\n      | ^^^^^^^^^^^^^\n> 176 |   }\n      | ^^^^ The component is created during render here\n  177 |\n  178 |   // ============================================\n  179 |   // Region grid",
+        "line": 331,
+        "column": 16,
+        "source": "<OptionCard"
+      },
+      {
+        "file": "src/components/find-club-wizard.tsx",
+        "rule": "react-hooks/static-components",
+        "message": "Error: Cannot create components during render\n\nComponents created during render will reset their state each time they are created. Declare components outside of render.\n\n/Users/joelonsw/Desktop/PP/powerplay/src/components/find-club-wizard.tsx:338:16\n  336 |                 desc={t(\"q1.adultDesc\")}\n  337 |               />\n> 338 |               <OptionCard\n      |                ^^^^^^^^^^ This component is created during render\n  339 |                 selected={playerType === \"youth\"}\n  340 |                 onClick={() => setPlayerType(\"youth\")}\n  341 |                 icon={<Baby className=\"w-6 h-6\" />}\n\n/Users/joelonsw/Desktop/PP/powerplay/src/components/find-club-wizard.tsx:122:3\n  120 |   // Option card component\n  121 |   // ============================================\n> 122 |   function OptionCard({\n      |   ^^^^^^^^^^^^^^^^^^^^^\n> 123 |     selected,\n      | ^^^^^^^^^^^^^\n> 124 |     onClick,\n      …\n      | ^^^^^^^^^^^^^\n> 175 |     );\n      | ^^^^^^^^^^^^^\n> 176 |   }\n      | ^^^^ The component is created during render here\n  177 |\n  178 |   // ============================================\n  179 |   // Region grid",
+        "line": 338,
+        "column": 16,
+        "source": "<OptionCard"
+      },
+      {
+        "file": "src/components/find-club-wizard.tsx",
+        "rule": "react-hooks/static-components",
+        "message": "Error: Cannot create components during render\n\nComponents created during render will reset their state each time they are created. Declare components outside of render.\n\n/Users/joelonsw/Desktop/PP/powerplay/src/components/find-club-wizard.tsx:355:14\n  353 |               {t(\"q2.title\")}\n  354 |             </h2>\n> 355 |             <RegionGrid />\n      |              ^^^^^^^^^^ This component is created during render\n  356 |           </div>\n  357 |         )}\n  358 |\n\n/Users/joelonsw/Desktop/PP/powerplay/src/components/find-club-wizard.tsx:181:3\n  179 |   // Region grid\n  180 |   // ============================================\n> 181 |   function RegionGrid() {\n      |   ^^^^^^^^^^^^^^^^^^^^^^^\n> 182 |     const toggleRegion = (r: string) => {\n      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n> 183 |       setSelectedRegions((prev) =>\n      …\n      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n> 210 |     );\n      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n> 211 |   }\n      | ^^^^ The component is created during render here\n  212 |\n  213 |   // ============================================\n  214 |   // Result card",
+        "line": 355,
+        "column": 14,
+        "source": "<RegionGrid />"
+      },
+      {
+        "file": "src/components/find-club-wizard.tsx",
+        "rule": "react-hooks/static-components",
+        "message": "Error: Cannot create components during render\n\nComponents created during render will reset their state each time they are created. Declare components outside of render.\n\n/Users/joelonsw/Desktop/PP/powerplay/src/components/find-club-wizard.tsx:366:16\n  364 |             </h2>\n  365 |             <div className=\"space-y-3\">\n> 366 |               <OptionCard\n      |                ^^^^^^^^^^ This component is created during render\n  367 |                 selected={hasEquipment === true}\n  368 |                 onClick={() => setHasEquipment(true)}\n  369 |                 icon={<ShieldCheck className=\"w-6 h-6\" />}\n\n/Users/joelonsw/Desktop/PP/powerplay/src/components/find-club-wizard.tsx:122:3\n  120 |   // Option card component\n  121 |   // ============================================\n> 122 |   function OptionCard({\n      |   ^^^^^^^^^^^^^^^^^^^^^\n> 123 |     selected,\n      | ^^^^^^^^^^^^^\n> 124 |     onClick,\n      …\n      | ^^^^^^^^^^^^^\n> 175 |     );\n      | ^^^^^^^^^^^^^\n> 176 |   }\n      | ^^^^ The component is created during render here\n  177 |\n  178 |   // ============================================\n  179 |   // Region grid",
+        "line": 366,
+        "column": 16,
+        "source": "<OptionCard"
+      },
+      {
+        "file": "src/components/find-club-wizard.tsx",
+        "rule": "react-hooks/static-components",
+        "message": "Error: Cannot create components during render\n\nComponents created during render will reset their state each time they are created. Declare components outside of render.\n\n/Users/joelonsw/Desktop/PP/powerplay/src/components/find-club-wizard.tsx:373:16\n  371 |                 desc={t(\"q4.yesDesc\")}\n  372 |               />\n> 373 |               <OptionCard\n      |                ^^^^^^^^^^ This component is created during render\n  374 |                 selected={hasEquipment === false}\n  375 |                 onClick={() => setHasEquipment(false)}\n  376 |                 icon={<ShieldX className=\"w-6 h-6\" />}\n\n/Users/joelonsw/Desktop/PP/powerplay/src/components/find-club-wizard.tsx:122:3\n  120 |   // Option card component\n  121 |   // ============================================\n> 122 |   function OptionCard({\n      |   ^^^^^^^^^^^^^^^^^^^^^\n> 123 |     selected,\n      | ^^^^^^^^^^^^^\n> 124 |     onClick,\n      …\n      | ^^^^^^^^^^^^^\n> 175 |     );\n      | ^^^^^^^^^^^^^\n> 176 |   }\n      | ^^^^ The component is created during render here\n  177 |\n  178 |   // ============================================\n  179 |   // Region grid",
+        "line": 373,
+        "column": 16,
+        "source": "<OptionCard"
+      },
+      {
+        "file": "src/components/install-prompt.tsx",
+        "rule": "@typescript-eslint/no-explicit-any",
+        "message": "Unexpected any. Specify a different type.",
+        "line": 11,
+        "column": 56,
+        "source": "const [deferredPrompt, setDeferredPrompt] = useState<any>(null);"
+      },
+      {
+        "file": "src/components/install-prompt.tsx",
+        "rule": "@typescript-eslint/no-explicit-any",
+        "message": "Unexpected any. Specify a different type.",
+        "line": 18,
+        "column": 91,
+        "source": "const userAgent = window.navigator.userAgent || window.navigator.vendor || (window as any).opera;"
+      },
+      {
+        "file": "src/components/install-prompt.tsx",
+        "rule": "@typescript-eslint/no-explicit-any",
+        "message": "Unexpected any. Specify a different type.",
+        "line": 27,
+        "column": 25,
+        "source": "const handler = (e: any) => {"
+      },
+      {
+        "file": "src/components/install-prompt.tsx",
+        "rule": "@typescript-eslint/no-explicit-any",
+        "message": "Unexpected any. Specify a different type.",
+        "line": 40,
+        "column": 47,
+        "source": "const isStandalone = (window.navigator as any).standalone === true ||"
+      },
+      {
+        "file": "src/components/install-prompt.tsx",
+        "rule": "react-hooks/set-state-in-effect",
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\n/Users/joelonsw/Desktop/PP/powerplay/src/components/install-prompt.tsx:50:26\n  48 |     // 2. Any Mobile In-App Browser and NOT standalone (since beforeinstallprompt often fails there)\n  49 |     if (!isStandalone && (isIosDevice || isInApp)) {\n> 50 |         if (isIosDevice) setIsIOS(true);\n     |                          ^^^^^^^^ Avoid calling setState() directly within an effect\n  51 |         setIsVisible(true);\n  52 |     }\n  53 |",
+        "line": 50,
+        "column": 26,
+        "source": "if (isIosDevice) setIsIOS(true);"
+      },
+      {
+        "file": "src/components/match-share-button.tsx",
+        "rule": "@typescript-eslint/no-explicit-any",
+        "message": "Unexpected any. Specify a different type.",
+        "line": 7,
+        "column": 10,
+        "source": "match: any; // Using any for simplicity with complex match objects"
+      },
+      {
+        "file": "src/components/match-type-filter-drawer.tsx",
+        "rule": "react-hooks/set-state-in-effect",
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\n/Users/joelonsw/Desktop/PP/powerplay/src/components/match-type-filter-drawer.tsx:29:7\n  27 |   useEffect(() => {\n  28 |     if (isOpen) {\n> 29 |       setIsVisible(true);\n     |       ^^^^^^^^^^^^ Avoid calling setState() directly within an effect\n  30 |       setTempSelected(selectedTypes);\n  31 |       document.body.style.overflow = \"hidden\";\n  32 |     } else {",
+        "line": 29,
+        "column": 7,
+        "source": "setIsVisible(true);"
+      },
+      {
+        "file": "src/components/notification-guide-modal.tsx",
+        "rule": "@typescript-eslint/no-explicit-any",
+        "message": "Unexpected any. Specify a different type.",
+        "line": 24,
+        "column": 77,
+        "source": "const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;"
+      },
+      {
+        "file": "src/components/notification-guide-modal.tsx",
+        "rule": "@typescript-eslint/no-explicit-any",
+        "message": "Unexpected any. Specify a different type.",
+        "line": 25,
+        "column": 59,
+        "source": "if (/iPad|iPhone|iPod/.test(userAgent) && !(window as any).MSStream) {"
+      },
+      {
+        "file": "src/components/notification-guide-modal.tsx",
+        "rule": "@typescript-eslint/no-explicit-any",
+        "message": "Unexpected any. Specify a different type.",
+        "line": 34,
+        "column": 21,
+        "source": "(navigator as any).standalone === true;"
+      },
+      {
+        "file": "src/components/notification-guide-modal.tsx",
+        "rule": "react/no-unescaped-entities",
+        "message": "`'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.",
+        "line": 237,
+        "column": 59,
+        "source": "<p className=\"font-medium mb-1\">'홈 화면에 추가' 선택</p>"
+      },
+      {
+        "file": "src/components/notification-guide-modal.tsx",
+        "rule": "react/no-unescaped-entities",
+        "message": "`'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.",
+        "line": 237,
+        "column": 68,
+        "source": "<p className=\"font-medium mb-1\">'홈 화면에 추가' 선택</p>"
+      },
+      {
+        "file": "src/components/notification-guide-modal.tsx",
+        "rule": "react/no-unescaped-entities",
+        "message": "`'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.",
+        "line": 274,
+        "column": 59,
+        "source": "<p className=\"font-medium mb-1\">'앱 설치' 또는 '홈 화면에 추가'</p>"
+      },
+      {
+        "file": "src/components/notification-guide-modal.tsx",
+        "rule": "react/no-unescaped-entities",
+        "message": "`'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.",
+        "line": 274,
+        "column": 64,
+        "source": "<p className=\"font-medium mb-1\">'앱 설치' 또는 '홈 화면에 추가'</p>"
+      },
+      {
+        "file": "src/components/notification-guide-modal.tsx",
+        "rule": "react/no-unescaped-entities",
+        "message": "`'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.",
+        "line": 274,
+        "column": 69,
+        "source": "<p className=\"font-medium mb-1\">'앱 설치' 또는 '홈 화면에 추가'</p>"
+      },
+      {
+        "file": "src/components/notification-guide-modal.tsx",
+        "rule": "react/no-unescaped-entities",
+        "message": "`'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.",
+        "line": 274,
+        "column": 78,
+        "source": "<p className=\"font-medium mb-1\">'앱 설치' 또는 '홈 화면에 추가'</p>"
+      },
+      {
+        "file": "src/components/notification-test-panel.tsx",
+        "rule": "react-hooks/immutability",
+        "message": "Error: Cannot access variable before it is declared\n\n`loadLogs` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.\n\n/Users/joelonsw/Desktop/PP/powerplay/src/components/notification-test-panel.tsx:34:5\n  32 |\n  33 |   useEffect(() => {\n> 34 |     loadLogs();\n     |     ^^^^^^^^ `loadLogs` accessed before it is declared\n  35 |   }, []);\n  36 |\n  37 |   async function loadLogs() {\n\n/Users/joelonsw/Desktop/PP/powerplay/src/components/notification-test-panel.tsx:37:3\n  35 |   }, []);\n  36 |\n> 37 |   async function loadLogs() {\n     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n> 38 |     setLogsLoading(true);\n     | ^^^^^^^^^^^^^^^^^^^^^^^^^\n> 39 |     const { logs: data } = await getNotificationLogs(50);\n     | ^^^^^^^^^^^^^^^^^^^^^^^^^\n> 40 |     setLogs(data as NotificationLog[]);\n     | ^^^^^^^^^^^^^^^^^^^^^^^^^\n> 41 |     setLogsLoading(false);\n     | ^^^^^^^^^^^^^^^^^^^^^^^^^\n> 42 |   }\n     | ^^^^ `loadLogs` is declared here\n  43 |\n  44 |   async function handleSendTest() {\n  45 |     if (!targetUserId) {",
+        "line": 34,
+        "column": 5,
+        "source": "loadLogs();"
+      },
+      {
+        "file": "src/components/notification-test-panel.tsx",
+        "rule": "@typescript-eslint/no-explicit-any",
+        "message": "Unexpected any. Specify a different type.",
+        "line": 67,
+        "column": 19,
+        "source": "} catch (err: any) {"
+      },
+      {
+        "file": "src/components/onboarding-guard.tsx",
+        "rule": "react-hooks/set-state-in-effect",
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\n/Users/joelonsw/Desktop/PP/powerplay/src/components/onboarding-guard.tsx:27:7\n  25 |\n  26 |     if (isExcluded) {\n> 27 |       setChecked(true);\n     |       ^^^^^^^^^^ Avoid calling setState() directly within an effect\n  28 |       return;\n  29 |     }\n  30 |",
+        "line": 27,
+        "column": 7,
+        "source": "setChecked(true);"
+      },
+      {
+        "file": "src/components/parent-applications-list.tsx",
+        "rule": "react/no-unescaped-entities",
+        "message": "`\"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.",
+        "line": 164,
+        "column": 37,
+        "source": "<p className=\"italic\">\"{app.description}\"</p>"
+      },
+      {
+        "file": "src/components/parent-applications-list.tsx",
+        "rule": "react/no-unescaped-entities",
+        "message": "`\"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.",
+        "line": 164,
+        "column": 55,
+        "source": "<p className=\"italic\">\"{app.description}\"</p>"
+      },
+      {
+        "file": "src/components/post-detail-client.tsx",
+        "rule": "@typescript-eslint/no-explicit-any",
+        "message": "Unexpected any. Specify a different type.",
+        "line": 28,
+        "column": 9,
+        "source": "user: any;"
+      },
+      {
+        "file": "src/components/region-filter-drawer.tsx",
+        "rule": "react-hooks/set-state-in-effect",
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\n/Users/joelonsw/Desktop/PP/powerplay/src/components/region-filter-drawer.tsx:29:7\n  27 |   useEffect(() => {\n  28 |     if (isOpen) {\n> 29 |       setIsVisible(true);\n     |       ^^^^^^^^^^^^ Avoid calling setState() directly within an effect\n  30 |       setTempSelected(selectedRegions);\n  31 |       document.body.style.overflow = \"hidden\";\n  32 |     } else {",
+        "line": 29,
+        "column": 7,
+        "source": "setIsVisible(true);"
+      },
+      {
+        "file": "src/components/rink-filter-drawer.tsx",
+        "rule": "react-hooks/set-state-in-effect",
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\n/Users/joelonsw/Desktop/PP/powerplay/src/components/rink-filter-drawer.tsx:30:7\n  28 |   useEffect(() => {\n  29 |     if (isOpen) {\n> 30 |       setIsVisible(true);\n     |       ^^^^^^^^^^^^ Avoid calling setState() directly within an effect\n  31 |       setTempSelectedIds(selectedRinkIds);\n  32 |       // Prevent body scroll\n  33 |       document.body.style.overflow = \"hidden\";",
+        "line": 30,
+        "column": 7,
+        "source": "setIsVisible(true);"
+      },
+      {
+        "file": "src/components/tamagotchi-closet.tsx",
+        "rule": "react-hooks/set-state-in-effect",
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\n/Users/joelonsw/Desktop/PP/powerplay/src/components/tamagotchi-closet.tsx:38:7\n  36 |   useEffect(() => {\n  37 |     if (isOpen) {\n> 38 |       setDraft(initialColors);\n     |       ^^^^^^^^ Avoid calling setState() directly within an effect\n  39 |       setSelectedPart(\"helmet\");\n  40 |       setError(null);\n  41 |     }",
+        "line": 38,
+        "column": 7,
+        "source": "setDraft(initialColors);"
+      },
+      {
+        "file": "src/components/user-management-tab.tsx",
+        "rule": "@typescript-eslint/no-explicit-any",
+        "message": "Unexpected any. Specify a different type.",
+        "line": 62,
+        "column": 32,
+        "source": "const clubObj = user.club as any;"
+      },
+      {
+        "file": "src/components/youth-write-client.tsx",
+        "rule": "@typescript-eslint/no-explicit-any",
+        "message": "Unexpected any. Specify a different type.",
+        "line": 22,
+        "column": 9,
+        "source": "user: any;"
+      },
+      {
+        "file": "src/contexts/notification-context.tsx",
+        "rule": "@typescript-eslint/no-explicit-any",
+        "message": "Unexpected any. Specify a different type.",
+        "line": 22,
+        "column": 19,
+        "source": "deferredPrompt: any;"
+      },
+      {
+        "file": "src/contexts/notification-context.tsx",
+        "rule": "@typescript-eslint/no-explicit-any",
+        "message": "Unexpected any. Specify a different type.",
+        "line": 42,
+        "column": 56,
+        "source": "const [deferredPrompt, setDeferredPrompt] = useState<any>(null);"
+      },
+      {
+        "file": "src/contexts/notification-context.tsx",
+        "rule": "@typescript-eslint/no-explicit-any",
+        "message": "Unexpected any. Specify a different type.",
+        "line": 45,
+        "column": 25,
+        "source": "const handler = (e: any) => {"
+      },
+      {
+        "file": "src/contexts/notification-context.tsx",
+        "rule": "@typescript-eslint/no-explicit-any",
+        "message": "Unexpected any. Specify a different type.",
+        "line": 163,
+        "column": 23,
+        "source": "(navigator as any).standalone === true;"
+      },
+      {
+        "file": "tests/mocks/supabase.ts",
+        "rule": "@typescript-eslint/no-explicit-any",
+        "message": "Unexpected any. Specify a different type.",
+        "line": 5,
+        "column": 15,
+        "source": "const mock: any = {"
+      },
+      {
+        "file": "tests/unit/parent-flow.test.ts",
+        "rule": "@typescript-eslint/no-explicit-any",
+        "message": "Unexpected any. Specify a different type.",
+        "line": 27,
+        "column": 20,
+        "source": "let mockDataValue: any = null;"
+      },
+      {
+        "file": "tests/unit/parent-flow.test.ts",
+        "rule": "@typescript-eslint/no-explicit-any",
+        "message": "Unexpected any. Specify a different type.",
+        "line": 28,
+        "column": 21,
+        "source": "let mockErrorValue: any = null;"
+      },
+      {
+        "file": "tests/unit/parent-flow.test.ts",
+        "rule": "@typescript-eslint/no-explicit-any",
+        "message": "Unexpected any. Specify a different type.",
+        "line": 37,
+        "column": 20,
+        "source": "const chain: any = {"
+      },
+      {
+        "file": "tests/unit/parent-flow.test.ts",
+        "rule": "@typescript-eslint/no-explicit-any",
+        "message": "Unexpected any. Specify a different type.",
+        "line": 302,
+        "column": 48,
+        "source": "formData.append(\"file\", { size: 100 } as any);"
+      }
+    ],
+    "warnings": [
+      {
+        "file": "scripts/update-rinks.js",
+        "rule": "@typescript-eslint/no-unused-vars",
+        "message": "'e' is defined but never used.",
+        "line": 17,
+        "column": 10,
+        "source": "} catch (e) {"
+      },
+      {
+        "file": "src/app/[locale]/(admin)/admin/admins/[id]/page.tsx",
+        "rule": "@next/next/no-img-element",
+        "message": "Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element",
+        "line": 172,
+        "column": 49,
+        "source": "<img src={club.logo_url} alt={club.name} className=\"w-10 h-10 rounded-lg object-cover bg-zinc-800\" />"
+      },
+      {
+        "file": "src/app/[locale]/(admin)/admin/points/page.tsx",
+        "rule": "@typescript-eslint/no-unused-vars",
+        "message": "'Suspense' is defined but never used.",
+        "line": 1,
+        "column": 10,
+        "source": "import { Suspense } from \"react\";"
+      },
+      {
+        "file": "src/app/[locale]/(admin)/admin/points/page.tsx",
+        "rule": "@typescript-eslint/no-unused-vars",
+        "message": "'createClient' is defined but never used.",
+        "line": 4,
+        "column": 10,
+        "source": "import { createClient } from \"@/lib/supabase/server\";"
+      },
+      {
+        "file": "src/app/[locale]/(public)/chat/page.tsx",
+        "rule": "@typescript-eslint/no-unused-vars",
+        "message": "'getTranslations' is defined but never used.",
+        "line": 3,
+        "column": 10,
+        "source": "import { getTranslations } from \"next-intl/server\";"
+      },
+      {
+        "file": "src/app/[locale]/(public)/clubs/[id]/card/page.client.tsx",
+        "rule": "@typescript-eslint/no-unused-vars",
+        "message": "'establishedDate' is assigned a value but never used.",
+        "line": 218,
+        "column": 9,
+        "source": "const establishedDate = club.created_at ? new Date(club.created_at).getFullYear().toString() : new Date().getFullYear().toString();"
+      },
+      {
+        "file": "src/app/[locale]/(public)/mypage/card/page.client.tsx",
+        "rule": "@typescript-eslint/no-unused-vars",
+        "message": "'useEffect' is defined but never used.",
+        "line": 3,
+        "column": 28,
+        "source": "import { useRef, useState, useEffect } from \"react\";"
+      },
+      {
+        "file": "src/app/[locale]/instagram/matches/page.tsx",
+        "rule": "@typescript-eslint/no-unused-vars",
+        "message": "'t' is assigned a value but never used.",
+        "line": 18,
+        "column": 9,
+        "source": "const t = await getTranslations({ locale, namespace: \"match\" });"
+      },
+      {
+        "file": "src/app/actions/clubs.ts",
+        "rule": "@typescript-eslint/no-unused-vars",
+        "message": "'isSuperUser' is assigned a value but never used.",
+        "line": 1188,
+        "column": 9,
+        "source": "const isSuperUser = profile?.role === \"superuser\";"
+      },
+      {
+        "file": "src/app/actions/clubs.ts",
+        "rule": "@typescript-eslint/no-unused-vars",
+        "message": "'isSuperUser' is assigned a value but never used.",
+        "line": 1240,
+        "column": 9,
+        "source": "const isSuperUser = profile?.role === \"superuser\";"
+      },
+      {
+        "file": "src/app/actions/points.ts",
+        "rule": "@typescript-eslint/no-unused-vars",
+        "message": "'sendPushToSuperUsers' is defined but never used.",
+        "line": 5,
+        "column": 10,
+        "source": "import { sendPushToSuperUsers, sendPushNotification } from \"@/app/actions/push\";"
+      },
+      {
+        "file": "src/app/actions/push.ts",
+        "rule": "@typescript-eslint/no-unused-vars",
+        "message": "'results' is assigned a value but never used.",
+        "line": 314,
+        "column": 9,
+        "source": "const results = await Promise.allSettled("
+      },
+      {
+        "file": "src/components/admin-club-notices.tsx",
+        "rule": "@typescript-eslint/no-unused-vars",
+        "message": "'Trash2' is defined but never used.",
+        "line": 7,
+        "column": 28,
+        "source": "import { Loader2, Plus, X, Trash2 } from \"lucide-react\";"
+      },
+      {
+        "file": "src/components/calendar-view.tsx",
+        "rule": "@typescript-eslint/no-unused-vars",
+        "message": "'t' is assigned a value but never used.",
+        "line": 15,
+        "column": 9,
+        "source": "const t = useTranslations(\"home\");"
+      },
+      {
+        "file": "src/components/card-news-studio.tsx",
+        "rule": "@next/next/no-img-element",
+        "message": "Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element",
+        "line": 696,
+        "column": 25,
+        "source": "<img"
+      },
+      {
+        "file": "src/components/card-news-studio.tsx",
+        "rule": "@next/next/no-img-element",
+        "message": "Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element",
+        "line": 870,
+        "column": 25,
+        "source": "<img"
+      },
+      {
+        "file": "src/components/card-news-studio.tsx",
+        "rule": "@next/next/no-img-element",
+        "message": "Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element",
+        "line": 1040,
+        "column": 29,
+        "source": "<img src=\"/favicon.png\" alt=\"PowerPlay\" className=\"w-3.5 h-3.5 object-contain rounded-sm bg-white/10\" />"
+      },
+      {
+        "file": "src/components/card-news-studio.tsx",
+        "rule": "@next/next/no-img-element",
+        "message": "Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element",
+        "line": 1057,
+        "column": 29,
+        "source": "<img"
+      },
+      {
+        "file": "src/components/card-news-studio.tsx",
+        "rule": "@next/next/no-img-element",
+        "message": "Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element",
+        "line": 1107,
+        "column": 25,
+        "source": "<img"
+      },
+      {
+        "file": "src/components/card-news-studio.tsx",
+        "rule": "@next/next/no-img-element",
+        "message": "Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element",
+        "line": 1295,
+        "column": 25,
+        "source": "<img"
+      },
+      {
+        "file": "src/components/card-news-studio.tsx",
+        "rule": "@next/next/no-img-element",
+        "message": "Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element",
+        "line": 1470,
+        "column": 25,
+        "source": "<img"
+      },
+      {
+        "file": "src/components/card-news-studio.tsx",
+        "rule": "@next/next/no-img-element",
+        "message": "Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element",
+        "line": 1655,
+        "column": 25,
+        "source": "<img"
+      },
+      {
+        "file": "src/components/club-subscribe-button.tsx",
+        "rule": "@typescript-eslint/no-unused-vars",
+        "message": "'Check' is defined but never used.",
+        "line": 6,
+        "column": 20,
+        "source": "import { UserPlus, Check, UserMinus } from \"lucide-react\";"
+      },
+      {
+        "file": "src/components/copy-bank-account.tsx",
+        "rule": "@typescript-eslint/no-unused-vars",
+        "message": "'locale' is defined but never used.",
+        "line": 7,
+        "column": 3,
+        "source": "locale"
+      },
+      {
+        "file": "src/components/date-filter.tsx",
+        "rule": "@typescript-eslint/no-unused-vars",
+        "message": "'useRouter' is defined but never used.",
+        "line": 3,
+        "column": 10,
+        "source": "import { useRouter, useSearchParams } from \"next/navigation\";"
+      },
+      {
+        "file": "src/components/date-filter.tsx",
+        "rule": "@typescript-eslint/no-unused-vars",
+        "message": "'useSearchParams' is defined but never used.",
+        "line": 3,
+        "column": 21,
+        "source": "import { useRouter, useSearchParams } from \"next/navigation\";"
+      },
+      {
+        "file": "src/components/find-club-wizard.tsx",
+        "rule": "@typescript-eslint/no-unused-vars",
+        "message": "'router' is assigned a value but never used.",
+        "line": 41,
+        "column": 9,
+        "source": "const router = useRouter();"
+      },
+      {
+        "file": "src/components/install-prompt.tsx",
+        "rule": "@typescript-eslint/no-unused-vars",
+        "message": "'Download' is defined but never used.",
+        "line": 4,
+        "column": 10,
+        "source": "import { Download, X } from \"lucide-react\";"
+      },
+      {
+        "file": "src/components/install-prompt.tsx",
+        "rule": "@typescript-eslint/no-unused-vars",
+        "message": "'outcome' is assigned a value but never used.",
+        "line": 79,
+        "column": 13,
+        "source": "const { outcome } = await deferredPrompt.userChoice;"
+      },
+      {
+        "file": "src/components/lounge-business-form.tsx",
+        "rule": "@next/next/no-img-element",
+        "message": "Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element",
+        "line": 222,
+        "column": 17,
+        "source": "<img src={logoUrl} alt=\"Business logo\" className=\"h-full w-full object-cover\" />"
+      },
+      {
+        "file": "src/components/lounge-business-form.tsx",
+        "rule": "@next/next/no-img-element",
+        "message": "Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element",
+        "line": 274,
+        "column": 17,
+        "source": "<img src={coverImageUrl} alt=\"Business cover\" className=\"h-full w-full object-cover\" />"
+      },
+      {
+        "file": "src/components/lounge-card.tsx",
+        "rule": "@next/next/no-img-element",
+        "message": "Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element",
+        "line": 84,
+        "column": 17,
+        "source": "<img src={business.logo_url} alt={business.name} className=\"h-14 w-14 rounded-xl border border-zinc-200 object-cover dark:border-zinc-700\" />"
+      },
+      {
+        "file": "src/components/match-share-button.tsx",
+        "rule": "@typescript-eslint/no-unused-vars",
+        "message": "'toastMsg' is assigned a value but never used.",
+        "line": 42,
+        "column": 7,
+        "source": "toastMsg = \"Invitation copied to clipboard!\";"
+      },
+      {
+        "file": "src/components/notification-test-panel.tsx",
+        "rule": "@typescript-eslint/no-unused-vars",
+        "message": "'Search' is defined but never used.",
+        "line": 5,
+        "column": 68,
+        "source": "import { Bell, Send, RefreshCw, CheckCircle, XCircle, AlertCircle, Search } from \"lucide-react\";"
+      },
+      {
+        "file": "src/components/notification-test-panel.tsx",
+        "rule": "@typescript-eslint/no-unused-vars",
+        "message": "'targetEmail' is assigned a value but never used.",
+        "line": 23,
+        "column": 10,
+        "source": "const [targetEmail, setTargetEmail] = useState(\"\");"
+      },
+      {
+        "file": "src/components/notification-test-panel.tsx",
+        "rule": "@typescript-eslint/no-unused-vars",
+        "message": "'setTargetEmail' is assigned a value but never used.",
+        "line": 23,
+        "column": 23,
+        "source": "const [targetEmail, setTargetEmail] = useState(\"\");"
+      },
+      {
+        "file": "src/components/onboarding-guard.tsx",
+        "rule": "@typescript-eslint/no-unused-vars",
+        "message": "'checked' is assigned a value but never used.",
+        "line": 15,
+        "column": 10,
+        "source": "const [checked, setChecked] = useState(false);"
+      },
+      {
+        "file": "src/components/point-status-tab.tsx",
+        "rule": "@typescript-eslint/no-unused-vars",
+        "message": "'ChevronRight' is defined but never used.",
+        "line": 4,
+        "column": 18,
+        "source": "import { Search, ChevronRight, Edit2, Loader2, Save, X } from \"lucide-react\";"
+      },
+      {
+        "file": "src/components/point-status-tab.tsx",
+        "rule": "@typescript-eslint/no-unused-vars",
+        "message": "'X' is defined but never used.",
+        "line": 4,
+        "column": 54,
+        "source": "import { Search, ChevronRight, Edit2, Loader2, Save, X } from \"lucide-react\";"
+      },
+      {
+        "file": "src/components/point-status-tab.tsx",
+        "rule": "@typescript-eslint/no-unused-vars",
+        "message": "'getAllUserPoints' is defined but never used.",
+        "line": 7,
+        "column": 3,
+        "source": "getAllUserPoints,"
+      },
+      {
+        "file": "src/components/post-detail-client.tsx",
+        "rule": "@typescript-eslint/no-unused-vars",
+        "message": "'Link' is defined but never used.",
+        "line": 6,
+        "column": 8,
+        "source": "import Link from \"next/link\";"
+      },
+      {
+        "file": "src/components/post-detail-client.tsx",
+        "rule": "@typescript-eslint/no-unused-vars",
+        "message": "'ArrowLeft' is defined but never used.",
+        "line": 16,
+        "column": 3,
+        "source": "ArrowLeft,"
+      },
+      {
+        "file": "src/components/post-detail-client.tsx",
+        "rule": "@typescript-eslint/no-unused-vars",
+        "message": "'User' is defined but never used.",
+        "line": 20,
+        "column": 3,
+        "source": "User,"
+      },
+      {
+        "file": "src/components/post-detail-client.tsx",
+        "rule": "@typescript-eslint/no-unused-vars",
+        "message": "'Clock' is defined but never used.",
+        "line": 21,
+        "column": 3,
+        "source": "Clock,"
+      },
+      {
+        "file": "src/components/user-header-menu.tsx",
+        "rule": "@typescript-eslint/no-unused-vars",
+        "message": "'switchLocale' is assigned a value but never used.",
+        "line": 53,
+        "column": 9,
+        "source": "const switchLocale = (newLocale: string) => {"
+      },
+      {
+        "file": "src/components/youth-client.tsx",
+        "rule": "@typescript-eslint/no-unused-vars",
+        "message": "'Sparkles' is defined but never used.",
+        "line": 23,
+        "column": 3,
+        "source": "Sparkles,"
+      },
+      {
+        "file": "src/components/youth-client.tsx",
+        "rule": "@typescript-eslint/no-unused-vars",
+        "message": "'Users' is defined but never used.",
+        "line": 37,
+        "column": 3,
+        "source": "Users,"
+      },
+      {
+        "file": "src/components/youth-client.tsx",
+        "rule": "@typescript-eslint/no-unused-vars",
+        "message": "'showPostForm' is assigned a value but never used.",
+        "line": 86,
+        "column": 10,
+        "source": "const [showPostForm, setShowPostForm] = useState(false);"
+      },
+      {
+        "file": "src/components/youth-client.tsx",
+        "rule": "@typescript-eslint/no-unused-vars",
+        "message": "'isUploadingPostImg' is assigned a value but never used.",
+        "line": 90,
+        "column": 10,
+        "source": "const [isUploadingPostImg, setIsUploadingPostImg] = useState(false);"
+      },
+      {
+        "file": "src/components/youth-client.tsx",
+        "rule": "@typescript-eslint/no-unused-vars",
+        "message": "'isSubmittingPost' is assigned a value but never used.",
+        "line": 91,
+        "column": 10,
+        "source": "const [isSubmittingPost, setIsSubmittingPost] = useState(false);"
+      },
+      {
+        "file": "src/components/youth-client.tsx",
+        "rule": "@typescript-eslint/no-unused-vars",
+        "message": "'postError' is assigned a value but never used.",
+        "line": 92,
+        "column": 10,
+        "source": "const [postError, setPostError] = useState<string | null>(null);"
+      },
+      {
+        "file": "src/components/youth-client.tsx",
+        "rule": "@typescript-eslint/no-unused-vars",
+        "message": "'postFileRef' is assigned a value but never used.",
+        "line": 93,
+        "column": 9,
+        "source": "const postFileRef = useRef<HTMLInputElement>(null);"
+      },
+      {
+        "file": "src/components/youth-client.tsx",
+        "rule": "@typescript-eslint/no-unused-vars",
+        "message": "'handlePostSubmit' is assigned a value but never used.",
+        "line": 221,
+        "column": 9,
+        "source": "const handlePostSubmit = async (e: React.FormEvent) => {"
+      },
+      {
+        "file": "src/components/youth-write-client.tsx",
+        "rule": "@typescript-eslint/no-unused-vars",
+        "message": "'user' is defined but never used.",
+        "line": 29,
+        "column": 3,
+        "source": "user,"
+      },
+      {
+        "file": "tests/unit/admin-refund-repro.test.ts",
+        "rule": "@typescript-eslint/no-unused-vars",
+        "message": "'rentalFee' is defined but never used.",
+        "line": 11,
+        "column": 3,
+        "source": "rentalFee: number,"
+      },
+      {
+        "file": "tests/unit/admin-refund-repro.test.ts",
+        "rule": "@typescript-eslint/no-unused-vars",
+        "message": "'isRentalOptIn' is defined but never used.",
+        "line": 12,
+        "column": 3,
+        "source": "isRentalOptIn: boolean"
+      },
+      {
+        "file": "tests/unit/instagram-weekly-paginate.test.ts",
+        "rule": "@typescript-eslint/no-unused-vars",
+        "message": "'WeeklyPage' is defined but never used.",
+        "line": 5,
+        "column": 8,
+        "source": "type WeeklyPage,"
+      }
+    ]
+  },
+  "excludedGenerated": [
+    {
+      "file": "public/sw.js",
+      "reason": "Ignored generated Serwist/esbuild service worker; output varies by build and is not repository source. Source src/app/sw.ts remains subject to lint.",
+      "errorCount": 1,
+      "warningCount": 89
+    }
+  ],
+  "comparison": "Compare test file + fullName and lint file + rule + message + source; line/column aid diagnosis but may shift. Touched-source failures must be resolved rather than grandfathered."
+}

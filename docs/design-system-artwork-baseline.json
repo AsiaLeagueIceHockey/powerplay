@@ -1,0 +1,16 @@
+{
+  "commit": "7b0e5c9",
+  "artwork": {
+    "src/app/[locale]/(public)/clubs/[id]/card/page.client.tsx": [
+      "c549673521a2d607ab8d8212e6d5a7b65259159dfbe5f6e275dde6c89468a881"
+    ],
+    "src/app/[locale]/(public)/mypage/card/page.client.tsx": [
+      "e96a8611363a71b939f0e5866c62c74f41f308cd1c41ff9d3ef07297bd1351ff"
+    ],
+    "src/components/card-news-studio.tsx": [
+      "721ba8d2d8fc6374271e2a26bef9dcfc9143e741cec3f981aa720d3eedfd6f81"
+    ]
+  },
+  "aboutLegacyClasses": "db7b061405c46a396c097c1ac17a1706878068b91997a7f55272fe25ae07288d",
+  "globalAppearance": "c14143c7322ed1916ca1ceefd45c0c732d1d8a74cac61fa4f9899c2e49bb0e76"
+}

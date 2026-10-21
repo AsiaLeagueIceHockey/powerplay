@@ -11,7 +11,11 @@
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "verify": "npm run typecheck",
-    "perf:pwa": "tsx scripts/measure-pwa-startup.ts"
+    "perf:pwa": "tsx scripts/measure-pwa-startup.ts",
+    "ui:check": "node --import tsx scripts/ui-check.ts",
+    "ui:test": "vitest run --maxWorkers=2 tests/ui tests/unit/home-navigation.test.tsx tests/unit/i18n-message-keys.test.ts tests/unit/find-club.test.ts tests/unit/club-voting.test.ts tests/unit/rental-logic.test.ts tests/unit/waitlist-rental.test.ts tests/unit/parent-flow.test.ts",
+    "ui:visual": "node --import tsx scripts/ui-visual.ts",
+    "ui:baseline": "node --import tsx scripts/ui-baseline.ts"
   },
   "dependencies": {
     "@sentry/nextjs": "^10.38.0",
