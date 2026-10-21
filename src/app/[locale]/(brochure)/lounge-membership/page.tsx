@@ -67,8 +67,8 @@ function SectionHeader({
   return (
     <div className="max-w-2xl space-y-2">
       <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#8b6814]">{eyebrow}</p>
-      <h2 className="text-2xl font-black tracking-tight text-zinc-950 md:text-3xl">{title}</h2>
-      <p className="text-sm leading-7 text-zinc-600 md:text-base">{body}</p>
+      <h2 className="text-2xl font-black tracking-tight text-pp-text md:text-3xl">{title}</h2>
+      <p className="text-sm leading-7 text-pp-muted md:text-base">{body}</p>
     </div>
   );
 }
@@ -81,7 +81,7 @@ function SectionShell({
   className?: string;
 }) {
   return (
-    <section className={`rounded-[32px] border border-zinc-200 bg-white p-6 shadow-sm md:p-8 ${className}`}>
+    <section className={`rounded-[32px] border border-pp-border bg-pp-surface p-6 shadow-sm md:p-8 ${className}`}>
       {children}
     </section>
   );
@@ -101,15 +101,15 @@ function ScreenshotCard({
   tall?: boolean;
 }) {
   return (
-    <div className="overflow-hidden rounded-3xl border border-zinc-200 bg-white shadow-sm">
-      <div className="relative bg-zinc-100">
+    <div className="overflow-hidden rounded-3xl border border-pp-border bg-pp-surface shadow-sm">
+      <div className="relative bg-pp-surface-muted">
         <div className={`relative w-full ${tall ? "aspect-[9/19.5]" : "aspect-[9/16]"}`}>
           <Image src={src} alt={alt} fill className="object-cover object-top" />
         </div>
       </div>
       <div className="space-y-2 p-4">
-        <p className="text-lg font-black tracking-tight text-zinc-950">{title}</p>
-        <p className="text-sm leading-6 text-zinc-600">{body}</p>
+        <p className="text-lg font-black tracking-tight text-pp-text">{title}</p>
+        <p className="text-sm leading-6 text-pp-muted">{body}</p>
       </div>
     </div>
   );
@@ -195,7 +195,7 @@ function BrochurePage({ locale }: { locale: string }) {
       };
 
   return (
-    <div className="bg-[#f7f5ef] text-zinc-950">
+    <div className="bg-[#f7f5ef] text-pp-text">
       <div className="mx-auto flex max-w-6xl flex-col gap-20 px-5 py-10 md:px-8 md:py-14 print:max-w-none print:gap-12 print:px-6 print:py-6">
         <section className="overflow-hidden rounded-[36px] border border-[#d4a017]/25 bg-[radial-gradient(circle_at_top_right,_rgba(243,210,122,0.28),_transparent_26%),linear-gradient(135deg,#0f172a_0%,#1e293b_52%,#d4a017_145%)] px-6 py-8 text-white md:px-10 md:py-12 print:rounded-3xl">
           <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
@@ -211,14 +211,14 @@ function BrochurePage({ locale }: { locale: string }) {
                 <h1 className="max-w-3xl text-4xl font-black tracking-tight md:text-5xl">
                   {strings.heroTitle}
                 </h1>
-                <p className="max-w-2xl text-sm leading-7 text-zinc-200 md:text-base">
+                <p className="max-w-2xl text-sm leading-7 text-pp-text md:text-base">
                   {strings.heroBody}
                 </p>
               </div>
               <div className="flex flex-wrap gap-3 print:hidden">
                 <Link
                   href={`/${locale}/lounge`}
-                  className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-3 text-sm font-bold text-zinc-950"
+                  className="inline-flex items-center gap-2 rounded-xl bg-pp-surface px-4 py-3 text-sm font-bold text-pp-text"
                 >
                   {strings.primaryCta}
                   <ArrowRight className="h-4 w-4" />
@@ -234,7 +234,7 @@ function BrochurePage({ locale }: { locale: string }) {
                 isKo ? "노출/클릭 성과 추적" : "Exposure and click analytics",
               ].map((item) => (
                 <div key={item} className="rounded-2xl border border-white/12 bg-white/8 p-4 backdrop-blur">
-                  <p className="text-sm font-semibold text-zinc-100">{item}</p>
+                  <p className="text-sm font-semibold text-pp-text">{item}</p>
                 </div>
               ))}
             </div>
@@ -262,10 +262,10 @@ function BrochurePage({ locale }: { locale: string }) {
                     : "Not just a listing. Partners can operate and expose actual schedules.",
                 },
               ].map((item) => (
-                <div key={item.title} className="rounded-3xl border border-zinc-200 bg-white p-5 shadow-sm">
-                  <div className="mb-3 inline-flex rounded-2xl bg-zinc-100 p-3 text-zinc-700">{item.icon}</div>
-                  <p className="text-base font-bold text-zinc-950">{item.title}</p>
-                  <p className="mt-2 text-sm leading-6 text-zinc-600">{item.body}</p>
+                <div key={item.title} className="rounded-3xl border border-pp-border bg-pp-surface p-5 shadow-sm">
+                  <div className="mb-3 inline-flex rounded-2xl bg-pp-surface-muted p-3 text-pp-muted">{item.icon}</div>
+                  <p className="text-base font-bold text-pp-text">{item.title}</p>
+                  <p className="mt-2 text-sm leading-6 text-pp-muted">{item.body}</p>
                 </div>
               ))}
             </div>
@@ -283,7 +283,7 @@ function BrochurePage({ locale }: { locale: string }) {
                   isKo ? "치료/재활" : "Recovery & Rehab",
                   isKo ? "기타 하키 서비스" : "Other hockey services",
                 ].map((item) => (
-                  <span key={item} className="rounded-full border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm font-medium text-zinc-700">
+                  <span key={item} className="rounded-full border border-pp-border bg-pp-surface-muted px-3 py-2 text-sm font-medium text-pp-muted">
                     {item}
                   </span>
                 ))}
@@ -317,10 +317,10 @@ function BrochurePage({ locale }: { locale: string }) {
                 body: isKo ? "비즈니스 노출, 클릭, 일정별 반응, CTA 클릭 흐름을 확인할 수 있습니다." : "Track exposures, clicks, schedule engagement, and CTA activity.",
               },
             ].map((item) => (
-              <div key={item.title} className="rounded-3xl border border-zinc-200 bg-white p-5 shadow-sm">
-                <div className="mb-3 inline-flex rounded-2xl bg-zinc-100 p-3 text-zinc-700">{item.icon}</div>
-                <p className="text-base font-bold text-zinc-950">{item.title}</p>
-                <p className="mt-2 text-sm leading-6 text-zinc-600">{item.body}</p>
+              <div key={item.title} className="rounded-3xl border border-pp-border bg-pp-surface p-5 shadow-sm">
+                <div className="mb-3 inline-flex rounded-2xl bg-pp-surface-muted p-3 text-pp-muted">{item.icon}</div>
+                <p className="text-base font-bold text-pp-text">{item.title}</p>
+                <p className="mt-2 text-sm leading-6 text-pp-muted">{item.body}</p>
               </div>
             ))}
           </div>
@@ -389,13 +389,13 @@ function BrochurePage({ locale }: { locale: string }) {
                     body: isKo ? "노출, 클릭, 문의 채널 반응을 보고 다음 일정과 운영 방식을 조정합니다." : "Review exposures, clicks, and inquiry actions to improve future operations.",
                   },
                 ].map((item) => (
-                  <div key={item.step} className="flex gap-4 rounded-2xl border border-zinc-200 bg-zinc-50 p-4">
+                  <div key={item.step} className="flex gap-4 rounded-2xl border border-pp-border bg-pp-surface-muted p-4">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-zinc-900 text-sm font-black text-white">
                       {item.step}
                     </div>
                     <div>
-                      <p className="text-base font-bold text-zinc-950">{item.title}</p>
-                      <p className="mt-1 text-sm leading-6 text-zinc-600">{item.body}</p>
+                      <p className="text-base font-bold text-pp-text">{item.title}</p>
+                      <p className="mt-1 text-sm leading-6 text-pp-muted">{item.body}</p>
                     </div>
                   </div>
                 ))}
@@ -407,7 +407,7 @@ function BrochurePage({ locale }: { locale: string }) {
                 <SectionHeader eyebrow={strings.eyebrow6} title={strings.title6} body={strings.body6} />
                 <div className="mt-6 rounded-[28px] border border-[#d4a017]/25 bg-[radial-gradient(circle_at_top_left,_rgba(243,210,122,0.18),_transparent_28%),linear-gradient(180deg,#fff8eb_0%,#fffdf7_100%)] p-6">
                   <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#8b6814]">{strings.priceTitle}</p>
-                  <p className="mt-4 whitespace-pre-line text-base font-semibold leading-8 text-zinc-900">{strings.priceBody}</p>
+                  <p className="mt-4 whitespace-pre-line text-base font-semibold leading-8 text-pp-text">{strings.priceBody}</p>
                 </div>
               </div>
 
@@ -428,12 +428,12 @@ function BrochurePage({ locale }: { locale: string }) {
                       body: isKo ? "노출, 클릭, 문의 채널 반응을 보면서 다음 일정과 운영 방향을 더 빠르게 정할 수 있습니다." : "Use exposure, click, and inquiry data to guide your next schedule and promotional decisions.",
                     },
                   ].map((item) => (
-                    <div key={item.title} className="rounded-2xl border border-zinc-200 bg-zinc-50 p-4">
+                    <div key={item.title} className="rounded-2xl border border-pp-border bg-pp-surface-muted p-4">
                       <div className="flex items-start gap-3">
                         <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-[#8b6814]" />
                         <div>
-                          <p className="text-base font-bold text-zinc-950">{item.title}</p>
-                          <p className="mt-1 text-sm leading-6 text-zinc-600">{item.body}</p>
+                          <p className="text-base font-bold text-pp-text">{item.title}</p>
+                          <p className="mt-1 text-sm leading-6 text-pp-muted">{item.body}</p>
                         </div>
                       </div>
                     </div>
@@ -444,16 +444,16 @@ function BrochurePage({ locale }: { locale: string }) {
           </div>
         </SectionShell>
 
-        <section className="rounded-[36px] border border-zinc-200 bg-white px-6 py-8 shadow-sm md:px-8 md:py-10">
+        <section className="rounded-[36px] border border-pp-border bg-pp-surface px-6 py-8 shadow-sm md:px-8 md:py-10">
           <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
             <div className="space-y-3">
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#8b6814]">
                 {isKo ? "Ready To Start" : "Ready To Start"}
               </p>
-              <h2 className="text-2xl font-black tracking-tight text-zinc-950 md:text-3xl">
+              <h2 className="text-2xl font-black tracking-tight text-pp-text md:text-3xl">
                 {isKo ? "파워플레이 라운지로 하키 비즈니스를 키워나가세요" : "Grow your hockey business with PowerPlay Lounge"}
               </h2>
-              <p className="text-sm leading-7 text-zinc-600 md:text-base">
+              <p className="text-sm leading-7 text-pp-muted md:text-base">
                 {isKo
                   ? "공개 라운지, 일정 노출, 문의 채널 연결, 성과 추적까지. 파워플레이 안에서 한 번에 운영할 수 있습니다."
                   : "Public exposure, schedules, inquiry channels, and analytics in one operating flow."}

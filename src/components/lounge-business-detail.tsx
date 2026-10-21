@@ -1,4 +1,5 @@
 "use client";
+import { surfaceStyles, buttonStyles, segmentedItemStyles } from "@/components/ui/styles";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -125,7 +126,7 @@ export function LoungeBusinessDetail({
   }, [selectedEventId, viewMode]);
 
   return (
-    <div className="space-y-8">
+    <div data-ui-theme="lounge" className="space-y-8">
       <section className={`overflow-hidden rounded-[28px] border ${loungeIceGoldTheme.detailShell}`}>
         <LoungeImpressionTracker entityType="business" businessId={business.id} locale={locale} source={source} />
         {business.cover_image_url ? (
@@ -155,7 +156,7 @@ export function LoungeBusinessDetail({
                   alt={business.name}
                   width={64}
                   height={64}
-                  className="h-16 w-16 shrink-0 rounded-2xl border border-zinc-200 object-cover dark:border-zinc-700"
+                  className="h-16 w-16 shrink-0 rounded-2xl border border-pp-border object-cover "
                 />
               ) : null}
               <div className="min-w-0 flex-1">
@@ -165,11 +166,11 @@ export function LoungeBusinessDetail({
                   <Trophy className="h-3 w-3" />
                   {categoryLabel}
                 </span>
-                <h1 className="mt-3 break-keep text-3xl font-black tracking-tight text-zinc-900 dark:text-zinc-100">
+                <h1 className="mt-3 break-keep text-3xl font-black tracking-tight text-pp-text ">
                   {business.name}
                 </h1>
                 {business.tagline ? (
-                  <p className="mt-2 text-base font-medium text-zinc-600 dark:text-zinc-300">
+                  <p className="mt-2 text-base font-medium text-pp-muted ">
                     {business.tagline}
                   </p>
                 ) : null}
@@ -177,7 +178,7 @@ export function LoungeBusinessDetail({
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-2 text-sm text-zinc-600 dark:text-zinc-300">
+          <div className="flex flex-wrap gap-2 text-sm text-pp-muted ">
             <span
               className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 font-semibold ${categoryTheme.subtleBadge}`}
             >
@@ -188,20 +189,20 @@ export function LoungeBusinessDetail({
             </span>
           </div>
 
-          <div className="rounded-2xl border border-zinc-200 bg-zinc-50/70 p-5 dark:border-zinc-800 dark:bg-zinc-900/60">
-            <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
+          <div className={surfaceStyles({ density: "comfortable" }) + " "}>
+            <h2 className="text-lg font-bold text-pp-text ">
               {locale === "ko" ? "소개" : "Introduction"}
             </h2>
-            <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-zinc-600 dark:text-zinc-300">
+            <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-pp-muted ">
               {business.description || (locale === "ko" ? "등록된 소개가 없습니다." : "No introduction yet.")}
             </p>
             {business.address ? (
-              <p className="mt-4 text-sm font-medium text-zinc-700 dark:text-zinc-200">
+              <p className="mt-4 text-sm font-medium text-pp-muted ">
                 {business.address}
               </p>
             ) : null}
-            <div className="mt-5 border-t border-zinc-200 pt-5 dark:border-zinc-800">
-              <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
+            <div className="mt-5 border-t border-pp-border pt-5 ">
+              <h3 className="text-sm font-bold text-pp-text ">
                 {locale === "ko" ? "연락하기" : "Contact"}
               </h3>
               <div className="mt-3 grid grid-cols-2 gap-2 md:max-w-[420px]">
@@ -212,7 +213,7 @@ export function LoungeBusinessDetail({
                   url={business.phone ? `tel:${business.phone}` : null}
                   locale={locale}
                   source={source}
-                  className="flex items-center justify-center gap-2 rounded-xl border border-zinc-900 bg-zinc-900 px-3 py-2.5 text-sm font-semibold text-white shadow-sm disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-100 dark:bg-zinc-100 dark:text-zinc-900"
+                  className={buttonStyles({ variant: "outline", size: "compact" }) + " flex items-center justify-center gap-2"}
                 >
                   <Phone className="h-4 w-4" strokeWidth={2.4} />
                   {locale === "ko" ? "전화" : "Call"}
@@ -224,7 +225,7 @@ export function LoungeBusinessDetail({
                   url={business.kakao_open_chat_url}
                   locale={locale}
                   source={source}
-                  className="flex items-center justify-center gap-2 rounded-xl bg-[#FEE500] px-3 py-2.5 text-sm font-semibold text-[#3B1E1E] disabled:cursor-not-allowed disabled:opacity-40"
+                  className={buttonStyles({ variant: "kakao", size: "compact" }) + " flex items-center justify-center gap-2"}
                 >
                   <MessageCircle className="h-4 w-4" />
                   {locale === "ko" ? "카카오톡" : "KakaoTalk"}
@@ -248,7 +249,7 @@ export function LoungeBusinessDetail({
                   url={business.website_url}
                   locale={locale}
                   source={source}
-                  className="flex items-center justify-center gap-2 rounded-xl border border-zinc-200 px-3 py-2.5 text-sm font-semibold text-zinc-700 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-700 dark:text-zinc-200"
+                  className={buttonStyles({ variant: "outline", size: "compact" }) + " flex items-center justify-center gap-2"}
                 >
                   <Globe className="h-4 w-4" />
                   {locale === "ko" ? "웹사이트" : "Website"}
@@ -270,20 +271,20 @@ export function LoungeBusinessDetail({
 
       <section
         aria-labelledby="lounge-notices-heading"
-        className="space-y-4 rounded-[28px] border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-950 md:p-6"
+        className="space-y-4 rounded-[28px] border border-pp-border bg-pp-surface p-5 shadow-sm md:p-6"
       >
         <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
           <div>
             <div className="flex items-center gap-2">
-              <BellRing className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+              <BellRing className="h-5 w-5 text-pp-warning-text " />
               <h2
                 id="lounge-notices-heading"
-                className="text-xl font-black text-zinc-900 dark:text-zinc-100"
+                className="text-xl font-black text-pp-text "
               >
                 {t("title")}
               </h2>
             </div>
-            <p className="mt-1.5 text-sm leading-6 text-zinc-500 dark:text-zinc-400">
+            <p className="mt-1.5 text-sm leading-6 text-pp-muted ">
               {t("description", { businessName: business.name })}
             </p>
           </div>
@@ -297,21 +298,21 @@ export function LoungeBusinessDetail({
         </div>
 
         {sortedNotices.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-zinc-300 bg-zinc-50/70 px-5 py-8 text-center dark:border-zinc-700 dark:bg-zinc-900/60">
-            <p className="text-sm font-semibold text-zinc-600 dark:text-zinc-300">
+          <div className={surfaceStyles({ density: "none" }) + " text-center"}>
+            <p className="text-sm font-semibold text-pp-muted ">
               {t("empty")}
             </p>
-            <p className="mt-1 text-xs leading-5 text-zinc-500 dark:text-zinc-400">
+            <p className="mt-1 text-xs leading-5 text-pp-muted ">
               {t("emptyDescription")}
             </p>
           </div>
         ) : (
-          <div className="divide-y divide-zinc-200 overflow-hidden rounded-2xl border border-zinc-200 dark:divide-zinc-800 dark:border-zinc-800">
+          <div className="divide-y divide-zinc-200 overflow-hidden rounded-2xl border border-pp-border dark:divide-zinc-800 ">
             {sortedNotices.map((notice) => (
               <Link
                 key={notice.id}
                 href={`/${locale}/lounge/${business.slug}/notices/${notice.id}`}
-                className="group flex items-start justify-between gap-4 bg-white p-4 transition hover:bg-amber-50/70 dark:bg-zinc-950 dark:hover:bg-amber-950/20 md:p-5"
+                className={buttonStyles({ variant: "warning", size: "compact" }) + " group flex items-start justify-between gap-4"}
               >
                 <div className="flex min-w-0 items-start gap-3 md:gap-4">
                   {notice.image_url ? (
@@ -320,25 +321,25 @@ export function LoungeBusinessDetail({
                       alt=""
                       width={112}
                       height={112}
-                      className="h-20 w-20 shrink-0 rounded-xl border border-zinc-200 object-cover dark:border-zinc-800 md:h-24 md:w-24"
+                      className="h-20 w-20 shrink-0 rounded-xl border border-pp-border object-cover md:h-24 md:w-24"
                     />
                   ) : null}
                   <div className="min-w-0">
-                    <p className="line-clamp-1 font-bold text-zinc-900 group-hover:text-amber-800 dark:text-zinc-100 dark:group-hover:text-amber-300">
+                    <p className="line-clamp-1 font-bold text-pp-text group-hover:text-pp-warning-text ">
                       {notice.title}
                     </p>
-                    <p className="mt-1.5 line-clamp-2 whitespace-pre-line text-sm leading-6 text-zinc-500 dark:text-zinc-400">
+                    <p className="mt-1.5 line-clamp-2 whitespace-pre-line text-sm leading-6 text-pp-muted ">
                       {notice.body}
                     </p>
                     <time
                       dateTime={notice.created_at}
-                      className="mt-2 block text-xs font-medium text-zinc-400 dark:text-zinc-500"
+                      className="mt-2 block text-xs font-medium text-pp-muted "
                     >
                       {formatNoticeDate(notice.created_at)} · KST
                     </time>
                   </div>
                 </div>
-                <ChevronRight className="mt-1 h-5 w-5 shrink-0 text-zinc-400 transition-transform group-hover:translate-x-0.5 group-hover:text-amber-600" />
+                <ChevronRight className="mt-1 h-5 w-5 shrink-0 text-pp-muted transition-transform group-hover:translate-x-0.5 group-hover:text-pp-warning-text" />
               </Link>
             ))}
           </div>
@@ -348,16 +349,15 @@ export function LoungeBusinessDetail({
       <section id="all-schedules" ref={allSchedulesRef} className="space-y-4 pt-8">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
+            <h2 className="text-xl font-bold text-pp-text ">
               {locale === "ko" ? "전체 일정" : "All schedules"}
             </h2>
           </div>
-          <div className="flex items-center rounded-lg bg-zinc-100 p-1 dark:bg-zinc-800">
+          <div className="flex items-center rounded-lg bg-pp-surface-muted p-1 ">
             <button
               type="button"
               onClick={() => setViewMode("list")}
-              aria-pressed={viewMode === "list"}
-              className={`flex items-center gap-2 rounded-md px-4 py-2 text-sm font-bold transition-colors ${viewMode === "list" ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-700 dark:text-white" : "text-zinc-500 dark:text-zinc-400"}`}
+              aria-pressed={viewMode === "list"} className={segmentedItemStyles({ selected: viewMode === "list" })}
             >
               <List className="h-4 w-4" />
               {locale === "ko" ? "목록" : "List"}
@@ -365,8 +365,7 @@ export function LoungeBusinessDetail({
             <button
               type="button"
               onClick={() => setViewMode("calendar")}
-              aria-pressed={viewMode === "calendar"}
-              className={`flex items-center gap-2 rounded-md px-4 py-2 text-sm font-bold transition-colors ${viewMode === "calendar" ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-700 dark:text-white" : "text-zinc-500 dark:text-zinc-400"}`}
+              aria-pressed={viewMode === "calendar"} className={segmentedItemStyles({ selected: viewMode === "calendar" })}
             >
               <CalendarDays className="h-4 w-4" />
               {locale === "ko" ? "캘린더" : "Calendar"}
@@ -384,7 +383,7 @@ export function LoungeBusinessDetail({
             selectedDate={selectedDate}
           />
         ) : filteredEvents.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-zinc-300 p-8 text-center text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
+          <div className="rounded-xl border border-dashed border-pp-border p-8 text-center text-sm text-pp-muted ">
             {locale === "ko" ? "선택한 날짜에 등록된 일정이 없습니다." : "No events for the selected date."}
           </div>
         ) : (

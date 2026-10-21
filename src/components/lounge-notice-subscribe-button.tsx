@@ -1,4 +1,5 @@
 "use client";
+import { buttonStyles } from "@/components/ui/styles";
 
 import { useEffect, useRef, useState, useTransition } from "react";
 import { Bell, BellOff, Smartphone } from "lucide-react";
@@ -97,11 +98,7 @@ export function LoungeNoticeSubscribeButton({
           onClick={handleToggle}
           disabled={isPending}
           aria-pressed={isLoggedIn ? subscribed : undefined}
-          className={`inline-flex min-h-10 items-center justify-center gap-2 whitespace-nowrap rounded-xl border px-4 py-2 text-sm font-bold transition disabled:cursor-wait disabled:opacity-60 ${
-            subscribed
-              ? "border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-200"
-              : "border-zinc-300 bg-white text-zinc-800 hover:border-amber-400 hover:bg-amber-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:border-amber-700 dark:hover:bg-amber-950/30"
-          }`}
+          className={buttonStyles({ variant: subscribed ? "warning" : "outline" })}
         >
           {subscribed ? <BellOff className="h-4 w-4" /> : <Bell className="h-4 w-4" />}
           {isPending
@@ -117,7 +114,7 @@ export function LoungeNoticeSubscribeButton({
           <button
             type="button"
             onClick={() => openGuide("notification")}
-            className="inline-flex min-h-10 items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-zinc-100 px-4 py-2 text-sm font-semibold text-zinc-700 transition hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
+            className={buttonStyles({ variant: "secondary", size: "compact" }) + " inline-flex items-center justify-center gap-2"}
           >
             <Smartphone className="h-4 w-4" />
             {t("deviceGuide")}
@@ -126,13 +123,13 @@ export function LoungeNoticeSubscribeButton({
       </div>
 
       {isLoggedIn && subscribed && deviceStatusReady ? (
-        <p className="text-xs leading-5 text-zinc-500 dark:text-zinc-400">
+        <p className="text-xs leading-5 text-pp-muted ">
           {hasDbSubscription ? t("activeDescription") : t("deviceDescription")}
         </p>
       ) : null}
 
       {error ? (
-        <p role="alert" className="text-xs font-medium text-red-600 dark:text-red-400">
+        <p role="alert" className="text-xs font-medium text-pp-danger-text ">
           {error}
         </p>
       ) : null}

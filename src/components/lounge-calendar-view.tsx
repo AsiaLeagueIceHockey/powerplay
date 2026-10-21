@@ -1,4 +1,5 @@
 "use client";
+import { surfaceStyles, buttonStyles } from "@/components/ui/styles";
 
 import { useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -89,12 +90,12 @@ export function LoungeCalendarView({ events, locale, onDateSelect, selectedDate 
   };
 
   return (
-    <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-4">
+    <div className={surfaceStyles({ density: "default" }) + " "}>
       <div className="flex items-center justify-between mb-4">
         <button
           type="button"
           onClick={() => setCurrentDate(new Date(year, month - 1, 1))}
-          className="p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+          className={buttonStyles({ variant: "secondary", size: "compact" })}
           aria-label="Previous month"
         >
           <ChevronLeft className="w-5 h-5" />
@@ -105,7 +106,7 @@ export function LoungeCalendarView({ events, locale, onDateSelect, selectedDate 
         <button
           type="button"
           onClick={() => setCurrentDate(new Date(year, month + 1, 1))}
-          className="p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+          className={buttonStyles({ variant: "secondary", size: "compact" })}
           aria-label="Next month"
         >
           <ChevronRight className="w-5 h-5" />
@@ -116,7 +117,7 @@ export function LoungeCalendarView({ events, locale, onDateSelect, selectedDate 
         {weekdays.map((day, i) => (
           <div
             key={day}
-            className={`text-center text-xs font-medium py-2 ${i === 0 ? "text-red-500" : "text-zinc-500 dark:text-zinc-400"}`}
+            className={`text-center text-xs font-medium py-2 ${i === 0 ? "text-pp-danger-text" : "text-pp-muted "}`}
           >
             {day}
           </div>
@@ -138,7 +139,7 @@ export function LoungeCalendarView({ events, locale, onDateSelect, selectedDate 
           const selected = selectedDate === dateString;
 
           return (
-            <button
+            <button data-ui-exception="calendar-day"
               key={`${year}-${month}-${day}`}
               type="button"
               onClick={() => onDateSelect(dateString, hasEvents)}
@@ -149,8 +150,8 @@ export function LoungeCalendarView({ events, locale, onDateSelect, selectedDate 
                   ? loungeIceGoldTheme.calendarToday
                   : hasEvents
                     ? loungeIceGoldTheme.calendarHasEvent
-                    : "hover:bg-zinc-100 dark:hover:bg-zinc-800"
-              } ${isSunday && !today ? "text-red-500" : ""}`}
+                    : "hover:bg-pp-surface-muted "
+              } ${isSunday && !today ? "text-pp-danger-text" : ""}`}
             >
               <span>{day}</span>
               {badgeLabel ? (

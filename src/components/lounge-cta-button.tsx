@@ -1,4 +1,5 @@
 "use client";
+import { buttonStyles } from "@/components/ui/styles";
 
 import { ReactNode, useTransition } from "react";
 import { trackLoungeClick, type LoungeCtaType } from "@/app/actions/lounge";
@@ -57,7 +58,7 @@ export function LoungeCtaButton({
       onClick={handleClick}
       disabled={isPending}
       aria-label={ariaLabel}
-      className={className}
+      className={className || buttonStyles({ variant: "ghost" })}
     >
       {children}
     </button>

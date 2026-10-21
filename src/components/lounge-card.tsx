@@ -1,4 +1,5 @@
 "use client";
+import { surfaceStyles, badgeStyles } from "@/components/ui/styles";
 
 import { ArrowRight, Trophy } from "lucide-react";
 import type { LoungeBusiness } from "@/app/actions/lounge";
@@ -45,7 +46,7 @@ export function LoungeCard({
 
   return (
     <article
-      className={`relative overflow-hidden rounded-xl border border-zinc-200 bg-white p-5 shadow-sm transition-all duration-300 ${categoryTheme.hoverBorder} hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900`}
+      className={surfaceStyles({ interactive: true, density: "comfortable" }) + ` relative overflow-hidden ${categoryTheme.hoverBorder}`}
     >
       <LoungeImpressionTracker entityType="business" businessId={business.id} locale={locale} source={source} />
       <div className={`absolute inset-x-0 top-0 h-1 ${categoryTheme.accentLine}`} />
@@ -67,33 +68,33 @@ export function LoungeCard({
                 {categoryLabel}
               </span>
               {isFeatured ? (
-                <span className="inline-flex items-center gap-1 rounded-full bg-zinc-900 px-2.5 py-1 text-[11px] font-bold text-white dark:bg-zinc-100 dark:text-zinc-900">
+                <span className="inline-flex items-center gap-1 rounded-full bg-zinc-900 px-2.5 py-1 text-[11px] font-bold text-white dark:bg-pp-surface-muted dark:text-pp-text">
                   {locale === "ko" ? "파워플레이 추천" : "Featured"}
                 </span>
               ) : null}
-              {region ? <span className="rounded-full bg-zinc-100 px-2.5 py-1 text-[11px] font-medium text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">{region}</span> : null}
+              {region ? <span className={badgeStyles()}>{region}</span> : null}
             </div>
             <div className="mt-3 flex items-start justify-between gap-3">
               <div className="min-w-0 flex-1">
-                <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">{business.name}</h3>
+                <h3 className="text-xl font-bold text-pp-text ">{business.name}</h3>
                 {business.tagline ? (
-                  <p className="mt-1 text-sm font-medium text-zinc-600 dark:text-zinc-300">{business.tagline}</p>
+                  <p className="mt-1 text-sm font-medium text-pp-muted ">{business.tagline}</p>
                 ) : null}
               </div>
               {business.logo_url ? (
-                <img src={business.logo_url} alt={business.name} className="h-14 w-14 rounded-xl border border-zinc-200 object-cover dark:border-zinc-700" />
+                <img src={business.logo_url} alt={business.name} className="h-14 w-14 rounded-xl border border-pp-border object-cover " />
               ) : null}
             </div>
-            <p className="mt-4 line-clamp-3 text-sm leading-6 text-zinc-600 dark:text-zinc-300">
+            <p className="mt-4 line-clamp-3 text-sm leading-6 text-pp-muted ">
               {business.description || (locale === "ko" ? "등록된 소개가 없습니다." : "No introduction yet.")}
             </p>
             {upcomingCount > 0 ? (
-              <p className="mt-3 text-xs font-medium text-zinc-500 dark:text-zinc-400">
+              <p className="mt-3 text-xs font-medium text-pp-muted ">
                 {locale === "ko" ? `예정 일정 ${upcomingCount}개` : `${upcomingCount} upcoming events`}
               </p>
             ) : null}
           </div>
-          <ArrowRight className="mt-1 h-4 w-4 shrink-0 text-zinc-400" />
+          <ArrowRight className="mt-1 h-4 w-4 shrink-0 text-pp-muted" />
         </div>
       </LoungeDetailLink>
 

@@ -1,4 +1,5 @@
 "use client";
+import { buttonStyles } from "@/components/ui/styles";
 
 import { useState } from "react";
 import { ChevronDown, ChevronUp, Globe, Instagram, MessageCircle, Phone } from "lucide-react";
@@ -59,7 +60,7 @@ export function LoungeContactMenu({
   return (
     <div className="relative flex items-center justify-end">
       {open ? (
-        <div className="absolute bottom-full right-0 z-10 mb-2 flex items-center gap-2 rounded-full bg-white px-2 py-2 shadow-lg ring-1 ring-zinc-200 dark:bg-zinc-950 dark:ring-zinc-700">
+        <div className="absolute bottom-full right-0 z-10 mb-2 flex items-center gap-2 rounded-full bg-pp-surface px-2 py-2 shadow-lg ring-1 ring-pp-border ">
           {items.map((item) => (
             <LoungeCtaButton
               key={item.key}
@@ -83,7 +84,7 @@ export function LoungeContactMenu({
         type="button"
         onClick={() => setOpen((prev) => !prev)}
         aria-expanded={open}
-        className="inline-flex items-center gap-1 rounded-full border border-zinc-200 bg-white px-3 py-2 text-xs font-semibold text-zinc-700 shadow-sm transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
+        className={buttonStyles({ variant: "outline", size: "compact" }) + " inline-flex items-center gap-1"}
       >
         {locale === "ko" ? "연락하기" : "Contact"}
         {open ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}

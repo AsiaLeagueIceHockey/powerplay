@@ -1,4 +1,5 @@
 "use client";
+import { segmentedItemStyles, filterChipStyles } from "@/components/ui/styles";
 
 import { useMemo, useState } from "react";
 import { CalendarDays, List, Trophy } from "lucide-react";
@@ -91,7 +92,7 @@ export function LoungePageClient({ businesses, events, locale, source }: LoungeP
   ];
 
   return (
-    <div className="space-y-6">
+    <div data-ui-theme="lounge" className="space-y-6">
       <style jsx>{`
         .hide-scrollbar::-webkit-scrollbar {
           display: none;
@@ -106,7 +107,7 @@ export function LoungePageClient({ businesses, events, locale, source }: LoungeP
             <p className="font-bold text-sm leading-tight text-white">
               {locale === "ko" ? "PowerPlay 라운지" : "PowerPlay Lounge"}
             </p>
-            <p className="mt-0.5 text-xs leading-tight text-zinc-200">
+            <p className="mt-0.5 text-xs leading-tight text-pp-text">
               {locale === "ko"
                 ? "유소년 클럽부터 레슨, 훈련장, 대회, 브랜드 정보를 만나보세요!"
                 : "Discover youth clubs, lessons, training centers, tournaments, and brand info."}
@@ -115,7 +116,7 @@ export function LoungePageClient({ businesses, events, locale, source }: LoungeP
         </div>
       </section>
 
-      <section className="border-b border-zinc-200 dark:border-zinc-800">
+      <section className="border-b border-pp-border ">
         <div className="flex">
           {tabs.map((tab) => {
             const active = activeTab === tab.id;
@@ -124,9 +125,7 @@ export function LoungePageClient({ businesses, events, locale, source }: LoungeP
                 key={tab.id}
                 type="button"
                 onClick={() => setActiveTab(tab.id)}
-                className={`relative flex-1 pb-3 text-base font-bold transition-colors md:text-lg ${
-                  active ? "text-zinc-900 dark:text-white" : "text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
-                }`}
+                className={segmentedItemStyles({ selected: active, kind: "tab" }) + " relative flex-1"}
               >
                 {tab.label}
                 {active ? <span className="absolute bottom-0 left-0 h-0.5 w-full bg-zinc-900 dark:bg-white" /> : null}
@@ -141,7 +140,7 @@ export function LoungePageClient({ businesses, events, locale, source }: LoungeP
           {featuredBusinesses.length > 0 ? (
             <section className="space-y-4">
               <div>
-                <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
+                <h2 className="text-xl font-bold text-pp-text ">
                   {locale === "ko" ? "파워플레이 추천" : "PowerPlay featured"}
                 </h2>
               </div>
@@ -165,11 +164,7 @@ export function LoungePageClient({ businesses, events, locale, source }: LoungeP
                     key={option.value}
                     type="button"
                     onClick={() => setSelectedCategory(option.value)}
-                    className={`whitespace-nowrap rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
-                      active
-                        ? "bg-zinc-900 text-white border-zinc-900 shadow-sm dark:bg-zinc-100 dark:text-zinc-900 dark:border-zinc-100"
-                        : "bg-white text-zinc-600 border-zinc-200 hover:bg-zinc-50 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700 dark:hover:bg-zinc-700"
-                    }`}
+                    aria-pressed={active} className={filterChipStyles({ selected: active })}
                   >
                     {option.label}
                   </button>
@@ -178,7 +173,7 @@ export function LoungePageClient({ businesses, events, locale, source }: LoungeP
             </div>
 
             {filteredBusinesses.length === 0 ? (
-              <div className="rounded-xl border border-dashed border-zinc-300 p-8 text-center text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
+              <div className="rounded-xl border border-dashed border-pp-border p-8 text-center text-sm text-pp-muted ">
                 {locale === "ko" ? "선택한 카테고리에 공개된 항목이 없습니다." : "No items in this category yet."}
               </div>
             ) : (
@@ -195,11 +190,11 @@ export function LoungePageClient({ businesses, events, locale, source }: LoungeP
       {activeTab === "events" ? (
         <section className="space-y-4">
           <div className="flex justify-end">
-            <div className="flex items-center rounded-lg bg-zinc-100 p-1 dark:bg-zinc-800">
+            <div className="flex items-center rounded-lg bg-pp-surface-muted p-1 ">
               <button
                 type="button"
                 onClick={() => setViewMode("list")}
-                className={`flex items-center gap-2 rounded-md px-4 py-2 text-sm font-bold transition-colors ${viewMode === "list" ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-700 dark:text-white" : "text-zinc-500 dark:text-zinc-400"}`}
+                aria-pressed={viewMode === "list"} className={segmentedItemStyles({ selected: viewMode === "list" })}
               >
                 <List className="h-4 w-4" />
                 {locale === "ko" ? "목록" : "List"}
@@ -207,7 +202,7 @@ export function LoungePageClient({ businesses, events, locale, source }: LoungeP
               <button
                 type="button"
                 onClick={() => setViewMode("calendar")}
-                className={`flex items-center gap-2 rounded-md px-4 py-2 text-sm font-bold transition-colors ${viewMode === "calendar" ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-700 dark:text-white" : "text-zinc-500 dark:text-zinc-400"}`}
+                aria-pressed={viewMode === "calendar"} className={segmentedItemStyles({ selected: viewMode === "calendar" })}
               >
                 <CalendarDays className="h-4 w-4" />
                 {locale === "ko" ? "캘린더" : "Calendar"}
@@ -226,11 +221,7 @@ export function LoungePageClient({ businesses, events, locale, source }: LoungeP
                   key={option.value}
                   type="button"
                   onClick={() => setSelectedEventCategory(option.value)}
-                  className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors whitespace-nowrap ${
-                    active
-                      ? "bg-zinc-900 text-white border-zinc-900 shadow-sm dark:bg-zinc-100 dark:text-zinc-900 dark:border-zinc-100"
-                      : "bg-white text-zinc-600 border-zinc-200 hover:bg-zinc-50 dark:bg-zinc-800 dark:text-zinc-300 dark:border-zinc-700 dark:hover:bg-zinc-700"
-                  }`}
+                  aria-pressed={active} className={filterChipStyles({ selected: active })}
                 >
                   {option.label}
                 </button>
@@ -246,7 +237,7 @@ export function LoungePageClient({ businesses, events, locale, source }: LoungeP
               selectedDate={selectedDate}
             />
           ) : filteredEvents.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-zinc-300 p-8 text-center text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
+            <div className="rounded-xl border border-dashed border-pp-border p-8 text-center text-sm text-pp-muted ">
               {locale === "ko" ? "선택한 날짜에 등록된 일정이 없습니다." : "No events for the selected date."}
             </div>
           ) : (

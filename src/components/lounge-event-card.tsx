@@ -1,4 +1,5 @@
 "use client";
+import { surfaceStyles } from "@/components/ui/styles";
 
 import Image from "next/image";
 import type { LoungeBusiness, LoungeEvent } from "@/app/actions/lounge";
@@ -101,10 +102,10 @@ export function LoungeEventCard({
   return (
     <article
       id={`lounge-event-${event.id}`}
-      className={`relative overflow-hidden rounded-xl border bg-white p-4 shadow-sm transition-all duration-300 dark:bg-zinc-900 ${
+      className={`${surfaceStyles({ interactive: true, density: "default" })} relative overflow-hidden ${
         isHighlighted
           ? loungeIceGoldTheme.highlightState
-          : `border-zinc-200 ${categoryTheme.hoverBorder} hover:shadow-lg dark:border-zinc-800`
+          : categoryTheme.hoverBorder
       }`}
     >
       <LoungeImpressionTracker entityType="event" businessId={event.business_id} eventId={event.id} locale={locale} source={source} />
@@ -120,8 +121,8 @@ export function LoungeEventCard({
       >
         <div className="mb-3 flex items-center justify-between gap-1.5 flex-wrap">
           <div className="flex items-center gap-1.5 text-[13px] font-bold">
-            <span className="whitespace-nowrap text-zinc-400 dark:text-zinc-500">{formattedDate}</span>
-            <span className="font-normal text-zinc-200 dark:text-zinc-700">|</span>
+            <span className="whitespace-nowrap text-pp-muted ">{formattedDate}</span>
+            <span className="font-normal text-pp-text ">|</span>
             <span className={`whitespace-nowrap ${categoryTheme.timeText}`}>{formattedTime}</span>
           </div>
           <div className="flex items-center gap-1.5">
@@ -131,12 +132,12 @@ export function LoungeEventCard({
               {categoryLabel}
             </span>
             {event.price_krw ? (
-              <span className="rounded-lg border border-zinc-100 bg-zinc-50 px-1.5 py-0.5 text-[10px] font-bold text-zinc-600 dark:border-zinc-700 dark:bg-zinc-800/40 dark:text-zinc-300">
+              <span className="rounded-lg border border-pp-border bg-pp-surface-muted px-1.5 py-0.5 text-[10px] font-bold text-pp-muted ">
                 {event.price_krw.toLocaleString()}{locale === "ko" ? "원" : " KRW"}
               </span>
             ) : null}
             {capacityLabel ? (
-              <span className="rounded-lg border border-zinc-100 bg-white px-1.5 py-0.5 text-[10px] font-bold text-zinc-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300">
+              <span className="rounded-lg border border-pp-border bg-pp-surface px-1.5 py-0.5 text-[10px] font-bold text-pp-muted ">
                 {capacityLabel}
               </span>
             ) : null}
@@ -144,27 +145,27 @@ export function LoungeEventCard({
         </div>
 
         <div className="mb-3">
-          <h4 className="leading-tight text-lg font-bold text-zinc-900 transition-colors dark:text-zinc-100">
+          <h4 className="leading-tight text-lg font-bold text-pp-text transition-colors ">
             {event.title}
           </h4>
           {compactLocationLabel ? (
-            <p className="mt-1 text-xs font-medium text-zinc-400 dark:text-zinc-500">{compactLocationLabel}</p>
+            <p className="mt-1 text-xs font-medium text-pp-muted ">{compactLocationLabel}</p>
           ) : null}
         </div>
 
         {cardPreviewText ? (
-          <p className={`text-sm leading-6 text-zinc-600 dark:text-zinc-300 ${detailMode ? "whitespace-pre-wrap" : "line-clamp-3"}`}>
+          <p className={`text-sm leading-6 text-pp-muted ${detailMode ? "whitespace-pre-wrap" : "line-clamp-3"}`}>
             {cardPreviewText}
           </p>
         ) : null}
       </LoungeDetailLink>
 
       {detailMode && descriptionText ? (
-        <div className="mb-4 rounded-xl border border-zinc-100 bg-zinc-50/80 p-3 dark:border-zinc-800 dark:bg-zinc-950/40">
-          <p className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">
+        <div className={surfaceStyles({ density: "compact" }) + " mb-4 "}>
+          <p className="text-sm font-semibold text-pp-muted ">
             {locale === "ko" ? "상세 설명" : "Description"}
           </p>
-          <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-zinc-600 dark:text-zinc-300">
+          <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-pp-muted ">
             {descriptionText}
           </p>
         </div>
@@ -182,7 +183,7 @@ export function LoungeEventCard({
         </div>
       ) : null}
 
-      <div className="flex min-h-[48px] items-center justify-between gap-3 border-t border-zinc-100 pt-3 dark:border-zinc-800/70">
+      <div className="flex min-h-[48px] items-center justify-between gap-3 border-t border-pp-border pt-3 ">
         <div className="min-w-0">
           {business ? (
             <div className="flex items-center gap-2 overflow-hidden">
@@ -192,10 +193,10 @@ export function LoungeEventCard({
                   alt={business.name || "Business logo"}
                   width={22}
                   height={22}
-                  className="h-[22px] w-[22px] rounded object-cover bg-white shadow-sm"
+                  className="h-[22px] w-[22px] rounded object-cover bg-pp-surface shadow-sm"
                 />
               ) : null}
-              <span className="truncate text-sm font-bold text-zinc-600 dark:text-zinc-300">{business.name}</span>
+              <span className="truncate text-sm font-bold text-pp-muted ">{business.name}</span>
             </div>
           ) : null}
         </div>

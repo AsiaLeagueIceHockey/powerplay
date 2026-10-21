@@ -1,4 +1,5 @@
 "use client";
+import { surfaceStyles } from "@/components/ui/styles";
 
 import { DynamicRinkMap } from "@/components/dynamic-rink-map";
 
@@ -22,7 +23,7 @@ export function LoungeLocationMap({
   }
 
   return (
-    <div className="h-52 overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800">
+    <div className={surfaceStyles({ density: "none" }) + " overflow-hidden"}>
       <DynamicRinkMap
         isCompact={true}
         rinks={[

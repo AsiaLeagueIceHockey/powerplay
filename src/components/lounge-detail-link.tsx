@@ -1,4 +1,5 @@
 "use client";
+import { buttonStyles } from "@/components/ui/styles";
 
 import { useRouter } from "next/navigation";
 import { ReactNode } from "react";
@@ -36,7 +37,7 @@ export function LoungeDetailLink({
     <button
       type="button"
       onClick={handleClick}
-      className={className}
+      className={className || buttonStyles({ variant: "ghost" })}
     >
       {children}
     </button>
