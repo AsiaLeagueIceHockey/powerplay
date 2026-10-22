@@ -8,7 +8,7 @@ This is the **single source of UI rules** for ordinary user UI. `CLAUDE.md`, `AG
 2. **`className` is for layout only**: placement, width, flex/grid, visibility. Never set colors, font size, padding, radius, height or shadow on a shared control. Pick a documented option instead, or add a variant (rule 9).
 3. **Colors come from `pp-*` tokens** (`bg-pp-surface`, `text-pp-muted`, `border-pp-border`, `bg-pp-accent` …). Raw Tailwind palette classes and hex values are allowed in ordinary UI only as a recorded exception in `scripts/ui-policy.json`.
 4. **Do not pair a token with a `dark:` override** (for example `text-pp-text dark:text-white`). Tokens already resolve for dark mode.
-5. **One brand accent, used only for what can be pressed.** Primary actions, links, focus rings and selected states use the brand accent. See "Palette and hierarchy rules" P1–P6. Lounge and Youth section colors currently appear only in badges, icons and accent lines; P5 proposes a per-page family instead.
+5. **One brand family per page, its base color only for what can be pressed.** PowerPlay pages use the blue family; Lounge pages use the gold family and Youth pages the violet family (P5). Primary actions, links, focus rings and selected states use the page's base color. See "Palette and hierarchy rules".
 6. **Status, category, points, cheer and provider colors are exceptions.** Use them only where their meaning is needed, as text or icons rather than large fills (P3, P4). Express hierarchy through type size, weight and gray level, not color (P7–P10).
 7. **Icon + label actions never wrap on mobile.** Shared buttons are `nowrap`; wrap the label in `actionLabelClass` so it truncates. Buttons in one group share size. Club detail actions reuse `components/club-detail-action-styles.ts`.
 8. **Clickable cards** apply `surfaceStyles({ interactive: true })` to the real link or button; hover and focus come from the recipe, never ad-hoc `hover:border-*` or `hover:shadow-*`. Static panels are not interactive.
@@ -38,8 +38,9 @@ The **Now** column is what the tokens implement today. The **Target** column is 
 | Role | Target | Now |
 | --- | --- | --- |
 | Brand accent | `#2563eb` (hover `#1d4ed8`) for every section's primary actions, links, focus and selection | Done in tokens: `--pp-accent` is `#2563eb` in every scope. Components with hard-coded colors change in stage ③ |
-| Section themes | Lounge ice gold `#d4a017` / `#f3d27a` and Youth violet `#7c3aed` exposed as a separate section accent, used only in badges, icons and accent lines | Done in tokens: `--pp-section-accent(-soft/-text)`, used by the `brand` badge. `lounge-theme.ts` hex classes remain until stage ③ |
-| Neutrals | One gray family for background, surface, muted surface, border and text in light and dark | Zinc in both modes: light `#fafafa` / `#ffffff` / `#f4f4f5` / border `#e4e4e7` / text `#18181b` / muted `#71717a`. Dark cards use `--pp-card` `#222226` with border `#34343b`, one step above the `#18181b` page |
+| Section themes | Each section is one brand family (P5): PowerPlay blue, Lounge gold, Youth violet. The theme scope swaps the whole three-step family, so header and bottom-nav active states follow the page and blue never shares a page with gold or violet | ① split a separate `--pp-section-accent` (badges only, buttons stay blue). Replaced by P5 when the palette is applied |
+| Neutrals | Palette A (Slate) — see "Palette and hierarchy rules" | Zinc in both modes: light `#fafafa` / `#ffffff` / `#f4f4f5` / border `#e4e4e7` / text `#18181b` / muted `#71717a`. Dark cards use `--pp-card` `#222226` with border `#34343b`, one step above the `#18181b` page |
+| Boundaries | Decorative borders (cards, dividers, chips, outline buttons) stay light. Required boundaries of fields (input, select, textarea) use `--pp-control-border` with ≥3:1 non-text contrast (WCAG 1.4.11) against every surface they sit on | Done: `--pp-control-border` light `#86868f` (≥3.28:1), dark `#78787f` (≥3.40:1) on `.pp-field`. Native checkboxes and radios keep the browser's own ≥3:1 outline |
 | Radius | Controls and cards 8px, segmented items 6px, modal and sheet 12px. Chips and badges stay pill-shaped so they read differently from buttons; avatars and circles stay full | Done in tokens (`--pp-radius-control/card` 8px, `--pp-radius-small` 6px, `--pp-radius-sheet` 12px, chips and badges pill). Hard-coded `rounded-*` classes change in stage ③ |
 | Shadow | Resting cards have a border only; hover changes the border color. Overlays and popovers get one small shadow | Done in tokens (`--pp-shadow-card/hover` none, `--pp-shadow-overlay`). Hard-coded `shadow-*` classes change in stage ③ |
 | Spacing | 4px-based scale (4, 8, 12, 16, 20, 24, 32, 40, 48, 64). More generous defaults for page padding, section gap and card padding | Scale defined up to 64px; Surface densities widened to 16/20/24/32. Page and section spacing tokens arrive in stage ② |
@@ -56,7 +57,24 @@ Theme scopes must cover user routes outside `(public)`, including onboarding, ch
 
 These rules make a screen read as one palette and express importance through type rather than color. They apply to every ordinary user screen. Where a rule conflicts with "Rules at a glance" or the Visual direction table, this section wins once its pending decisions are settled.
 
-**Pending decisions:** the concrete palette values (candidates in `artifacts/ui/palette/`), cheer pink (keep or absorb into the brand family, rule P4) and the Lounge/Youth page-family proposal (rule P5). Until they are decided, the current tokens stay.
+**Decided 2026-10-22:** palette A (Slate) and P5. **Pending:** cheer pink (P4). Palette A is not in `globals.css` yet; it is applied together with the chosen club-card design. The values below are the source of truth. The local mockup override (`artifacts/ui/mockups/palette-a.css`, not committed) mirrors them.
+
+| Role | Light | Dark | Token |
+| --- | --- | --- | --- |
+| Page / surface | `#ffffff` | `#0b1120` | `--pp-surface` |
+| Subtle background | `#f8fafc` | `#131c2e` | `--pp-background`, dark `--pp-card` |
+| Muted surface | `#f1f5f9` | `#1e293b` | `--pp-surface-muted` |
+| Decorative border | `#e2e8f0` | `#1e293b` | `--pp-border`, `--pp-card-border` |
+| Field boundary (≥3:1) | `#7f8ea3` | `#6b7a93` | `--pp-control-border` |
+| Secondary text | `#64748b` | `#94a3b8` | `--pp-text-muted` |
+| Body text (near-black) | `#0f172a` | `#e2e8f0` | `--pp-text` |
+| Brand strong (navy) | `#172554` | `#dbeafe` | `--pp-brand-strong` |
+| Brand base | `#2563eb` | `#2563eb` (link text `#7aa7f7`) | `--pp-accent`, `--pp-link` |
+| Brand soft | `#eff6ff` / text `#1e40af` | `#172554` / text `#bfdbfe` | `--pp-accent-soft`, `--pp-accent-text` |
+| Error | `#c0392f` | `#ec8b84` | `--pp-danger(-text)` |
+| Success / warning (text only) | `#2f7d4f` / `#8a5a12` | `#7cc79a` / `#e2bb6a` | `--pp-success-text`, `--pp-warning-text` |
+
+Every text pair passes WCAG AA (4.5:1). The local swatch sheet is `artifacts/ui/palette/palette-A.png` (not committed).
 
 ### Palette
 
@@ -69,7 +87,10 @@ These rules make a screen read as one palette and express importance through typ
   - **External brand colors** (Kakao yellow, Naver green) appear only where the provider's guideline requires them, such as the Kakao login button. Secondary provider actions (Kakao share, open chat) are neutral icon buttons.
   - **Success, warning and points** colors appear only as text or an icon where the meaning is needed, never as a large background.
 - **P4. Cheer pink** is pending: either a separate cheer color limited by P3, or absorbed into the brand family.
-- **P5. One family per page.** Pending proposal: Lounge and Youth pages replace the brand family with their own three-step family (gold or violet), so blue and gold never share a page. Grays stay shared.
+- **P5. One family per page (decided 2026-10-22).** Lounge and Youth pages replace the brand family with their own three-step family, so blue never shares a page with gold or violet. The theme scope swaps the whole family, including the header and bottom-nav active state. Grays stay shared.
+  - Lounge gold: strong `#5c430d`, base `#d4a017` with near-black `#111827` text (white fails contrast on gold), link `#8b6814`, soft `#fbf4dd` / text `#6b4e0f`. Dark: strong `#f6e3ae`, link `#e8c463`, soft `#2b2414` / text `#f3d27a`.
+  - Youth violet: strong `#3b1a78`, base `#7c3aed` with white text, link `#6d28d9`, soft `#f3effe` / text `#5b21b6`. Dark: strong `#e4dbff`, link `#b8a2fb`, soft `#2a1660` / text `#d4c6ff`.
+  - Consequence of P1 (to confirm when Lounge is redesigned): Lounge category colors (lesson, youth club, training, tournament, brand, service) stop being separate families. A category is shown as text, or as a neutral badge if it must stand out.
 
 ### Hierarchy
 
@@ -78,6 +99,7 @@ These rules make a screen read as one palette and express importance through typ
 - **P8. Hierarchy through type, not color.** Order is name > key facts > description > secondary actions. Express it with size, weight and gray level (near-black → gray).
 - **P9. No chip or badge sprawl.** Prefer plain text for information. Use a filled chip or badge only for a state the user must notice, and only as the card's single accent (P7).
 - **P10. Same meaning, same shape.** Each kind of marker has one style. For example, all rank markers share one style regardless of rank, and all tags share one style.
+- **P11. Required boundaries are visible.** Field boundaries use `--pp-control-border` (≥3:1). Card, divider and chip borders are decorative and may stay light because their content identifies them.
 
 ## Components and recipes
 

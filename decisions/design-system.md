@@ -1,5 +1,16 @@
 # Use shared native UI primitives and recipes
 
+## Amendment 2026-10-22: palette A, one brand family per page
+
+- Status: accepted by user, 2026-10-22
+- Supersedes: the 2026-10-21 rule that Lounge gold and Youth violet appear only in badges, icons and accent lines.
+
+- **Palette:** A (Slate). Cool grays tinted toward the brand hue, near-black body text, and a three-step brand family (navy strong, `#2563eb` base, pale soft tint). Values are in `docs/design-system.md` → "Palette and hierarchy rules".
+- **Sections (P5):** each section is one brand family. Lounge pages use gold and Youth pages use violet in place of blue, including the header and bottom-nav active states. Blue never shares a page with gold or violet. Grays stay shared.
+- **Required boundaries:** field boundaries get their own `--pp-control-border` token with ≥3:1 non-text contrast. Decorative borders stay light.
+- **Logo:** the dark header logo's black box is removed by converting black to transparency. Replace it with an SVG when one is available.
+- **Pending:** cheer pink (keep a desaturated pink, or absorb it into the brand family) is decided together with the club-card design.
+
 ## Amendment 2026-10-21: restyle toward a calm, single-accent product UI
 
 - Status: accepted by user, 2026-10-21

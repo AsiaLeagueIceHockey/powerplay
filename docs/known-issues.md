@@ -26,10 +26,12 @@
 | --- | --- | --- | --- |
 | `/[locale]/youth`, `/youth/write`, `/youth/community/[id]` | 페이지 본문 | `profiles.parent_nickname` 자동 생성 | 승인된 학부모 또는 슈퍼유저이고 닉네임이 없을 때 |
 | `/[locale]/youth/community/[id]` | `getParentPostDetail` | `increment_parent_post_views` RPC (조회수 +1) | 로그인한 승인 학부모·슈퍼유저 |
-| `/[locale]/mypage/matches` | `getMyMatches` | 조건에 맞는 참가 신청을 `status: "canceled"`로 변경 | 로그인 |
-| `/[locale]/mypage/points/charge` | `getUserPendingMatches` | 조건에 맞는 참가 신청을 `status: "canceled"`로 변경 | 로그인 |
+| `/[locale]/mypage/matches` | `getMyMatches` | 조건에 맞는 참가 신청을 `status: "canceled"`로 변경 | 로그인; **디자인 작업 후 별도 검토** |
+| `/[locale]/mypage/points/charge` | `getUserPendingMatches` | 조건에 맞는 참가 신청을 `status: "canceled"`로 변경 | 로그인; **디자인 작업 후 별도 검토** |
 | `/[locale]/mypage/fortune` | `getDailyHockeyFortuneScreen` | 운세 결과 upsert, `viewed_at`·`signals` 갱신 | 로그인 |
 | `/[locale]/chat/[roomId]` | `markMessagesAsRead` | 메시지 `is_read: true` | 로그인한 채팅 참여자 |
 | `GET /api/cron/match-reminder` | 라우트 핸들러 | 경기 알림 발송과 로그 기록 | `x-cron-secret` 헤더가 일치할 때 |
+
+GET 요청이 참가 신청을 자동 취소하는 두 경로(`/mypage/matches`, `/mypage/points/charge`)는 디자인 작업이 끝난 뒤 별도로 검토한다(2026-10-22 결정). 페이지 조회만으로 신청 상태가 바뀌는 것이 의도된 동작인지 확인이 필요하다.
 
 익명 공개 화면(홈, 동호회, 링크장, 경기, 라운지, 클럽 찾기, About)은 렌더링 중 쓰기가 없다. 다만 브라우저에서 실행되는 서버 액션(투표, 라운지 노출·클릭 트래킹 등)은 POST로 나가므로 따로 막아야 한다.

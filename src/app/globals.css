@@ -75,6 +75,8 @@ body {
   --pp-text-muted: #71717a;
   --pp-border: #e4e4e7;
   --pp-border-strong: #d4d4d8;
+  /* Boundaries users must see (inputs, selects, textareas): >=3:1 against every surface they sit on. */
+  --pp-control-border: #86868f;
   /* Cards sit one step above the page (the page itself uses --pp-surface). */
   --pp-card: var(--pp-surface);
   --pp-card-border: var(--pp-border);
@@ -129,6 +131,7 @@ body {
   --color-pp-muted: var(--pp-text-muted);
   --color-pp-border: var(--pp-border);
   --color-pp-border-strong: var(--pp-border-strong);
+  --color-pp-control-border: var(--pp-control-border);
   --color-pp-card: var(--pp-card);
   --color-pp-card-border: var(--pp-card-border);
   --color-pp-accent: var(--pp-accent);
@@ -209,6 +212,7 @@ body {
     --pp-text-muted: #a1a1aa;
     --pp-border: #27272a;
     --pp-border-strong: #3f3f46;
+    --pp-control-border: #78787f;
     --pp-card: #222226;
     --pp-card-border: #34343b;
     --pp-success-text: #86efac;
@@ -236,6 +240,7 @@ body {
   --pp-text-muted: #71717a;
   --pp-border: #e4e4e7;
   --pp-border-strong: #d4d4d8;
+  --pp-control-border: #86868f;
   --pp-card: #ffffff;
   --pp-card-border: #e4e4e7;
   --pp-success-text: #15803d;
@@ -258,6 +263,7 @@ body {
   --pp-text-muted: #a1a1aa;
   --pp-border: #27272a;
   --pp-border-strong: #3f3f46;
+  --pp-control-border: #78787f;
   --pp-card: #222226;
   --pp-card-border: #34343b;
   --pp-success-text: #86efac;
@@ -340,7 +346,7 @@ body {
   min-width: 0;
   height: 44px;
   padding: 0 12px;
-  border: 1px solid var(--pp-border);
+  border: 1px solid var(--pp-control-border);
   border-radius: var(--pp-radius-control);
   background: var(--pp-surface);
   color: var(--pp-text);
