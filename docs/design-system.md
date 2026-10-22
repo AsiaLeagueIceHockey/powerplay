@@ -8,8 +8,8 @@ This is the **single source of UI rules** for ordinary user UI. `CLAUDE.md`, `AG
 2. **`className` is for layout only**: placement, width, flex/grid, visibility. Never set colors, font size, padding, radius, height or shadow on a shared control. Pick a documented option instead, or add a variant (rule 9).
 3. **Colors come from `pp-*` tokens** (`bg-pp-surface`, `text-pp-muted`, `border-pp-border`, `bg-pp-accent` …). Raw Tailwind palette classes and hex values are allowed in ordinary UI only as a recorded exception in `scripts/ui-policy.json`.
 4. **Do not pair a token with a `dark:` override** (for example `text-pp-text dark:text-white`). Tokens already resolve for dark mode.
-5. **One brand accent.** Primary actions, links, focus rings and selected states use the brand accent in every section. Lounge and Youth section colors appear only in badges, icons and accent lines.
-6. **Status, category, points, cheer and provider colors keep their meaning.** Use them for small marks (badges, icons, lines), not large fills.
+5. **One brand accent, used only for what can be pressed.** Primary actions, links, focus rings and selected states use the brand accent. See "Palette and hierarchy rules" P1–P6. Lounge and Youth section colors currently appear only in badges, icons and accent lines; P5 proposes a per-page family instead.
+6. **Status, category, points, cheer and provider colors are exceptions.** Use them only where their meaning is needed, as text or icons rather than large fills (P3, P4). Express hierarchy through type size, weight and gray level, not color (P7–P10).
 7. **Icon + label actions never wrap on mobile.** Shared buttons are `nowrap`; wrap the label in `actionLabelClass` so it truncates. Buttons in one group share size. Club detail actions reuse `components/club-detail-action-styles.ts`.
 8. **Clickable cards** apply `surfaceStyles({ interactive: true })` to the real link or button; hover and focus come from the recipe, never ad-hoc `hover:border-*` or `hover:shadow-*`. Static panels are not interactive.
 9. **A new variant ships together with** its implementation, gallery fixture, behavior test and an update to this guide.
@@ -51,6 +51,33 @@ The **Now** column is what the tokens implement today. The **Target** column is 
 | Home discovery | Clubs → Rinks → Matches, with equally compact club-finder banners and the monthly ranking disclosure | Same |
 
 Theme scopes must cover user routes outside `(public)`, including onboarding, chat rooms, fortune controls and the Lounge membership brochure. Global notification and install UI needs its own explicit scope because it is rendered in the locale layout. Administrator screens and export canvases must not pick up the public appearance by accident.
+
+## Palette and hierarchy rules (2026-10-22)
+
+These rules make a screen read as one palette and express importance through type rather than color. They apply to every ordinary user screen. Where a rule conflicts with "Rules at a glance" or the Visual direction table, this section wins once its pending decisions are settled.
+
+**Pending decisions:** the concrete palette values (candidates in `artifacts/ui/palette/`), cheer pink (keep or absorb into the brand family, rule P4) and the Lounge/Youth page-family proposal (rule P5). Until they are decided, the current tokens stay.
+
+### Palette
+
+- **P1. Four families per page.** A page uses at most four color families: white (background), gray (secondary text, borders, muted surfaces), near-black (body text) and one brand family. Each family can have several steps, but there is no fifth family except the exceptions in P3.
+- **P2. Tone on tone.** The four families must look related.
+  - The brand family has three lightness steps of one hue: **strong** (navy, for emphasized text and headers), **base** (blue `#2563eb`, for buttons and links) and **soft** (a pale tint, for selected-state backgrounds and brand badges).
+  - Grays and near-black are cool grays tinted toward the brand hue, not pure neutrals.
+- **P3. Exceptions are small and placed.**
+  - **Error red** marks error states only, slightly desaturated so it sits in the palette.
+  - **External brand colors** (Kakao yellow, Naver green) appear only where the provider's guideline requires them, such as the Kakao login button. Secondary provider actions (Kakao share, open chat) are neutral icon buttons.
+  - **Success, warning and points** colors appear only as text or an icon where the meaning is needed, never as a large background.
+- **P4. Cheer pink** is pending: either a separate cheer color limited by P3, or absorbed into the brand family.
+- **P5. One family per page.** Pending proposal: Lounge and Youth pages replace the brand family with their own three-step family (gold or violet), so blue and gold never share a page. Grays stay shared.
+
+### Hierarchy
+
+- **P6. Blue means pressable.** The brand base color is used only for things that can be pressed: buttons, links and selected controls. Non-interactive text, numbers and decorations do not use it.
+- **P7. One accent per card, one primary action per screen.** A card has at most one accent-colored element. A screen has one visually prominent primary action; other actions are secondary, ghost or text links.
+- **P8. Hierarchy through type, not color.** Order is name > key facts > description > secondary actions. Express it with size, weight and gray level (near-black → gray).
+- **P9. No chip or badge sprawl.** Prefer plain text for information. Use a filled chip or badge only for a state the user must notice, and only as the card's single accent (P7).
+- **P10. Same meaning, same shape.** Each kind of marker has one style. For example, all rank markers share one style regardless of rank, and all tags share one style.
 
 ## Components and recipes
 
