@@ -9,7 +9,10 @@
 - **Sections (P5):** each section is one brand family. Lounge pages use gold and Youth pages use violet in place of blue, including the header and bottom-nav active states. Blue never shares a page with gold or violet. Grays stay shared.
 - **Required boundaries:** field boundaries get their own `--pp-control-border` token with ≥3:1 non-text contrast. Decorative borders stay light.
 - **Logo:** the dark header logo's black box is removed by converting black to transparency. Replace it with an SVG when one is available.
-- **Pending:** cheer pink (keep a desaturated pink, or absorb it into the brand family) is decided together with the club-card design.
+- **Cheer (decided later the same day):** absorbed into the brand family (P4-2). The club card follows layout A (find-club first, vote as a 44px outline button).
+- **Home banners:** the carousel shows paid Lounge sponsors only, with the club's image when provided (navy fallback otherwise) and a "광고" label. PowerPlay's own Instagram and open-chat links leave the carousel for a quiet list at the end of the home lists. Sponsor and house banners are told apart by source, without a schema change. Image spec: `docs/lounge-home-banner-spec.md`.
+- **Bottom nav:** the Lounge tab's unconditional gold shimmer is removed. A future "new" signal would be a neutral dot.
+- **alert/confirm:** alert() may be replaced by a Toast in bulk; confirm() moves to an async dialog only per call site, and delete, cancel and payment flows only after tests (see the restyle plan, G8).
 
 ## Amendment 2026-10-21: restyle toward a calm, single-accent product UI
 
