@@ -67,18 +67,28 @@ body {
 
 /* PowerPlay UI tokens. Definitions are inert until an explicit pp-* recipe is used. */
 :root {
-  --pp-background: #f9fafb;
+  /* One neutral family (zinc) in light and dark. */
+  --pp-background: #fafafa;
   --pp-surface: #ffffff;
-  --pp-surface-muted: #f3f4f6;
-  --pp-text: #111827;
-  --pp-text-muted: #6b7280;
-  --pp-border: #e5e7eb;
+  --pp-surface-muted: #f4f4f5;
+  --pp-text: #18181b;
+  --pp-text-muted: #71717a;
+  --pp-border: #e4e4e7;
+  --pp-border-strong: #d4d4d8;
+  /* Cards sit one step above the page (the page itself uses --pp-surface). */
+  --pp-card: var(--pp-surface);
+  --pp-card-border: var(--pp-border);
+  /* The brand accent is the only interactive accent in every section. */
   --pp-accent: #2563eb;
   --pp-accent-hover: #1d4ed8;
   --pp-on-accent: #ffffff;
   --pp-accent-soft: #eff6ff;
   --pp-accent-text: #1d4ed8;
   --pp-focus: #3b82f6;
+  /* Section identity (Lounge gold, Youth violet) for badges, icons and accent lines only. */
+  --pp-section-accent: var(--pp-accent);
+  --pp-section-accent-soft: var(--pp-accent-soft);
+  --pp-section-accent-text: var(--pp-accent-text);
   --pp-success: #16a34a;
   --pp-success-text: #15803d;
   --pp-warning: #d97706;
@@ -91,8 +101,10 @@ body {
   --pp-cheer-text: #be185d;
   --pp-points: #f59e0b;
   --pp-navy: #172554;
-  --pp-radius-card: 12px;
-  --pp-radius-sheet: 24px;
+  --pp-radius-small: 6px;
+  --pp-radius-control: 8px;
+  --pp-radius-card: 8px;
+  --pp-radius-sheet: 12px;
   --pp-space-1: 4px;
   --pp-space-2: 8px;
   --pp-space-3: 12px;
@@ -100,8 +112,13 @@ body {
   --pp-space-5: 20px;
   --pp-space-6: 24px;
   --pp-space-8: 32px;
-  --pp-shadow-card: 0 1px 2px rgb(0 0 0 / 0.05);
-  --pp-shadow-hover: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --pp-space-10: 40px;
+  --pp-space-12: 48px;
+  --pp-space-16: 64px;
+  /* Resting cards are border-only; only overlays and popovers float. */
+  --pp-shadow-card: 0 0 #0000;
+  --pp-shadow-hover: 0 0 #0000;
+  --pp-shadow-overlay: 0 8px 24px -4px rgb(0 0 0 / 0.12), 0 2px 6px rgb(0 0 0 / 0.06);
 }
 
 @theme inline {
@@ -111,14 +128,22 @@ body {
   --color-pp-text: var(--pp-text);
   --color-pp-muted: var(--pp-text-muted);
   --color-pp-border: var(--pp-border);
+  --color-pp-border-strong: var(--pp-border-strong);
+  --color-pp-card: var(--pp-card);
+  --color-pp-card-border: var(--pp-card-border);
   --color-pp-accent: var(--pp-accent);
   --color-pp-accent-soft: var(--pp-accent-soft);
   --color-pp-accent-text: var(--pp-accent-text);
+  --color-pp-section: var(--pp-section-accent);
+  --color-pp-section-soft: var(--pp-section-accent-soft);
+  --color-pp-section-text: var(--pp-section-accent-text);
   --color-pp-success: var(--pp-success);
   --color-pp-warning: var(--pp-warning);
   --color-pp-danger: var(--pp-danger);
   --color-pp-cheer: var(--pp-cheer);
   --color-pp-navy: var(--pp-navy);
+  --radius-pp-small: var(--pp-radius-small);
+  --radius-pp-control: var(--pp-radius-control);
   --radius-pp-card: var(--pp-radius-card);
   --radius-pp-sheet: var(--pp-radius-sheet);
 }
@@ -155,32 +180,24 @@ body {
   --color-pp-info: var(--pp-info);
 }
 
-/* Theme scopes may nest; no admin or exported canvas is opted in implicitly. */
+/* Theme scopes may nest; no admin or exported canvas is opted in implicitly.
+   Sections only change the section accent; --pp-accent stays the brand blue everywhere. */
 .pp-ui[data-ui-theme="powerplay"], .pp-ui [data-ui-theme="powerplay"] {
-  --pp-accent: #2563eb;
-  --pp-accent-hover: #1d4ed8;
-  --pp-on-accent: #ffffff;
-  --pp-accent-soft: #eff6ff;
-  --pp-accent-text: #1d4ed8;
-  --pp-focus: #3b82f6;
+  --pp-section-accent: var(--pp-accent);
+  --pp-section-accent-soft: var(--pp-accent-soft);
+  --pp-section-accent-text: var(--pp-accent-text);
 }
 
 .pp-ui[data-ui-theme="lounge"], .pp-ui [data-ui-theme="lounge"] {
-  --pp-accent: #d4a017;
-  --pp-accent-hover: #bd8e14;
-  --pp-on-accent: #111827;
-  --pp-accent-soft: #fbf4dd;
-  --pp-accent-text: #8b6814;
-  --pp-focus: #d4a017;
+  --pp-section-accent: #d4a017;
+  --pp-section-accent-soft: #fbf4dd;
+  --pp-section-accent-text: #8b6814;
 }
 
 .pp-ui[data-ui-theme="youth"], .pp-ui [data-ui-theme="youth"] {
-  --pp-accent: #7c3aed;
-  --pp-accent-hover: #6d28d9;
-  --pp-on-accent: #ffffff;
-  --pp-accent-soft: #f5f3ff;
-  --pp-accent-text: #6d28d9;
-  --pp-focus: #8b5cf6;
+  --pp-section-accent: #7c3aed;
+  --pp-section-accent-soft: #f5f3ff;
+  --pp-section-accent-text: #6d28d9;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -188,9 +205,12 @@ body {
     --pp-background: #09090b;
     --pp-surface: #18181b;
     --pp-surface-muted: #27272a;
-    --pp-text: #f4f4f5;
+    --pp-text: #fafafa;
     --pp-text-muted: #a1a1aa;
-    --pp-border: #3f3f46;
+    --pp-border: #27272a;
+    --pp-border-strong: #3f3f46;
+    --pp-card: #222226;
+    --pp-card-border: #34343b;
     --pp-success-text: #86efac;
     --pp-warning-text: #fcd34d;
     --pp-danger-text: #fca5a5;
@@ -198,20 +218,26 @@ body {
     --pp-cheer-text: #f9a8d4;
     --pp-accent-soft: #172554;
     --pp-accent-text: #93c5fd;
+    --pp-shadow-overlay: 0 8px 24px -4px rgb(0 0 0 / 0.5), 0 0 0 1px rgb(255 255 255 / 0.04);
   }
-  .pp-ui[data-ui-theme="powerplay"], .pp-ui [data-ui-theme="powerplay"] { --pp-accent-soft: #172554; --pp-accent-text: #93c5fd; }
-  .pp-ui[data-ui-theme="lounge"], .pp-ui [data-ui-theme="lounge"] { --pp-accent-soft: #2b2414; --pp-accent-text: #f3d27a; }
-  .pp-ui[data-ui-theme="youth"], .pp-ui [data-ui-theme="youth"] { --pp-accent-soft: #2e1065; --pp-accent-text: #c4b5fd; }
+  .pp-ui[data-ui-theme="lounge"], .pp-ui [data-ui-theme="lounge"] { --pp-section-accent-soft: #2b2414; --pp-section-accent-text: #f3d27a; }
+  .pp-ui[data-ui-theme="youth"], .pp-ui [data-ui-theme="youth"] { --pp-section-accent-soft: #2e1065; --pp-section-accent-text: #c4b5fd; }
 }
 
 /* Explicit modes are for the fixture gallery; the product keeps the OS preference. */
 .pp-ui[data-ui-mode="light"], .pp-ui [data-ui-mode="light"] {
-  --pp-background: #f9fafb;
+  --pp-section-accent: var(--pp-accent);
+  --pp-section-accent-soft: var(--pp-accent-soft);
+  --pp-section-accent-text: var(--pp-accent-text);
+  --pp-background: #fafafa;
   --pp-surface: #ffffff;
-  --pp-surface-muted: #f3f4f6;
-  --pp-text: #111827;
-  --pp-text-muted: #6b7280;
-  --pp-border: #e5e7eb;
+  --pp-surface-muted: #f4f4f5;
+  --pp-text: #18181b;
+  --pp-text-muted: #71717a;
+  --pp-border: #e4e4e7;
+  --pp-border-strong: #d4d4d8;
+  --pp-card: #ffffff;
+  --pp-card-border: #e4e4e7;
   --pp-success-text: #15803d;
   --pp-warning-text: #92400e;
   --pp-danger-text: #b91c1c;
@@ -219,14 +245,21 @@ body {
   --pp-cheer-text: #be185d;
   --pp-accent-soft: #eff6ff;
   --pp-accent-text: #1d4ed8;
+  --pp-shadow-overlay: 0 8px 24px -4px rgb(0 0 0 / 0.12), 0 2px 6px rgb(0 0 0 / 0.06);
 }
 .pp-ui[data-ui-mode="dark"], .pp-ui [data-ui-mode="dark"] {
+  --pp-section-accent: var(--pp-accent);
+  --pp-section-accent-soft: var(--pp-accent-soft);
+  --pp-section-accent-text: var(--pp-accent-text);
   --pp-background: #09090b;
   --pp-surface: #18181b;
   --pp-surface-muted: #27272a;
-  --pp-text: #f4f4f5;
+  --pp-text: #fafafa;
   --pp-text-muted: #a1a1aa;
-  --pp-border: #3f3f46;
+  --pp-border: #27272a;
+  --pp-border-strong: #3f3f46;
+  --pp-card: #222226;
+  --pp-card-border: #34343b;
   --pp-success-text: #86efac;
   --pp-warning-text: #fcd34d;
   --pp-danger-text: #fca5a5;
@@ -234,11 +267,12 @@ body {
   --pp-cheer-text: #f9a8d4;
   --pp-accent-soft: #172554;
   --pp-accent-text: #93c5fd;
+  --pp-shadow-overlay: 0 8px 24px -4px rgb(0 0 0 / 0.5), 0 0 0 1px rgb(255 255 255 / 0.04);
 }
-.pp-ui[data-ui-mode="light"][data-ui-theme="lounge"], .pp-ui [data-ui-mode="light"][data-ui-theme="lounge"], .pp-ui[data-ui-mode="light"] [data-ui-theme="lounge"] { --pp-accent-soft: #fbf4dd; --pp-accent-text: #8b6814; }
-.pp-ui[data-ui-mode="light"][data-ui-theme="youth"], .pp-ui [data-ui-mode="light"][data-ui-theme="youth"], .pp-ui[data-ui-mode="light"] [data-ui-theme="youth"] { --pp-accent-soft: #f5f3ff; --pp-accent-text: #6d28d9; }
-.pp-ui[data-ui-mode="dark"][data-ui-theme="lounge"], .pp-ui [data-ui-mode="dark"][data-ui-theme="lounge"], .pp-ui[data-ui-mode="dark"] [data-ui-theme="lounge"] { --pp-accent-soft: #2b2414; --pp-accent-text: #f3d27a; }
-.pp-ui[data-ui-mode="dark"][data-ui-theme="youth"], .pp-ui [data-ui-mode="dark"][data-ui-theme="youth"], .pp-ui[data-ui-mode="dark"] [data-ui-theme="youth"] { --pp-accent-soft: #2e1065; --pp-accent-text: #c4b5fd; }
+.pp-ui[data-ui-mode="light"][data-ui-theme="lounge"], .pp-ui [data-ui-mode="light"][data-ui-theme="lounge"], .pp-ui[data-ui-mode="light"] [data-ui-theme="lounge"] { --pp-section-accent: #d4a017; --pp-section-accent-soft: #fbf4dd; --pp-section-accent-text: #8b6814; }
+.pp-ui[data-ui-mode="light"][data-ui-theme="youth"], .pp-ui [data-ui-mode="light"][data-ui-theme="youth"], .pp-ui[data-ui-mode="light"] [data-ui-theme="youth"] { --pp-section-accent: #7c3aed; --pp-section-accent-soft: #f5f3ff; --pp-section-accent-text: #6d28d9; }
+.pp-ui[data-ui-mode="dark"][data-ui-theme="lounge"], .pp-ui [data-ui-mode="dark"][data-ui-theme="lounge"], .pp-ui[data-ui-mode="dark"] [data-ui-theme="lounge"] { --pp-section-accent: #d4a017; --pp-section-accent-soft: #2b2414; --pp-section-accent-text: #f3d27a; }
+.pp-ui[data-ui-mode="dark"][data-ui-theme="youth"], .pp-ui [data-ui-mode="dark"][data-ui-theme="youth"], .pp-ui[data-ui-mode="dark"] [data-ui-theme="youth"] { --pp-section-accent: #7c3aed; --pp-section-accent-soft: #2e1065; --pp-section-accent-text: #c4b5fd; }
 
 .pp-button, .pp-filter-chip, .pp-segmented-item {
   display: inline-flex;
@@ -265,7 +299,7 @@ body {
   height: var(--pp-button-height);
   padding: 0 16px;
   border-color: var(--pp-button-border);
-  border-radius: var(--pp-radius-card);
+  border-radius: var(--pp-radius-control);
   background: var(--pp-button-bg);
   color: var(--pp-button-text);
   font-size: 14px;
@@ -275,14 +309,14 @@ body {
 .pp-button-club { --pp-button-height: 46px; gap: 6px; padding-inline: 12px; font-size: 13px; font-weight: 700; line-height: 1; letter-spacing: -0.01em; }
 @media (min-width: 640px) { .pp-button-club { padding-inline: 16px; } }
 .pp-button-secondary { --pp-button-bg: var(--pp-accent-soft); --pp-button-hover: color-mix(in srgb, var(--pp-accent) 18%, var(--pp-surface)); --pp-button-text: var(--pp-accent-text); }
-.pp-button-navy { --pp-button-bg: #172554; --pp-button-hover: #1e3a8a; --pp-button-text: #ffffff; }
+.pp-button-navy { --pp-button-bg: var(--pp-navy); --pp-button-hover: color-mix(in srgb, var(--pp-navy) 80%, #fff); --pp-button-text: #ffffff; }
 .pp-button-outline { --pp-button-bg: var(--pp-surface); --pp-button-hover: var(--pp-surface-muted); --pp-button-text: var(--pp-text); --pp-button-border: var(--pp-border); }
 .pp-button-ghost { --pp-button-bg: transparent; --pp-button-hover: var(--pp-surface-muted); --pp-button-text: var(--pp-text-muted); }
-.pp-button-danger { --pp-button-bg: var(--pp-danger); --pp-button-hover: #b91c1c; --pp-button-text: #ffffff; }
-.pp-button-success { --pp-button-bg: var(--pp-success); --pp-button-hover: #15803d; --pp-button-text: #ffffff; }
-.pp-button-warning { --pp-button-bg: var(--pp-warning); --pp-button-hover: #b45309; --pp-button-text: #ffffff; }
-.pp-button-cheer { --pp-button-bg: var(--pp-cheer); --pp-button-hover: #be185d; --pp-button-text: #ffffff; }
-.pp-button-points { --pp-button-bg: var(--pp-points); --pp-button-hover: #d97706; --pp-button-text: #111827; }
+.pp-button-danger { --pp-button-bg: var(--pp-danger); --pp-button-hover: color-mix(in srgb, var(--pp-danger) 86%, #000); --pp-button-text: #ffffff; }
+.pp-button-success { --pp-button-bg: var(--pp-success); --pp-button-hover: color-mix(in srgb, var(--pp-success) 86%, #000); --pp-button-text: #ffffff; }
+.pp-button-warning { --pp-button-bg: var(--pp-warning); --pp-button-hover: color-mix(in srgb, var(--pp-warning) 86%, #000); --pp-button-text: #ffffff; }
+.pp-button-cheer { --pp-button-bg: var(--pp-cheer); --pp-button-hover: color-mix(in srgb, var(--pp-cheer) 86%, #000); --pp-button-text: #ffffff; }
+.pp-button-points { --pp-button-bg: var(--pp-points); --pp-button-hover: color-mix(in srgb, var(--pp-points) 86%, #000); --pp-button-text: #111827; }
 .pp-button-kakao { --pp-button-bg: #fee500; --pp-button-hover: #fada0a; --pp-button-text: #191919; }
 .pp-button-naver { --pp-button-bg: #03c75a; --pp-button-hover: #02b350; --pp-button-text: #ffffff; }
 .pp-icon-button, .pp-button-circle { width: var(--pp-button-height); padding: 0; }
@@ -307,7 +341,7 @@ body {
   height: 44px;
   padding: 0 12px;
   border: 1px solid var(--pp-border);
-  border-radius: var(--pp-radius-card);
+  border-radius: var(--pp-radius-control);
   background: var(--pp-surface);
   color: var(--pp-text);
   font-family: inherit;
@@ -329,21 +363,21 @@ body {
 .pp-field-error { color: var(--pp-danger-text); }
 
 .pp-surface {
-  border: 1px solid var(--pp-border);
+  border: 1px solid var(--pp-card-border);
   border-radius: var(--pp-radius-card);
-  background: var(--pp-surface);
+  background: var(--pp-card);
   color: var(--pp-text);
   box-shadow: var(--pp-shadow-card);
 }
 .pp-surface-none { padding: 0; }
-.pp-surface-compact { padding: 12px; }
-.pp-surface-default { padding: 16px; }
-.pp-surface-comfortable { padding: 20px; }
-.pp-surface-roomy { padding: 24px; }
+.pp-surface-compact { padding: 16px; }
+.pp-surface-default { padding: 20px; }
+.pp-surface-comfortable { padding: 24px; }
+.pp-surface-roomy { padding: 32px; }
 .pp-surface-muted-content { background: var(--pp-surface-muted); color: var(--pp-text-muted); }
 .pp-surface-interactive { transition: border-color 150ms, box-shadow 150ms; }
 @media (hover: hover) {
-  .pp-surface-interactive:hover { border-color: var(--pp-focus); box-shadow: var(--pp-shadow-hover); }
+  .pp-surface-interactive:hover { border-color: var(--pp-border-strong); box-shadow: var(--pp-shadow-hover); }
 }
 .pp-surface-interactive:focus-visible { border-color: var(--pp-focus); box-shadow: var(--pp-shadow-hover); }
 
@@ -354,7 +388,7 @@ body {
   align-items: center;
   gap: 4px;
   border-radius: 9999px;
-  padding: 4px 8px;
+  padding: 3px 8px;
   background: var(--pp-badge-bg);
   color: var(--pp-badge-color);
   font-size: 11px;
@@ -362,7 +396,7 @@ body {
   font-weight: 600;
   white-space: nowrap;
 }
-.pp-badge-brand { --pp-badge-color: var(--pp-accent-text); --pp-badge-bg: var(--pp-accent-soft); }
+.pp-badge-brand { --pp-badge-color: var(--pp-section-accent-text); --pp-badge-bg: var(--pp-section-accent-soft); }
 .pp-badge-success { --pp-badge-color: var(--pp-success-text); --pp-badge-bg: color-mix(in srgb, var(--pp-success) 12%, var(--pp-surface)); }
 .pp-badge-warning { --pp-badge-color: var(--pp-warning-text); --pp-badge-bg: color-mix(in srgb, var(--pp-warning) 12%, var(--pp-surface)); }
 .pp-badge-danger { --pp-badge-color: var(--pp-danger-text); --pp-badge-bg: color-mix(in srgb, var(--pp-danger) 12%, var(--pp-surface)); }
@@ -371,7 +405,7 @@ body {
 
 .pp-filter-chip {
   min-height: 36px;
-  padding: 7px 12px;
+  padding: 7px 14px;
   border-color: var(--pp-border);
   border-radius: 9999px;
   background: var(--pp-surface);
@@ -379,18 +413,18 @@ body {
   font-size: 12px;
 }
 .pp-filter-chip.pp-selected { border-color: var(--pp-accent); background: var(--pp-accent-soft); color: var(--pp-accent-text); }
-.pp-filter-row { justify-content: flex-start; border-radius: var(--pp-radius-card); padding: 12px 16px; white-space: normal; text-align: start; font-size: 14px; }
-.pp-filter-date { flex-direction: column; gap: 4px; min-height: 64px; border-radius: var(--pp-radius-card); padding: 8px 12px; }
-.pp-segmented-control { display: inline-flex; gap: 4px; min-width: 0; padding: 4px; border: 1px solid var(--pp-border); border-radius: var(--pp-radius-card); background: var(--pp-surface-muted); }
-.pp-segmented-item { min-height: 36px; padding: 7px 12px; border-radius: 8px; background: transparent; color: var(--pp-text-muted); font-size: 12px; }
-.pp-segmented-item.pp-selected { background: var(--pp-surface); color: var(--pp-accent-text); box-shadow: var(--pp-shadow-card); }
+.pp-filter-row { justify-content: flex-start; border-radius: var(--pp-radius-control); padding: 12px 16px; white-space: normal; text-align: start; font-size: 14px; }
+.pp-filter-date { flex-direction: column; gap: 4px; min-height: 64px; border-radius: var(--pp-radius-control); padding: 8px 12px; }
+.pp-segmented-control { display: inline-flex; gap: 4px; min-width: 0; padding: 4px; border: 1px solid var(--pp-border); border-radius: var(--pp-radius-control); background: var(--pp-surface-muted); }
+.pp-segmented-item { min-height: 36px; padding: 7px 14px; border-radius: var(--pp-radius-small); background: transparent; color: var(--pp-text-muted); font-size: 12px; }
+.pp-segmented-item.pp-selected { background: var(--pp-surface); color: var(--pp-text); box-shadow: 0 0 0 1px var(--pp-border); }
 .pp-section-tab { min-height: 48px; border-radius: 0; font-size: 16px; }
 .pp-section-tab.pp-selected { background: transparent; color: var(--pp-text); box-shadow: none; font-weight: 700; }
 @media (hover: hover) {
   .pp-filter-chip:hover:not(:disabled):not(.pp-selected), .pp-segmented-item:hover:not(:disabled):not(.pp-selected) { background: var(--pp-surface-muted); color: var(--pp-text); }
 }
 
-.pp-overlay-surface { border: 1px solid var(--pp-border); background: var(--pp-surface); color: var(--pp-text); box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1); }
+.pp-overlay-surface { border: 1px solid var(--pp-border); background: var(--pp-surface); color: var(--pp-text); box-shadow: var(--pp-shadow-overlay); }
 .pp-overlay-modal { border-radius: var(--pp-radius-sheet); }
 .pp-overlay-sheet { border-radius: var(--pp-radius-sheet) var(--pp-radius-sheet) 0 0; }
 .pp-text-title { font-size: 24px; line-height: 1.3; font-weight: 700; }

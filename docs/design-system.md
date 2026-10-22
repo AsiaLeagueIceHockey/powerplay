@@ -37,12 +37,12 @@ The **Now** column is what the tokens implement today. The **Target** column is 
 
 | Role | Target | Now |
 | --- | --- | --- |
-| Brand accent | `#2563eb` (hover `#1d4ed8`) for every section's primary actions, links, focus and selection | `#2563eb` in PowerPlay. Lounge and Youth scopes still swap `--pp-accent` to gold and violet |
-| Section themes | Lounge ice gold `#d4a017` / `#f3d27a` and Youth violet `#7c3aed` exposed as a separate section accent, used only in badges, icons and accent lines | Applied through `--pp-accent`, so buttons, chips and focus also turn gold or violet |
-| Neutrals | One gray family for background, surface, muted surface, border and text in light and dark | Light uses Tailwind gray (`#f9fafb`, `#e5e7eb`, `#6b7280`); dark uses zinc |
-| Radius | Controls and cards 8px, small elements (badges, chips, segmented items) 6px, modal and sheet 12px; pills, avatars and circles stay full | 12px for controls and cards, 24px for modal and sheet |
-| Shadow | Resting cards have a border only; hover changes the border color. Overlays and popovers get one small shadow | Cards have a resting shadow, hover adds a medium shadow, overlays have an xl shadow |
-| Spacing | 4px-based scale (4, 8, 12, 16, 20, 24, 32, 40, 48, 64). More generous defaults for page padding, section gap and card padding | Scale defined up to 32px, but unused; padding is chosen per file |
+| Brand accent | `#2563eb` (hover `#1d4ed8`) for every section's primary actions, links, focus and selection | Done in tokens: `--pp-accent` is `#2563eb` in every scope. Components with hard-coded colors change in stage ③ |
+| Section themes | Lounge ice gold `#d4a017` / `#f3d27a` and Youth violet `#7c3aed` exposed as a separate section accent, used only in badges, icons and accent lines | Done in tokens: `--pp-section-accent(-soft/-text)`, used by the `brand` badge. `lounge-theme.ts` hex classes remain until stage ③ |
+| Neutrals | One gray family for background, surface, muted surface, border and text in light and dark | Zinc in both modes: light `#fafafa` / `#ffffff` / `#f4f4f5` / border `#e4e4e7` / text `#18181b` / muted `#71717a`. Dark cards use `--pp-card` `#222226` with border `#34343b`, one step above the `#18181b` page |
+| Radius | Controls and cards 8px, segmented items 6px, modal and sheet 12px. Chips and badges stay pill-shaped so they read differently from buttons; avatars and circles stay full | Done in tokens (`--pp-radius-control/card` 8px, `--pp-radius-small` 6px, `--pp-radius-sheet` 12px, chips and badges pill). Hard-coded `rounded-*` classes change in stage ③ |
+| Shadow | Resting cards have a border only; hover changes the border color. Overlays and popovers get one small shadow | Done in tokens (`--pp-shadow-card/hover` none, `--pp-shadow-overlay`). Hard-coded `shadow-*` classes change in stage ③ |
+| Spacing | 4px-based scale (4, 8, 12, 16, 20, 24, 32, 40, 48, 64). More generous defaults for page padding, section gap and card padding | Scale defined up to 64px; Surface densities widened to 16/20/24/32. Page and section spacing tokens arrive in stage ② |
 | Control sizes | Compact 36px, default 44px, large CTA 56px (touch targets). Club actions 46px with 18px icons and one-line labels | Same |
 | Typography | Token scale caption 12, body 14, body-lg 16, heading 18, title 24, display 30, plus a micro step (11px) for dense metadata. Weights 400, 500, 600, 700 only | Four `pp-text-*` classes; ad-hoc sizes include `text-[10px]` and `text-[11px]`; weights 400–900 |
 | Theme preference | OS light/dark only | Same |

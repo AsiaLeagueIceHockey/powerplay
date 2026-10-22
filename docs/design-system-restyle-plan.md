@@ -24,8 +24,9 @@
 | --- | --- | --- |
 | 1a | 회색 계열 통일 | 라이트도 다크처럼 zinc 계열로 맞춘다. background `#fafafa`, surface `#ffffff`, surface-muted `#f4f4f5`, border `#e4e4e7`, text `#18181b`, muted `#71717a`. hover용 `--pp-border-strong`을 추가한다 |
 | 1b | 액센트 분리 | 모든 스코프에서 `--pp-accent`는 `#2563eb`로 고정한다. Lounge와 Youth는 새 `--pp-section-accent`, `--pp-section-accent-soft`, `--pp-section-accent-text`만 바꾼다. `brand` 배지와 강조선은 section accent를 쓰고, 버튼·칩·포커스 링은 파랑으로 통일된다 |
-| 1c | radius | 컨트롤과 카드 8px, 배지·칩·세그먼트 아이템 6px, 모달·시트 12px. 원형과 pill은 명시적인 shape 옵션일 때만 쓴다 |
+| 1c | radius | 컨트롤과 카드 8px, 세그먼트 아이템 6px, 모달·시트 12px. 칩·배지는 버튼과 구분되도록 pill을 유지한다 (2026-10-22 결정) |
 | 1d | 그림자 | 평상시 카드는 테두리만 둔다. hover는 테두리 색만 바꾼다. 오버레이와 팝오버에만 작은 그림자 하나(`--pp-shadow-overlay`)를 쓴다 |
+| 1d' | 다크 카드 구분 | 페이지가 `--pp-surface`를 쓰므로 카드 전용 `--pp-card`(다크 `#222226`)와 `--pp-card-border`(다크 `#34343b`)를 두어 카드를 한 단계 띄운다 (2026-10-22 결정) |
 | 1e | 여백 | Surface density를 한 단계씩 넓힌다(compact 12→16, default 16→20, comfortable 20→24, roomy 24→32). 세그먼트와 칩의 좌우 패딩도 조금 늘린다. 컨트롤 높이(36/44/56, 클럽 46)는 유지한다 |
 | 1f | 토큰 정리 | `.pp-button-*`의 hover hex와 navy 하드코딩을 `color-mix` 기반 토큰으로 바꾼다 |
 | 1g | 검증 갱신 | `scripts/ui-visual.ts`의 기대값(섹션별 accent, background RGB)과 `docs/design-system.md`의 Now 열을 새 값으로 갱신한다 |
@@ -35,6 +36,8 @@
 **알려진 한계 (① 단계에서는 정상):**
 - 컴포넌트에 직접 적힌 `rounded-2xl`, `shadow-lg`, raw 색상, `lounge-theme.ts`의 금색 hex는 ③ 전까지 그대로 남는다. 그래서 파일럿 화면은 "토큰이 닿는 부분만" 바뀐 중간 상태로 보인다.
 - 1b 때문에 라운지와 청소년 화면의 기본 버튼과 선택 칩이 파랑으로 바뀐다. 의도된 변화다.
+
+**상태:** 2026-10-22 사용자 승인, 커밋 완료. 회색 계열과 팔레트는 "팔레트·위계 규칙" 작업에서 다시 정한다.
 
 **완료 조건:** 사용자 승인. `ui:check`, `ui:test`, `ui:visual`, typecheck 통과. 관리자와 내보내기 캔버스의 외형 변화 없음(isolation 테스트). 커밋 1개.
 
@@ -83,6 +86,4 @@
 
 | 항목 | 기본안 | 대안 |
 | --- | --- | --- |
-| 회색 계열 | zinc (다크와 동일, Vercel·Linear와 가까운 무채색) | neutral (완전 무채색), slate (푸른 기, Stripe 느낌) |
-| 칩·배지 모양 | 6px 라운드 사각 | pill 유지 |
 | 파일럿 이후 반영 방식 | 승인 후 ① 커밋, ②부터 순차 진행 | ①을 피처 플래그로 감싸 일부 화면만 먼저 반영 |
