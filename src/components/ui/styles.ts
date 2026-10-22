@@ -19,6 +19,11 @@ export function iconButtonStyles({ variant = "ghost", size = "default", shape = 
   return uiClassNames(buttonStyles({ variant, size, shape }), "pp-icon-button");
 }
 
+/** Text link (P6: blue means pressable). tone "muted" for a secondary link next to a stronger accent. */
+export function linkStyles({ tone = "brand" }: { tone?: "brand" | "muted" } = {}) {
+  return uiClassNames("pp-link", tone === "muted" && "pp-link-muted");
+}
+
 export function surfaceStyles({ interactive = false, density = "default", tone = "default" }: { interactive?: boolean; density?: SurfaceDensity; tone?: "default" | "muted" } = {}) {
   return uiClassNames("pp-surface", `pp-surface-${density}`, tone === "muted" && "pp-surface-muted-content", interactive && "pp-surface-interactive");
 }

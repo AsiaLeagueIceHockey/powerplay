@@ -3,6 +3,7 @@
 import { Link } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { ChevronRight } from "lucide-react";
+import { buttonStyles } from "@/components/ui/styles";
 
 export function FindClubBanner() {
   const t = useTranslations("findClub");
@@ -10,18 +11,17 @@ export function FindClubBanner() {
   return (
     <Link
       href="/find-club"
-      className="block w-full overflow-hidden rounded-xl bg-[#1e3a6e] px-4 py-2.5 shadow-sm transition-opacity hover:opacity-90"
+      // The single primary action of the clubs home (P7); same compact height on every home tab.
+      className={`${buttonStyles({ variant: "primary", size: "default", fullWidth: true })} justify-between`}
     >
-      <div className="flex items-center justify-between gap-2">
-        <h2 className="flex min-w-0 items-center gap-1.5 text-sm font-semibold text-white">
-          <span>{t("title")}</span>
-          <span aria-hidden="true">🏒</span>
-        </h2>
-        <div className="flex shrink-0 items-center gap-1 whitespace-nowrap text-[11px] text-white/80">
-          <span className="hidden sm:inline">{t("bannerHint")}</span>
-          <ChevronRight className="h-3 w-3 text-white/80" aria-hidden="true" />
-        </div>
-      </div>
+      <h2 className="flex min-w-0 items-center gap-1.5 truncate text-sm font-semibold">
+        <span className="truncate">{t("title")}</span>
+        <span aria-hidden="true">🏒</span>
+      </h2>
+      <span className="flex shrink-0 items-center gap-1 whitespace-nowrap text-xs font-medium opacity-80">
+        <span className="hidden sm:inline">{t("bannerHint")}</span>
+        <ChevronRight className="h-4 w-4" aria-hidden="true" />
+      </span>
     </Link>
   );
 }

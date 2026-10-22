@@ -7,7 +7,7 @@ import { Button, IconButton, LinkButton } from "@/components/ui/button";
 import { Field, Input, Select, Textarea } from "@/components/ui/field";
 import { FilterChip } from "@/components/ui/filter-chip";
 import { SegmentedControl, SegmentedItem } from "@/components/ui/segmented-control";
-import { badgeStyles, buttonStyles, iconButtonStyles, overlayStyles, surfaceStyles } from "@/components/ui/styles";
+import { badgeStyles, buttonStyles, iconButtonStyles, linkStyles, overlayStyles, surfaceStyles } from "@/components/ui/styles";
 
 vi.mock("@/i18n/navigation", () => ({ Link: ({ prefetch, ...props }: ComponentProps<"a"> & { prefetch?: boolean }) => { void prefetch; return <a {...props} />; } }));
 afterEach(cleanup);
@@ -105,5 +105,7 @@ describe("native design-system controls", () => {
     // Icon-only controls drop text padding and stay square (or circular) at the chosen size.
     expect(iconButtonStyles()).toBe("pp-button pp-button-ghost pp-button-default pp-icon-button");
     expect(iconButtonStyles({ variant: "outline", size: "compact", shape: "circle" })).toBe("pp-button pp-button-outline pp-button-compact pp-button-circle pp-icon-button");
+    expect(linkStyles()).toBe("pp-link");
+    expect(linkStyles({ tone: "muted" })).toBe("pp-link pp-link-muted");
   });
 });

@@ -39,10 +39,11 @@ async function main() {
         });
         assert(measures.width <= measures.viewport, `Horizontal overflow: ${theme}/${locale}/${mode}/${viewport.width}`);
         assert.deepEqual(measures.sizes, [36, 44, 56]);
-        // One brand accent everywhere; sections only change their badge/icon/accent-line color.
-        assert.equal(measures.accent, "#2563eb");
-        if (theme !== "powerplay") assert.equal(measures.sectionAccent, { lounge: "#d4a017", youth: "#7c3aed" }[theme]);
-        assert.equal(measures.background, mode === "dark" ? "rgb(9, 9, 11)" : "rgb(250, 250, 250)");
+        // P5: each section is one brand family; the section accent always equals the page accent.
+        const family = { powerplay: "#2563eb", lounge: "#d4a017", youth: "#7c3aed" }[theme];
+        assert.equal(measures.accent, family);
+        assert.equal(measures.sectionAccent, family);
+        assert.equal(measures.background, mode === "dark" ? "rgb(14, 17, 22)" : "rgb(248, 250, 252)");
         assert.equal(await page.locator('[aria-invalid="true"]').count(), 1);
         assert.equal(await page.locator('button[aria-busy="true"]:disabled').count(), 1);
         await page.getByRole("button", { name: locale === "ko" ? "선택됨" : "Selected", exact: true }).click();

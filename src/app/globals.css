@@ -65,43 +65,47 @@ body {
   /* iOS 11.2+ */
 }
 
-/* PowerPlay UI tokens. Definitions are inert until an explicit pp-* recipe is used. */
+/* PowerPlay UI tokens. Palette A (Slate) + one brand family per page (P5); values and rules: docs/design-system.md. */
 :root {
-  /* One neutral family (zinc) in light and dark. */
-  --pp-background: #fafafa;
+  /* Cool grays tinted toward the brand hue; near-black body text. */
+  --pp-background: #f8fafc;
   --pp-surface: #ffffff;
-  --pp-surface-muted: #f4f4f5;
-  --pp-text: #18181b;
-  --pp-text-muted: #71717a;
-  --pp-border: #e4e4e7;
-  --pp-border-strong: #d4d4d8;
+  --pp-surface-muted: #f1f5f9;
+  --pp-text: #0f172a;
+  --pp-text-muted: #64748b;
+  --pp-border: #e2e8f0;
+  --pp-border-strong: #cbd5e1;
   /* Boundaries users must see (inputs, selects, textareas): >=3:1 against every surface they sit on. */
-  --pp-control-border: #86868f;
+  --pp-control-border: #7f8ea3;
   /* Cards sit one step above the page (the page itself uses --pp-surface). */
-  --pp-card: var(--pp-surface);
-  --pp-card-border: var(--pp-border);
-  /* The brand accent is the only interactive accent in every section. */
+  --pp-card: #ffffff;
+  --pp-card-border: #e2e8f0;
+  /* Brand family: strong (emphasis text, headers) / base (pressable) / soft (selected, brand badge). */
+  --pp-brand-strong: #172554;
   --pp-accent: #2563eb;
   --pp-accent-hover: #1d4ed8;
   --pp-on-accent: #ffffff;
   --pp-accent-soft: #eff6ff;
-  --pp-accent-text: #1d4ed8;
-  --pp-focus: #3b82f6;
-  /* Section identity (Lounge gold, Youth violet) for badges, icons and accent lines only. */
+  --pp-accent-text: #1e40af;
+  --pp-link: #2563eb;
+  --pp-focus: #2563eb;
   --pp-section-accent: var(--pp-accent);
   --pp-section-accent-soft: var(--pp-accent-soft);
   --pp-section-accent-text: var(--pp-accent-text);
-  --pp-success: #16a34a;
-  --pp-success-text: #15803d;
-  --pp-warning: #d97706;
-  --pp-warning-text: #92400e;
-  --pp-danger: #dc2626;
-  --pp-danger-text: #b91c1c;
+  /* Cheer is absorbed into the page's brand family (P4-2). */
+  --pp-cheer: var(--pp-accent);
+  --pp-cheer-text: var(--pp-accent-text);
+  /* Exceptions (P3): small, placed, text or icon only. */
+  --pp-success: #2f7d4f;
+  --pp-success-text: #2f7d4f;
+  --pp-warning: #b7791f;
+  --pp-warning-text: #8a5a12;
+  --pp-danger: #c0392f;
+  --pp-danger-text: #c0392f;
   --pp-info: #2563eb;
-  --pp-info-text: #1d4ed8;
-  --pp-cheer: #db2777;
-  --pp-cheer-text: #be185d;
+  --pp-info-text: #1e40af;
   --pp-points: #f59e0b;
+  /* Fixed dark-navy surface (finder/banner fills); stays navy in dark mode. */
   --pp-navy: #172554;
   --pp-radius-small: 6px;
   --pp-radius-control: 8px;
@@ -134,9 +138,11 @@ body {
   --color-pp-control-border: var(--pp-control-border);
   --color-pp-card: var(--pp-card);
   --color-pp-card-border: var(--pp-card-border);
+  --color-pp-brand-strong: var(--pp-brand-strong);
   --color-pp-accent: var(--pp-accent);
   --color-pp-accent-soft: var(--pp-accent-soft);
   --color-pp-accent-text: var(--pp-accent-text);
+  --color-pp-link: var(--pp-link);
   --color-pp-section: var(--pp-section-accent);
   --color-pp-section-soft: var(--pp-section-accent-soft);
   --color-pp-section-text: var(--pp-section-accent-text);
@@ -151,7 +157,7 @@ body {
   --radius-pp-sheet: var(--pp-radius-sheet);
 }
 
-/* Status colors retain meaning across themes and explicit fixture modes. */
+/* Soft status fills are derived per scope so they follow the page family and mode. */
 :root, .pp-ui {
   --pp-success-soft: color-mix(in srgb, var(--pp-success) 12%, var(--pp-surface));
   --pp-success-border: color-mix(in srgb, var(--pp-success) 35%, var(--pp-surface));
@@ -183,102 +189,116 @@ body {
   --color-pp-info: var(--pp-info);
 }
 
-/* Theme scopes may nest; no admin or exported canvas is opted in implicitly.
-   Sections only change the section accent; --pp-accent stays the brand blue everywhere. */
-.pp-ui[data-ui-theme="powerplay"], .pp-ui [data-ui-theme="powerplay"] {
+/* P5: a section scope swaps the whole brand family, so blue never shares a page with gold or violet.
+   Scopes may nest; no admin or exported canvas is opted in implicitly. */
+.pp-ui[data-ui-theme="powerplay"], .pp-ui [data-ui-theme="powerplay"],
+.pp-ui[data-ui-theme="lounge"], .pp-ui [data-ui-theme="lounge"],
+.pp-ui[data-ui-theme="youth"], .pp-ui [data-ui-theme="youth"] {
   --pp-section-accent: var(--pp-accent);
   --pp-section-accent-soft: var(--pp-accent-soft);
   --pp-section-accent-text: var(--pp-accent-text);
+  --pp-cheer: var(--pp-accent);
+  --pp-cheer-text: var(--pp-accent-text);
 }
-
 .pp-ui[data-ui-theme="lounge"], .pp-ui [data-ui-theme="lounge"] {
-  --pp-section-accent: #d4a017;
-  --pp-section-accent-soft: #fbf4dd;
-  --pp-section-accent-text: #8b6814;
+  /* White fails contrast on gold, so the base carries near-black text and links use the deeper gold. */
+  --pp-brand-strong: #5c430d;
+  --pp-accent: #d4a017;
+  --pp-accent-hover: #bd8e14;
+  --pp-on-accent: #111827;
+  --pp-accent-soft: #fbf4dd;
+  --pp-accent-text: #6b4e0f;
+  --pp-link: #8b6814;
+  --pp-focus: #8b6814;
 }
-
 .pp-ui[data-ui-theme="youth"], .pp-ui [data-ui-theme="youth"] {
-  --pp-section-accent: #7c3aed;
-  --pp-section-accent-soft: #f5f3ff;
-  --pp-section-accent-text: #6d28d9;
+  --pp-brand-strong: #3b1a78;
+  --pp-accent: #7c3aed;
+  --pp-accent-hover: #6d28d9;
+  --pp-on-accent: #ffffff;
+  --pp-accent-soft: #f3effe;
+  --pp-accent-text: #5b21b6;
+  --pp-link: #6d28d9;
+  --pp-focus: #6d28d9;
 }
 
+/* Dark: a near-neutral cool dark (saturation ~20%) rather than slate navy. */
 @media (prefers-color-scheme: dark) {
   :root {
-    --pp-background: #09090b;
-    --pp-surface: #18181b;
-    --pp-surface-muted: #27272a;
-    --pp-text: #fafafa;
-    --pp-text-muted: #a1a1aa;
-    --pp-border: #27272a;
-    --pp-border-strong: #3f3f46;
-    --pp-control-border: #78787f;
-    --pp-card: #222226;
-    --pp-card-border: #34343b;
-    --pp-success-text: #86efac;
-    --pp-warning-text: #fcd34d;
-    --pp-danger-text: #fca5a5;
-    --pp-info-text: #93c5fd;
-    --pp-cheer-text: #f9a8d4;
+    --pp-background: #0e1116;
+    --pp-surface: #0e1116;
+    --pp-surface-muted: #1f242c;
+    --pp-text: #e6e9ef;
+    --pp-text-muted: #9aa3b0;
+    --pp-border: #262c35;
+    --pp-border-strong: #3a414c;
+    --pp-control-border: #6f7886;
+    --pp-card: #161a21;
+    --pp-card-border: #262c35;
+    --pp-brand-strong: #dbeafe;
     --pp-accent-soft: #172554;
-    --pp-accent-text: #93c5fd;
+    --pp-accent-text: #bfdbfe;
+    --pp-link: #7aa7f7;
+    --pp-focus: #7aa7f7;
+    --pp-success-text: #7cc79a;
+    --pp-warning-text: #e2bb6a;
+    --pp-danger-text: #ec8b84;
+    --pp-info-text: #93c5fd;
     --pp-shadow-overlay: 0 8px 24px -4px rgb(0 0 0 / 0.5), 0 0 0 1px rgb(255 255 255 / 0.04);
   }
-  .pp-ui[data-ui-theme="lounge"], .pp-ui [data-ui-theme="lounge"] { --pp-section-accent-soft: #2b2414; --pp-section-accent-text: #f3d27a; }
-  .pp-ui[data-ui-theme="youth"], .pp-ui [data-ui-theme="youth"] { --pp-section-accent-soft: #2e1065; --pp-section-accent-text: #c4b5fd; }
+  .pp-ui[data-ui-theme="lounge"], .pp-ui [data-ui-theme="lounge"] { --pp-brand-strong: #f6e3ae; --pp-accent-soft: #2b2414; --pp-accent-text: #f3d27a; --pp-link: #e8c463; --pp-focus: #e8c463; }
+  .pp-ui[data-ui-theme="youth"], .pp-ui [data-ui-theme="youth"] { --pp-brand-strong: #e4dbff; --pp-accent-soft: #2a1660; --pp-accent-text: #d4c6ff; --pp-link: #b8a2fb; --pp-focus: #b8a2fb; }
 }
 
-/* Explicit modes are for the fixture gallery; the product keeps the OS preference. */
+/* Explicit modes are for the fixture gallery (and dark export tools); the product keeps the OS preference. */
 .pp-ui[data-ui-mode="light"], .pp-ui [data-ui-mode="light"] {
-  --pp-section-accent: var(--pp-accent);
-  --pp-section-accent-soft: var(--pp-accent-soft);
-  --pp-section-accent-text: var(--pp-accent-text);
-  --pp-background: #fafafa;
+  --pp-background: #f8fafc;
   --pp-surface: #ffffff;
-  --pp-surface-muted: #f4f4f5;
-  --pp-text: #18181b;
-  --pp-text-muted: #71717a;
-  --pp-border: #e4e4e7;
-  --pp-border-strong: #d4d4d8;
-  --pp-control-border: #86868f;
+  --pp-surface-muted: #f1f5f9;
+  --pp-text: #0f172a;
+  --pp-text-muted: #64748b;
+  --pp-border: #e2e8f0;
+  --pp-border-strong: #cbd5e1;
+  --pp-control-border: #7f8ea3;
   --pp-card: #ffffff;
-  --pp-card-border: #e4e4e7;
-  --pp-success-text: #15803d;
-  --pp-warning-text: #92400e;
-  --pp-danger-text: #b91c1c;
-  --pp-info-text: #1d4ed8;
-  --pp-cheer-text: #be185d;
+  --pp-card-border: #e2e8f0;
+  --pp-brand-strong: #172554;
   --pp-accent-soft: #eff6ff;
-  --pp-accent-text: #1d4ed8;
+  --pp-accent-text: #1e40af;
+  --pp-link: #2563eb;
+  --pp-focus: #2563eb;
+  --pp-success-text: #2f7d4f;
+  --pp-warning-text: #8a5a12;
+  --pp-danger-text: #c0392f;
+  --pp-info-text: #1e40af;
   --pp-shadow-overlay: 0 8px 24px -4px rgb(0 0 0 / 0.12), 0 2px 6px rgb(0 0 0 / 0.06);
 }
 .pp-ui[data-ui-mode="dark"], .pp-ui [data-ui-mode="dark"] {
-  --pp-section-accent: var(--pp-accent);
-  --pp-section-accent-soft: var(--pp-accent-soft);
-  --pp-section-accent-text: var(--pp-accent-text);
-  --pp-background: #09090b;
-  --pp-surface: #18181b;
-  --pp-surface-muted: #27272a;
-  --pp-text: #fafafa;
-  --pp-text-muted: #a1a1aa;
-  --pp-border: #27272a;
-  --pp-border-strong: #3f3f46;
-  --pp-control-border: #78787f;
-  --pp-card: #222226;
-  --pp-card-border: #34343b;
-  --pp-success-text: #86efac;
-  --pp-warning-text: #fcd34d;
-  --pp-danger-text: #fca5a5;
-  --pp-info-text: #93c5fd;
-  --pp-cheer-text: #f9a8d4;
+  --pp-background: #0e1116;
+  --pp-surface: #0e1116;
+  --pp-surface-muted: #1f242c;
+  --pp-text: #e6e9ef;
+  --pp-text-muted: #9aa3b0;
+  --pp-border: #262c35;
+  --pp-border-strong: #3a414c;
+  --pp-control-border: #6f7886;
+  --pp-card: #161a21;
+  --pp-card-border: #262c35;
+  --pp-brand-strong: #dbeafe;
   --pp-accent-soft: #172554;
-  --pp-accent-text: #93c5fd;
+  --pp-accent-text: #bfdbfe;
+  --pp-link: #7aa7f7;
+  --pp-focus: #7aa7f7;
+  --pp-success-text: #7cc79a;
+  --pp-warning-text: #e2bb6a;
+  --pp-danger-text: #ec8b84;
+  --pp-info-text: #93c5fd;
   --pp-shadow-overlay: 0 8px 24px -4px rgb(0 0 0 / 0.5), 0 0 0 1px rgb(255 255 255 / 0.04);
 }
-.pp-ui[data-ui-mode="light"][data-ui-theme="lounge"], .pp-ui [data-ui-mode="light"][data-ui-theme="lounge"], .pp-ui[data-ui-mode="light"] [data-ui-theme="lounge"] { --pp-section-accent: #d4a017; --pp-section-accent-soft: #fbf4dd; --pp-section-accent-text: #8b6814; }
-.pp-ui[data-ui-mode="light"][data-ui-theme="youth"], .pp-ui [data-ui-mode="light"][data-ui-theme="youth"], .pp-ui[data-ui-mode="light"] [data-ui-theme="youth"] { --pp-section-accent: #7c3aed; --pp-section-accent-soft: #f5f3ff; --pp-section-accent-text: #6d28d9; }
-.pp-ui[data-ui-mode="dark"][data-ui-theme="lounge"], .pp-ui [data-ui-mode="dark"][data-ui-theme="lounge"], .pp-ui[data-ui-mode="dark"] [data-ui-theme="lounge"] { --pp-section-accent: #d4a017; --pp-section-accent-soft: #2b2414; --pp-section-accent-text: #f3d27a; }
-.pp-ui[data-ui-mode="dark"][data-ui-theme="youth"], .pp-ui [data-ui-mode="dark"][data-ui-theme="youth"], .pp-ui[data-ui-mode="dark"] [data-ui-theme="youth"] { --pp-section-accent: #7c3aed; --pp-section-accent-soft: #2e1065; --pp-section-accent-text: #c4b5fd; }
+.pp-ui[data-ui-mode="light"][data-ui-theme="lounge"], .pp-ui [data-ui-mode="light"][data-ui-theme="lounge"], .pp-ui[data-ui-mode="light"] [data-ui-theme="lounge"] { --pp-brand-strong: #5c430d; --pp-accent-soft: #fbf4dd; --pp-accent-text: #6b4e0f; --pp-link: #8b6814; --pp-focus: #8b6814; }
+.pp-ui[data-ui-mode="light"][data-ui-theme="youth"], .pp-ui [data-ui-mode="light"][data-ui-theme="youth"], .pp-ui[data-ui-mode="light"] [data-ui-theme="youth"] { --pp-brand-strong: #3b1a78; --pp-accent-soft: #f3effe; --pp-accent-text: #5b21b6; --pp-link: #6d28d9; --pp-focus: #6d28d9; }
+.pp-ui[data-ui-mode="dark"][data-ui-theme="lounge"], .pp-ui [data-ui-mode="dark"][data-ui-theme="lounge"], .pp-ui[data-ui-mode="dark"] [data-ui-theme="lounge"] { --pp-brand-strong: #f6e3ae; --pp-accent-soft: #2b2414; --pp-accent-text: #f3d27a; --pp-link: #e8c463; --pp-focus: #e8c463; }
+.pp-ui[data-ui-mode="dark"][data-ui-theme="youth"], .pp-ui [data-ui-mode="dark"][data-ui-theme="youth"], .pp-ui[data-ui-mode="dark"] [data-ui-theme="youth"] { --pp-brand-strong: #e4dbff; --pp-accent-soft: #2a1660; --pp-accent-text: #d4c6ff; --pp-link: #b8a2fb; --pp-focus: #b8a2fb; }
 
 /* Component rules live in the components layer so Tailwind utilities (layout classes such as gap,
    padding or justify) override them instead of being silently ignored. Tokens above stay unlayered. */
@@ -436,6 +456,10 @@ body {
   .pp-overlay-surface { border: 1px solid var(--pp-border); background: var(--pp-surface); color: var(--pp-text); box-shadow: var(--pp-shadow-overlay); }
   .pp-overlay-modal { border-radius: var(--pp-radius-sheet); }
   .pp-overlay-sheet { border-radius: var(--pp-radius-sheet) var(--pp-radius-sheet) 0 0; }
+  .pp-link { display: inline-flex; align-items: center; gap: 2px; padding: 0; border: 0; background: none; color: var(--pp-link); font: inherit; font-weight: 600; text-decoration: none; cursor: pointer; }
+  .pp-link-muted { color: var(--pp-text-muted); }
+  @media (hover: hover) { .pp-link:hover { text-decoration: underline; text-underline-offset: 3px; } }
+  .pp-link:focus-visible { outline: 2px solid var(--pp-focus); outline-offset: 2px; border-radius: 2px; }
   .pp-text-title { font-size: 24px; line-height: 1.3; font-weight: 700; }
   .pp-text-heading { font-size: 18px; line-height: 1.4; font-weight: 700; }
   .pp-text-body { font-size: 14px; line-height: 1.5; }

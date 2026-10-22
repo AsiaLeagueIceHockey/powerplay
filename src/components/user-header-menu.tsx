@@ -57,7 +57,8 @@ export function UserHeaderMenu({
     return (
       <Link
         href={`/${locale}/login`}
-        className={buttonStyles({ variant: "primary", size: "compact" })}
+        // Secondary so each page's own primary action stays the only prominent one (P7).
+        className={buttonStyles({ variant: "secondary", size: "compact" })}
       >
         {locale === "ko" ? "로그인" : "Login"}
       </Link>

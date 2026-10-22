@@ -157,7 +157,7 @@ export function BottomNav({ locale }: { locale: string }) {
   ];
 
   return (
-    <nav className={`fixed bottom-0 left-0 right-0 z-40 w-full border-t border-pp-border bg-white/80 backdrop-blur-sm dark:bg-pp-surface/80 pb-safe transition-all duration-300 bottom-navigation-bar ${isKeyboardOpen ? "translate-y-full opacity-0 pointer-events-none" : "translate-y-0 opacity-100"}`}>
+    <nav className={`fixed bottom-0 left-0 right-0 z-40 w-full border-t border-pp-border bg-pp-surface pb-safe transition-all duration-300 bottom-navigation-bar ${isKeyboardOpen ? "translate-y-full opacity-0 pointer-events-none" : "translate-y-0 opacity-100"}`}>
       <div className="flex justify-around items-center h-14 px-2">
         {tabs.map((tab) => {
           const active = isActive(tab.href);
@@ -170,8 +170,8 @@ export function BottomNav({ locale }: { locale: string }) {
               prefetch={false}
               className={`flex flex-col items-center justify-center w-full h-full gap-0.5 transition-colors ${
                 active
-                  ? "text-pp-accent-text "
-                  : "text-pp-muted hover:text-pp-text "
+                  ? "text-pp-link"
+                  : "text-pp-muted hover:text-pp-text"
               }`}
               title={tab.name}
               aria-label={tab.name}

@@ -4,7 +4,7 @@ export type PolicyIssue = { line: number; rule: "bypass" | "override" | "color" 
 export type UiExceptions = { controls?: Record<string, string>; colors?: Record<string, string>; artwork?: Record<string, string>; legacyBranch?: { condition: string; reason: string } };
 const shared = new Set(["Button", "IconButton", "LinkButton", "Input", "Select", "Textarea", "FilterChip", "SegmentedItem", "Badge", "Surface", "ModalSurface", "SheetSurface"]);
 const native = new Set(["button", "input", "select", "textarea"]);
-const recipe = /(?:iconButtonStyles|buttonStyles|fieldStyles|filterChipStyles|segmentedItemStyles|badgeStyles|surfaceStyles|overlayStyles|clubDetailActionButtonClass)/;
+const recipe = /(?:linkStyles|iconButtonStyles|buttonStyles|fieldStyles|filterChipStyles|segmentedItemStyles|badgeStyles|surfaceStyles|overlayStyles|clubDetailActionButtonClass)/;
 const visual = /^(?:(?:hover|focus|focus-visible|disabled|dark|sm|md|lg|active):)*(?:bg-|text-(?!(?:left|right|center|start|end|justify|ellipsis|wrap|nowrap|balance|pretty)$)|pp-text-|font-|rounded|shadow|ring-|border(?:-|$)|h-|min-h-|p[xytrblse]?-[\d[])/;
 const rawColor = /(?:^|:)(?:bg|text|border|ring|shadow|from|via|to|outline|accent|fill|stroke)-(?:\[#[^\]]+\]|(?:zinc|slate|gray|neutral|stone|blue|indigo|violet|purple|pink|rose|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky)-\d+)(?:\/\S+)?$/;
 
