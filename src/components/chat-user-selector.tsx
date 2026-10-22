@@ -1,5 +1,5 @@
 "use client";
-import { buttonStyles, fieldStyles, overlayStyles, surfaceStyles } from "@/components/ui/styles";
+import { fieldStyles, overlayStyles, surfaceStyles, iconButtonStyles } from "@/components/ui/styles";
 
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
@@ -89,7 +89,7 @@ export function ChatUserSelector({ isOpen, onClose }: { isOpen: boolean; onClose
       <div role="dialog" aria-modal="true" aria-labelledby="chat-selector-title" className={overlayStyles() + " w-full sm:max-w-md h-[80vh] sm:h-[600px] flex flex-col overflow-hidden"}>
         <div className="flex items-center justify-between p-4 border-b border-pp-border ">
           <h2 id="chat-selector-title" className="pp-text-heading">{t("userSelectorTitle")}</h2>
-          <button type="button" onClick={onClose} aria-label={locale === "ko" ? "닫기" : "Close"} className={buttonStyles({ variant: "ghost", size: "compact" })}>
+          <button type="button" onClick={onClose} aria-label={locale === "ko" ? "닫기" : "Close"} className={iconButtonStyles({ variant: "ghost", size: "compact" })}>
             <X size={20} />
           </button>
         </div>

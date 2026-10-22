@@ -1,5 +1,5 @@
 "use client";
-import { buttonStyles, fieldStyles } from "@/components/ui/styles";
+import { buttonStyles, fieldStyles, iconButtonStyles } from "@/components/ui/styles";
 
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useTranslations } from "next-intl";
@@ -261,7 +261,7 @@ export function ChatRoomClient({
         <div className="flex items-center gap-3">
           <button type="button"
             onClick={() => router.push(`/${locale}/chat`)}
-            className={`${buttonStyles({ variant: "ghost", size: "compact" })} -ml-1`}
+            className={`${iconButtonStyles({ variant: "ghost", size: "compact" })} -ml-1`}
           >
             <ArrowLeft size={24} />
           </button>

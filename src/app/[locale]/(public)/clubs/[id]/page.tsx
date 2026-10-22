@@ -1,5 +1,5 @@
 
-import { badgeStyles, buttonStyles, surfaceStyles } from "@/components/ui/styles";
+import { badgeStyles, buttonStyles, surfaceStyles, iconButtonStyles } from "@/components/ui/styles";
 import { getPublicClubById, getPublicClubIds, getPublicClubNotices } from "@/lib/public-clubs";
 import { getMyClubVoteSummary, isClubMember } from "@/app/actions/clubs";
 import { getTranslations, setRequestLocale } from "next-intl/server";
@@ -149,7 +149,7 @@ export default async function ClubDetailPage({
         <div className="flex shrink-0 self-end items-center gap-1 sm:self-auto">
           <Link
             href={`/${locale}/clubs/${club.id}/card`}
-            className={`${buttonStyles({ variant: "primary", size: "compact" })} flex items-center justify-center`}
+            className={iconButtonStyles({ variant: "primary", size: "compact" })}
             title={t("card.view", { fallback: "카드 보기" })}
           >
             <CreditCard className="w-5 h-5" />

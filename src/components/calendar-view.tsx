@@ -1,6 +1,6 @@
 "use client";
 
-import { buttonStyles, surfaceStyles } from "@/components/ui/styles";
+import { surfaceStyles, iconButtonStyles } from "@/components/ui/styles";
 
 import { useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
@@ -91,7 +91,7 @@ export function CalendarView({ matches, onDateSelect }: CalendarViewProps) {
       <div className="flex items-center justify-between mb-4">
         <button type="button"
           onClick={prevMonth}
-          className={buttonStyles({ variant: "secondary", size: "compact" })}
+          className={iconButtonStyles({ variant: "secondary", size: "compact" })}
           aria-label="Previous month"
         >
           <ChevronLeft className="w-5 h-5" />
@@ -101,7 +101,7 @@ export function CalendarView({ matches, onDateSelect }: CalendarViewProps) {
         </h2>
         <button type="button"
           onClick={nextMonth}
-          className={buttonStyles({ variant: "secondary", size: "compact" })}
+          className={iconButtonStyles({ variant: "secondary", size: "compact" })}
           aria-label="Next month"
         >
           <ChevronRight className="w-5 h-5" />

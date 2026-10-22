@@ -108,7 +108,7 @@ All controls preserve native form, event, ref and ARIA properties. Shared compon
 | Export | Use and options |
 | --- | --- |
 | `Button`, `LinkButton` | `variant`, `size`, `fullWidth`; `Button` also accepts `loading`. Variants: primary, secondary, outline, ghost, danger, success, warning, cheer, points, kakao, naver. Sizes: compact, default, large, club. |
-| `IconButton` | `label` supplies an accessible name; default ghost appearance. Use for an actual icon-only action. |
+| `IconButton` | `label` supplies an accessible name; default ghost appearance. Use for an actual icon-only action. On a link or a domain-owned button, use the `iconButtonStyles({ variant, size, shape })` recipe instead of `buttonStyles` + width classes: text padding would squeeze the icon. Use size `default` (44px) where touch matters. |
 | `Input`, `Select`, `Textarea` | Native props plus `invalid` and `controlSize="compact" | "default"`. Keep file/hidden/checkbox/date/slider behavior explicit. |
 | `Field` | Caller-owned `id`, `label`, optional `help`/`error`, and one control child. Connects label, help and error IDs, preserving existing `aria-describedby`. |
 | `Surface` | `density="none" | "compact" | "default" | "comfortable" | "roomy"`, optional `interactive`. Use a recipe on a real link/button when the whole card is actionable. `density="none"` means the caller owns the padding: padding utilities (`px-4 py-3`) are allowed there and only there. `h-full` is allowed so cards in a grid row share one height. |
@@ -117,7 +117,7 @@ All controls preserve native form, event, ref and ARIA properties. Shared compon
 | `SegmentedControl`, `SegmentedItem` | Labeled group with pressed-state buttons. Use for view switches; do not claim tab semantics without a real tabpanel relationship. |
 | `ModalSurface`, `SheetSurface` | Required `titleId`; role/dialog title association and appearance only. The owner retains backdrop, open/close state, Escape/focus behavior and scroll locking. |
 
-Matching pure recipes are `buttonStyles`, `fieldStyles`, `surfaceStyles`, `badgeStyles`, `filterChipStyles`, `segmentedItemStyles`, and `overlayStyles`. `uiClassNames` joins conditional class strings; it is not a conflicting-Tailwind resolver. Do not invent a `cn` utility or `Dialog` component that the repository does not provide.
+Matching pure recipes are `buttonStyles`, `iconButtonStyles`, `fieldStyles`, `surfaceStyles`, `badgeStyles`, `filterChipStyles`, `segmentedItemStyles`, and `overlayStyles`. `uiClassNames` joins conditional class strings; it is not a conflicting-Tailwind resolver. Do not invent a `cn` utility or `Dialog` component that the repository does not provide.
 
 ```tsx
 import { Button, Field, Input, LinkButton } from "@/components/ui";

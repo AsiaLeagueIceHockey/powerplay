@@ -1,6 +1,6 @@
 "use client";
 
-import { buttonStyles, filterChipStyles, overlayStyles } from "@/components/ui/styles";
+import { buttonStyles, filterChipStyles, overlayStyles, iconButtonStyles } from "@/components/ui/styles";
 
 import { useEffect, useState } from "react";
 import { X, Check, RefreshCw } from "lucide-react";
@@ -125,7 +125,7 @@ export function RegionFilterDrawer({
         <div className="p-4 border-t border-pp-border flex gap-3 safe-area-bottom">
           <button type="button"
             onClick={handleReset}
-            className={`${buttonStyles({ variant: "secondary", size: "large" })} flex items-center justify-center gap-2`}
+            className={iconButtonStyles({ variant: "secondary", size: "large" })}
           >
             <RefreshCw className="w-5 h-5" />
             <span className="sr-only">{locale === "ko" ? "초기화" : "Reset"}</span>

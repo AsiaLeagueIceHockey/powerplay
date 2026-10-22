@@ -14,6 +14,11 @@ export function buttonStyles({ variant = "primary", size = "default", fullWidth 
   return uiClassNames("pp-button", `pp-button-${variant}`, `pp-button-${size}`, shape !== "default" && `pp-button-${shape}`, fullWidth && "pp-full-width");
 }
 
+/** Icon-only control: square at the chosen size (circle with shape "circle"), no text padding. */
+export function iconButtonStyles({ variant = "ghost", size = "default", shape = "default" }: { variant?: ButtonVariant; size?: ButtonSize; shape?: ButtonShape } = {}) {
+  return uiClassNames(buttonStyles({ variant, size, shape }), "pp-icon-button");
+}
+
 export function surfaceStyles({ interactive = false, density = "default", tone = "default" }: { interactive?: boolean; density?: SurfaceDensity; tone?: "default" | "muted" } = {}) {
   return uiClassNames("pp-surface", `pp-surface-${density}`, tone === "muted" && "pp-surface-muted-content", interactive && "pp-surface-interactive");
 }

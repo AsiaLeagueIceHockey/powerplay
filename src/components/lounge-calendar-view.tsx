@@ -1,5 +1,5 @@
 "use client";
-import { surfaceStyles, buttonStyles } from "@/components/ui/styles";
+import { surfaceStyles, iconButtonStyles } from "@/components/ui/styles";
 
 import { useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -95,7 +95,7 @@ export function LoungeCalendarView({ events, locale, onDateSelect, selectedDate 
         <button
           type="button"
           onClick={() => setCurrentDate(new Date(year, month - 1, 1))}
-          className={buttonStyles({ variant: "secondary", size: "compact" })}
+          className={iconButtonStyles({ variant: "secondary", size: "compact" })}
           aria-label="Previous month"
         >
           <ChevronLeft className="w-5 h-5" />
@@ -106,7 +106,7 @@ export function LoungeCalendarView({ events, locale, onDateSelect, selectedDate 
         <button
           type="button"
           onClick={() => setCurrentDate(new Date(year, month + 1, 1))}
-          className={buttonStyles({ variant: "secondary", size: "compact" })}
+          className={iconButtonStyles({ variant: "secondary", size: "compact" })}
           aria-label="Next month"
         >
           <ChevronRight className="w-5 h-5" />

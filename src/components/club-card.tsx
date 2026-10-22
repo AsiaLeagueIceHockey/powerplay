@@ -1,6 +1,6 @@
 "use client";
 
-import { badgeStyles, buttonStyles, surfaceStyles } from "@/components/ui/styles";
+import { badgeStyles, buttonStyles, surfaceStyles, iconButtonStyles } from "@/components/ui/styles";
 
 import { Club } from "@/app/actions/types";
 import { useState } from "react";
@@ -206,7 +206,7 @@ export function ClubCard({
             target="_blank"
             rel="noreferrer"
             onClick={(e) => e.stopPropagation()}
-            className={`${buttonStyles({ variant: "kakao", size: "default" })} flex items-center justify-center w-10`}
+            className={iconButtonStyles({ variant: "kakao", size: "default" })}
             title="KakaoTalk Open Chat"
           >
              <MessageCircle className="w-5 h-5 fill-current" />

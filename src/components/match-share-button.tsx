@@ -1,6 +1,6 @@
 "use client";
 
-import { buttonStyles } from "@/components/ui/styles";
+import { iconButtonStyles } from "@/components/ui/styles";
 
 import type { Match } from "@/app/actions/match";
 import { useState } from "react";
@@ -83,7 +83,7 @@ export function MatchShareButton({ match }: MatchShareButtonProps) {
     <div className="relative">
       <button type="button"
         onClick={handleShare}
-        className={`${buttonStyles({ variant: "primary", size: "compact" })} !rounded-full aspect-square`}
+        className={iconButtonStyles({ variant: "primary", size: "compact", shape: "circle" })}
         title={locale === "ko" ? "공유하기" : "Share"}
       >
         <svg

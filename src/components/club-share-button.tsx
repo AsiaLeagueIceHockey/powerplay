@@ -1,6 +1,6 @@
 "use client";
 
-import { buttonStyles } from "@/components/ui/styles";
+import { iconButtonStyles } from "@/components/ui/styles";
 
 import { useState } from "react";
 import { useLocale } from "next-intl";
@@ -61,7 +61,7 @@ export function ClubShareButton({ club }: ClubShareButtonProps) {
     <div className="relative">
       <button type="button"
         onClick={handleShare}
-        className={`${buttonStyles({ variant: "primary", size: "compact" })} flex items-center justify-center shrink-0 !rounded-full aspect-square`}
+        className={`${iconButtonStyles({ variant: "primary", size: "compact", shape: "circle" })} shrink-0`}
         title={locale === "ko" ? "링크 공유하기" : "Share Link"}
         aria-label="Share"
       >

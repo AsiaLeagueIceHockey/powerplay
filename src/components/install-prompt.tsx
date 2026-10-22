@@ -1,6 +1,6 @@
 "use client";
 import { useTranslations } from "next-intl";
-import { buttonStyles } from "@/components/ui/styles";
+import { buttonStyles, iconButtonStyles } from "@/components/ui/styles";
 
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
@@ -112,7 +112,7 @@ export function InstallPrompt() {
         <button type="button"
             aria-label="닫기 / Close"
             onClick={handleDismiss}
-            className={buttonStyles({ variant: "outline", size: "compact" }) + " absolute -top-2 -right-2"}
+            className={iconButtonStyles({ variant: "outline", size: "compact", shape: "circle" }) + " absolute -top-2 -right-2"}
         >
             <X className="w-4 h-4" />
         </button>

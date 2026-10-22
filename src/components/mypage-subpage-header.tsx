@@ -1,5 +1,5 @@
 
-import { buttonStyles } from "@/components/ui/styles";
+import { iconButtonStyles } from "@/components/ui/styles";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 
@@ -15,7 +15,7 @@ export function MypageSubpageHeader({ locale, title, backLabel }: MypageSubpageH
       <Link
         href={`/${locale}/mypage`}
         aria-label={backLabel}
-        className={`${buttonStyles({ variant: "secondary", size: "compact", shape: "circle" })} w-10 flex-shrink-0`}
+        className={`${iconButtonStyles({ variant: "secondary", size: "compact", shape: "circle" })} flex-shrink-0`}
       >
         <ChevronLeft className="h-6 w-6" />
       </Link>

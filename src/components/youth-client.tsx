@@ -1,5 +1,5 @@
 "use client";
-import { buttonStyles, surfaceStyles, fieldStyles, segmentedItemStyles } from "@/components/ui/styles";
+import { buttonStyles, surfaceStyles, fieldStyles, segmentedItemStyles, iconButtonStyles } from "@/components/ui/styles";
 
 import { useState, useRef } from "react";
 import Link from "next/link";
@@ -634,7 +634,7 @@ export function YouthClient({
                   setNicknameInput(userProfile?.parent_nickname || "");
                   setIsEditingNickname(true);
                 }}
-                className={buttonStyles({ variant: "secondary", size: "compact" })}
+                className={iconButtonStyles({ variant: "secondary", size: "compact" })}
                 title={locale === "ko" ? "닉네임 변경" : "Edit Nickname"}
                 aria-label={locale === "ko" ? "닉네임 변경" : "Edit Nickname"}
               >
@@ -803,7 +803,7 @@ export function YouthClient({
                     <button
                       type="button"
                       onClick={() => setShowNewsForm(false)}
-                      className={buttonStyles({ variant: "secondary", size: "compact" })}
+                      className={iconButtonStyles({ variant: "secondary", size: "compact" })}
                     >
                       <X size={18} />
                     </button>

@@ -1,6 +1,6 @@
 "use client";
 
-import { buttonStyles, surfaceStyles } from "@/components/ui/styles";
+import { buttonStyles, surfaceStyles, iconButtonStyles } from "@/components/ui/styles";
 
 import { useState, useRef, useEffect } from "react";
 import { NaverMap, Marker, useNavermaps, Container as MapContainer, NavermapsProvider } from "react-naver-maps";
@@ -253,7 +253,7 @@ function RinkMapContent({ rinks, matches = [], clubs = [], isCompact = false }: 
       {!isCompact && (
         <button type="button"
           onClick={handleMyLocation}
-          className={`${buttonStyles({ variant: "outline", size: "default" })} absolute bottom-6 right-6 z-10 !rounded-full aspect-square`}
+          className={`${iconButtonStyles({ variant: "outline", size: "default", shape: "circle" })} absolute bottom-6 right-6 z-10`}
           title="내 위치"
         >
           <Navigation className="w-5 h-5" />
