@@ -25,6 +25,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - 프론트엔드·UI·반응형·i18n을 바꾸면 완료 보고·커밋·푸시 전에 `$powerplay-ui-final-check`를 반드시 실행한다 (AGENTS.md의 필수 게이트). 스킬을 쓸 수 없으면 런타임·번역·모바일·콘솔·자동 검사를 수동으로 하고 누락을 보고한다.
 - 자동 검사를 통과해도 UI·데이터 플로우는 수동 확인이 필요하다.
 - `public/sw.js`는 `next build`가 아닌 별도 esbuild 결과물이다. 서비스워커를 고쳤다면 `dev`/`build` 스크립트를 거쳐야 갱신된다.
+- 원래부터 실패하는 테스트 7개는 `docs/known-issues.md`에 있다. "새 실패가 없는지"는 그 목록과 테스트 이름으로 비교한다.
+
+### 검증 안전 규칙: dev 서버로 확인할 때 운영 DB 쓰기 금지
+
+`.env.local`은 운영 Supabase를 가리킨다. dev 서버로 화면을 확인하거나 스크린샷을 찍을 때는 다음을 지킨다.
+
+- DB 연결이 필요 없는 확인은 `/dev/design-system` 갤러리(고정 예시, DB 미연결)를 먼저 쓴다.
+- 브라우저 자동화는 **로그인하지 않은 새 세션**으로 하고, `GET`/`HEAD` 외의 요청은 모두 차단한다. 서버 액션, 투표, 트래킹 같은 POST가 나가지 않게 하기 위해서다.
+- 서버 렌더링 중 DB에 쓰는 GET 경로는 `docs/known-issues.md` §2에 있다. 로그인 상태로는 이 경로를 열지 않는다.
+- 폼 제출, 투표, 참가 신청, 결제·충전, 채팅 읽음 처리처럼 데이터를 바꾸는 동작은 실행하지 않는다. 꼭 필요하면 먼저 사용자에게 묻는다.
 
 ## 아키텍처
 
@@ -101,3 +111,4 @@ UI 규칙의 단일 기준은 **`docs/design-system.md`**이다. 일반 사용�
 | 2026-04-24 | 초기 하네스 구성 | 전체 (agents 5, skills 7) | 신규 구축 — 신기능 통합 개발 + QA/회귀 감사 자동화 |
 | 2026-10-21 | 명령어·아키텍처·도메인 규약 요약 섹션 추가 | 문서 구조 | `/init` 분석 결과 반영 — 신규 인스턴스 온보딩 속도 개선 |
 | 2026-10-21 | "UI 규칙" 섹션 추가, 옛 UI 가드레일(`rounded-xl`·`border-blue-500`) 제거 | CLAUDE.md, code-builder, powerplay-context, nextjs-patterns, boundary-audit | UI 규칙을 `docs/design-system.md` 한 곳으로 일원화 (Codex·Claude 공용) |
+| 2026-10-22 | "검증 안전 규칙" 추가, known issue 문서 연결 | CLAUDE.md, docs/known-issues.md | dev 서버가 운영 DB를 가리키므로 검증 중 쓰기 방지 |
