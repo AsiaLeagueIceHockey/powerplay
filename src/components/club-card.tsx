@@ -80,7 +80,7 @@ export function ClubCard({
         }
       }}
       onClick={() => router.push(`/${locale}/clubs/${club.id}`)}
-      className={`${surfaceStyles({ interactive: true, density: "default" })} relative block flex flex-col justify-between cursor-pointer`}
+      className={`${surfaceStyles({ interactive: true, density: "default" })} relative flex h-full flex-col justify-between cursor-pointer`}
     >
       {showRank ? (
         <div className={`absolute right-4 -top-4 z-10 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-black shadow-sm ring-1 ${rankTone}`}>

@@ -57,7 +57,7 @@ function RinkDetailCard({ rink, matches, clubs = [], onClose }: { rink: Rink; ma
                   </h4>
                   <div className="flex flex-wrap gap-2">
                      {rinkClubs.map(club => (
-                         <Link key={club.id} href={`/clubs/${club.id}`} className={`${surfaceStyles({ interactive: true, density: "none" })} flex items-center gap-2 `}>
+                         <Link key={club.id} href={`/clubs/${club.id}`} className={`${surfaceStyles({ interactive: true, density: "none" })} flex items-center gap-2 px-3 py-2`}>
                              <span className="text-sm font-medium text-pp-muted ">{club.name}</span>
                          </Link>
                      ))}

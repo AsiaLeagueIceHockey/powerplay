@@ -24,6 +24,7 @@ export function LoungeLocationMap({
 
   return (
     <div className={surfaceStyles({ density: "none" }) + " overflow-hidden"}>
+      <div className="h-52">
       <DynamicRinkMap
         isCompact={true}
         rinks={[
@@ -38,6 +39,7 @@ export function LoungeLocationMap({
           },
         ]}
       />
+      </div>
     </div>
   );
 }

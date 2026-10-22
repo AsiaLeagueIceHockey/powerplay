@@ -40,7 +40,7 @@ export function ParticipantList({
     return (
       <div
         key={participant.id}
-        className={`${surfaceStyles({ interactive: false, density: "none" })} flex items-center justify-between `}
+        className={`${surfaceStyles({ interactive: false, density: "none" })} flex items-center justify-between px-4 py-3`}
       >
         <div className="flex items-center gap-3">
           <span className="flex h-6 w-6 items-center justify-center rounded-full bg-pp-surface-muted text-xs font-medium ">

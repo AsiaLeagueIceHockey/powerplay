@@ -1,5 +1,5 @@
 "use client";
-import { buttonStyles, fieldStyles, overlayStyles } from "@/components/ui/styles";
+import { buttonStyles, fieldStyles, overlayStyles, surfaceStyles } from "@/components/ui/styles";
 
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
@@ -119,7 +119,7 @@ export function ChatUserSelector({ isOpen, onClose }: { isOpen: boolean; onClose
                   key={user.id}
                   onClick={() => handleUserClick(user)}
                   disabled={isCreating}
-                  className={`${buttonStyles({ variant: "secondary", size: "default" })} w-full text-left`}
+                  className={`${surfaceStyles({ interactive: true, density: "none" })} flex w-full items-center p-3 text-left disabled:opacity-50`}
                 >
                   <div className="w-10 h-10 rounded-full bg-pp-surface-muted flex items-center justify-center text-pp-muted font-bold shrink-0">
                     {user.full_name?.charAt(0)}

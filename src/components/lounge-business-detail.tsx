@@ -298,7 +298,7 @@ export function LoungeBusinessDetail({
         </div>
 
         {sortedNotices.length === 0 ? (
-          <div className={surfaceStyles({ density: "none" }) + " text-center"}>
+          <div className={surfaceStyles({ density: "none" }) + " px-5 py-8 text-center"}>
             <p className="text-sm font-semibold text-pp-muted ">
               {t("empty")}
             </p>
@@ -312,7 +312,7 @@ export function LoungeBusinessDetail({
               <Link
                 key={notice.id}
                 href={`/${locale}/lounge/${business.slug}/notices/${notice.id}`}
-                className={buttonStyles({ variant: "warning", size: "compact" }) + " group flex items-start justify-between gap-4"}
+                className="group flex items-start justify-between gap-4 p-4 transition-colors hover:bg-pp-surface-muted md:p-5"
               >
                 <div className="flex min-w-0 items-start gap-3 md:gap-4">
                   {notice.image_url ? (

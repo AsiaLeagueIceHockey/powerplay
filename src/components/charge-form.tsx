@@ -124,7 +124,7 @@ export function ChargeForm({ bankAccount, initialAmount = 30000 }: ChargeFormPro
 
       {/* 직접 입력 */}
       <div>
-        <label htmlFor="charge-custom-amount" className="pp-field-label mb-2">
+        <label htmlFor="charge-custom-amount" className="pp-field-label mb-2 block">
           {t("customAmount")}
         </label>
         <div className="relative">
@@ -182,7 +182,7 @@ export function ChargeForm({ bankAccount, initialAmount = 30000 }: ChargeFormPro
 
       {/* 입금자명 */}
       <div>
-        <label htmlFor="charge-depositor-name" className="pp-field-label mb-2">
+        <label htmlFor="charge-depositor-name" className="pp-field-label mb-2 block">
           {t("depositorName")} *
         </label>
         <input

@@ -1,5 +1,5 @@
 "use client";
-import { buttonStyles } from "@/components/ui/styles";
+import { buttonStyles, surfaceStyles } from "@/components/ui/styles";
 
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
@@ -170,7 +170,7 @@ export function TamagotchiDetail({ locale, initialState }: TamagotchiDetailProps
       <button
         type="button"
         onClick={() => setIsClosetOpen(true)}
-        className={buttonStyles({ variant: "outline", size: "compact" }) + " group w-full text-left"}
+        className={surfaceStyles({ interactive: true, density: "default" }) + " group w-full text-left"}
       >
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-pp-info-soft ">

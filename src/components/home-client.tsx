@@ -462,7 +462,7 @@ export function HomeClient({
               </div>
             </div>
 
-            <details className={`${surfaceStyles({ density: "none" })} group mb-6 `}>
+            <details className={`${surfaceStyles({ density: "none" })} group mb-6 px-4 py-3`}>
               <summary className="flex cursor-pointer list-none items-center justify-between gap-3 [&::-webkit-details-marker]:hidden">
                 <div className="min-w-0">
                   <p className="text-[11px] font-medium text-pp-muted ">

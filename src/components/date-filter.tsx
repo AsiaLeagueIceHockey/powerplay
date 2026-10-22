@@ -77,7 +77,7 @@ export function DateFilter({ selectedDate, onSelect, tone = "default" }: DateFil
       <button type="button"
         onClick={() => onSelect(null)}
         aria-pressed={!selectedDate}
-        className={filterChipStyles({ selected: !selectedDate, shape: "date" })}
+        className={`${filterChipStyles({ selected: !selectedDate, shape: "date" })} min-w-[52px]`}
       >
         <span className="text-sm font-bold whitespace-nowrap">
           {locale === "ko" ? "전체" : "All"}
@@ -96,7 +96,7 @@ export function DateFilter({ selectedDate, onSelect, tone = "default" }: DateFil
             key={dateStr}
             onClick={() => handleDateClick(date)}
             aria-pressed={selected}
-            className={filterChipStyles({ selected, shape: "date" })}
+            className={`${filterChipStyles({ selected, shape: "date" })} min-w-[52px]`}
           >
             <span className={`text-lg font-bold ${selected ? ("text-inherit") : ""}`}>
               {formatDay(date)}

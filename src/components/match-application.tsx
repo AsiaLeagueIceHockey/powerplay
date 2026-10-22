@@ -562,7 +562,7 @@ export function MatchApplication({
              </div>
 
              {/* Total Cost Display */}
-             <div className={`${surfaceStyles({ density: "none" })} flex justify-between items-center`}>
+             <div className={`${surfaceStyles({ density: "none" })} flex justify-between items-center px-2 py-3`}>
                 <span className="text-pp-muted font-medium">
                   {t("totalCost")}
                 </span>
@@ -668,7 +668,7 @@ export function MatchApplication({
             </div>
 
             {/* Total Cost Display */}
-            <div className={`${surfaceStyles({ density: "none" })} flex justify-between items-center`}>
+            <div className={`${surfaceStyles({ density: "none" })} flex justify-between items-center px-2 py-3`}>
               <span className="text-pp-muted font-medium">
                 {t("totalCost")}
               </span>

@@ -138,7 +138,7 @@ export function RinkExplorer({ rinks, matches, clubs }: RinkExplorerProps) {
                                         <h4 className="text-xs font-semibold text-pp-text mb-2">{copy("clubs")}</h4>
                                         <div className="flex flex-wrap gap-2">
                                             {rinkClubs.map(club => (
-                                                <Link key={club.id} href={`/clubs/${club.id}`} className={`${surfaceStyles({ interactive: true, density: "none" })} flex items-center gap-2 `}>
+                                                <Link key={club.id} href={`/clubs/${club.id}`} className={`${surfaceStyles({ interactive: true, density: "none" })} flex items-center gap-2 px-3 py-2`}>
                                                     <span className="text-sm font-medium text-pp-muted ">{club.name}</span>
                                                 </Link>
                                             ))}

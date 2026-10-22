@@ -54,7 +54,7 @@ export function ProfileForm({ profile }: { profile: Profile | null }) {
       )}
 
       <div>
-        <label htmlFor="profile-email" className="pp-field-label mb-2">
+        <label htmlFor="profile-email" className="pp-field-label mb-2 block">
           {t("email")}
         </label>
         <input

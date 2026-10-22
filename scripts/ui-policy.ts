@@ -43,7 +43,12 @@ export function inspectUiSource(source: string, exceptions: UiExceptions = {}): 
       if (native.has(tag) && !specialInput && !isRecipe && !controlException) add("bypass", `Use a shared ${tag} or appearance recipe.`);
       if ((shared.has(tag) || isRecipe) && !controlException) {
         const overlay = expression.includes("overlayStyles") || ["ModalSurface", "SheetSurface"].includes(tag);
-        for (const token of classes.filter(c => visual.test(c) && !(overlay && /(?:^|:)(?:h-|min-h-)/.test(c)))) add("override", `Choose a component option instead of '${token}'.`);
+        // density "none" means the caller owns the surface padding, so padding utilities are layout there.
+        const callerPadding = /surfaceStyles\(\s*\{[^}]*density:\s*["']none["']/.test(expression) || (tag === "Surface" && /density=["']none["']/.test(node.getText(file)));
+        // A surface may stretch to its grid/flex cell (h-full) so cards in a row share one height.
+        const surface = expression.includes("surfaceStyles") || tag === "Surface";
+        const allowed = (c: string) => (overlay && /(?:^|:)(?:h-|min-h-)/.test(c)) || (callerPadding && /^(?:(?:sm|md|lg):)*p[xytrblse]?-[\d[]/.test(c)) || (surface && c === "h-full");
+        for (const token of classes.filter(c => visual.test(c) && !allowed(c))) add("override", `Choose a component option instead of '${token}'.`);
       }
       for (const token of classes.filter(c => rawColor.test(c))) {
         if (!exceptions.colors?.[token]) add("color", `Use a semantic token or document '${token}'.`);

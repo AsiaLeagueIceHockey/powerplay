@@ -17,6 +17,17 @@ describe("UI policy AST guard", () => {
     expect(issues.filter(i => i.rule === "color")).toHaveLength(2);
     expect(issues.filter(i => i.rule === "override")).toHaveLength(3);
   });
+  it("lets callers own padding only on a density-none surface", () => {
+    expect(inspectUiSource('<details className={`${surfaceStyles({ density: "none" })} group px-4 py-3 md:p-5`} />')).toEqual([]);
+    expect(inspectUiSource('<div className={`${surfaceStyles({ interactive: true })} flex h-full flex-col`} />')).toEqual([]);
+    expect(inspectUiSource('<button type="button" className={buttonStyles() + " h-full"} />').map(i => i.rule)).toEqual(["override"]);
+    const issues = inspectUiSource('<><div className={surfaceStyles({ density: "compact" }) + " px-4"} /><div className={`${surfaceStyles({ density: "none" })} px-4 bg-pp-surface rounded-xl`} /></>');
+    expect(issues.filter(i => i.rule === "override").map(i => i.message)).toEqual([
+      "Choose a component option instead of 'px-4'.",
+      "Choose a component option instead of 'bg-pp-surface'.",
+      "Choose a component option instead of 'rounded-xl'.",
+    ]);
+  });
   it("permits narrow provider and artwork exceptions with reasons", () => {
     expect(inspectUiSource('<><input type="hidden" name="id" /><input type="file" /><button type="button" data-ui-exception="provider" className="bg-[#fee500]">Kakao</button></>', { controls: { provider: "Existing provider popup control" }, colors: { "bg-[#fee500]": "Kakao brand" } })).toEqual([]);
   });

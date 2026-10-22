@@ -111,7 +111,7 @@ All controls preserve native form, event, ref and ARIA properties. Shared compon
 | `IconButton` | `label` supplies an accessible name; default ghost appearance. Use for an actual icon-only action. |
 | `Input`, `Select`, `Textarea` | Native props plus `invalid` and `controlSize="compact" | "default"`. Keep file/hidden/checkbox/date/slider behavior explicit. |
 | `Field` | Caller-owned `id`, `label`, optional `help`/`error`, and one control child. Connects label, help and error IDs, preserving existing `aria-describedby`. |
-| `Surface` | `density="none" | "compact" | "default" | "roomy"`, optional `interactive`. Use a recipe on a real link/button when the whole card is actionable. |
+| `Surface` | `density="none" | "compact" | "default" | "comfortable" | "roomy"`, optional `interactive`. Use a recipe on a real link/button when the whole card is actionable. `density="none"` means the caller owns the padding: padding utilities (`px-4 py-3`) are allowed there and only there. `h-full` is allowed so cards in a grid row share one height. |
 | `Badge` | `tone="neutral" | "brand" | "success" | "warning" | "danger" | "info" | "cheer"`. Choose by meaning rather than decoration. |
 | `FilterChip` | `selected` maps to pressed state; keep filter selection logic in the owner. |
 | `SegmentedControl`, `SegmentedItem` | Labeled group with pressed-state buttons. Use for view switches; do not claim tab semantics without a real tabpanel relationship. |

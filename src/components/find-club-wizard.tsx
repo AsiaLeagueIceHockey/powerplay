@@ -438,7 +438,7 @@ export function FindClubWizard({ regions }: FindClubWizardProps) {
             {/* Browse all */}
             <Link
               href="/clubs"
-              className={`${buttonStyles({ variant: "primary", size: "default" })} mt-4`}
+              className={`${buttonStyles({ variant: "primary", size: "default", fullWidth: true })} mt-4`}
             >
               {t("result.viewAll")} →
             </Link>

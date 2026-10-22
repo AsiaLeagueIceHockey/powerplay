@@ -326,7 +326,7 @@ export function YouthClient({
   if (status === "pending") {
     return (
       <div data-ui-theme="youth" className="max-w-lg mx-auto py-12">
-        <div className={surfaceStyles({ density: "none" }) + " text-center space-y-6"}>
+        <div className={surfaceStyles({ density: "roomy" }) + " text-center space-y-6"}>
           <div className="w-16 h-16 bg-pp-warning-soft text-pp-warning-text rounded-full flex items-center justify-center mx-auto animate-pulse">
             <Clock size={36} />
           </div>
