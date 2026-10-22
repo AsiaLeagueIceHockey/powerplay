@@ -30,7 +30,8 @@
     },
     "error": "An error occurred.",
     "more": "See more",
-    "fold": "Fold"
+    "fold": "Fold",
+    "adLabel": "Ad"
   },
   "home": {
     "title": "Matches",

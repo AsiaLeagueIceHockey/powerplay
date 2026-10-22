@@ -1,6 +1,6 @@
 import { setRequestLocale } from "next-intl/server";
 import { getPublicHomeMatches } from "@/lib/public-matches";
-import { FeedbackBanner } from "@/components/feedback-banner";
+import { FeedbackBanner, HouseLinks } from "@/components/feedback-banner";
 import { HomeClient } from "@/components/home-client";
 import { PublicSectionTabs } from "@/components/public-section-tabs";
 import { Suspense } from "react";
@@ -93,6 +93,8 @@ export default async function HomePage({
       <Suspense fallback={<HomePageSkeleton />}>
         <HomeContent />
       </Suspense>
+
+      <HouseLinks />
 
       <div className="border-t border-pp-border pt-3 text-center text-[11px] text-pp-muted ">
         <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2">

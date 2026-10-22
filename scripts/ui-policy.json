@@ -113,12 +113,7 @@
       }
     },
     "src/components/birth-date-picker.tsx": {},
-    "src/components/bottom-nav.tsx": {
-      "colors": {
-        "text-[#f0b63a]": "Preserve the existing Lounge gold navigation accent.",
-        "dark:text-[#f6d895]": "Preserve the existing Lounge gold navigation accent."
-      }
-    },
+    "src/components/bottom-nav.tsx": {},
     "src/components/brand-logo.tsx": {},
     "src/components/calendar-view.tsx": {
       "controls": {

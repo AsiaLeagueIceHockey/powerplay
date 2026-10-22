@@ -3,7 +3,7 @@ import { setRequestLocale } from "next-intl/server";
 
 import { getCachedMatches, getCachedRinks, getRankedClubs } from "@/app/actions/cache";
 import { getMyClubVoteSummary } from "@/app/actions/clubs";
-import { FeedbackBanner } from "@/components/feedback-banner";
+import { FeedbackBanner, HouseLinks } from "@/components/feedback-banner";
 import { HomeClient } from "@/components/home-client";
 import { PublicSectionTabs } from "@/components/public-section-tabs";
 
@@ -80,6 +80,8 @@ export default async function ClubsDirectoryPage({
         clubVoteSummary={clubVoteSummary}
         forcedTab="club"
       />
+
+      <HouseLinks />
     </div>
   );
 }

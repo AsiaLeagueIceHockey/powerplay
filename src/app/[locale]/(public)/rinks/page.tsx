@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
 
 import { getCachedClubs, getCachedMatches } from "@/app/actions/cache";
-import { FeedbackBanner } from "@/components/feedback-banner";
+import { FeedbackBanner, HouseLinks } from "@/components/feedback-banner";
 import { FindClubBanner } from "@/components/find-club-banner";
 import { PublicSectionTabs } from "@/components/public-section-tabs";
 import { RinkExplorer } from "@/components/rink-explorer";
@@ -79,6 +79,8 @@ export default async function RinksDirectoryPage({
       <section>
         <RinkExplorer rinks={rinks} matches={matches} clubs={clubs} />
       </section>
+
+      <HouseLinks />
     </div>
   );
 }

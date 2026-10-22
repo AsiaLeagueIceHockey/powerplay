@@ -19,7 +19,7 @@ vi.mock("@/i18n/navigation", () => ({
 vi.mock("next-intl/server", () => ({ setRequestLocale: vi.fn() }));
 vi.mock("@/lib/public-matches", () => ({ getPublicHomeMatches: vi.fn() }));
 vi.mock("@/components/home-client", () => ({ HomeClient: () => null }));
-vi.mock("@/components/feedback-banner", () => ({ FeedbackBanner: () => null }));
+vi.mock("@/components/feedback-banner", () => ({ FeedbackBanner: () => null, HouseLinks: () => null }));
 vi.mock("@/components/find-club-banner", () => ({ FindClubBanner: () => null }));
 vi.mock("@/components/skeletons", () => ({ HomePageSkeleton: () => null }));
 
