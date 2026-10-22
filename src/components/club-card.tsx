@@ -145,7 +145,7 @@ export function ClubCard({
              {club.description && club.description.length > 50 && (
                 <button type="button"
                     onClick={toggleExpand}
-                    className={`${buttonStyles({ variant: "secondary", size: "compact" })} flex items-center gap-1 mt-1`}
+                    className={`${buttonStyles({ variant: "secondary", size: "compact" })} mt-1`}
                 >
                     {isExpanded ? (
                         <>

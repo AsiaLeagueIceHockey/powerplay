@@ -71,7 +71,7 @@ export function MatchCard({ match }: { match: Match }) {
         </div>
         <div className="flex items-center gap-1.5">
           {match.duration_minutes && (
-            <span className={`${badgeStyles({ tone: "neutral" })} whitespace-nowrap inline-block`}>
+            <span className={badgeStyles({ tone: "neutral" })}>
               {match.duration_minutes}{locale === "ko" ? "분" : "m"}
             </span>
           )}
@@ -161,7 +161,7 @@ export function MatchCard({ match }: { match: Match }) {
 
         {/* Rental Badge aligned to right */}
         {match.rental_available && (
-          <span className={`${badgeStyles({ tone: "brand" })} ml-auto whitespace-nowrap inline-block`}>
+          <span className={`${badgeStyles({ tone: "brand" })} ml-auto`}>
             + {t("rentalFee")} {match.rental_fee >= 0 ? `${match.rental_fee.toLocaleString()}원` : t("goalieFree")}
           </span>
         )}

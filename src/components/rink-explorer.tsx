@@ -157,7 +157,7 @@ export function RinkExplorer({ rinks, matches, clubs }: RinkExplorerProps) {
                                 <div className="grid grid-cols-2 gap-2">
                                     <Link
                                         href={`/rinks/${rink.id}`}
-                                        className={`${buttonStyles({ variant: "primary", size: "default" })} block w-full text-center `}
+                                        className={`${buttonStyles({ variant: "primary", size: "default" })} w-full`}
                                     >
                                         {locale === "ko" ? "링크장 상세" : "Rink details"}
                                     </Link>
@@ -165,7 +165,7 @@ export function RinkExplorer({ rinks, matches, clubs }: RinkExplorerProps) {
                                         href={rink.map_url || `https://map.naver.com/v5/search/${rink.name_ko}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className={`${buttonStyles({ variant: "naver", size: "default" })} block w-full text-center `}
+                                        className={`${buttonStyles({ variant: "naver", size: "default" })} w-full`}
                                     >
                                         {copy("naver")}</a>
                                 </div>
