@@ -50,3 +50,13 @@ Full test suite: 31 files / 209 tests passed. Typecheck, production build,
 warning on the daily page). The browser smoke check passed both real custom-font
 rendering and intentional missing-font rejection. Production monthly PNG was
 visually inspected, including a close-up of the heading and first two club names.
+
+## Linux CI result
+
+Automation checks passed for the exact font implementation commit `de7eb53`,
+including real custom Pretendard Korean/Latin glyph rendering, missing-font
+rejection, typecheck, strict automation lint, all 209 tests, and production build:
+https://github.com/AsiaLeagueIceHockey/powerplay/actions/runs/41292564054
+
+The same commit's `main` run also passed:
+https://github.com/AsiaLeagueIceHockey/powerplay/actions/runs/41292698941
