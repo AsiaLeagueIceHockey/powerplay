@@ -80,6 +80,7 @@ async function InstagramWeeklyContent({
 
   return (
     <div
+      data-instagram-story="weekly-matches"
       className="relative mx-auto flex flex-col items-center justify-start bg-[#ffffff] font-sans text-[#172554]"
       data-weekly-total-pages={totalPages}
       data-weekly-empty={isEmptyWeek ? "true" : "false"}
