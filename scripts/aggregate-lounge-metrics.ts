@@ -155,8 +155,7 @@ async function fetchAllRawMetrics(afterDate: string | null, beforeDateInclusive:
 
     const { data, error } = await query;
     if (error) {
-      console.error("Error fetching lounge_metrics:", error.message);
-      break;
+      throw new Error(`Failed to fetch lounge_metrics: ${error.message}`);
     }
 
     const rows = (data as RawMetricRow[]) ?? [];
@@ -176,7 +175,8 @@ async function getLastAggregatedDate(): Promise<string | null> {
     .order("date", { ascending: false })
     .limit(1);
 
-  if (error || !data || data.length === 0) return null;
+  if (error) throw new Error(`Failed to read aggregation cursor: ${error.message}`);
+  if (!data || data.length === 0) return null;
   return data[0].date;
 }
 
@@ -201,7 +201,7 @@ async function upsertDailyMetrics(
         .upsert(chunk, { onConflict: "business_id,date" });
 
       if (error) {
-        console.error(`Upsert error for business ${businessId}:`, error.message);
+        throw new Error(`Failed to aggregate business ${businessId}: ${error.message}`);
       } else {
         upsertCount += chunk.length;
       }
@@ -222,8 +222,7 @@ async function deleteOldLogs(): Promise<number> {
     .lt("created_at", cutoffIso);
 
   if (error) {
-    console.error("Error deleting old logs:", error.message);
-    return 0;
+    throw new Error(`Failed to delete old logs: ${error.message}`);
   }
 
   return count ?? 0;

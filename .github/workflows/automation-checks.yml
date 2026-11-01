@@ -1,0 +1,64 @@
+name: Automation checks
+
+on:
+  push:
+    paths:
+      - .github/workflows/**
+      - scripts/**
+      - tests/unit/automation-*.test.ts
+      - tests/unit/slack-webhook.test.ts
+      - tests/unit/lounge-aggregation.test.ts
+      - package*.json
+  pull_request:
+    paths:
+      - .github/workflows/**
+      - scripts/**
+      - tests/unit/automation-*.test.ts
+      - tests/unit/slack-webhook.test.ts
+      - tests/unit/lounge-aggregation.test.ts
+      - package*.json
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    # Playwright 1.58.2 supports Ubuntu 24.04, not ubuntu-latest's 26.04.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: https://ci-fixtures.invalid
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-fixture-no-access
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          cache: npm
+      - run: npm ci --legacy-peer-deps
+      - run: npx playwright install --with-deps chromium
+      - name: Verify browser can launch and render
+        run: |
+          node --input-type=module <<'JS'
+          import { chromium } from 'playwright';
+          const browser = await chromium.launch({ headless: true });
+          try {
+            const page = await browser.newPage();
+            await page.setContent('<h1>PowerPlay automation smoke check</h1>');
+            if (await page.locator('h1').textContent() !== 'PowerPlay automation smoke check') {
+              throw new Error('Chromium failed to render');
+            }
+          } finally {
+            await browser.close();
+          }
+          JS
+      - run: npm run typecheck
+      - name: Lint automation sources (strict)
+        run: >-
+          npx eslint scripts/capture-club-ranking.ts scripts/capture-instagram-story.ts
+          scripts/capture-instagram-weekly.ts scripts/aggregate-lounge-metrics.ts
+          scripts/lib/ tests/unit/automation-dates.test.ts
+          tests/unit/slack-webhook.test.ts tests/unit/lounge-aggregation.test.ts
+      - run: npm test
+      - run: npm run build

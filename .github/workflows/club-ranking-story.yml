@@ -2,28 +2,33 @@ name: Monthly Club Ranking Instagram Story
 
 on:
   schedule:
-    # 매월 28~31일 22:00 KST (13:00 UTC) 트리거.
-    # 스크립트가 KST 마지막 날인지 검사 후 진행/스킵.
-    - cron: "0 13 28-31 * *"
+    # 매월 1일 09:17 KST (00:17 UTC): 전월 투표가 모두 끝난 뒤 캡처.
+    # UTC/KST 자정과 혼잡한 정각을 피하고 지연 실행에도 전월을 사용.
+    - cron: "17 0 1 * *"
   workflow_dispatch:
     inputs:
       target_month:
-        description: "캡처할 월 (YYYY-MM, 예: 2026-04). 비워두면 KST 기준 이번 달."
+        description: "캡처할 월 (YYYY-MM, 예: 2026-04). 비워두면 KST 기준 전월 (마감된 월)."
         required: false
         type: string
 
+permissions:
+  contents: read
+
 jobs:
   capture:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
-          node-version: "20"
+          node-version: "24"
+          cache: npm
 
       - name: Install Dependencies
         run: npm ci --legacy-peer-deps
@@ -39,6 +44,15 @@ jobs:
           TARGET_MONTH: ${{ github.event.inputs.target_month }}
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: npx tsx scripts/capture-club-ranking.ts
+
+      - name: Preserve generated stories
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: instagram-stories-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/instagram/
+          if-no-files-found: ignore
+          retention-days: 30
 
       - name: Ping Better Stack heartbeat
         if: ${{ success() }}

@@ -1,3 +1,5 @@
+import { postSlackBlocks } from "./lib/slack-webhook";
+import { writeStoryArtifact } from "./lib/story-artifact";
 import { chromium } from "playwright";
 import { createClient } from "@supabase/supabase-js";
 import sharp from "sharp";
@@ -114,7 +116,8 @@ async function run() {
     const probePage = await probeContext.newPage();
     const probeUrl = `${SITE_URL}/ko/instagram/weekly-matches?weekStart=${weekStart}&page=1`;
     console.log(`Probing totalPages from: ${probeUrl}`);
-    await probePage.goto(probeUrl, { waitUntil: "load", timeout: 60000 });
+    const probeResponse = await probePage.goto(probeUrl, { waitUntil: "load", timeout: 60000 });
+    if (!probeResponse?.ok()) throw new Error(`Weekly probe returned HTTP ${probeResponse?.status()}`);
     await probePage.evaluate(async () => {
       await document.fonts.ready;
     });
@@ -123,7 +126,7 @@ async function run() {
       const root = document.querySelector(
         "[data-weekly-total-pages]"
       ) as HTMLElement | null;
-      if (!root) return { totalPages: 0, empty: true };
+      if (!root) throw new Error("Weekly capture metadata is missing");
       return {
         totalPages: parseInt(root.dataset.weeklyTotalPages ?? "0", 10),
         empty: root.dataset.weeklyEmpty === "true",
@@ -151,7 +154,8 @@ async function run() {
       const url = `${SITE_URL}/ko/instagram/weekly-matches?weekStart=${weekStart}&page=${pageNum}`;
       console.log(`Navigating to: ${url}`);
 
-      await page.goto(url, { waitUntil: "load", timeout: 60000 });
+      const response = await page.goto(url, { waitUntil: "load", timeout: 60000 });
+      if (!response?.ok()) throw new Error(`Capture page returned HTTP ${response?.status()}`);
       await page.evaluate(async () => {
         await document.fonts.ready;
       });
@@ -177,6 +181,7 @@ async function run() {
 
       // 업로드: instagram-stories/weekly/{weekStart}/page-{n}.png
       const fileName = `weekly/${weekStart}/page-${pageNum}.png`;
+      await writeStoryArtifact(fileName, screenshotBuffer);
       console.log(`Uploading to Supabase: instagram-stories/${fileName}`);
 
       const { data, error: uploadError } = await supabase.storage
@@ -209,7 +214,7 @@ async function run() {
   } catch (err) {
     console.error("Capture failed:", err);
     await sendFailureSlack(weekStart, err);
-    process.exit(1);
+    throw err;
   } finally {
     await browser.close();
   }
@@ -253,21 +258,7 @@ async function sendSlackNotification(weekStart: string, urls: string[]) {
     });
   });
 
-  try {
-    const res = await fetch(webhookUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ blocks }),
-    });
-    if (!res.ok) {
-      const body = await res.text();
-      console.error(`Slack notification failed: ${res.status} ${body}`);
-    } else {
-      console.log("Slack notification sent.");
-    }
-  } catch (err) {
-    console.error("Slack notification error:", err);
-  }
+  await postSlackBlocks(webhookUrl, blocks);
 }
 
 // ───── Slack: 빈 주 알림 ─────
@@ -298,21 +289,7 @@ async function sendEmptyWeekSlack(weekStart: string) {
     },
   ];
 
-  try {
-    const res = await fetch(webhookUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ blocks }),
-    });
-    if (!res.ok) {
-      const body = await res.text();
-      console.error(`Empty-week Slack failed: ${res.status} ${body}`);
-    } else {
-      console.log("Empty-week Slack sent.");
-    }
-  } catch (err) {
-    console.error("Empty-week Slack error:", err);
-  }
+  await postSlackBlocks(webhookUrl, blocks);
 }
 
 // ───── Slack: 실패 알림 ─────
@@ -327,6 +304,7 @@ async function sendFailureSlack(weekStart: string, err: unknown) {
     await fetch(webhookUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      signal: AbortSignal.timeout(15_000),
       body: JSON.stringify({
         blocks: [
           {
@@ -349,4 +327,7 @@ async function sendFailureSlack(weekStart: string, err: unknown) {
   }
 }
 
-run();
+run().catch((error: unknown) => {
+  console.error("Story capture failed:", error);
+  process.exitCode = 1;
+});

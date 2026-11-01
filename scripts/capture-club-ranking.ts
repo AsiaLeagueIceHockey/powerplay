@@ -1,5 +1,8 @@
+import { postSlackBlocks } from "./lib/slack-webhook";
+import { writeStoryArtifact } from "./lib/story-artifact";
 import { chromium } from "playwright";
 import { createClient } from "@supabase/supabase-js";
+import { resolveRankingMonth } from "./lib/automation-dates";
 
 // Load environment variables
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -18,31 +21,6 @@ interface ClubVoteTotalRow {
   vote_count: number | string | null;
 }
 
-const MONTH_KEY_REGEX = /^\d{4}-(0[1-9]|1[0-2])$/;
-
-function getKstParts(date: Date): { year: number; month: number; day: number; lastDay: number } {
-  const formatter = new Intl.DateTimeFormat("en-CA", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    timeZone: "Asia/Seoul",
-  });
-  const parts = formatter.formatToParts(date);
-  const year = Number(parts.find((p) => p.type === "year")?.value);
-  const month = Number(parts.find((p) => p.type === "month")?.value);
-  const day = Number(parts.find((p) => p.type === "day")?.value);
-  // last day of the same KST month
-  const nextMonthDate = new Date(Date.UTC(year, month, 1));
-  const lastDayDate = new Date(nextMonthDate.getTime() - 24 * 60 * 60 * 1000);
-  const lastDay = lastDayDate.getUTCDate();
-  return { year, month, day, lastDay };
-}
-
-function kstMonthKey(date: Date): string {
-  const { year, month } = getKstParts(date);
-  return `${year}-${String(month).padStart(2, "0")}`;
-}
-
 function buildMonthLabel(monthKey: string): string {
   const [year, month] = monthKey.split("-").map(Number);
   return `${year}년 ${month}월`;
@@ -51,34 +29,10 @@ function buildMonthLabel(monthKey: string): string {
 async function run() {
   console.log("Starting Instagram Club Ranking Capture...");
 
-  // 1. Determine target month
-  const envTargetMonth = process.env.TARGET_MONTH?.trim();
-  const isManualRun = Boolean(envTargetMonth);
-
-  let targetMonth: string;
-  if (envTargetMonth) {
-    if (!MONTH_KEY_REGEX.test(envTargetMonth)) {
-      console.error(`Invalid TARGET_MONTH format: ${envTargetMonth} (expected YYYY-MM)`);
-      process.exit(1);
-    }
-    targetMonth = envTargetMonth;
-    console.log(`Using provided target month (manual): ${targetMonth}`);
-  } else {
-    targetMonth = kstMonthKey(new Date());
-    console.log(`Using default target month (KST current month): ${targetMonth}`);
-  }
-
-  // 2. Last-day guard (skipped on manual workflow_dispatch)
-  if (!isManualRun) {
-    const { day, lastDay } = getKstParts(new Date());
-    if (day !== lastDay) {
-      console.log(
-        `Today is KST day ${day}, not the last day of month (${lastDay}). Skipping (cron safeguard).`
-      );
-      process.exit(0);
-    }
-    console.log(`Today is KST last day of month (${day}/${lastDay}); proceeding.`);
-  }
+  // Capture a completed KST month, including when a scheduled job starts late.
+  // An explicit TARGET_MONTH permits historical regeneration on any date.
+  const targetMonth = resolveRankingMonth(process.env.TARGET_MONTH);
+  console.log(`Target month (KST): ${targetMonth}`);
 
   // 3. Vote count guard — skip capture if no votes for the month
   const { data: voteTotals, error: voteError } = await supabase.rpc(
@@ -142,7 +96,8 @@ async function run() {
     const url = `${SITE_URL}/ko/instagram/club-ranking?month=${targetMonth}`;
     console.log(`Navigating to: ${url}`);
 
-    await page.goto(url, { waitUntil: "load", timeout: 60000 });
+    const response = await page.goto(url, { waitUntil: "load", timeout: 60000 });
+    if (!response?.ok()) throw new Error(`Capture page returned HTTP ${response?.status()}`);
     await page.evaluate(async () => {
       await document.fonts.ready;
     });
@@ -155,6 +110,7 @@ async function run() {
 
     // 5. Upload to Supabase Storage
     const fileName = `club-ranking/${targetMonth}.png`;
+    await writeStoryArtifact(fileName, screenshotBuffer);
     console.log(`Uploading to Supabase: instagram-stories/${fileName}`);
 
     const { data, error: uploadError } = await supabase.storage
@@ -185,7 +141,7 @@ async function run() {
     console.log("\nCapture completed successfully.");
   } catch (error) {
     console.error("Capture failed:", error);
-    process.exit(1);
+    throw error;
   } finally {
     await browser.close();
   }
@@ -226,21 +182,7 @@ async function sendSlackNotification(monthKey: string, publicUrl: string) {
     },
   ];
 
-  try {
-    const res = await fetch(webhookUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ blocks }),
-    });
-    if (!res.ok) {
-      const body = await res.text();
-      console.error(`Slack notification failed: ${res.status} ${body}`);
-    } else {
-      console.log("Slack notification sent.");
-    }
-  } catch (err) {
-    console.error("Slack notification error:", err);
-  }
+  await postSlackBlocks(webhookUrl, blocks);
 }
 
 async function sendSlackEmptyNotice(monthKey: string) {
@@ -264,23 +206,10 @@ async function sendSlackEmptyNotice(monthKey: string) {
     },
   ];
 
-  try {
-    const res = await fetch(webhookUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ blocks }),
-    });
-    if (!res.ok) {
-      const body = await res.text();
-      console.error(
-        `Slack empty-state notification failed: ${res.status} ${body}`
-      );
-    } else {
-      console.log("Slack empty-state notification sent.");
-    }
-  } catch (err) {
-    console.error("Slack empty-state notification error:", err);
-  }
+  await postSlackBlocks(webhookUrl, blocks);
 }
 
-run();
+run().catch((error: unknown) => {
+  console.error("Club ranking capture failed:", error);
+  process.exitCode = 1;
+});

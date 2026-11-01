@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import {
   filterSuperuserMatches,
   getSuperuserMatchDisplayStatus,
@@ -60,6 +60,11 @@ const MATCHES: SuperuserMatchSummary[] = [
 ];
 
 describe("superuser-match-filters", () => {
+  beforeEach(() => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-03-23T00:00:00.000Z"));
+  });
+  afterEach(() => vi.useRealTimers());
   it("searches across rink, creator, club, description, and bank account", () => {
     expect(
       filterSuperuserMatches(MATCHES, {
@@ -97,8 +102,6 @@ describe("superuser-match-filters", () => {
   });
 
   it("treats past matches as finished for filtering", () => {
-    vi.useFakeTimers();
-    vi.setSystemTime(new Date("2026-03-23T00:00:00.000Z"));
 
     expect(getSuperuserMatchDisplayStatus(MATCHES[0].start_time, MATCHES[0].status)).toBe("finished");
 
@@ -110,6 +113,5 @@ describe("superuser-match-filters", () => {
       }).map((match) => match.id)
     ).toEqual(["m1"]);
 
-    vi.useRealTimers();
   });
 });
