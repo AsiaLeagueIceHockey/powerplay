@@ -1,3 +1,5 @@
+import { postSlackBlocks } from "./lib/slack-webhook";
+import { writeStoryArtifact } from "./lib/story-artifact";
 import { chromium } from "playwright";
 import { createClient } from "@supabase/supabase-js";
 
@@ -106,7 +108,8 @@ async function run() {
       // The public layout opens persistent analytics and navigation requests,
       // so networkidle can never settle in GitHub Actions. The capture route is
       // server-rendered; wait for its document and fonts instead.
-      await page.goto(url, { waitUntil: "load", timeout: 60000 });
+      const response = await page.goto(url, { waitUntil: "load", timeout: 60000 });
+      if (!response?.ok()) throw new Error(`Capture page returned HTTP ${response?.status()}`);
       await page.evaluate(async () => {
         await document.fonts.ready;
       });
@@ -120,6 +123,7 @@ async function run() {
 
       // Upload to Supabase Storage
       const fileName = `${targetDateStr}/story-${pageNum}.png`;
+      await writeStoryArtifact(fileName, screenshotBuffer);
       console.log(`Uploading to Supabase: instagram-stories/${fileName}`);
 
       const { data, error: uploadError } = await supabase.storage
@@ -153,7 +157,7 @@ async function run() {
     await sendSlackNotification(targetDateStr, uploadedUrls);
   } catch (error) {
     console.error("Capture failed:", error);
-    process.exit(1);
+    throw error;
   } finally {
     await browser.close();
   }
@@ -196,21 +200,10 @@ async function sendSlackNotification(date: string, urls: string[]) {
     });
   });
 
-  try {
-    const res = await fetch(webhookUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ blocks }),
-    });
-    if (!res.ok) {
-      const body = await res.text();
-      console.error(`Slack notification failed: ${res.status} ${body}`);
-    } else {
-      console.log("Slack notification sent.");
-    }
-  } catch (err) {
-    console.error("Slack notification error:", err);
-  }
+  await postSlackBlocks(webhookUrl, blocks);
 }
 
-run();
+run().catch((error: unknown) => {
+  console.error("Story capture failed:", error);
+  process.exitCode = 1;
+});

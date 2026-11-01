@@ -53,3 +53,6 @@ public/sw*
 /.omx/state/
 /.omx/metrics.json
 /.omx/notepad.md
+
+# CI story screenshots
+/artifacts/instagram/

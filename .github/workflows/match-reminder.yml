@@ -5,16 +5,25 @@ on:
     - cron: "0 11 * * *" # 11:00 UTC = 20:00 KST
   workflow_dispatch: # 수동 실행 가능
 
+permissions:
+  contents: read
+
 jobs:
   send-reminder:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
     steps:
       - name: Call match reminder endpoint
+        env:
+          APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
-          # --fail-with-body: 4xx/5xx 도 응답 body 출력 후 fail (기존 -f 는 silent fail)
-          curl --fail-with-body -sS -X GET \
-            "${{ secrets.NEXT_PUBLIC_APP_URL }}/api/cron/match-reminder" \
-            -H "x-cron-secret: ${{ secrets.CRON_SECRET }}" \
+          : "${APP_URL:?NEXT_PUBLIC_APP_URL is required}"
+          : "${CRON_SECRET:?CRON_SECRET is required}"
+          # 재시도는 중복 발송 위험이 있어 사용하지 않는다.
+          curl --fail-with-body --silent --show-error --connect-timeout 10 --max-time 180 -X GET \
+            "${APP_URL%/}/api/cron/match-reminder" \
+            -H "x-cron-secret: ${CRON_SECRET}" \
             -H "Content-Type: application/json"
 
       - name: Ping Better Stack heartbeat

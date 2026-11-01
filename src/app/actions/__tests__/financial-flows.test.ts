@@ -1,5 +1,5 @@
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { mockSupabase, resetSupabaseMock, createChainableMock } from '../../../../tests/mocks/supabase';
 import { joinMatch, cancelJoin } from '../match';
 import { confirmPointCharge } from '../superuser';
@@ -44,7 +44,11 @@ describe('Financial Flows', () => {
   let transactionsMock: any;
   let requestsMock: any;
 
+  afterEach(() => vi.useRealTimers());
+
   beforeEach(() => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-02-01T00:00:00Z'));
     resetSupabaseMock();
     
     // Create fresh chains for each table
@@ -78,7 +82,7 @@ describe('Financial Flows', () => {
       
       // Match info (Entry: 10,000, Open)
       matchesMock.single.mockResolvedValue({
-        data: { entry_points: 10000, status: 'open', goalie_free: false, id: mockMatchId, start_time: new Date().toISOString(), created_by: 'admin-1', rink: { name_ko: 'Rink' } }
+        data: { entry_points: 10000, status: 'open', goalie_free: false, id: mockMatchId, start_time: '2026-03-01T13:00:00Z', created_by: 'admin-1', rink: { name_ko: 'Rink' } }
       });
       
       // User Points (Has 20,000)
@@ -130,7 +134,7 @@ describe('Financial Flows', () => {
     it('Scenario 3: Goalie Free -> Confirmed (0 Points)', async () => {
       participantsMock.single.mockResolvedValue({ data: null });
       matchesMock.single.mockResolvedValue({
-        data: { entry_points: 10000, status: 'open', goalie_free: true, id: mockMatchId, start_time: new Date().toISOString() }
+        data: { entry_points: 10000, status: 'open', goalie_free: true, id: mockMatchId, start_time: '2026-03-01T13:00:00Z' }
       });
       profilesMock.single.mockResolvedValue({
         data: { points: 0 }
@@ -270,7 +274,7 @@ describe('Financial Flows', () => {
         data: { id: 'p-leaving', status: 'confirmed', position: 'FW' }
       });
       matchesMock.single.mockResolvedValue({
-        data: { entry_points: 10000, start_time: new Date().toISOString(), goalie_free: false, rink: { name_ko: 'Test Rink' } }
+        data: { entry_points: 10000, start_time: '2026-03-01T13:00:00Z', goalie_free: false, rink: { name_ko: 'Test Rink' } }
       });
       profilesMock.single.mockResolvedValue({
         data: { points: 0 } // cancelled user parts
@@ -329,7 +333,7 @@ describe('Financial Flows', () => {
     it('Refund: cancelMatchByAdmin refunds confirmed users', async () => {
       // 1. Setup: Confirmed user exists
       matchesMock.single.mockResolvedValue({
-        data: { entry_points: 10000, start_time: new Date().toISOString(), rink: { name_ko: 'Rink' } }
+        data: { entry_points: 10000, start_time: '2026-03-01T13:00:00Z', rink: { name_ko: 'Rink' } }
       });
 
       const mockParticipant = { user_id: 'p-user', status: 'confirmed', entry_points: 0 };

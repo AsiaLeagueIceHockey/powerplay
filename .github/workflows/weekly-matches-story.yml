@@ -12,18 +12,23 @@ on:
         required: false
         type: string
 
+permissions:
+  contents: read
+
 jobs:
   capture-and-upload:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
-          node-version: "20"
+          node-version: "24"
+          cache: npm
 
       - name: Install Dependencies
         run: npm ci --legacy-peer-deps
@@ -39,6 +44,15 @@ jobs:
           TARGET_WEEK_START: ${{ github.event.inputs.target_week_start }}
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: npx tsx scripts/capture-instagram-weekly.ts
+
+      - name: Preserve generated stories
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: instagram-stories-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/instagram/
+          if-no-files-found: ignore
+          retention-days: 30
 
       - name: Ping Better Stack heartbeat
         if: ${{ success() }}
