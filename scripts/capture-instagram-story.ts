@@ -1,3 +1,4 @@
+import { waitForStoryFonts } from "./lib/story-fonts";
 import { postSlackBlocks } from "./lib/slack-webhook";
 import { writeStoryArtifact } from "./lib/story-artifact";
 import { chromium } from "playwright";
@@ -110,9 +111,7 @@ async function run() {
       // server-rendered; wait for its document and fonts instead.
       const response = await page.goto(url, { waitUntil: "load", timeout: 60000 });
       if (!response?.ok()) throw new Error(`Capture page returned HTTP ${response?.status()}`);
-      await page.evaluate(async () => {
-        await document.fonts.ready;
-      });
+      await waitForStoryFonts(page);
 
       // Take screenshot
       const screenshotBuffer = await page.screenshot({

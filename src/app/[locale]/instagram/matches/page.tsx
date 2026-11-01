@@ -37,6 +37,7 @@ async function InstagramStoryContent({ locale, date, page = "1" }: { locale: str
 
   return (
     <div 
+      data-instagram-story="matches"
       className="flex flex-col bg-[#ffffff] text-[#172554] relative items-center justify-start overflow-hidden mx-auto font-sans"
       style={{
         width: "1080px",

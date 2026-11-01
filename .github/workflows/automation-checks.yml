@@ -8,6 +8,8 @@ on:
       - tests/unit/automation-*.test.ts
       - tests/unit/slack-webhook.test.ts
       - tests/unit/lounge-aggregation.test.ts
+      - public/fonts/pretendard/**
+      - src/app/**/instagram/**
       - package*.json
   pull_request:
     paths:
@@ -16,6 +18,8 @@ on:
       - tests/unit/automation-*.test.ts
       - tests/unit/slack-webhook.test.ts
       - tests/unit/lounge-aggregation.test.ts
+      - public/fonts/pretendard/**
+      - src/app/**/instagram/**
       - package*.json
   workflow_dispatch:
 
@@ -53,12 +57,14 @@ jobs:
             await browser.close();
           }
           JS
+      - name: Verify bundled Korean story fonts
+        run: npx tsx scripts/check-story-fonts.ts
       - run: npm run typecheck
       - name: Lint automation sources (strict)
         run: >-
           npx eslint scripts/capture-club-ranking.ts scripts/capture-instagram-story.ts
           scripts/capture-instagram-weekly.ts scripts/aggregate-lounge-metrics.ts
-          scripts/lib/ tests/unit/automation-dates.test.ts
+          scripts/lib/ scripts/check-story-fonts.ts tests/unit/automation-dates.test.ts
           tests/unit/slack-webhook.test.ts tests/unit/lounge-aggregation.test.ts
       - run: npm test
       - run: npm run build

@@ -1,3 +1,4 @@
+import { waitForStoryFonts } from "./lib/story-fonts";
 import { postSlackBlocks } from "./lib/slack-webhook";
 import { writeStoryArtifact } from "./lib/story-artifact";
 import { chromium } from "playwright";
@@ -118,9 +119,7 @@ async function run() {
     console.log(`Probing totalPages from: ${probeUrl}`);
     const probeResponse = await probePage.goto(probeUrl, { waitUntil: "load", timeout: 60000 });
     if (!probeResponse?.ok()) throw new Error(`Weekly probe returned HTTP ${probeResponse?.status()}`);
-    await probePage.evaluate(async () => {
-      await document.fonts.ready;
-    });
+    await waitForStoryFonts(probePage);
 
     const probeMeta = await probePage.evaluate(() => {
       const root = document.querySelector(
@@ -156,9 +155,7 @@ async function run() {
 
       const response = await page.goto(url, { waitUntil: "load", timeout: 60000 });
       if (!response?.ok()) throw new Error(`Capture page returned HTTP ${response?.status()}`);
-      await page.evaluate(async () => {
-        await document.fonts.ready;
-      });
+      await waitForStoryFonts(page);
 
       const screenshotBuffer = await page.screenshot({
         type: "png",
