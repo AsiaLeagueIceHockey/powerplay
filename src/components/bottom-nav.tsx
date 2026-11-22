@@ -33,9 +33,9 @@ export function BottomNav({ locale }: { locale: string }) {
 
     // 1. Capture-phase focus/blur listeners (extremely reliable across Safari/Chrome and Webviews)
     const handleFocus = (e: FocusEvent) => {
-      const target = e.target as HTMLElement;
+      const target = e.target;
       if (
-        target &&
+        target instanceof Element &&
         (target.tagName === "INPUT" ||
           target.tagName === "TEXTAREA" ||
           target.getAttribute("contenteditable") === "true")
